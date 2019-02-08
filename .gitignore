@@ -1,0 +1,8 @@
+*.optrpt
+*.orig*
+*~*
+*#*
+*.o
+src/see
+src/run
+

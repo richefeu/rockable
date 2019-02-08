@@ -1,0 +1,6 @@
+/**
+@mainpage My common header-only c++ tools
+
+This folder contains header-only c++ tools used by most of the codes in the folder mbox.
+
+*/
