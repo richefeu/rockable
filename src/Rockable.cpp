@@ -1,15 +1,19 @@
-// Copyright (C) Rockable <vincent.richefeu@3sr-grenoble.fr>
-//
-// This file is part of mbox.
-//
-// Rockable can not be copied and/or distributed without the express
-// permission of the authors.
-// It is coded for academic purposes.
-//
-// Note
-// Without a license, the code is copyrighted by default.
-// People can read the code, but they have no legal right to use it.
-// To use the code, you must contact the author directly and ask permission.
+//        Rockable, 3D-DEM with sphero-polyhedra
+//        Copyright (C) 2016-2019  <vincent.richefeu@3sr-grenoble.fr>
+//        
+//        This program is free software: you can redistribute it and/or modify
+//        it under the terms of the GNU General Public License as published by
+//        the Free Software Foundation, either version 3 of the License, or
+//        (at your option) any later version.
+//        
+//        This program is distributed in the hope that it will be useful,
+//        but WITHOUT ANY WARRANTY; without even the implied warranty of
+//        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//        GNU General Public License for more details.
+//        
+//        You should have received a copy of the GNU General Public License
+//        along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 
 #define CONF_VERSION_DATE "29-11-2018"
 #include "Rockable.hpp"
@@ -111,17 +115,12 @@ bool Rockable::isInteractive() const { return interactiveMode; }
 void Rockable::showBanner() {
   std::cout << std::endl;
   std::cout << std::endl;
-  std::cout << "ROCKABLE (2017-2018)\n";
-  std::cout << "A DEM code that rocks the rocks!\n";
-  std::cout << "      ... with sphero-polyhedra\n";
+  
+  std::cout << "Rockable  Copyright (C) 2016-2019  <vincent.richefeu@3sr-grenoble.fr>\n";
+  std::cout << "This program comes with ABSOLUTELY NO WARRANTY.\n";
+  std::cout << "This is academic software\n";
   std::cout << "Documentation: "
-               "https://richefeu.gitbook.io/cdm/\n";
-  std::cout << "<Vincent.Richefeu@3sr-grenoble.fr>\n\n";
-
-  std::cout << "SVN revision number: " << SVN_REV << '\n';
-  std::cout << "Compilation (of the file Rockable.cpp)\n";
-  std::cout << "    date: " << __DATE__ << '\n';
-  std::cout << "    time: " << __TIME__ << '\n';
+               "https://richefeu.gitbook.io/cdm/\n\n";
 
   std::cout << std::endl;
   std::cout << "Compilation options:\n";
