@@ -163,18 +163,18 @@ void Rockable::initialChecks() {
             << "Considering a single contact between two particles\n"
                "        (this can be done by using a 'ContactPartnership')\n"
                "  dt_critical / dt = "
-            << dtc / dt << " (estimated)" << /*msg::normal() <<*/ std::endl;
+            << dtc / dt << " (estimated)" << std::endl;
 
   getCriticalTimeStep(dtc);
   if (dtc > 0.0) {
-    std::cout << /*msg::info() <<*/ "  dt_critical / dt = " << dtc / dt
-              << " (over ALL Interactions)" /*<< msg::normal()*/
+    std::cout <<  "  dt_critical / dt = " << dtc / dt
+              << " (over ALL Interactions)" 
               << std::endl;
   }
 
   getCurrentCriticalTimeStep(dtc);
   if (dtc > 0.0) {
-    std::cout << /*msg::info() <<*/ "  dt_critical / dt = " << dtc / dt << " (over ACTIVE Interactions)"
+    std::cout << "  dt_critical / dt = " << dtc / dt << " (over ACTIVE Interactions)"
               << msg::normal() << std::endl;
   }
 }
