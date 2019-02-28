@@ -33,8 +33,6 @@
 #  The fact that you are presently reading this means that you have had
 #  knowledge of the CeCILL-B license and that you accept its terms.
 #######################################################################################################################
-# get the svn revision number
-SVNDEV := -D'SVN_REV="$(shell svnversion -n .)"'
 
 # An option can be disable by adding 'n' before
 OPTIONS = -DQUAT_ACC -DnFT_CORR -DnROT_MATRIX -DnBREAK_ONCE
@@ -47,14 +45,14 @@ ifeq ($(UNAME_S),Darwin)
   # The compiler to be used
   CXX = g++-8
   # The list of flags passed to the compiler
-  CXXFLAGS = -fopenmp -O3 -Wall -Wextra -Wno-deprecated-declarations -std=c++11 -I $(COMMONPATH) $(OPTIONS) $(SVNDEV)
+  CXXFLAGS = -fopenmp -O3 -Wall -Wextra -Wno-deprecated-declarations -std=c++11 -I $(COMMONPATH) $(OPTIONS)
   # Link flags for OpenGL and glut
   GLLINK = -framework OpenGL -framework GLUT
 else
   # The compiler to be used
   CXX = g++
   # The list of flags passed to the compiler
-  CXXFLAGS = -fopenmp -O3 -std=c++0x -I $(COMMONPATH) $(OPTIONS) $(SVNDEV)
+  CXXFLAGS = -fopenmp -O3 -std=c++0x -I $(COMMONPATH) $(OPTIONS)
   # Link flags for OpenGL and glut
   GLLINK = -lGLU -lGL -L/usr/X11R6/lib -lglut -lXmu -lXext -lX11 -lXi
 endif
