@@ -179,13 +179,13 @@ void Rockable::initialChecks() {
   estimateCriticalTimeStep(dtc);
   std::cout << msg::info()
             << "Considering a single contact between two particles\n"
-               "        (this can be done by using a 'ContactPartnership')\n"
+               "  (this can be done by using a 'ContactPartnership')\n"
                "  dt_critical / dt = "
             << dtc / dt << " (estimated)" << std::endl;
 
   getCriticalTimeStep(dtc);
   if (dtc > 0.0) {
-    std::cout <<  "  dt_critical / dt = " << dtc / dt
+    std::cout << "  dt_critical / dt = " << dtc / dt
               << " (over ALL Interactions)" 
               << std::endl;
   }
@@ -3042,32 +3042,4 @@ void Rockable::particlesClonage(size_t idFirst, size_t idLast, vec3r& translatio
   if (Interfaces.size() != Particles.size()) Interfaces.resize(Particles.size());
 }
 
-/*
-// METTRE DANS PERIODIC CELL
 
-//                  xpj'
-//   +-----------+
-//   |     |  xpi|
-//   ------+------
-//   | xpj |     |
-//   +-----------+
-// Return vector from pi to pj, but
-// if a component of this vector is longer than half a period length (in each
-direction),
-// then the period length in the corresponding direction is substracted
-// (the vector from pi to pj' is returned)
-vec3r relativePosition(vec3r pj, vec3r pi) const
-{
-        // Here we suppose that hinv has been updated
-        // and we get the adimentionned position of i and j
-        vec3r pi_ = hinv * pi;
-        vec3r pj_ = hinv * pj;
-
-        vec3r sij = pj - pi;
-        sij.x -= floor(sij.x + 0.5);
-        sij.y -= floor(sij.y + 0.5);
-        sij.z -= floor(sij.z + 0.5);
-        return (h * sij);
-}
-
-*/
