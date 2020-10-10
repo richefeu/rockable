@@ -144,6 +144,7 @@ class Rockable {
   vec3r cellMinSizes;      ///< Sizes of the linked cells in the 3 directions x, y ad z
   int boxForLinkCellsOpt;  ///< Option for defining the master cell when linkCells' stategy in employed
 
+
   // Ctor
   Rockable();
 

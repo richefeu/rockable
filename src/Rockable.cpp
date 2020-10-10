@@ -1380,6 +1380,12 @@ void Rockable::getInteractingGroups(Interaction& I, int& g1, int& g2) {
   g2 = Particles[I.j].group;
 }
 
+/*
+bool Rockable::forceLawGravitation(Interaction& I) {
+  
+}
+*/
+
 /**
     @brief   Force-law used for rock avalanches at Laboratoire 3SR
     @return  Return true if the interaction is active (ie. with a non-zero force)
