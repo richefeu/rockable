@@ -75,6 +75,7 @@ DataExtractor_TrackBody.cpp \
 DataExtractor_ClusterAABB.cpp \
 DataExtractor_dnStat.cpp \
 DataExtractor_DuoBalance.cpp \
+DataExtractor_MeanVelocity.cpp \
 BodyForce.cpp \
 BodyForce_PreferredDirection.cpp \
 BodyForce_AttractingPoint.cpp
