@@ -43,7 +43,7 @@ COMMONPATH = ../common
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
   # The compiler to be used
-  CXX = g++-8
+  CXX = g++-10
   # The list of flags passed to the compiler
   CXXFLAGS = -fopenmp -O3 -Wall -Wextra -Wno-deprecated-declarations -std=c++11 -I $(COMMONPATH) $(OPTIONS)
   # Link flags for OpenGL and glut
@@ -59,8 +59,8 @@ endif
 
 # If you don't want to use libpng in 'see', comment this two lines
 # In this case the screenshots will be TGA (not compressed)
-OPTIONS += -DPNG_SCREENSHOTS
-GLLINK += -lpng
+#OPTIONS += -DPNG_SCREENSHOTS
+#GLLINK += -lpng
 
 # The list of source files needed by Rockable
 SOURCES = Shape.cpp \
