@@ -255,8 +255,7 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
     [](Interaction& I, Particle& Pi, Particle& Pj) -> bool {
 #define _EPSILON_VALUE_ 1.0e-12
       // Be carreful about this small value because, if it is not
-      // sufficiently small, some edges (tubes) couldn't see them each
-      // other.
+      // sufficiently small, some edges (tubes) may not see them each other.
 
       vec3r posi1 = Pi.GlobVertex(Pi.shape->edge[I.isub].first);
       vec3r posi2 = Pi.GlobVertex(Pi.shape->edge[I.isub].second);

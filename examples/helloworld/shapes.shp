@@ -1,0 +1,62 @@
+<
+name Plan
+radius 0.05
+preCompDone y
+nv 4
+2 0 0.5
+2 0 -0.5
+-2 0 -0.5
+-2 0 0.5
+ne 4
+0 1
+1 2
+2 3
+3 0
+nf 1
+4 0 1 2 3
+obb.extent 2.0 0.05 0.5
+obb.e1 1 0 0
+obb.e2 0 1 0
+obb.e3 0 0 1
+obb.center 0 0 0
+volume 1
+I/m 1 1 1
+>
+
+<
+name Sphere
+radius 0.08
+preCompDone y
+nv 1
+0 0 0
+ne 0
+nf 0
+obb.extent 0.08 0.08 0.08
+obb.e1 1 0 0
+obb.e2 0 1 0
+obb.e3 0 0 1
+obb.center 0 0 0
+volume 0.002144660584851
+I/m 0.00256 0.00256 0.00256
+>
+
+<
+name Rice
+radius 0.08
+preCompDone n
+nv 3
+0 -0.16 0
+0 0 0
+0 0.16 0
+ne 2
+0 1
+1 2
+nf 0
+obb.extent 0.08 0.24 0.08
+obb.e1 1 0 0
+obb.e2 0 1 0
+obb.e3 0 0 1
+obb.center 0 0 0
+volume 0.008578642339403
+I/m 0.00493333 0.00493333 0.0032
+>

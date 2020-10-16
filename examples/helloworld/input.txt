@@ -1,0 +1,38 @@
+Rockable 29-11-2018
+
+#### time #############################
+t 0
+tmax 2.0
+dt 1e-6
+interVerlet 0.01
+interConf 0.05
+
+#### proximity of the particles #######
+DVerlet 0.08
+dVerlet 0.02
+
+#### properties for particles #########
+density 0 2700
+density 1 2700
+
+#### interaction model ################
+forceLaw Avalanches
+
+#### interaction parameters ###########
+knContact 0 1 1e6
+en2Contact 0 1 0.2
+ktContact 0 1 1e7
+muContact 0 1 0.9
+krContact 0 1 1e7
+murContact 0 1 0.0
+
+#### the system #######################
+iconf 0
+nDriven 1
+shapeFile shapes.shp
+Particles 3
+Plan 0 0 1.0   0 -0.05 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
+Rice 1 0 1.0   -0.5 0.5 0   0 0 0   0 0 0   0.707 0 0.707 0   0 0 -10   0 0 0
+Sphere 1 0 1.0   0.3 0.5 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
+
+

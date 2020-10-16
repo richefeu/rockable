@@ -1,0 +1,2 @@
+#Servo ramp _y_For_   1    0 -140     0 0.2
+Control _y_Vel_ 1 -0.01

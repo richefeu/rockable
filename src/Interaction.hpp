@@ -42,18 +42,19 @@
 #include "Particle.hpp"
 #include "vec3.hpp"
 
-//====================   isub is:     jsub is:
+//====================   isub is:     jsub is:  ===========
 const int vvType = 0;  // vertex       vertex
 const int veType = 1;  // vertex       edge
 const int vfType = 2;  // vertex       face
 const int eeType = 3;  // edge         edge
-//=============================================//
+//=========================================================
 const std::string InteractionTypeName[] = {
   "vertex-vertex",
   "vertex-edge",
   "vertex-face",
   "edge-edge"
 };
+//=========================================================
 
 class BreakableInterface;
 
@@ -132,6 +133,7 @@ if (lhs.jsub > rhs.jsub) return false;
 return false;
 
 // on pourrait ajouter des fonctions de comparaison qui ne testent pas i (sous entendu lhs.i == rhs.i) ????
+// Mais il n'est pas certain que le gain soit genial
 */
 
 template <>
