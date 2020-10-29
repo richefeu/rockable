@@ -2349,7 +2349,7 @@ void Rockable::getCurrentCriticalTimeStep(double& dtc) {
   }
 
   // compute the critical time step
-  dtc = sqrt(sqrdtcMin);
+  dtc = M_PI * sqrt(sqrdtcMin);
 }
 
 /**
