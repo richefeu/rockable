@@ -14,7 +14,7 @@ ne 4
 3 0
 nf 1
 4 0 1 2 3
-obb.extent 2.0 0.05 0.5
+obb.extent 2.05 0.05 0.55
 obb.e1 1 0 0
 obb.e2 0 1 0
 obb.e3 0 0 1

@@ -43,7 +43,7 @@ Rice 1 0 1.0   -0.5 0.5 0   0 0 0   0 0 0   0.707 0 0.707 0   0 0 -10   0 0 0
 Sphere 1 0 1.0   0.3 0.5 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
 ```
 
-A conf-file defines the format that `Rockable` is able to understand. It is used as input configuration, and also as stored configuration. The definition of this format is documented [here](https://richefeu.gitbook.io/cdm/dem/format-of-configuration-files-conf-files).
+A conf-file defines the format that `Rockable` is able to understand. It is used as input configuration, and also as stored configuration (periodically saved in the simulation flow). The definition of this format is documented [here](https://richefeu.gitbook.io/cdm/dem/format-of-configuration-files-conf-files).
 
 The shape file to be used is stated in the input file with the keyword `shapeFile` followed with the name of the file. Here is the shape-file defined in the hello-world example:
 
@@ -108,4 +108,4 @@ To run a simulation with what is defined in `input.txt`, type:
 ../../src/run input.txt
 ```
 
-After a few seconds, a hundred files named `confXXX` will have been created (`XXX` ranges from 0 to 99). To see them, simply invoke `see` without argument. the navigation from one file to another is done with the `+` and `-` keys. The mouse usage is explained when typing the key `h`, and keyboard shortcuts are obtained by typing `k`. 
+After a few seconds, hundred files named `confXXX` will have been created (`XXX` ranges from 0 to 99). To see them, simply invoke `see` without argument. the navigation from one file to another is done with the `+` and `-` keys. The mouse usage is explained when typing the key `h`, and keyboard shortcuts are obtained by typing `k`. 
