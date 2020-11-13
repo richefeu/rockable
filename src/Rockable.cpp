@@ -1,24 +1,24 @@
 //  Copyright or © or Copr. Rockable
-//  
+//
 //  vincent.richefeu@3sr-grenoble.fr
-//  
-//  This software is a computer program whose purpose is 
+//
+//  This software is a computer program whose purpose is
 //    (i)  to hold sphero-polyhedral shapes,
-//    (ii) to manage breakable interfaces. 
+//    (ii) to manage breakable interfaces.
 //  It is developed for an ACADEMIC USAGE
-//  
+//
 //  This software is governed by the CeCILL-B license under French law and
-//  abiding by the rules of distribution of free software.  You can  use, 
+//  abiding by the rules of distribution of free software.  You can  use,
 //  modify and/ or redistribute the software under the terms of the CeCILL-B
 //  license as circulated by CEA, CNRS and INRIA at the following URL
-//  "http://www.cecill.info". 
-//  
+//  "http://www.cecill.info".
+//
 //  As a counterpart to the access to the source code and  rights to copy,
 //  modify and redistribute granted by the license, users are provided only
 //  with a limited warranty  and the software's author,  the holder of the
 //  economic rights,  and the successive licensors  have only  limited
-//  liability. 
-//  
+//  liability.
+//
 //  In this respect, the user's attention is drawn to the risks associated
 //  with loading,  using,  modifying and/or developing or reproducing the
 //  software by the user in light of its specific status of free software,
@@ -26,10 +26,10 @@
 //  therefore means  that it is reserved for developers  and  experienced
 //  professionals having in-depth computer knowledge. Users are therefore
 //  encouraged to load and test the software's suitability as regards their
-//  requirements in conditions enabling the security of their systems and/or 
-//  data to be ensured and,  more generally, to use and operate it in the 
-//  same conditions as regards security. 
-//  
+//  requirements in conditions enabling the security of their systems and/or
+//  data to be ensured and,  more generally, to use and operate it in the
+//  same conditions as regards security.
+//
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
@@ -133,7 +133,7 @@ bool Rockable::isInteractive() const { return interactiveMode; }
 void Rockable::showBanner() {
   std::cout << std::endl;
   std::cout << std::endl;
-  
+
   std::cout << "Rockable  Copyright (C) 2016-2019  <vincent.richefeu@3sr-grenoble.fr>\n";
   std::cout << "This program comes with ABSOLUTELY NO WARRANTY.\n";
   std::cout << "This is academic software\n";
@@ -185,15 +185,12 @@ void Rockable::initialChecks() {
 
   getCriticalTimeStep(dtc);
   if (dtc > 0.0) {
-    std::cout << "  dt_critical / dt = " << dtc / dt
-              << " (over ALL Interactions)" 
-              << std::endl;
+    std::cout << "  dt_critical / dt = " << dtc / dt << " (over ALL Interactions)" << std::endl;
   }
 
   getCurrentCriticalTimeStep(dtc);
   if (dtc > 0.0) {
-    std::cout << "  dt_critical / dt = " << dtc / dt << " (over ACTIVE Interactions)"
-              << msg::normal() << std::endl;
+    std::cout << "  dt_critical / dt = " << dtc / dt << " (over ACTIVE Interactions)" << msg::normal() << std::endl;
   }
 }
 
@@ -336,7 +333,7 @@ void Rockable::saveConf(int i) {
       conf << '\n';
     }
   }
-  
+
   conf << std::flush;
 }
 
@@ -537,8 +534,7 @@ void Rockable::loadConf(const char* name) {
   parser.kwMap["glue_with_walls"] = __DO__(conf) {
     std::string YesNo;
     conf >> YesNo;
-    if (YesNo == "yes" || YesNo == "YES" || YesNo == "y" || YesNo == "Y" || YesNo == "1")
-      glue_with_walls = true;
+    if (YesNo == "yes" || YesNo == "YES" || YesNo == "y" || YesNo == "Y" || YesNo == "1") glue_with_walls = true;
   };
   parser.kwMap["precision"] = __DO__(conf) {
     int pr;
@@ -571,7 +567,7 @@ void Rockable::loadConf(const char* name) {
       }
       conf >> P.group >> P.cluster >> P.homothety >> P.pos >> P.vel >> P.acc >> P.Q >> P.vrot >> P.arot;
 
-      P.shape = &(Shapes[shapeId[shpName]]); // Plug to the shape
+      P.shape = &(Shapes[shapeId[shpName]]);  // Plug to the shape
       double h = P.homothety;
       P.mass = (h * h * h * P.shape->volume) * properties.get(idDensity, P.group);
       P.inertia = (h * h * P.shape->inertia_mass) * P.mass;
@@ -592,8 +588,8 @@ void Rockable::loadConf(const char* name) {
 
     Interaction I;
     for (size_t k = 0; k < nb; ++k) {
-      conf >> I.i >> I.j >> I.type >> I.isub >> I.jsub >> I.n >> I.dn 
-        >> I.pos >> I.vel >> I.fn >> I.ft >> I.mom >> I.damp;
+      conf >> I.i >> I.j >> I.type >> I.isub >> I.jsub >> I.n >> I.dn >> I.pos >> I.vel >> I.fn >> I.ft >> I.mom >>
+          I.damp;
 
       // Remark: the vector 'activeInteractions' will be filled in the call of
       // 'acceleration' at the end of this method
@@ -645,7 +641,7 @@ void Rockable::loadConf(const char* name) {
   };
   parser.kwMap["DataExtractor"] = __DO__(conf) {  // Kept for compatibility (use file dataExtractors.txt instead)
 
-    if (interactiveMode == true) return;          // The dataExtractors are not read in interactive mode
+    if (interactiveMode == true) return;  // The dataExtractors are not read in interactive mode
 
     std::string ExtractorName;
     conf >> ExtractorName;
@@ -1382,7 +1378,7 @@ void Rockable::getInteractingGroups(Interaction& I, int& g1, int& g2) {
 
 /*
 bool Rockable::forceLawGravitation(Interaction& I) {
-  
+
 }
 */
 
@@ -1461,7 +1457,7 @@ bool Rockable::forceLawAvalanches(Interaction& I) {
 }
 
 /**
-   This is the force-law initiated by ANDRA's study (PhD of Marta Stasiak) 
+   This is the force-law initiated by ANDRA's study (PhD of Marta Stasiak)
    Bodies can be glued and when the glue is 'broken', it is irreversibly
    switched to frictional contact
 */
@@ -1486,7 +1482,7 @@ bool Rockable::forceLawStickedLinks(Interaction& I) {
       int g1 = Particles[I.i].group;
       int g2 = Particles[I.j].group;
 
-      if (Particles[I.i].cluster == Particles[I.j].cluster) { // Inner
+      if (Particles[I.i].cluster == Particles[I.j].cluster) {  // Inner
         isInner = true;
         kn = dataTable.get(idKnInnerBond, g1, g2);
         kt = dataTable.get(idKtInnerBond, g1, g2);
@@ -1494,7 +1490,7 @@ bool Rockable::forceLawStickedLinks(Interaction& I) {
         ft0 = dataTable.get(idFt0InnerBond, g1, g2);
         power = dataTable.get(idPowInnerBond, g1, g2);
         dn0 = 0.0;
-      } else { // Outer
+      } else {  // Outer
         isInner = false;
         kn = dataTable.get(idKnOuterBond, g1, g2);
         kt = dataTable.get(idKtOuterBond, g1, g2);
@@ -1794,8 +1790,7 @@ void Rockable::integrate() {
       double Fmax, F_fnmax, Fmean, Fstddev;
       getResultantQuickStats(Fmax, F_fnmax, Fmean, Fstddev, nDriven);
       std::cout << "|   Resultant forces on particles:\n|   " << __printNamedCell(13, "Fmax:", 13, Fmax)
-                << __printNamedCell(13, "Fmean:", 13, Fmean) << __printNamedCell(13, "Fstddev:", 13, Fstddev)
-                << '\n';
+                << __printNamedCell(13, "Fmean:", 13, Fmean) << __printNamedCell(13, "Fstddev:", 13, Fstddev) << '\n';
       double fnMin, fnMax, fnMean, fnStddev;
       getInteractionQuickStats(fnMin, fnMax, fnMean, fnStddev);
       std::cout << "|   Interaction forces:\n|   " << __printNamedCell(13, "fnMin:", 13, fnMin)
@@ -1902,7 +1897,7 @@ void Rockable::accelerations() {
     Particles[i].moment.reset();
     Particles[i].arot.reset();
   }
-  
+
 #pragma omp parallel for default(shared)
   for (size_t i = nDriven; i < Particles.size(); ++i) {
     Particles[i].force = Particles[i].mass * gravity;
@@ -2313,7 +2308,7 @@ void Rockable::getCriticalTimeStep(double& dtc) {
 }
 
 /**
-    @brief Compute the critical time step by looping over all currently active interactions 
+    @brief Compute the critical time step by looping over all currently active interactions
     @param[out]  dtc  minimum value of square root of meff/kn.
 */
 void Rockable::getCurrentCriticalTimeStep(double& dtc) {
@@ -2425,12 +2420,12 @@ void Rockable::getResultantQuickStats(double& Fmax, double& F_fnmax, double& Fme
 
 /**
     @brief Get some statistics of the normal interaction forces
-   
+
     @param[out] fnMin     Smallest normal contact force
     @param[out] fnMin     Biggest normal contact force
     @param[out] fnMean    Averaged value of normal contact forces
     @param[out] fnStddev  Standard deviation of normal contact forces
-   
+
     @remarks Notice that this method needs that 'activeInteractions' is not empty.
 */
 void Rockable::getInteractionQuickStats(double& fnMin, double& fnMax, double& fnMean, double& fnStddev) {
@@ -2472,7 +2467,7 @@ void Rockable::getInteractionQuickStats(double& fnMin, double& fnMax, double& fn
 
    @param[out]  clusters  A vector of 'clusterParticles' that hold the clusterId and the list of involved particleId
 */
-void Rockable::getClusters(std::vector<clusterParticles> & clusters) {
+void Rockable::getClusters(std::vector<clusterParticles>& clusters) {
   clusters.clear();  // clear clusters if not empty
   std::set<clusterParticles> clusterSet;
   clusterParticles C;
@@ -2502,37 +2497,37 @@ void Rockable::getClusters(std::vector<clusterParticles> & clusters) {
       __SHOW( clusters[c].particleId[i] );
     }
   }
-#endif  
+#endif
 }
 
 /**
     @brief      Get the set of sub-parts (broken clusters).
     @attention  The clusterId in subParts is NOT the original cluster number (when it was not broken).
                 Let say clusterId should be called partId in 'clusterParticles'
-   
+
     @param[out]   subParts   A vector of 'clusterParticles'
 
     @remark This method has been carfully checked with Marta. It seems to work correctly
 */
 void Rockable::getBrokenSubClusters(std::vector<clusterParticles>& subParts) {
-  subParts.clear(); // clear clusters in case it's not empty
+  subParts.clear();  // clear clusters in case it's not empty
 
-  std::vector<std::set<int> > subs;
+  std::vector<std::set<int>> subs;
   std::set<int> addedParticles;
   for (size_t i = 0; i < Interfaces.size(); i++) {
     for (auto it = Interfaces[i].begin(); it != Interfaces[i].end(); ++it) {
       size_t I = it->i;
       size_t J = it->j;
       if (Particles[I].cluster == Particles[J].cluster) {
-        
+
         int afound = -1;
         if (!subs.empty()) {
-          for (size_t a = subs.size() ; a-- > 0 ; ) {
-            auto itI = subs[a].find(I); 
+          for (size_t a = subs.size(); a-- > 0;) {
+            auto itI = subs[a].find(I);
             if (itI != subs[a].end()) {
               afound = a;
               break;
-            } 
+            }
             auto itJ = subs[a].find(J);
             if (itJ != subs[a].end()) {
               afound = a;
@@ -2540,35 +2535,34 @@ void Rockable::getBrokenSubClusters(std::vector<clusterParticles>& subParts) {
             }
           }
         }
-        
+
         if (afound >= 0) {
           subs[afound].insert(I);
           subs[afound].insert(J);
           addedParticles.insert(I);
           addedParticles.insert(J);
-        }
-        else {
+        } else {
           std::set<int> s;
           s.insert(I);
-          s.insert(J); 
+          s.insert(J);
           subs.push_back(s);
           addedParticles.insert(I);
           addedParticles.insert(J);
         }
-        
-      } // end 'if same cluster'
-    } // end 'for it'
-  } // end 'for i'
-  
+
+      }  // end 'if same cluster'
+    }    // end 'for it'
+  }      // end 'for i'
+
   // Merge sets that have common particle.
   // Remark: the merge of more than 2 sets is not possible because an interface can onle involve 2 particles
-  std::vector<std::set<int> > subsFinal;
+  std::vector<std::set<int>> subsFinal;
   for (size_t a = 0; a < subs.size(); a++) {
-  	bool hasBeenMerged = false;
+    bool hasBeenMerged = false;
     for (size_t b = a + 1; b < subs.size(); b++) {
       bool hasCommon = false;
-      for(auto it = subs[a].begin(); it!=  subs[a].end(); ++it) {
-        if (subs[b].find(*it) != subs[b].end()) { // found
+      for (auto it = subs[a].begin(); it != subs[a].end(); ++it) {
+        if (subs[b].find(*it) != subs[b].end()) {  // found
           hasCommon = true;
           break;
         }
@@ -2583,31 +2577,31 @@ void Rockable::getBrokenSubClusters(std::vector<clusterParticles>& subParts) {
         break;
       }
     }
-    
-    if (hasBeenMerged == false) { 
+
+    if (hasBeenMerged == false) {
       // add a to subsFinal
       std::set<int> s;
       for (auto ia = subs[a].begin(); ia != subs[a].end(); ++ia) s.insert(*ia);
       subsFinal.push_back(s);
     }
   }
-  
+
   // Add parts composed of single particle
   for (int n = nDriven; n < (int)Particles.size(); n++) {
     if (addedParticles.find(n) == addedParticles.end()) {
-  	  std::set<int> s;
+      std::set<int> s;
       s.insert(n);
       subsFinal.push_back(s);
     }
   }
-    
+
   for (size_t a = 0; a < subsFinal.size(); a++) {
     clusterParticles C;
     C.clusterId = a;
     C.particleId.assign(subsFinal[a].begin(), subsFinal[a].end());
-    subParts.push_back(C); 
+    subParts.push_back(C);
   }
-  
+
 #if 0
   std::cout << " --------- " << std::endl;
   for (size_t c = 0 ; c < subParts.size() ; c++) {
@@ -2618,7 +2612,7 @@ void Rockable::getBrokenSubClusters(std::vector<clusterParticles>& subParts) {
       __SHOW( subParts[c].particleId[i] );
     }
   }
-#endif  
+#endif
 }
 
 // ==============================================================================================================
@@ -2628,7 +2622,7 @@ void Rockable::getBrokenSubClusters(std::vector<clusterParticles>& subParts) {
 /**
    @brief  Apply a transformation (rotation followed by translation)
            to the bodies having number in a given range (boundaries included)
-  
+
    @param[in]  center  Rotation point
    @param[in]  axis    Rotation axis
    @param[in]  angle   Rotation angle
@@ -2644,7 +2638,7 @@ void Rockable::rotateAndTranslateBlock(vec3r & center, vec3r & axis, double angl
    @brief Create sticked contacts between vertices (spheres) of particles
           that belong to the same cluster (same cluster-ID)
 
-   @param[in]  epsilonDist  A small distance below which the 'glue' is not added 
+   @param[in]  epsilonDist  A small distance below which the 'glue' is not added
 */
 void Rockable::stickVerticesInClusters(double epsilonDist) {
   for (size_t i = 0; i < Particles.size(); i++) {
@@ -2721,72 +2715,72 @@ void Rockable::stickVerticesInClusters(double epsilonDist) {
 }
 
 /**
-   @brief Create sticked interface between two sub-elements of two particles  
+   @brief Create sticked interface between two sub-elements of two particles
           that do not belong to the same cluster (different cluster-ID).
-          The idea is to update the neighbor list and then replace the contacts 
+          The idea is to update the neighbor list and then replace the contacts
           between different clusters by a SINGLE sticked link.
 
-   @param[in]  epsilonDist  A small distance below which the 'glue' is not added.   
+   @param[in]  epsilonDist  A small distance below which the 'glue' is not added.
 */
 void Rockable::stickClusters(double epsilonDist) {
   // In case the neighbor list has not been yet updated
   UpdateNL();
-  
+
   // Associate pair(i, j) with vector of interactions
-  std::map<std::pair<size_t,size_t>, std::vector<Interaction*> > ctc_packets;
-  
+  std::map<std::pair<size_t, size_t>, std::vector<Interaction*>> ctc_packets;
+
   // Find Packets of contacts
   for (size_t k = 0; k < Interactions.size(); ++k) {
     for (auto it = Interactions[k].begin(); it != Interactions[k].end(); ++it) {
       size_t i = it->i;
       size_t j = it->j;
-      
+
       if (glue_with_walls == false) {
-        if (i < nDriven || j < nDriven) continue; // no sticked link involving a driven body ('walls')
+        if (i < nDriven || j < nDriven) continue;  // no sticked link involving a driven body ('walls')
       }
-      
+
       // Stick is only possible in-between different clusters
-      if (Particles[i].cluster == Particles[j].cluster) continue; 
-      
+      if (Particles[i].cluster == Particles[j].cluster) continue;
+
       // update the interaction
-      Interaction *I = const_cast<Interaction*>(std::addressof(*it));
+      Interaction* I = const_cast<Interaction*>(std::addressof(*it));
       bool valid = Interaction::UpdateDispatcher[it->type](*I, Particles[i], Particles[j]);
-            
+
       if (valid && it->dn < epsilonDist) {
-        if (j < i) std::swap(i, j); // NORMALLY, NOT NECESSARY BECAUSE THE NEIGHBOR LIST IS CONSTRUCTED SO THAT i < j
+        if (j < i) std::swap(i, j);  // NORMALLY, NOT NECESSARY BECAUSE THE NEIGHBOR LIST IS CONSTRUCTED SO THAT i < j
         std::pair<size_t, size_t> duo(i, j);
         auto itf = ctc_packets.find(duo);
-        if (itf == ctc_packets.end()) { // if not found
+        if (itf == ctc_packets.end()) {  // if not found
           std::vector<Interaction*> v;
-          auto p = ctc_packets.insert(std::pair<std::pair<size_t,size_t>, std::vector<Interaction*>>(duo, v));
+          auto p = ctc_packets.insert(std::pair<std::pair<size_t, size_t>, std::vector<Interaction*>>(duo, v));
           itf = p.first;
         }
         itf->second.push_back(I);
       }
     }
   }
-  
+
   if (ctc_packets.empty()) {
     std::cout << msg::info() << "@Rockable::stickClusters, No possible glued points, ctc_packets is empty.\n"
-      << msg::normal();
+              << msg::normal();
     return;
   }
-  
+
   // Replace contact packets by single sticked link:
-  for (auto p: ctc_packets) {
-    
+  for (auto p : ctc_packets) {
+
     // -- barycenter of each packet
     vec3r c;
     size_t nb = p.second.size();
-    for (size_t ip = 0 ; ip < nb ; ip++) {
+    for (size_t ip = 0; ip < nb; ip++) {
       c += (p.second)[ip]->pos;
     }
-    c /= nb; // remark: we know that nb >= 1
+    c /= nb;  // remark: we know that nb >= 1
 
     // -- select the contact point that is the closest (for each packet)
     double d2min = norm2((p.second)[0]->pos - c);
     size_t imin = 0;
-    for (size_t ip = 1 ; ip < nb ; ip++) {
+    for (size_t ip = 1; ip < nb; ip++) {
       double d2 = norm2((p.second)[ip]->pos - c);
       if (d2 < d2min) {
         d2min = d2;
@@ -2817,26 +2811,35 @@ void Rockable::stickClusters(double epsilonDist) {
     BreakableInterface* BI = const_cast<BreakableInterface*>(std::addressof(*(ret.first)));
 
     Interaction* Iptr = const_cast<Interaction*>(std::addressof(*((p.second)[imin])));
-    
+
     Iptr->stick = BI;
     BI->concernedBonds.push_back(Iptr);
   }
-  
+
   // -- remove 'not-glued' contacts between clusters
   for (size_t k = 0; k < Interactions.size(); ++k) {
-    for (auto it = Interactions[k].begin(); it != Interactions[k].end(); ) {
+    for (auto it = Interactions[k].begin(); it != Interactions[k].end();) {
       size_t i = it->i;
       size_t j = it->j;
-      if (i < nDriven || j < nDriven) { ++it; continue; } // contact with walls are not erased
-      if (Particles[i].cluster == Particles[j].cluster) { ++it; continue; } // inner bonds are not erased
-      if (it->stick != nullptr) { ++it; continue; } // bonded links are not erased
-      
+      if (i < nDriven || j < nDriven) {
+        ++it;
+        continue;
+      }  // contact with walls are not erased
+      if (Particles[i].cluster == Particles[j].cluster) {
+        ++it;
+        continue;
+      }  // inner bonds are not erased
+      if (it->stick != nullptr) {
+        ++it;
+        continue;
+      }  // bonded links are not erased
+
       // erase the interaction (when not sticked)
-      it = Interactions[k].erase(it); // 'it' points now to the next iterator
+      it = Interactions[k].erase(it);  // 'it' points now to the next iterator
     }
   }
-  
-  // activeInteractions needs to be re-set because 'saveConf' uses it  
+
+  // activeInteractions needs to be re-set because 'saveConf' uses it
   activeInteractions.clear();
   for (size_t k = 0; k < Interactions.size(); ++k) {
     for (auto it = Interactions[k].begin(); it != Interactions[k].end(); ++it) {
@@ -2888,7 +2891,7 @@ void Rockable::copyParamsToInterfaces(std::string& isInnerStr) {
 }
 
 /**
-   @brief  Set the ratio kt/kn in interfaces 
+   @brief  Set the ratio kt/kn in interfaces
            (only for parameters that are stored in Interfaces)
 */
 void Rockable::setStiffnessRatioInterfaces(double ratio) {
@@ -2896,9 +2899,9 @@ void Rockable::setStiffnessRatioInterfaces(double ratio) {
     for (auto it = Interfaces[i].begin(); it != Interfaces[i].end(); ++it) {
       // Normally, we can't modify a value in a set because the order can be compromised.
       // But in this case, the value of kn and kt will not change the order.
-      // To be able to modify kt, we thus make use of a pointer: 
-      double *Kt_ptr = (double*)&(it->kt);
-      *Kt_ptr = ratio * it->kn;      
+      // To be able to modify kt, we thus make use of a pointer:
+      double* Kt_ptr = (double*)&(it->kt);
+      *Kt_ptr = ratio * it->kn;
     }
   }
 }
@@ -2945,7 +2948,7 @@ void Rockable::setVariableStickParams(std::string& paramName, std::string& isInn
     }
   }
 
-  ParamsInInterfaces = 1; // so that they are stored in the conf files (within interfaces)
+  ParamsInInterfaces = 1;  // so that they are stored in the conf files (within interfaces)
 }
 
 /**
@@ -2965,7 +2968,7 @@ void Rockable::randomlyOrientedVelocities(double velocityMagnitude) {
 /**
    @brief Set random orientation to the clusters
    @param[in]  velocityMagnitude  Magnitude of all velocities (only orientations change)
-   @param[in]  opt                An option. if opt = 1 then all the velocity vectors 
+   @param[in]  opt                An option. if opt = 1 then all the velocity vectors
                                   will be oriented towards negative y (downward)
 */
 void Rockable::randomlyOrientedVelocitiesClusters(double velocityMagnitude, int opt) {
@@ -3047,5 +3050,3 @@ void Rockable::particlesClonage(size_t idFirst, size_t idLast, vec3r& translatio
   if (Interactions.size() != Particles.size()) Interactions.resize(Particles.size());
   if (Interfaces.size() != Particles.size()) Interfaces.resize(Particles.size());
 }
-
-

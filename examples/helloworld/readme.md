@@ -108,4 +108,4 @@ To run a simulation with what is defined in `input.txt`, type:
 ../../src/run input.txt
 ```
 
-After a few seconds, hundred files named `confXXX` will have been created (`XXX` ranges from 0 to 99). To see them, simply invoke `see` without argument. the navigation from one file to another is done with the `+` and `-` keys. The mouse usage is explained when typing the key `h`, and keyboard shortcuts are obtained by typing `k`. 
+After a few seconds, hundred files named `confXXX` will have been created (`XXX` ranges from 0 to 40). To see them, simply invoke `see` without argument. the navigation from one file to another is done with the `+` and `-` keys. The mouse usage is explained when typing the key `h`, and keyboard shortcuts are obtained by typing `k`. 

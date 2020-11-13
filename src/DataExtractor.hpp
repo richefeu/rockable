@@ -33,8 +33,8 @@
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
-#ifndef DATAEXTRACTOR_HPP_E4213D85
-#define DATAEXTRACTOR_HPP_E4213D85
+#ifndef DATAEXTRACTOR_HPP
+#define DATAEXTRACTOR_HPP
 
 #include <fstream>
 #include <sstream>
@@ -72,4 +72,4 @@ class DataExtractor {
   DataExtractor();
 };
 
-#endif /* end of include guard: DATAEXTRACTOR_HPP_E4213D85 */
+#endif /* end of include guard: DATAEXTRACTOR_HPP */

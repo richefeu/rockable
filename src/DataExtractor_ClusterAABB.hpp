@@ -33,8 +33,8 @@
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
-#ifndef CLUSTERAABB_HPP_7FF11E00
-#define CLUSTERAABB_HPP_7FF11E00
+#ifndef CLUSTERAABB_HPP
+#define CLUSTERAABB_HPP
 
 #include <fstream>
 
@@ -53,4 +53,4 @@ class ClusterAABB : public DataExtractor {
   int icluster;
 };
 
-#endif /* end of include guard: CLUSTERAABB_HPP_7FF11E00 */
+#endif /* end of include guard: CLUSTERAABB_HPP */

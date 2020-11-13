@@ -33,8 +33,8 @@
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
-#ifndef TRACKBODY_HPP_4075DD16
-#define TRACKBODY_HPP_4075DD16
+#ifndef TRACKBODY_HPP
+#define TRACKBODY_HPP
 
 #include "DataExtractor.hpp"
 
@@ -57,4 +57,4 @@ class TrackBody : public DataExtractor {
   bool z_ForceImposed;
 };
 
-#endif /* end of include guard: TRACKBODY_HPP_4075DD16 */
+#endif /* end of include guard: TRACKBODY_HPP */

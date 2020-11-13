@@ -33,8 +33,8 @@
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
-#ifndef DNSTAT_HPP_4075DD16
-#define DNSTAT_HPP_4075DD16
+#ifndef DNSTAT_HPP
+#define DNSTAT_HPP
 
 #include "DataExtractor.hpp"
 
@@ -49,4 +49,4 @@ class dnStat : public DataExtractor {
   void end();
 };
 
-#endif /* end of include guard: DNSTAT_HPP_4075DD16 */
+#endif /* end of include guard: DNSTAT_HPP */

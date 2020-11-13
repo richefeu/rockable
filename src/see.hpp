@@ -33,8 +33,8 @@
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
-#ifndef SEE_HPP_E29BD15E
-#define SEE_HPP_E29BD15E
+#ifndef SEE_HPP
+#define SEE_HPP
 
 #include <tclap/CmdLine.h>
 
@@ -143,4 +143,4 @@ int screenshot(const char *filename);
 void selection(int x, int y);
 void editSelection();
 
-#endif /* end of include guard: SEE_HPP_E29BD15E */
+#endif /* end of include guard: SEE_HPP */

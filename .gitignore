@@ -7,4 +7,5 @@ src/see
 src/run
 src/patatrac
 src/postpro
+examples/*
 .vscode

@@ -33,8 +33,8 @@
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
-#ifndef CLUSTERPARTICLES_HPP_2A8381E6
-#define CLUSTERPARTICLES_HPP_2A8381E6
+#ifndef CLUSTERPARTICLES_HPP
+#define CLUSTERPARTICLES_HPP
 
 /// @brief A container struct with the cluster identifier 
 ///        and the identifiers of the held particles 
@@ -54,4 +54,4 @@ namespace std {
 	};
 }
 
-#endif /* end of include guard: CLUSTERPARTICLES_HPP_2A8381E6 */
+#endif /* end of include guard: CLUSTERPARTICLES_HPP */

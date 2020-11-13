@@ -34,8 +34,8 @@
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
 
-#ifndef ROCKABLE_HPP_468B722C
-#define ROCKABLE_HPP_468B722C
+#ifndef ROCKABLE_HPP
+#define ROCKABLE_HPP
 
 #include <algorithm>
 #include <cfenv>
@@ -297,4 +297,4 @@ class Rockable {
   std::ofstream kineticEnergyFile;  ///< to store kinetic energy data in the course of a computation
 };
 
-#endif /* end of include guard: ROCKABLE_HPP_468B722C */
+#endif /* end of include guard: ROCKABLE_HPP */

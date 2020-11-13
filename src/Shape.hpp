@@ -33,8 +33,8 @@
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
-#ifndef SHAPE_HPP_EEEA5A98
-#define SHAPE_HPP_EEEA5A98
+#ifndef SHAPE_HPP
+#define SHAPE_HPP
 
 #include <vector>
 #include <set>
@@ -133,4 +133,4 @@ class Shape {
   void updateObb(OBBnode& node);
 };
 
-#endif /* end of include guard: SHAPE_HPP_EEEA5A98 */
+#endif /* end of include guard: SHAPE_HPP */
