@@ -68,7 +68,7 @@ Rockable::Rockable() {
   idDensity = properties.add("density");
 
   forceLawPtr = std::bind(&Rockable::forceLawAvalanches, this, std::placeholders::_1);
-  optionNames["forceLaw"] = "Avalanches";
+  optionNames["forceLaw"] = "Default";
 
   AddOrRemoveInteractions = std::bind(&Rockable::AddOrRemoveInteractions_bruteForce, this, std::placeholders::_1,
                                       std::placeholders::_2, std::placeholders::_3);
@@ -78,6 +78,9 @@ Rockable::Rockable() {
   optionNames["UpdateNL"] = "bruteForce";
   cellMinSizes.set(1.0, 1.0, 1.0);
   boxForLinkCellsOpt = 0;
+
+  IntegrationStep = std::bind(&Rockable::velocityVerletStep, this);
+  optionNames["Integrator"] = "velocityVerlet";
 
   idKnContact = dataTable.add("knContact");
   idEn2Contact = dataTable.add("en2Contact");
@@ -104,7 +107,16 @@ Rockable::Rockable() {
 
   needUpdate = false;
   interactiveMode = false;
+  verbose = 0;
   glue_with_walls = false;
+}
+
+void Rockable::setVerboseLevel(int v) {
+  if (v > 0) {
+    verbose = v;
+  } else {
+    verbose = 0;
+  }
 }
 
 void Rockable::initOutputFiles() {
@@ -133,13 +145,13 @@ bool Rockable::isInteractive() const { return interactiveMode; }
 void Rockable::showBanner() {
   std::cout << std::endl;
   std::cout << std::endl;
-
+	
   std::cout << "Rockable  Copyright (C) 2016-2019  <vincent.richefeu@3sr-grenoble.fr>\n";
   std::cout << "This program comes with ABSOLUTELY NO WARRANTY.\n";
   std::cout << "This is academic software\n";
   std::cout << "Documentation: "
                "https://richefeu.gitbook.io/cdm/\n\n";
-
+	
   std::cout << std::endl;
   std::cout << "Compilation options:\n";
 
@@ -175,11 +187,28 @@ void Rockable::showBanner() {
 // ==================================================================================================================
 
 void Rockable::initialChecks() {
+
+  if (verbose >= 1) {
+    std::cout << "\n OPTIONS:\n";
+    std::cout << "forceLaw                = " << optionNames["forceLaw"] << '\n';
+    std::cout << "AddOrRemoveInteractions = " << optionNames["AddOrRemoveInteractions"] << '\n';
+    std::cout << "UpdateNL                = " << optionNames["UpdateNL"] << '\n';
+    std::cout << "Integrator              = " << optionNames["Integrator"] << '\n';
+  }
+
+  if (verbose >= 2) {
+    std::cout << "\n DataTable size " << dataTable.ngroup << "x" << dataTable.ngroup << " for parameters:\n";
+    for (auto& d : dataTable.data_id) {
+      std::cout << "      " << d.first << '\n';
+    }
+  }
+
+  // Always displayed:
   double dtc;
   estimateCriticalTimeStep(dtc);
   std::cout << msg::info()
             << "Considering a single contact between two particles\n"
-               "  (this can be done by using a 'ContactPartnership')\n"
+               "        (this can be done by using a 'ContactPartnership')\n"
                "  dt_critical / dt = "
             << dtc / dt << " (estimated)" << std::endl;
 
@@ -363,7 +392,7 @@ void Rockable::writeLawData(std::ostream& os, const char* parName) {
 void Rockable::loadConf(const char* name) {
   std::ifstream conf(name);
   if (!conf.is_open()) {
-    std::cerr << msg::warn() << "@Rockable, Cannot read " << name << msg::normal() << std::endl;
+    std::cerr << msg::warn() << "@Rockable::loadConf, Cannot read " << name << msg::normal() << std::endl;
     return;
   }
 
@@ -371,13 +400,14 @@ void Rockable::loadConf(const char* name) {
   std::string prog;
   conf >> prog;
   if (prog != "Rockable") {
-    std::cerr << msg::warn() << "@Rockable, This is not a file for the code Rockable!" << msg::normal() << std::endl;
+    std::cerr << msg::warn() << "@Rockable::loadConf, This is not a file for the code Rockable!" << msg::normal()
+              << std::endl;
   }
   std::string date;
   conf >> date;
   if (date != CONF_VERSION_DATE) {
-    std::cerr << msg::warn() << "@Rockable, The version-date should be " << CONF_VERSION_DATE << "!" << msg::normal()
-              << std::endl;
+    std::cerr << msg::warn() << "@Rockable::loadConf, The version-date should be '" << CONF_VERSION_DATE << "'!\n"
+              << "                     in most cases, this should not be a problem." << msg::normal() << std::endl;
   }
 
   kwParser parser;
@@ -387,7 +417,11 @@ void Rockable::loadConf(const char* name) {
   parser.kwMap["dt"] = __DO__(conf) {
     conf >> dt;
     dt_2 = 0.5 * dt;
-    dt2_2 = 0.5 * dt * dt;
+    dt2 = dt * dt;
+    dt2_2 = 0.5 * dt2;
+    dt2_8 = 0.125 * dt2;
+    dt2_6 = dt2 / 6.0;
+    dt_6 = dt / 6.0;
   };
   parser.kwMap["interVerlet"] = __GET__(conf, interVerlet);
   parser.kwMap["interConf"] = __GET__(conf, interConf);
@@ -449,14 +483,19 @@ void Rockable::loadConf(const char* name) {
   parser.kwMap["forceLaw"] = __DO__(conf) {
     std::string lawName;
     conf >> lawName;
-    if (lawName == "Avalanches") {
+    if (lawName == "Default") {
+      forceLawPtr = std::bind(&Rockable::forceLawDefault, this, std::placeholders::_1);
+      optionNames["forceLaw"] = "Default";
+    } else if (lawName == "Avalanches") {
       forceLawPtr = std::bind(&Rockable::forceLawAvalanches, this, std::placeholders::_1);
       optionNames["forceLaw"] = "Avalanches";
     } else if (lawName == "StickedLinks") {
       forceLawPtr = std::bind(&Rockable::forceLawStickedLinks, this, std::placeholders::_1);
       optionNames["forceLaw"] = "StickedLinks";
-    } else
+    } else {
       std::cout << msg::warn() << "forceLaw " << lawName << " is unknown" << msg::normal() << std::endl;
+      std::cout << "Option remains: forceLaw = " << optionNames["forceLaw"] << std::endl;
+    }
   };
   parser.kwMap["AddOrRemoveInteractions"] = __DO__(conf) {
     std::string Name;
@@ -469,8 +508,10 @@ void Rockable::loadConf(const char* name) {
       AddOrRemoveInteractions = std::bind(&Rockable::AddOrRemoveInteractions_OBBtree, this, std::placeholders::_1,
                                           std::placeholders::_2, std::placeholders::_3);
       optionNames["AddOrRemoveInteractions"] = "OBBtree";
-    } else
+    } else {
       std::cout << msg::warn() << "AddOrRemoveInteractions " << Name << " is unknown" << msg::normal() << std::endl;
+      std::cout << "Option remains: AddOrRemoveInteractions = " << optionNames["AddOrRemoveInteractions"] << std::endl;
+    }
   };
   parser.kwMap["UpdateNL"] = __DO__(conf) {
     std::string Name;
@@ -481,8 +522,30 @@ void Rockable::loadConf(const char* name) {
     } else if (Name == "linkCells") {
       UpdateNL = std::bind(&Rockable::UpdateNL_linkCells, this);
       optionNames["UpdateNL"] = "linkCells";
-    } else
+    } else {
       std::cout << msg::warn() << "UpdateNL " << Name << " is unknown" << msg::normal() << std::endl;
+      std::cout << "Option remains: UpdateNL = " << optionNames["UpdateNL"] << std::endl;
+    }
+  };
+  parser.kwMap["Integrator"] = __DO__(conf) {
+    std::string Name;
+    conf >> Name;
+    if (Name == "velocityVerlet") {
+      IntegrationStep = std::bind(&Rockable::velocityVerletStep, this);
+      optionNames["Integrator"] = "velocityVerlet";
+    } else if (Name == "Euler") {
+      IntegrationStep = std::bind(&Rockable::EulerStep, this);
+      optionNames["Integrator"] = "Euler";
+    } else if (Name == "Beeman") {
+      IntegrationStep = std::bind(&Rockable::BeemanStep, this);
+      optionNames["Integrator"] = "Beeman";
+    } else if (Name == "RungeKutta4") {
+      IntegrationStep = std::bind(&Rockable::RungeKutta4Step, this);
+      optionNames["Integrator"] = "RungeKutta4";
+    } else {
+      std::cout << msg::warn() << "Integrator " << Name << " is unknown" << msg::normal() << std::endl;
+      std::cout << "Option remains: Integrator = " << optionNames["Integrator"] << std::endl;
+    }
   };
   parser.kwMap["cellMinSizes"] = __GET__(conf, cellMinSizes);
   parser.kwMap["boxForLinkCellsOpt"] = __GET__(conf, boxForLinkCellsOpt);
@@ -1376,11 +1439,69 @@ void Rockable::getInteractingGroups(Interaction& I, int& g1, int& g2) {
   g2 = Particles[I.j].group;
 }
 
-/*
-bool Rockable::forceLawGravitation(Interaction& I) {
-
-}
+/**
+    @brief   Maybe the simplest law to use.
+             It includes Linear normal repulsion, normal viscosity, Coulomb Friction, and moment resistance
+    @return  Return true if the interaction is active (ie. with a non-zero force)
 */
+bool Rockable::forceLawDefault(Interaction& I) {
+  if (I.dn > 0.0) {
+    I.fn = 0.0;
+    I.ft.reset();
+    I.mom.reset();
+    return false;
+  }
+
+  int g1 = Particles[I.i].group;
+  int g2 = Particles[I.j].group;
+  double kn = dataTable.get(idKnContact, g1, g2);
+  double kt = dataTable.get(idKtContact, g1, g2);
+  double mu = dataTable.get(idMuContact, g1, g2);
+  double kr = dataTable.get(idKrContact, g1, g2);
+  double mur = dataTable.get(idMurContact, g1, g2);
+  double damp = I.damp;
+
+  if (ctcPartnership.getWeight != nullptr) {
+    double w = ctcPartnership.getWeight(I);
+    kn *= w;
+    kt *= w;
+    kr *= w;
+    damp *= sqrt(w);
+  }
+
+  // === Normal force (elatic contact + viscous damping)
+  double vn = I.vel * I.n;
+  double fne = -kn * I.dn;
+  double fnv = damp * vn;
+  I.fn = fne + fnv;
+
+  // === Tangential force (friction)
+  vec3r vt = I.vel - vn * I.n;
+#ifdef FT_CORR
+  vec3r ft_corr = I.ft;
+  ft_corr -= cross(ft_corr, cross(I.prev_n, I.n));
+  ft_corr -= cross(ft_corr, (dt_2 * (Particles[I.i].vrot + Particles[I.j].vrot) * I.n) * I.n);
+  I.ft = ft_corr + kt * (vt * dt);
+#else
+  I.ft += kt * (vt * dt);
+#endif
+
+  double threshold = fabs(mu * fne);
+  double ft_square = I.ft * I.ft;
+  if (ft_square > 0.0 && ft_square >= threshold * threshold) I.ft *= threshold / sqrt(ft_square);
+  // Remark: in fact, the test (ft_square > 0.0) means that ft_square is not
+  // zero, because ft_square >= 0 by definition.
+
+  // === Resistant moment
+  if (kr > 0.0) {
+    I.mom += kr * (Particles[I.j].vrot - Particles[I.i].vrot) * dt;
+    double threshold_mom = fabs(mur * I.fn);  // in this case mur is a *length*
+    double mom_square = I.mom * I.mom;
+    if (mom_square > 0.0 && mom_square >= threshold_mom * threshold_mom) I.mom *= threshold_mom / sqrt(mom_square);
+  }
+
+  return true;
+}
 
 /**
     @brief   Force-law used for rock avalanches at Laboratoire 3SR
@@ -1614,14 +1735,19 @@ bool Rockable::forceLawStickedLinks(Interaction& I) {
 //  CORE METHODS OF THE DEM ALGORITHM
 // ==============================================================================================================
 
-/**
-    @brief Makes ONE step with the velocity-Verlet scheme.
-*/
-void Rockable::velocityVerletStep() {
-  // If a ServoFunction exists, then it is called
-  if (System.ServoFunction != nullptr) System.ServoFunction(*this);
+void Rockable::initIntegrator() {
+  if (optionNames["Integrator"] == "Beeman") {
+    for (size_t i = 0; i < Particles.size(); ++i) {
+      Particles[i].beemanData = std::make_shared<BeemanMoreData>();
+    }
+  } else if (optionNames["Integrator"] == "RungeKutta4") {
+    for (size_t i = 0; i < Particles.size(); ++i) {
+      Particles[i].RK4Data = std::make_shared<RK4MoreData>();
+    }
+  }
+}
 
-  // Controlled bodies
+void Rockable::velocityControlledDrive() {
   for (size_t c = 0; c < System.controls.size(); ++c) {
     switch (System.controls[c].type) {
       case _x_Vel_: {
@@ -1654,6 +1780,71 @@ void Rockable::velocityVerletStep() {
         Particles[i].Q += ((Particles[i].Q.dot(vrot)) *= dt);
         Particles[i].Q.normalize();
       } break;
+      default:
+        break;
+    }
+  }
+}
+
+/**
+    @brief Makes ONE step with the Euler scheme.
+*/
+void Rockable::EulerStep() {
+  // If a ServoFunction exists, then it is called
+  if (System.ServoFunction != nullptr) System.ServoFunction(*this);
+
+  // Controlled bodies
+  velocityControlledDrive();
+  for (size_t c = 0; c < System.controls.size(); ++c) {
+    switch (System.controls[c].type) {
+      case _x_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].pos.x += dt * Particles[i].vel.x;
+        Particles[i].vel.x += dt * Particles[i].acc.x;
+      } break;
+      case _y_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].pos.y += dt * Particles[i].vel.y;
+        Particles[i].vel.y += dt * Particles[i].acc.y;
+      } break;
+      case _z_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].pos.z += dt * Particles[i].vel.z;
+        Particles[i].vel.z += dt * Particles[i].acc.z;
+      } break;
+      default:
+        break;
+    }
+  }
+
+  // Bodies that are free to move
+#pragma omp parallel for default(shared)
+  for (size_t i = nDriven; i < Particles.size(); ++i) {
+    Particles[i].pos += dt * Particles[i].vel;
+    Particles[i].vel += dt * Particles[i].acc;
+
+    // Rotation: Q <- Q + (dQ/dt)*dt
+    // It reads like this with quaternions
+    Particles[i].Q += ((Particles[i].Q.dot(Particles[i].vrot)) *= dt);
+    Particles[i].Q.normalize();
+
+    Particles[i].vrot += dt * Particles[i].arot;
+  }
+
+  accelerations();
+}
+
+/**
+    @brief Makes ONE step with the velocity-Verlet scheme.
+*/
+void Rockable::velocityVerletStep() {
+  // If a ServoFunction exists, then it is called
+  if (System.ServoFunction != nullptr) System.ServoFunction(*this);
+
+  // Controlled bodies
+  velocityControlledDrive();
+  for (size_t c = 0; c < System.controls.size(); ++c) {
+    switch (System.controls[c].type) {
       case _x_For_: {
         size_t i = System.controls[c].i;
         Particles[i].pos.x += dt * Particles[i].vel.x + dt2_2 * Particles[i].acc.x;
@@ -1680,21 +1871,12 @@ void Rockable::velocityVerletStep() {
     Particles[i].pos += dt * Particles[i].vel + dt2_2 * Particles[i].acc;
     Particles[i].vel += dt_2 * Particles[i].acc;
 
-#ifdef QUAT_ACC
-    // Rotation: Q = Q + (dQ/dt)*dt + (d2Q/dt2)*dt2/2
-    // It reads like this with quaternions
-    double omega2_2 = 0.5 * Particles[i].vrot * Particles[i].vrot;
-    Particles[i].Q += quat(
-        0.5 * (dt * (Particles[i].Q.s * Particles[i].vrot + cross(Particles[i].vrot, Particles[i].Q.v)) +
-               dt2_2 * (Particles[i].Q.s * Particles[i].arot + cross(Particles[i].arot, Particles[i].Q.v) -
-                        omega2_2 * Particles[i].Q.v)),
-        -0.5 * (Particles[i].vrot * Particles[i].Q.v * dt + (Particles[i].arot * Particles[i].Q.v + omega2_2) * dt2_2));
-#else
-    // Rotation: Q = Q + (dQ/dt)*dt
+    // Rotation: Q(k+1) = Q(k) + dQ(k) * dt + ddQ(k) * dt2/2
     // It reads like this with quaternions
     Particles[i].Q += ((Particles[i].Q.dot(Particles[i].vrot)) *= dt);
+#ifdef QUAT_ACC
+    Particles[i].Q += ((Particles[i].Q.ddot(Particles[i].vrot, Particles[i].arot)) *= dt2_2);
 #endif
-
     Particles[i].Q.normalize();
 
     Particles[i].vrot += dt_2 * Particles[i].arot;
@@ -1731,6 +1913,360 @@ void Rockable::velocityVerletStep() {
 }
 
 /**
+    @brief Makes ONE step with the Beeman scheme.
+*/
+void Rockable::BeemanStep() {
+  static const double CST_2_DIV_3 = 2.0 / 3.0;
+  static const double CST_1_DIV_6 = 1.0 / 6.0;
+  static const double CST_1_DIV_12 = 1.0 / 12.0;
+  static const double CST_5_DIV_12 = 5.0 / 12.0;
+
+  // If a ServoFunction exists, then it is called
+  if (System.ServoFunction != nullptr) System.ServoFunction(*this);
+
+  // Controlled bodies
+  velocityControlledDrive();
+
+  accelerations();
+
+  for (size_t c = 0; c < System.controls.size(); ++c) {
+    switch (System.controls[c].type) {
+      case _x_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].beemanData->accCurrent.x = Particles[i].acc.x;
+        Particles[i].pos.x += dt * Particles[i].vel.x + dt2 * (CST_2_DIV_3 * Particles[i].acc.x -
+                                                               CST_1_DIV_6 * Particles[i].beemanData->accPrevious.x);
+        Particles[i].beemanData->velPrevious.x = Particles[i].vel.x;
+        Particles[i].vel.x += dt * (1.5 * Particles[i].acc.x - 0.5 * Particles[i].beemanData->accPrevious.x);
+      } break;
+      case _y_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].beemanData->accCurrent.y = Particles[i].acc.y;
+        Particles[i].pos.y += dt * Particles[i].vel.y + dt2 * (CST_2_DIV_3 * Particles[i].acc.y -
+                                                               CST_1_DIV_6 * Particles[i].beemanData->accPrevious.y);
+        Particles[i].beemanData->velPrevious.y = Particles[i].vel.y;
+        Particles[i].vel.y += dt * (1.5 * Particles[i].acc.y - 0.5 * Particles[i].beemanData->accPrevious.y);
+      } break;
+      case _z_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].beemanData->accCurrent.z = Particles[i].acc.z;
+        Particles[i].pos.z += dt * Particles[i].vel.z + dt2 * (CST_2_DIV_3 * Particles[i].acc.z -
+                                                               CST_1_DIV_6 * Particles[i].beemanData->accPrevious.z);
+        Particles[i].beemanData->velPrevious.z = Particles[i].vel.z;
+        Particles[i].vel.z += dt * (1.5 * Particles[i].acc.z - 0.5 * Particles[i].beemanData->accPrevious.z);
+      } break;
+      default:
+        break;
+    }
+  }
+
+  // Bodies that are free to move
+#pragma omp parallel for default(shared)
+  for (size_t i = nDriven; i < Particles.size(); ++i) {
+    Particles[i].beemanData->accCurrent = Particles[i].acc;
+
+    Particles[i].pos += dt * Particles[i].vel +
+                        dt2 * (CST_2_DIV_3 * Particles[i].acc - CST_1_DIV_6 * Particles[i].beemanData->accPrevious);
+    Particles[i].beemanData->velPrevious = Particles[i].vel;
+    Particles[i].vel += dt * (1.5 * Particles[i].acc - 0.5 * Particles[i].beemanData->accPrevious);
+
+    Particles[i].beemanData->arotCurrent = Particles[i].arot;
+    // Rotation: Q(k+1) = Q(k) + dQ(k) * dt + (2/3 ddQ(k) - 1/6 ddQ(k-1)) * dt2
+    // It reads like this with quaternions
+    Particles[i].Q += ((Particles[i].Q.dot(Particles[i].vrot)) *= dt);
+    quat Qacc = ((Particles[i].Q.ddot(Particles[i].vrot, Particles[i].arot)) *= CST_2_DIV_3);
+    Qacc -= ((Particles[i].Q.ddot(Particles[i].vrot, Particles[i].beemanData->arotPrevious)) *= CST_1_DIV_6);
+    Particles[i].Q += (Qacc *= dt2);
+    Particles[i].Q.normalize();
+
+    Particles[i].beemanData->vrotPrevious = Particles[i].vrot;
+    Particles[i].vrot += dt * (1.5 * Particles[i].arot - 0.5 * Particles[i].beemanData->arotPrevious);
+  }
+
+  accelerations();
+
+  // Bodies where a component is controlled by force (like free in the corresponding direction)
+  for (size_t c = 0; c < System.controls.size(); ++c) {
+    switch (System.controls[c].type) {
+      case _x_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].vel.x =
+            Particles[i].beemanData->velPrevious.x +
+            dt * (CST_5_DIV_12 * Particles[i].acc.x + CST_2_DIV_3 * Particles[i].beemanData->accCurrent.x -
+                  CST_1_DIV_12 * Particles[i].beemanData->accPrevious.x);
+        Particles[i].beemanData->accPrevious.x = Particles[i].beemanData->accCurrent.x;
+      } break;
+      case _y_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].vel.y =
+            Particles[i].beemanData->velPrevious.y +
+            dt * (CST_5_DIV_12 * Particles[i].acc.y + CST_2_DIV_3 * Particles[i].beemanData->accCurrent.y -
+                  CST_1_DIV_12 * Particles[i].beemanData->accPrevious.y);
+        Particles[i].beemanData->accPrevious.y = Particles[i].beemanData->accCurrent.y;
+      } break;
+      case _z_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].vel.z =
+            Particles[i].beemanData->velPrevious.z +
+            dt * (CST_5_DIV_12 * Particles[i].acc.z + CST_2_DIV_3 * Particles[i].beemanData->accCurrent.z -
+                  CST_1_DIV_12 * Particles[i].beemanData->accPrevious.z);
+        Particles[i].beemanData->accPrevious.z = Particles[i].beemanData->accCurrent.z;
+      } break;
+      default:
+        break;
+    }
+  }
+
+  // Free bodies
+#pragma omp parallel for default(shared)
+  for (size_t i = nDriven; i < Particles.size(); ++i) {
+    Particles[i].vel = Particles[i].beemanData->velPrevious +
+                       dt * (CST_5_DIV_12 * Particles[i].acc + CST_2_DIV_3 * Particles[i].beemanData->accCurrent -
+                             CST_1_DIV_12 * Particles[i].beemanData->accPrevious);
+    Particles[i].vrot = Particles[i].beemanData->vrotPrevious +
+                        dt * (CST_5_DIV_12 * Particles[i].arot + CST_2_DIV_3 * Particles[i].beemanData->arotCurrent -
+                              CST_1_DIV_12 * Particles[i].beemanData->arotPrevious);
+
+    Particles[i].beemanData->accPrevious = Particles[i].beemanData->accCurrent;
+    Particles[i].beemanData->arotPrevious = Particles[i].beemanData->arotCurrent;
+  }
+}
+
+/**
+    @brief Makes ONE step with the Runge-Kutta-Nystrom (4th order) scheme.
+*/
+void Rockable::RungeKutta4Step() {
+  // If a ServoFunction exists, then it is called
+  if (System.ServoFunction != nullptr) System.ServoFunction(*this);
+
+  // velocity-controlled bodies
+  velocityControlledDrive();
+
+  // Bodies that are free to move
+
+  // k1 ........
+  for (size_t c = 0; c < System.controls.size(); ++c) {
+    switch (System.controls[c].type) {
+      case _x_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].RK4Data->pos0.x = Particles[i].pos.x;
+        Particles[i].RK4Data->vel0.x = Particles[i].vel.x;
+      } break;
+      case _y_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].RK4Data->pos0.y = Particles[i].pos.y;
+        Particles[i].RK4Data->vel0.y = Particles[i].vel.y;
+      } break;
+      case _z_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].RK4Data->pos0.z = Particles[i].pos.z;
+        Particles[i].RK4Data->vel0.z = Particles[i].vel.z;
+      } break;
+      default:
+        break;
+    }
+  }
+#pragma omp parallel for default(shared)
+  for (size_t i = nDriven; i < Particles.size(); ++i) {
+    Particles[i].RK4Data->pos0 = Particles[i].pos;
+    Particles[i].RK4Data->Q0 = Particles[i].Q;
+    Particles[i].RK4Data->vel0 = Particles[i].vel;
+    Particles[i].RK4Data->vrot0 = Particles[i].vrot;
+  }
+  accelerations();
+#pragma omp parallel for default(shared)
+  for (size_t i = 0; i < Particles.size(); ++i) {
+    Particles[i].RK4Data->k1acc = Particles[i].acc;
+    Particles[i].RK4Data->k1arot = Particles[i].arot;
+  }
+
+  // k2 ........
+  for (size_t c = 0; c < System.controls.size(); ++c) {
+    switch (System.controls[c].type) {
+      case _x_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].pos.x =
+            Particles[i].RK4Data->pos0.x + dt_2 * Particles[i].RK4Data->vel0.x + dt2_8 * Particles[i].RK4Data->k1acc.x;
+        Particles[i].vel.x = Particles[i].RK4Data->vel0.x + dt_2 * Particles[i].RK4Data->k1acc.x;
+      } break;
+      case _y_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].pos.y =
+            Particles[i].RK4Data->pos0.y + dt_2 * Particles[i].RK4Data->vel0.y + dt2_8 * Particles[i].RK4Data->k1acc.y;
+        Particles[i].vel.y = Particles[i].RK4Data->vel0.y + dt_2 * Particles[i].RK4Data->k1acc.y;
+      } break;
+      case _z_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].pos.z =
+            Particles[i].RK4Data->pos0.z + dt_2 * Particles[i].RK4Data->vel0.z + dt2_8 * Particles[i].RK4Data->k1acc.z;
+        Particles[i].vel.z = Particles[i].RK4Data->vel0.z + dt_2 * Particles[i].RK4Data->k1acc.z;
+      } break;
+      default:
+        break;
+    }
+  }
+#pragma omp parallel for default(shared)
+  for (size_t i = nDriven; i < Particles.size(); ++i) {
+    // pos0 + h_2 * vel0 + h2_8 * k1acc
+    Particles[i].pos =
+        Particles[i].RK4Data->pos0 + dt_2 * Particles[i].RK4Data->vel0 + dt2_8 * Particles[i].RK4Data->k1acc;
+    // Q0 + h_2 * dot(Q0,vrot0) + h2_8 * ddot(Q0,vrot0,k1arot)
+    Particles[i].Q = Particles[i].RK4Data->Q0;
+    Particles[i].Q += (Particles[i].RK4Data->Q0.dot(Particles[i].RK4Data->vrot0) *= dt_2);
+    Particles[i].Q +=
+        (Particles[i].RK4Data->Q0.ddot(Particles[i].RK4Data->vrot0, Particles[i].RK4Data->k1arot) *= dt2_8);
+    // vel0 + h_2 * k1acc
+    Particles[i].vel = Particles[i].RK4Data->vel0 + dt_2 * Particles[i].RK4Data->k1acc;
+    // vrot0 + h_2 * k1arot
+    Particles[i].vrot = Particles[i].RK4Data->vrot0 + dt_2 * Particles[i].RK4Data->k1arot;
+  }
+  accelerations();
+#pragma omp parallel for default(shared)
+  for (size_t i = 0; i < Particles.size(); ++i) {
+    Particles[i].RK4Data->k2acc = Particles[i].acc;
+    Particles[i].RK4Data->k2arot = Particles[i].arot;
+  }
+
+  // k3 ........
+  for (size_t c = 0; c < System.controls.size(); ++c) {
+    switch (System.controls[c].type) {
+      case _x_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].vel.x = Particles[i].RK4Data->vel0.x + dt_2 * Particles[i].RK4Data->k2acc.x;
+      } break;
+      case _y_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].vel.y = Particles[i].RK4Data->vel0.y + dt_2 * Particles[i].RK4Data->k2acc.y;
+      } break;
+      case _z_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].vel.z = Particles[i].RK4Data->vel0.z + dt_2 * Particles[i].RK4Data->k2acc.z;
+      } break;
+      default:
+        break;
+    }
+  }
+#pragma omp parallel for default(shared)
+  for (size_t i = nDriven; i < Particles.size(); ++i) {
+    // pos and Q not changed
+    // vel0 + h_2 * k2acc
+    Particles[i].vel = Particles[i].RK4Data->vel0 + dt_2 * Particles[i].RK4Data->k2acc;
+    // vrot0 + h_2 * k2arot
+    Particles[i].vrot = Particles[i].RK4Data->vrot0 + dt_2 * Particles[i].RK4Data->k2arot;
+  }
+  accelerations();
+#pragma omp parallel for default(shared)
+  for (size_t i = 0; i < Particles.size(); ++i) {
+    Particles[i].RK4Data->k3acc = Particles[i].acc;
+    Particles[i].RK4Data->k3arot = Particles[i].arot;
+  }
+
+  // k4 ........
+  for (size_t c = 0; c < System.controls.size(); ++c) {
+    switch (System.controls[c].type) {
+      case _x_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].pos.x =
+            Particles[i].RK4Data->pos0.x + dt * Particles[i].RK4Data->vel0.x + dt2_2 * Particles[i].RK4Data->k3acc.x;
+        Particles[i].vel.x = Particles[i].RK4Data->vel0.x + dt * Particles[i].RK4Data->k3acc.x;
+      } break;
+      case _y_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].pos.y =
+            Particles[i].RK4Data->pos0.y + dt * Particles[i].RK4Data->vel0.y + dt2_2 * Particles[i].RK4Data->k3acc.y;
+        Particles[i].vel.y = Particles[i].RK4Data->vel0.y + dt * Particles[i].RK4Data->k3acc.y;
+      } break;
+      case _z_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].pos.z =
+            Particles[i].RK4Data->pos0.z + dt * Particles[i].RK4Data->vel0.z + dt2_2 * Particles[i].RK4Data->k3acc.z;
+        Particles[i].vel.z = Particles[i].RK4Data->vel0.z + dt * Particles[i].RK4Data->k3acc.z;
+      } break;
+      default:
+        break;
+    }
+  }
+#pragma omp parallel for default(shared)
+  for (size_t i = nDriven; i < Particles.size(); ++i) {
+    // pos0 + h * vel0 + h2_2 * k3acc
+    Particles[i].pos =
+        Particles[i].RK4Data->pos0 + dt * Particles[i].RK4Data->vel0 + dt2_2 * Particles[i].RK4Data->k3acc;
+    // Q0 + h * dot(Q0,vrot0) + h2_2 * ddot(Q0,vrot0,k3arot)
+    Particles[i].Q = Particles[i].RK4Data->Q0;
+    Particles[i].Q += (Particles[i].RK4Data->Q0.dot(Particles[i].RK4Data->vrot0) *= dt);
+    Particles[i].Q +=
+        (Particles[i].RK4Data->Q0.ddot(Particles[i].RK4Data->vrot0, Particles[i].RK4Data->k3arot) *= dt2_2);
+    // vel0 + h * k3acc
+    Particles[i].vel = Particles[i].RK4Data->vel0 + dt * Particles[i].RK4Data->k3acc;
+    // vrot0 + h * k3arot
+    Particles[i].vrot = Particles[i].RK4Data->vrot0 + dt * Particles[i].RK4Data->k3arot;
+  }
+  accelerations();
+#pragma omp parallel for default(shared)
+  for (size_t i = 0; i < Particles.size(); ++i) {
+    Particles[i].RK4Data->k4acc = Particles[i].acc;
+    Particles[i].RK4Data->k4arot = Particles[i].arot;
+  }
+
+  // Weighting
+  for (size_t c = 0; c < System.controls.size(); ++c) {
+    switch (System.controls[c].type) {
+      case _x_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].pos.x =
+            Particles[i].RK4Data->pos0.x + dt * Particles[i].RK4Data->vel0.x +
+            dt2_6 * (Particles[i].RK4Data->k1acc.x + Particles[i].RK4Data->k2acc.x + Particles[i].RK4Data->k3acc.x);
+        Particles[i].vel.x =
+            Particles[i].RK4Data->vel0.x + dt_6 * (Particles[i].RK4Data->k1acc.x + 2.0 * Particles[i].RK4Data->k2acc.x +
+                                                   2.0 * Particles[i].RK4Data->k3acc.x + Particles[i].RK4Data->k4acc.x);
+      } break;
+      case _y_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].pos.y =
+            Particles[i].RK4Data->pos0.y + dt * Particles[i].RK4Data->vel0.y +
+            dt2_6 * (Particles[i].RK4Data->k1acc.y + Particles[i].RK4Data->k2acc.y + Particles[i].RK4Data->k3acc.y);
+        Particles[i].vel.y =
+            Particles[i].RK4Data->vel0.y + dt_6 * (Particles[i].RK4Data->k1acc.y + 2.0 * Particles[i].RK4Data->k2acc.y +
+                                                   2.0 * Particles[i].RK4Data->k3acc.y + Particles[i].RK4Data->k4acc.y);
+      } break;
+      case _z_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].pos.z =
+            Particles[i].RK4Data->pos0.z + dt * Particles[i].RK4Data->vel0.z +
+            dt2_6 * (Particles[i].RK4Data->k1acc.z + Particles[i].RK4Data->k2acc.z + Particles[i].RK4Data->k3acc.z);
+        Particles[i].vel.z =
+            Particles[i].RK4Data->vel0.z + dt_6 * (Particles[i].RK4Data->k1acc.z + 2.0 * Particles[i].RK4Data->k2acc.z +
+                                                   2.0 * Particles[i].RK4Data->k3acc.z + Particles[i].RK4Data->k4acc.z);
+      } break;
+      default:
+        break;
+    }
+  }
+#pragma omp parallel for default(shared)
+  for (size_t i = nDriven; i < Particles.size(); ++i) {
+    // pos = pos0 + dt * vel0 + dt2_6 * (k1acc + k2acc + k3acc);
+    Particles[i].pos =
+        Particles[i].RK4Data->pos0 + dt * Particles[i].RK4Data->vel0 +
+        dt2_6 * (Particles[i].RK4Data->k1acc + Particles[i].RK4Data->k2acc + Particles[i].RK4Data->k3acc);
+    // Q = Q0 + dt * dot(Q0,vel0) + dt2_6 * (ddot(Q0,vel0,k1arot) + ddot(Q0,vel0,k2arot) + ddot(Q0,vel0,k3arot));
+    Particles[i].Q = Particles[i].RK4Data->Q0;
+    Particles[i].Q += (Particles[i].RK4Data->Q0.dot(Particles[i].RK4Data->vrot0) *= dt);
+    quat Qadd = Particles[i].RK4Data->Q0.ddot(Particles[i].RK4Data->vrot0, Particles[i].RK4Data->k1arot);
+    Qadd += Particles[i].RK4Data->Q0.ddot(Particles[i].RK4Data->vrot0, Particles[i].RK4Data->k2arot);
+    Qadd += Particles[i].RK4Data->Q0.ddot(Particles[i].RK4Data->vrot0, Particles[i].RK4Data->k3arot);
+    Particles[i].Q += (Qadd *= dt2_6);
+    // vel = vel0 + dt_6 * (k1acc + 2.0 * k2acc + 2.0 * k3acc + k4acc);
+    Particles[i].vel =
+        Particles[i].RK4Data->vel0 + dt_6 * (Particles[i].RK4Data->k1acc + 2.0 * Particles[i].RK4Data->k2acc +
+                                             2.0 * Particles[i].RK4Data->k3acc + Particles[i].RK4Data->k4acc);
+    // vrot = vrot0 + dt_6 * (k1arot + 2.0 * k2arot + 2.0 * k3arot + k4arot);
+    Particles[i].vrot =
+        Particles[i].RK4Data->vrot0 + dt_6 * (Particles[i].RK4Data->k1arot + 2.0 * Particles[i].RK4Data->k2arot +
+                                              2.0 * Particles[i].RK4Data->k3arot + Particles[i].RK4Data->k4arot);
+  }
+}
+
+/**
     @brief The integration LOOP
 */
 void Rockable::integrate() {
@@ -1756,6 +2292,12 @@ void Rockable::integrate() {
   // or if they have been modified for any reason
   dt_2 = 0.5 * dt;
   dt2_2 = dt_2 * dt;
+  dt2 = dt * dt;
+  dt2_8 = 0.125 * dt2;
+  dt2_6 = dt2 / 6.0;
+  dt_6 = dt / 6.0;
+
+  initIntegrator();
 
   // Save the current configuration
   saveConf(iconf);
@@ -1782,7 +2324,7 @@ void Rockable::integrate() {
                 << __printNamedCell(13, "%Rest:", 13, 100.0 - NLPercent - ForcePercent) << '\n';
 
       double efficiency = interConf / elapsedTime;
-      perfFile << t << " " << efficiency << " " << NLPercent << " " << ForcePercent << '\n';
+      perfFile << t << " " << efficiency << " " << NLPercent << " " << ForcePercent << '\n' << std::flush;
 
       timeInUpdateNL = 0.0;
       timeInForceComputation = 0.0;
@@ -1801,14 +2343,14 @@ void Rockable::integrate() {
         double Fmax_fnMean = fabs(Fmax / fnMean);
         std::cout << "|   Static balance:\n|   " << __printNamedCell(13, "max(F/fnMax):", 13, F_fnmax)
                   << __printNamedCell(13, "Fmax/fnMean:", 13, Fmax_fnMean) << '\n';
-        staticBalanceFile << t << " " << F_fnmax << " " << Fmax_fnMean << '\n';
+        staticBalanceFile << t << " " << F_fnmax << " " << Fmax_fnMean << '\n' << std::flush;
       }
 
       double Etrans, Erot;
       getKineticEnergy(Etrans, Erot);
       std::cout << "|   Kinetic energy:\n|   " << __printNamedCell(13, "Etrans:", 13, Etrans)
                 << __printNamedCell(13, "Erot:", 13, Erot) << '\n';
-      kineticEnergyFile << t << " " << Etrans << " " << Erot << '\n';
+      kineticEnergyFile << t << " " << Etrans << " " << Erot << '\n' << std::flush;
       std::cout << "+-----------------------------------------------------------------------------------\n\n";
 
       saveConf(iconf);
@@ -1839,7 +2381,9 @@ void Rockable::integrate() {
       if (step % dataExtractors[d]->nrec == 0) dataExtractors[d]->record();
     }
 
-    velocityVerletStep();
+    // velocityVerletStep();
+    IntegrationStep();
+
     t += dt;
     interConfC += dt;
     interVerletC += dt;
@@ -1933,7 +2477,7 @@ void Rockable::accelerations() {
   interfacesToBreak.clear();
 
   // In the following loop, ALL interactions are updated.
-  // and the interacations that are sticked or with positive dn
+  // and the interactions that are sticked or with positive dn
 #pragma omp parallel for default(shared)
   for (size_t k = 0; k < Interactions.size(); ++k) {
     for (auto it = Interactions[k].begin(); it != Interactions[k].end(); ++it) {
@@ -1946,7 +2490,7 @@ void Rockable::accelerations() {
   // of the cantacts that share the same body pair
   if (ctcPartnership.update != nullptr) ctcPartnership.update(*this);
 
-    // Now the forces are computed (for active Interactions)
+    // Now the forces and moments are computed
 #pragma omp parallel for default(shared)
   for (size_t k = 0; k < Interactions.size(); ++k) {
     for (auto it = Interactions[k].begin(); it != Interactions[k].end(); ++it) {
@@ -2077,7 +2621,7 @@ void Rockable::numericalDamping() {
   double factorMinus = 1.0 - numericalDampingCoeff;
   double factorPlus = 1.0 + numericalDampingCoeff;
 
-  // Damping applied to the force-driven components of the bodies
+  // Damping applied to the force-driven components of the driven bodies
   for (size_t c = 0; c < System.controls.size(); ++c) {
     switch (System.controls[c].type) {
       case _x_For_: {
@@ -2103,17 +2647,7 @@ void Rockable::numericalDamping() {
 #pragma omp parallel for default(shared)
   for (size_t i = nDriven; i < Particles.size(); ++i) {
 
-    // Translation
-    factor = (Particles[i].force * Particles[i].vel > 0.0) ? factorMinus : factorPlus;
-    Particles[i].force *= factor;
-
-    // Rotation
-    factor = (Particles[i].moment * Particles[i].vrot > 0.0) ? factorMinus : factorPlus;
-    Particles[i].moment *= factor;
-
-    // The version below damp component by component,
-    // and it seems to be the wrong solution.
-    /*
+#ifdef COMPONENTWISE_NUM_DAMPING
     // Translation
     for (int c = 0; c < 3; ++c) {
       factor = (Particles[i].force[c] * Particles[i].vel[c] > 0.0) ? factorMinus : factorPlus;
@@ -2125,7 +2659,15 @@ void Rockable::numericalDamping() {
       factor = (Particles[i].moment[c] * Particles[i].vrot[c] > 0.0) ? factorMinus : factorPlus;
       Particles[i].moment[c] *= factor;
     }
-   */
+#else
+    // Translation
+    factor = (Particles[i].force * Particles[i].vel > 0.0) ? factorMinus : factorPlus;
+    Particles[i].force *= factor;
+
+    // Rotation
+    factor = (Particles[i].moment * Particles[i].vrot > 0.0) ? factorMinus : factorPlus;
+    Particles[i].moment *= factor;
+#endif
   }
 }
 
@@ -2143,24 +2685,6 @@ void Rockable::numericalDamping() {
 void Rockable::computeAABB(size_t first, size_t last) {
   if (last == 0) last = Particles.size() - 1;
 
-  // **** Previous version
-  /*
-  aabb.set_single(Particles[first].GlobVertex(0));
-  aabb.enlarge(Particles[first].MinskowskiRadius());
-
-  for (size_t i = first; i <= last; i++) {
-    double radius = Particles[i].MinskowskiRadius();
-    for (size_t v = 0; v < Particles[i].shape->vertex.size(); v++) {
-      AABB boxi;
-      boxi.set_single(Particles[i].GlobVertex(v));
-      boxi.enlarge(radius);
-
-      aabb.enlarge(boxi);
-    }
-  }
-  */
-
-  // **** New version
   paabb.clear();
   paabb.resize(Particles.size());
 
@@ -2181,6 +2705,49 @@ void Rockable::computeAABB(size_t first, size_t last) {
   for (size_t i = first + 1; i <= last; i++) {
     aabb.enlarge(paabb[i]);
   }
+}
+
+double Rockable::probeSolidFraction(AABB& aabb, size_t MCnstep) {
+  if (MCnstep == 0) return -1.0;
+
+  // select the concerned particles
+  OBB zone;
+  zone.center = 0.5 * (aabb.min + aabb.max);
+  zone.extent.set(0.5 * (aabb.max.x - aabb.min.x), 0.5 * (aabb.max.y - aabb.min.y), 0.5 * (aabb.max.z - aabb.min.z));
+  std::vector<size_t> pid;
+  for (size_t i = 0; i < Particles.size(); ++i) {
+    Particles[i].updateObb();
+    if (zone.intersect(Particles[i].obb)) {
+      pid.push_back(i);
+    }
+  }
+
+  vec3r pt3;
+  std::vector<double> vv(3);
+  Mth::sobolSequence(-3, vv);  // Initialize the Sobol sequence
+  size_t count = 0;
+  for (size_t imc = 0; imc < MCnstep; ++imc) {
+    Mth::sobolSequence(3, vv);
+    pt3.set(aabb.min.x + vv[0] * (aabb.max.x - aabb.min.x), aabb.min.y + vv[1] * (aabb.max.y - aabb.min.y),
+            aabb.min.z + vv[2] * (aabb.max.z - aabb.min.z));
+
+    bool inSolid = false;
+    for (size_t ii = 0; ii < pid.size(); ii++) {
+      size_t i = pid[ii];
+      vec3r ptTest = pt3 - Particles[i].pos;
+      quat Qinv = Particles[i].Q.get_conjugated();
+      ptTest = Qinv * ptTest;
+      ptTest /= Particles[i].homothety;
+
+      if (Particles[i].shape->inside(ptTest)) {
+        inSolid = true;
+        break;
+      }
+    }
+    if (inSolid) count++;
+  }
+
+  return ((double)count / (double)MCnstep);
 }
 
 /**
@@ -2638,7 +3205,7 @@ void Rockable::rotateAndTranslateBlock(vec3r & center, vec3r & axis, double angl
    @brief Create sticked contacts between vertices (spheres) of particles
           that belong to the same cluster (same cluster-ID)
 
-   @param[in]  epsilonDist  A small distance below which the 'glue' is not added
+   @param[in]  epsilonDist  A small distance above which the 'glue' is not added
 */
 void Rockable::stickVerticesInClusters(double epsilonDist) {
   for (size_t i = 0; i < Particles.size(); i++) {
@@ -2672,7 +3239,7 @@ void Rockable::stickVerticesInClusters(double epsilonDist) {
             dMaxSqr *= dMaxSqr;
 
             if (distSqr < dMaxSqr) {
-              // It is necessary two free bodies (spheres at vertices) that interact
+              // It is necessarily two free bodies (spheres at vertices) that interact
               double meff = (Particles[i].mass * Particles[j].mass) / (Particles[i].mass + Particles[j].mass);
               double en2 = dataTable.get(idEn2InnerBond, Particles[i].group, Particles[j].group);
               double kn = dataTable.get(idKnInnerBond, Particles[i].group, Particles[j].group);
@@ -2715,7 +3282,7 @@ void Rockable::stickVerticesInClusters(double epsilonDist) {
 }
 
 /**
-   @brief Create sticked interface between two sub-elements of two particles
+   @brief Create sticked interface between two sub-elements of two distinct particles
           that do not belong to the same cluster (different cluster-ID).
           The idea is to update the neighbor list and then replace the contacts
           between different clusters by a SINGLE sticked link.

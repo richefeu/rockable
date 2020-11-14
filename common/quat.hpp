@@ -87,16 +87,22 @@ public:
 		return (V + uv + uuv);
 	}
 
-	/// @brief Return the time derivative of the quaternion \f$ \dot{q} = \frac{1}{2} \omega q\f$
-	quat dot(const vec3r &omega) {
-		quat q(
-		    0.5 * (omega.y * v.z - omega.z * v.y + omega.x * s),
-		    0.5 * (omega.z * v.x - omega.x * v.z + omega.y * s),
-		    0.5 * (omega.x * v.y - omega.y * v.x + omega.z * s),
-		    -0.5 * (omega * v)
-		);
-		return q;
-	}
+  /// @brief Return the time derivative of the quaternion
+  quat dot(const vec3r &omega) {
+    quat q(0.5 * (omega.y * v.z - omega.z * v.y + omega.x * s), 0.5 * (omega.z * v.x - omega.x * v.z + omega.y * s),
+           0.5 * (omega.x * v.y - omega.y * v.x + omega.z * s), -0.5 * (omega * v));
+    return q;
+  }
+
+  /// @brief Return the time second-derivative of the quaternion
+  quat ddot(const vec3r &omega, const vec3r &domega) {
+    quat q1(s * domega + cross(domega, v), -domega * v); // remark: ctor is quat(v, s)
+    vec3r c = cross(omega, v);
+    quat q2(-(omega * v) * omega + cross(omega, s * omega + c), omega * (s * omega + c));
+    q1 += (q2 *= 0.5);
+    q1 *= 0.5;
+    return q1;
+  }
 	
 	/// @brief Change the quaternion to its conjugate
 	void conjugate() { v = -v; }
