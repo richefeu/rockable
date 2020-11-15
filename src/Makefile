@@ -35,7 +35,12 @@
 #######################################################################################################################
 
 # An option can be disable by adding 'n' before
-OPTIONS = -DQUAT_ACC -DnFT_CORR -DnROT_MATRIX -DnBREAK_ONCE
+OPTIONS = -DQUAT_ACC -DnFT_CORR -DnROT_MATRIX -DnBREAK_ONCE -DnCOMPONENTWISE_NUM_DAMPING
+
+# If you don't want to use libpng in 'see', comment this two lines
+# In this case the screenshots will be TGA (not compressed)
+#PNGFLAGS = -DPNG_H `pkg-config --cflags libpng`
+#PNGLINK = `pkg-config --libs libpng`
 
 # Paths
 COMMONPATH = ../common
@@ -45,14 +50,16 @@ ifeq ($(UNAME_S),Darwin)
   # The compiler to be used
   CXX = g++-10
   # The list of flags passed to the compiler
-  CXXFLAGS = -fopenmp -O3 -Wall -Wextra -Wno-deprecated-declarations -std=c++11 -I $(COMMONPATH) $(OPTIONS)
+  CXXFLAGS := -fopenmp -O3 -Wall -Wextra -Wno-deprecated-declarations -std=c++11 
+  CXXFLAGS += -I $(COMMONPATH) $(OPTIONS) $(SVNDEV)
   # Link flags for OpenGL and glut
-  GLLINK = -framework OpenGL -framework GLUT
+  GLUTFLAGS = `pkg-config --cflags glut`
+  GLLINK = `pkg-config --libs glut` -framework OpenGL
 else
   # The compiler to be used
   CXX = g++
   # The list of flags passed to the compiler
-  CXXFLAGS = -fopenmp -O3 -std=c++0x -I $(COMMONPATH) $(OPTIONS)
+  CXXFLAGS = -fopenmp -O3 -std=c++0x -I $(COMMONPATH) $(OPTIONS) $(SVNDEV)
   # Link flags for OpenGL and glut
   GLLINK = -lGLU -lGL -L/usr/X11R6/lib -lglut -lXmu -lXext -lX11 -lXi
 endif
@@ -125,7 +132,7 @@ patatrac: patatrac.cpp patatrac.hpp $(HEADERS) $(SOURCES) $(OBJECTS)
 
 # The application that visualizes the conf files
 see: see.cpp see.hpp $(HEADERS) $(SOURCES) $(OBJECTS)
-	$(CXX) $(CXXFLAGS) -c $<
-	$(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(GLLINK)
+	$(CXX) $(CXXFLAGS) $(GLUTFLAGS) $(PNGFLAGS) -c $< 
+	$(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(GLLINK) $(PNGLINK)
 
 #######################################################################################################################

@@ -35,16 +35,11 @@
 
 #ifndef SEE_HPP
 #define SEE_HPP
-
 #include <tclap/CmdLine.h>
 
-# ifdef __APPLE__
-#  include <GLUT/glut.h>
-# else
-#  include <GL/glut.h>
-# endif
+#include <GL/freeglut.h>
 
-# ifdef PNG_SCREENSHOTS
+# ifdef PNG_H
 #  include <png.h>
 # endif
 
@@ -66,6 +61,7 @@ int main_window;
 // flags with default values
 int show_background  = 1;
 int show_particles   = 1;
+int show_driven      = 1;
 int show_velocities  = 0;
 int show_slice       = 0;
 int show_forces      = 0;
@@ -76,6 +72,10 @@ int show_interFrames = 0;
 int show_interTypes  = 0;
 int show_keybinds    = 0;
 int show_traj        = 0;
+int show_probe       = 0;
+
+AABB probe;
+size_t probe_MCnsteps = 10000;
 
 int complexMode = 0;
 size_t complexityNumber = 0; // it says how the sample will be long to display
@@ -121,6 +121,7 @@ void drawTrajectories();
 void drawInteractionTypes();
 void drawInteractionFrames();
 void drawOBBs();
+void drawProbe();
 
 // Callback functions
 void keyboard(unsigned char Key, int x, int y);

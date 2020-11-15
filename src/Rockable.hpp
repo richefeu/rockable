@@ -69,6 +69,7 @@
 #include "message.hpp"
 
 // local headers
+#include "BodyForce.hpp"
 #include "BreakableInterface.hpp"
 #include "ContactPartnership.hpp"
 #include "DataExtractor.hpp"
@@ -76,35 +77,30 @@
 #include "Interaction.hpp"
 #include "Particle.hpp"
 #include "clusterParticles.hpp"
-#include "BodyForce.hpp"
 
 class Rockable {
  public:
   std::vector<Particle> Particles;                        ///< The particles
-  std::vector<std::set<Interaction> > Interactions;       ///< The interactions
-                                                          ///< (contacts and potential contacts)
+  std::vector<std::set<Interaction> > Interactions;       ///< The interactions (contacts and potential contacts)
   std::vector<std::set<BreakableInterface> > Interfaces;  ///< The interfaces
-  std::vector<Interaction*> activeInteractions;           ///< Hold a pointer to the
-                                                          ///< contact interactions that are active
-  ContactPartnership ctcPartnership;                      ///< Model to weight the stiffnesses of contacts
-                                                          ///< in case of multiple contacts between two particles
-  DrivingSystem System;                                   ///< The system driver acting on the nDriven first particles
-  size_t nDriven;                                         ///< Number of sphero-polyhedra that are fix at the beginning
-                                                          ///< of the list of bodies
+  std::vector<Interaction*> activeInteractions;  ///< Hold a pointer to the contact interactions that are active
 
-  std::vector<DataExtractor*> dataExtractors;  ///< Some data to be saved in
-                                               ///< files according to given
-                                               ///< processings
-  std::vector<Tempo<double> > Tempos;    ///< useful for force ramps for example
-  
-  BodyForce *bodyForce;                  ///< We can add body-forces and body-moments
-                                         ///< in addition to gravity 
+  ContactPartnership ctcPartnership;  ///< Model to weight the stiffnesses of contacts
+                                      ///< in case of multiple contacts between two particles
+
+  DrivingSystem System;  ///< The system driver acting on the nDriven first particles
+  size_t nDriven;        ///< Number of sphero-polyhedra that are fix at the beginning of the list of bodies
+
+  std::vector<DataExtractor*> dataExtractors;  ///< Some data to be saved in files according to given processings
+
+  std::vector<Tempo<double> > Tempos;  ///< Useful for force ramps for example
+
+  BodyForce* bodyForce;  ///< We can add body-forces and body-moments in addition to gravity
 
   // Shape library
   std::string shapeFile;                  ///< Name of the file that contain the library of shapes
   std::vector<Shape> Shapes;              ///< Loaded library of shapes
-  std::map<std::string, size_t> shapeId;  ///< Associate a name of shape with
-                                          ///< its id in the vector 'Shapes'
+  std::map<std::string, size_t> shapeId;  ///< Associate a name of shape with its id in the vector 'Shapes'
 
   // Time parameters
   double t;     ///< Current Time
@@ -139,16 +135,16 @@ class Rockable {
   vec3r gravity;            ///< Gravity acceleration
   int ParamsInInterfaces;   ///< Flag saying if the parameters for sticked blonds
                             ///< are embedded within the interfaces
-  bool glue_with_walls;     ///< flag to say if the glue can be also set between free and controlled particles 
+  bool glue_with_walls;     ///< flag to say if the glue can be also set between free and controlled particles
 
   vec3r cellMinSizes;      ///< Sizes of the linked cells in the 3 directions x, y ad z
   int boxForLinkCellsOpt;  ///< Option for defining the master cell when linkCells' stategy in employed
-
 
   // Ctor
   Rockable();
 
   // Initialization methods
+  void setVerboseLevel(int v);             ///< Defines verbosity
   void initOutputFiles();                  ///< Open the output files
   void setInteractive(bool imode = true);  ///< Set in a computation mode
   bool isInteractive() const;              ///< Set in a visualization mode
@@ -157,14 +153,14 @@ class Rockable {
   void initialChecks();  ///< Checks before runing a computation
 
   // Core DEM methods
-  void velocityVerletStep();               ///< Make a time increment with the
-                                           ///< velocity-Verlet scheme
-  void integrate();                        ///< Simulation flow (make time increments and check for
-                                           ///< updates or saving)
-  void accelerations();                    ///< Compute accelerations (both for particles and the
-                                           ///< periodic-cell)
-  void incrementResultants(Interaction&);  ///< Project force and moment on the
-                                           ///< interacting particles
+  void velocityVerletStep();               ///< Make a time increment with the velocity-Verlet scheme
+  void EulerStep();                        ///< Make a time increment with the explicit-Euler scheme
+  void BeemanStep();                       ///< Make a time increment with the Beeman scheme
+  void RungeKutta4Step();                  ///< Make a time increment with the Runge-Kutta scheme (4th order)
+  void initIntegrator();                   ///< Set additionally stored data required by some integrator
+  void integrate();                        ///< Simulation flow (make time increments and check for updates or saving)
+  void accelerations();                    ///< Compute accelerations (both for particles and the periodic-cell)
+  void incrementResultants(Interaction&);  ///< Project force and moment on the interacting particles
 
   // Save/Load methods
   void clearMemory();            ///< Clear the Particles and Interactions
@@ -176,9 +172,12 @@ class Rockable {
 
   void UpdateNL_bruteForce();      ///< Brute-force approach
   void UpdateNL_linkCells();       ///< Link-cells approach
-  std::function<void()> UpdateNL;  ///< Pointer funtion to the updateNL (update
-                                   ///< the neighbor-list) method
+  std::function<void()> UpdateNL;  ///< Pointer funtion to the updateNL
+                                   ///< (update the neighbor-list) method
 
+  std::function<void()> IntegrationStep;  ///< Pointer funtion for integration
+
+  bool forceLawDefault(Interaction&);             ///< Most common force law
   bool forceLawStickedLinks(Interaction&);        ///< Force law for 'glued' bodies
   bool forceLawAvalanches(Interaction&);          ///< Force law specific for rock avalanches
   std::function<bool(Interaction&)> forceLawPtr;  ///< Pointer funtion to the force-law used
@@ -197,6 +196,7 @@ class Rockable {
   void getClusters(std::vector<clusterParticles>& clusters);
   void getBrokenSubClusters(std::vector<clusterParticles>& subclusters);
   void getInteractionGroups(std::vector<size_t>& nbInt);
+  double probeSolidFraction(AABB& aabb, size_t MCnstep = 100000);
 
   // Pre-processing methods
   void stickVerticesInClusters(double);  ///< Create bonds between vertices if
@@ -220,6 +220,7 @@ class Rockable {
 
   // =============================================================================================================
  private:
+  void velocityControlledDrive();
   void numericalDamping();      ///< The Cundall damping solution
   void dynamicCheckUpdateNL();  ///< Ask for NL reconstruction if the maximum
                                 ///< displacement of rotation is more than given
@@ -241,6 +242,7 @@ class Rockable {
   std::map<std::string, std::string> optionNames;  ///< All the options refered to as a string and set
                                                    ///< as a string also
   bool interactiveMode;                            ///< computation (false) or visualization (true) modes
+  int verbose;
 
   // Some predefined identifiers to get (quickly) data from input tables
   size_t idDensity;  ///< Identifier of the density parameter
@@ -289,7 +291,11 @@ class Rockable {
 
   // time-step constants
   double dt_2;   ///< Half the time-step
+  double dt_6;   ///< Time-step divided by 6
   double dt2_2;  ///< Half the squared time-step
+  double dt2;    ///< Double of time-step
+  double dt2_8;  ///< Squared time-step divided by 8
+  double dt2_6;  ///< Squared time-step divided by 6
 
   // output files
   std::ofstream perfFile;           ///< to store performance data in the course of a computation

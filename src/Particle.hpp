@@ -37,11 +37,36 @@
 #define PARTICLE_HPP
 
 #include <vector>
+#include <memory>
 
 #include "quat.hpp"
 #include "vec3.hpp"
 
 #include "Shape.hpp"
+
+struct BeemanMoreData {
+  vec3r accPrevious;
+  vec3r arotPrevious;
+  vec3r velPrevious;
+  vec3r vrotPrevious;
+  vec3r accCurrent;
+  vec3r arotCurrent;
+};
+
+struct RK4MoreData {
+  vec3r pos0;
+  quat Q0;
+  vec3r vel0;
+  vec3r vrot0;
+  vec3r k1acc;
+  vec3r k2acc;
+  vec3r k3acc;
+  vec3r k4acc;
+  vec3r k1arot;
+  vec3r k2arot;
+  vec3r k3arot;
+  vec3r k4arot;
+};
 
 /// A particle (which is a sphero-polyhedron)
 class Particle {
@@ -56,6 +81,9 @@ class Particle {
   quat Q;      ///< Angular position
   vec3r vrot;  ///< Angular velocity
   vec3r arot;  ///< Angular acceleration
+  
+  std::shared_ptr<BeemanMoreData> beemanData;
+  std::shared_ptr<RK4MoreData> RK4Data;
 
   Shape* shape;      ///< The particle shape
   double homothety;  ///< Homothety applied to the shape

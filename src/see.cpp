@@ -72,7 +72,7 @@ void showKeybinds() {
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[p]    edit selected body");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[q]    quit");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[y]    make the display faster (and less nice)");
-#ifdef PNG_SCREENSHOTS
+#ifdef PNG_H
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[z]    make a screenshot (oneshot.png)");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[Z]    make a series of screenshots (shotX.png)");
 #else
@@ -104,6 +104,21 @@ void keyboard(unsigned char Key, int x, int y) {
       selectedParticle = -1;
       break;
 
+    case '!': {
+      show_probe = 1 - show_probe;
+      if (show_probe == 1 && fileTool::fileExists("probe.txt")) {
+        std::ifstream f("probe.txt");
+        f >> probe.min >> probe.max >> probe_MCnsteps;
+        std::cout << "Probe: min = " << probe.min << "\n       max = " << probe.max << "\n";
+      }
+    } break;
+
+    case '@': {
+      std::cout << "Probing with " << probe_MCnsteps << " Monte-Carlo steps...\n" << std::flush;
+      double SF = box.probeSolidFraction(probe, probe_MCnsteps);
+      std::cout << "Solid Fraction in probe: " << SF << '\n';
+    } break;
+
     case ' ':
       textZone.reset();
       break;
@@ -128,6 +143,10 @@ void keyboard(unsigned char Key, int x, int y) {
       for (int i = 0; i < 5000; i++) box.velocityVerletStep();
       textZone.addLine("5000 time steps have been done.");
     } break;
+
+    case 'd':
+      show_driven = 1 - show_driven;
+      break;
 
     case 'e':
       if (alpha_particles > 0.1) alpha_particles -= 0.05;
@@ -229,7 +248,11 @@ void keyboard(unsigned char Key, int x, int y) {
 
     case 'w': {
       vec3r d = center - eye;
-      up.set(-d.x * d.y, d.x * d.x + d.z * d.z, -d.z * d.y);
+      if (box.gravity.isnull())
+        up.set(-d.x * d.y, d.x * d.x + d.z * d.z, -d.z * d.y);
+      else {
+        up = -cross(cross(d, box.gravity), d);
+      }
       up.normalize();
     } break;
 
@@ -327,7 +350,9 @@ void selection(int x, int y) {
 
   if (show_particles) {
     glColor3f(0.5f, 0.5f, 0.5f);
-    for (size_t i = 0; i < box.Particles.size(); ++i) {
+    size_t i0 = 0;
+    if (show_driven == 0) i0 = box.nDriven;
+    for (size_t i = i0; i < box.Particles.size(); ++i) {
       glLoadName(i);
       vec3r pos = box.Particles[i].pos;
 
@@ -440,6 +465,7 @@ void motion(int x, int y) {
 }
 
 void display() {
+  sleep(0);  // it is supposed to accelerate the display
   glutTools::clearBackground(show_background);
   adjustClippingPlans();
   glMatrixMode(GL_MODELVIEW);
@@ -457,6 +483,7 @@ void display() {
   if (show_interTypes) drawInteractionTypes();
   if (show_obb) drawOBBs();
   if (show_particles) drawParticles();
+  if (show_probe) drawProbe();
 
   if (show_keybinds) showKeybinds();
   textZone.draw();
@@ -556,7 +583,7 @@ void drawShape(Shape* s, double homothety) {
 }
 
 void drawParticles() {
-  if (mouse_mode != NOTHING && complexityNumber > 5000) {
+  if (mouse_mode != NOTHING && complexityNumber > 100) {
     drawOBBs();
     return;
   }
@@ -579,20 +606,22 @@ void drawParticles() {
     glPopMatrix();
   }
 
-  for (size_t i = 0; i < box.nDriven; ++i) {
-    if (selectedParticle >= 0 && i == (size_t)selectedParticle) {
-      glColor4ub(234, 255, 0, (int)floor(alpha_fixparticles * 255));
-    } else
-      glColor4ub(128, 128, 128, (int)floor(alpha_fixparticles * 255));
+  if (show_driven == 1) {
+    for (size_t i = 0; i < box.nDriven; ++i) {
+      if (selectedParticle >= 0 && i == (size_t)selectedParticle) {
+        glColor4ub(234, 255, 0, (int)floor(alpha_fixparticles * 255));
+      } else
+        glColor4ub(128, 128, 128, (int)floor(alpha_fixparticles * 255));
 
-    vec3r pos = box.Particles[i].pos;
+      vec3r pos = box.Particles[i].pos;
 
-    glPushMatrix();
-    glTranslatef(pos.x, pos.y, pos.z);
-    quat2GLMatrix<GLfloat>(box.Particles[i].Q, Rot_Matrix);
-    glMultMatrixf(Rot_Matrix);
-    drawShape(box.Particles[i].shape, box.Particles[i].homothety);
-    glPopMatrix();
+      glPushMatrix();
+      glTranslatef(pos.x, pos.y, pos.z);
+      quat2GLMatrix<GLfloat>(box.Particles[i].Q, Rot_Matrix);
+      glMultMatrixf(Rot_Matrix);
+      drawShape(box.Particles[i].shape, box.Particles[i].homothety);
+      glPopMatrix();
+    }
   }
 }
 
@@ -605,7 +634,7 @@ void drawTrajectories() {
 
   for (size_t r = 0; r < releases.size(); ++r) {
     for (size_t f = 0; f < releases[r].freeFlights.size(); ++f) {
-      
+
       glBegin(GL_LINE_STRIP);
       vec3r p;
       for (double s = 0.0; s <= 1.0; s += 0.1) {
@@ -621,62 +650,6 @@ void drawTrajectories() {
 void drawOBBs() {
   glEnable(GL_LIGHTING);
   glEnable(GL_DEPTH_TEST);
-  glLineWidth(1.0f);
-  /*
-  for (size_t i = 0 ; i < box.Particles.size() ; ++i) {
-          glColor4ub(255, 0, 0, 255); // RED
-
-          double h = box.Particles[i].homothety;
-          vec3r pos = box.Particles[i].pos;
-          OBB obb = box.Particles[i].shape->obb;
-          pos += obb.center * h;
-          if (enlarged_obb) obb.enlarge(0.5 * box.DVerlet);
-          vec3r ext = obb.extent;
-          vec3r e0 = h * obb.e[0] * ext.x;
-          vec3r e1 = h * obb.e[1] * ext.y;
-          vec3r e2 = h * obb.e[2] * ext.z;
-
-          //if (!inSlice(pos)) continue;
-          glPushMatrix ();
-          glTranslatef (pos.x, pos.y, pos.z);
-          quat2GLMatrix<GLfloat> (box.Particles[i].Q, Rot_Matrix);
-          glMultMatrixf (Rot_Matrix);
-
-          vec3r corner;
-          glBegin (GL_LINE_LOOP);
-          corner = e0 + e1 + e2; glVertex3f (corner.x, corner.y, corner.z);
-          corner -= 2.0 * e1; glVertex3f (corner.x, corner.y, corner.z);
-          corner -= 2.0 * e2; glVertex3f (corner.x, corner.y, corner.z);
-          corner += 2.0 * e1; glVertex3f (corner.x, corner.y, corner.z);
-          corner += 2.0 * e2; glVertex3f (corner.x, corner.y, corner.z);
-          glEnd();
-          glBegin (GL_LINE_LOOP);
-          corner -= 2.0 * e0; glVertex3f (corner.x, corner.y, corner.z);
-          corner -= 2.0 * e1; glVertex3f (corner.x, corner.y, corner.z);
-          corner -= 2.0 * e2; glVertex3f (corner.x, corner.y, corner.z);
-          corner += 2.0 * e1; glVertex3f (corner.x, corner.y, corner.z);
-          corner += 2.0 * e2; glVertex3f (corner.x, corner.y, corner.z);
-          glEnd();
-
-          glBegin (GL_LINES);
-          glVertex3f (corner.x, corner.y, corner.z);
-          corner += 2.0 * e0; glVertex3f (corner.x, corner.y, corner.z);
-
-          corner -= 2.0 * e1; glVertex3f (corner.x, corner.y, corner.z);
-          corner -= 2.0 * e0; glVertex3f (corner.x, corner.y, corner.z);
-
-          corner -= 2.0 * e2; glVertex3f (corner.x, corner.y, corner.z);
-          corner += 2.0 * e0; glVertex3f (corner.x, corner.y, corner.z);
-
-          corner += 2.0 * e1; glVertex3f (corner.x, corner.y, corner.z);
-          corner -= 2.0 * e0; glVertex3f (corner.x, corner.y, corner.z);
-          glEnd();
-
-          glPopMatrix ();
-  }
-*/
-  /// ****
-
   glLineWidth(1.0f);
 
   OBB obbi, obbj;
@@ -733,34 +706,133 @@ void drawOBBs() {
     corner -= 2.0 * obbi.extent[0] * obbi.e[0];
     glVertex3f(corner.x, corner.y, corner.z);
     glEnd();
-
-    /*
-    for (size_t j = i + 1 ; j < box.Particles.size() ; j++) {
-
-            obbj = box.Particles[j].shape->obb;
-            obbj.rotate(box.Particles[j].Q);
-            obbj.extent *= box.Particles[j].homothety;
-            obbj.center *= box.Particles[j].homothety;
-            obbj.center += box.Particles[j].pos;
-            obbj.enlarge(0.5 * box.DVerlet);
-
-            // check intersection
-            if (obbi.intersect(obbj)) {
-                    glBegin (GL_LINES);
-                    glColor4ub(0, 0, 255, 255); // BLUE
-                    glVertex3f (obbi.center.x, obbi.center.y, obbi.center.z);
-                    glVertex3f (obbj.center.x, obbj.center.y, obbj.center.z);
-                    //glColor4ub(0, 255, 0, 255); // GREEN
-                    //glVertex3f (box.Particles[i].pos.x,
-    box.Particles[i].pos.y, box.Particles[i].pos.z);
-                    //glVertex3f (box.Particles[j].pos.x,
-    box.Particles[j].pos.y, box.Particles[j].pos.z);
-
-                    glEnd();
-            }
-    }
-    */
   }
+}
+
+void drawProbe() {
+  glDisable(GL_LIGHTING);
+  glDisable(GL_DEPTH_TEST);
+  glLineWidth(2.0f);
+
+  glColor4ub(0, 255, 0, 60);
+
+  glBegin(GL_TRIANGLE_FAN);
+  glVertex3f(probe.min.x, probe.min.y, probe.min.z);
+  glVertex3f(probe.max.x, probe.min.y, probe.min.z);
+  glVertex3f(probe.max.x, probe.max.y, probe.min.z);
+  glVertex3f(probe.min.x, probe.max.y, probe.min.z);
+  glEnd();
+
+  glBegin(GL_TRIANGLE_FAN);
+  glVertex3f(probe.min.x, probe.min.y, probe.max.z);
+  glVertex3f(probe.max.x, probe.min.y, probe.max.z);
+  glVertex3f(probe.max.x, probe.max.y, probe.max.z);
+  glVertex3f(probe.min.x, probe.max.y, probe.max.z);
+  glEnd();
+
+  glBegin(GL_TRIANGLE_FAN);
+  glVertex3f(probe.min.x, probe.min.y, probe.min.z);
+  glVertex3f(probe.max.x, probe.min.y, probe.min.z);
+  glVertex3f(probe.max.x, probe.min.y, probe.max.z);
+  glVertex3f(probe.min.x, probe.min.y, probe.max.z);
+  glEnd();
+
+  glBegin(GL_TRIANGLE_FAN);
+  glVertex3f(probe.min.x, probe.max.y, probe.min.z);
+  glVertex3f(probe.max.x, probe.max.y, probe.min.z);
+  glVertex3f(probe.max.x, probe.max.y, probe.max.z);
+  glVertex3f(probe.min.x, probe.max.y, probe.max.z);
+  glEnd();
+
+  glBegin(GL_TRIANGLE_FAN);
+  glVertex3f(probe.min.x, probe.min.y, probe.min.z);
+  glVertex3f(probe.min.x, probe.min.y, probe.max.z);
+  glVertex3f(probe.min.x, probe.max.y, probe.max.z);
+  glVertex3f(probe.min.x, probe.max.y, probe.min.z);
+  glEnd();
+
+  glBegin(GL_TRIANGLE_FAN);
+  glVertex3f(probe.max.x, probe.min.y, probe.min.z);
+  glVertex3f(probe.max.x, probe.min.y, probe.max.z);
+  glVertex3f(probe.max.x, probe.max.y, probe.max.z);
+  glVertex3f(probe.max.x, probe.max.y, probe.min.z);
+  glEnd();
+
+  glColor4ub(0, 255, 0, 255);
+  glBegin(GL_LINE_LOOP);
+  glVertex3f(probe.min.x, probe.min.y, probe.min.z);
+  glVertex3f(probe.max.x, probe.min.y, probe.min.z);
+  glVertex3f(probe.max.x, probe.max.y, probe.min.z);
+  glVertex3f(probe.min.x, probe.max.y, probe.min.z);
+  glEnd();
+  glBegin(GL_LINE_LOOP);
+  glVertex3f(probe.min.x, probe.min.y, probe.max.z);
+  glVertex3f(probe.max.x, probe.min.y, probe.max.z);
+  glVertex3f(probe.max.x, probe.max.y, probe.max.z);
+  glVertex3f(probe.min.x, probe.max.y, probe.max.z);
+  glEnd();
+  glBegin(GL_LINES);
+  glVertex3f(probe.min.x, probe.min.y, probe.min.z);
+  glVertex3f(probe.min.x, probe.min.y, probe.max.z);
+
+  glVertex3f(probe.max.x, probe.min.y, probe.min.z);
+  glVertex3f(probe.max.x, probe.min.y, probe.max.z);
+
+  glVertex3f(probe.max.x, probe.max.y, probe.min.z);
+  glVertex3f(probe.max.x, probe.max.y, probe.max.z);
+
+  glVertex3f(probe.min.x, probe.max.y, probe.min.z);
+  glVertex3f(probe.min.x, probe.max.y, probe.max.z);
+  glEnd();
+  
+  
+  
+  
+  ///// TEST
+  /*
+  glColor4ub(255, 0, 0, 255);
+  
+  OBB zone;
+  zone.center = 0.5 * (probe.min + probe.max);
+  zone.extent.set(0.5 * (probe.max.x - probe.min.x), 0.5 * (probe.max.y - probe.min.y), 0.5 * (probe.max.z - probe.min.z));
+  std::vector<size_t> pid;
+  for (size_t i = 0; i < box.Particles.size(); ++i) {
+    box.Particles[i].updateObb();
+    if (zone.intersect(box.Particles[i].obb)) {
+      pid.push_back(i);
+    }
+  }
+
+  vec3r pt3;
+  std::vector<double> vv(3);
+  Mth::sobolSequence(-3, vv);  // Initialize the Sobol sequence
+  //size_t count = 0;
+  glBegin(GL_POINTS);
+  for (size_t imc = 0; imc < 1000; ++imc) {
+    Mth::sobolSequence(3, vv);
+    pt3.set(probe.min.x + vv[0] * (probe.max.x - probe.min.x), probe.min.y + vv[1] * (probe.max.y - probe.min.y),
+            probe.min.z + vv[2] * (probe.max.z - probe.min.z));
+    
+    //bool inSolid = false;
+    for (size_t ii = 0; ii < pid.size(); ii++) {            
+      size_t i = pid[ii];
+      vec3r ptTest = pt3 - box.Particles[i].pos;
+      quat Qinv = box.Particles[i].Q.get_conjugated();
+      ptTest = Qinv * ptTest;
+      ptTest /= box.Particles[i].homothety;
+      
+      if (box.Particles[i].shape->inside(ptTest)) {
+        //inSolid = true;
+        glVertex3f(pt3.x, pt3.y, pt3.z);
+        break;
+      }
+    }
+    //if (inSolid) count++;
+  }
+  
+  glEnd();
+  */
+  
 }
 
 void drawInteractionTypes() {
@@ -1236,6 +1308,12 @@ int main(int argc, char* argv[]) {
     readTraj(trajFileName.c_str());
   }
 
+  if (fileTool::fileExists("probe.txt")) {
+    std::ifstream f("probe.txt");
+    f >> probe.min >> probe.max >> probe_MCnsteps;
+    std::cout << "Probe: min = " << probe.min << "\n       max = " << probe.max << "\n";
+  }
+
   complexityNumber = 0;
   for (size_t i = 0; i < box.Particles.size(); ++i) {
     complexityNumber += box.Particles[i].shape->vertex.size();
@@ -1251,7 +1329,8 @@ int main(int argc, char* argv[]) {
 
   // ==== Init GLUT and create window
   glutInit(&argc, argv);
-  glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_ALPHA | GLUT_DEPTH);
+  glutSetOption(GLUT_MULTISAMPLE, 8);
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DOUBLE | GLUT_ALPHA | GLUT_DEPTH | GLUT_MULTISAMPLE);
   glutInitWindowPosition(50, 50);
   glutInitWindowSize(width, height);
   main_window = glutCreateWindow("Rockable VISUALIZER");
