@@ -14,6 +14,8 @@ dVerlet 0.02
 #### properties for particles #########
 density 0 2700
 density 1 2700
+#BodyForce ViscousFluid 3000
+
 
 #### interaction model ################
 forceLaw Avalanches

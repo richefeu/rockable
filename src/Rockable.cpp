@@ -733,6 +733,9 @@ void Rockable::loadConf(const char* name) {
       BF->plug(this);
       BF->read(conf);
       bodyForce = BF;
+      if (verbose == 1) {
+        std::cout << "The BodyForce named " << BodyForceName << " has been activated\n";
+      }
     } else {
       std::cerr << msg::warn() << "The BodyForce named " << BodyForceName << " is unknown!" << msg::normal()
                 << std::endl;

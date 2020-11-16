@@ -69,7 +69,7 @@ endif
 #OPTIONS += -DPNG_SCREENSHOTS
 #GLLINK += -lpng
 
-# The list of source files needed by Rockable
+# The list of source files needed by Rockable (excepted run.cpp)
 SOURCES = Shape.cpp \
 Particle.cpp \
 Interaction.cpp \
@@ -85,9 +85,10 @@ DataExtractor_DuoBalance.cpp \
 DataExtractor_MeanVelocity.cpp \
 BodyForce.cpp \
 BodyForce_PreferredDirection.cpp \
-BodyForce_AttractingPoint.cpp
+BodyForce_AttractingPoint.cpp \
+BodyForce_ViscousFluid.cpp
 
-# The list of source files for post-processing
+# The list of source files for post-processing (excepted postpro.cpp)
 POSTPROSOURCES = PostProcessor.cpp \
 PostProcessor_ClusterGranulo.cpp \
 PostProcessor_ParticleStress.cpp
