@@ -46,7 +46,7 @@ void ViscousFluid::read(std::istream& is) { is >> fluidDensity; }
 
 void ViscousFluid::write(std::ostream& os) { os << "ViscousFluid " << fluidDensity << '\n'; }
 
-/// @attention \emoji{:construction:} This solution has never been tested. So we don't know if the implementation is ok
+/// @attention @emoji :construction: This solution has never been tested. So we don't know if the implementation is ok
 /// @date November-2020
 /// @author Vincent Richefeu
 void ViscousFluid::getForceAndMoment(size_t ibody, vec3r& force, vec3r& /*moment*/) {
