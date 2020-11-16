@@ -3,7 +3,7 @@
 
 #include <GL/freeglut.h>
 
-#include "../Rockable/Shape.hpp"
+#include "../../src/Shape.hpp"
 #include <fstream>
 #include <functional>
 #include <map>

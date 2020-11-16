@@ -27,7 +27,7 @@ all: shapeSurvey
 clean:
 	rm -f *.o shapeSurvey
 
-Shape.o: ../Rockable/Shape.cpp ../Rockable/Shape.hpp
+Shape.o: ../../src/Shape.cpp ../../src/Shape.hpp
 	$(CXX) $(CXXFLAGS) -c $<
 
 # The application that visualize the conf files

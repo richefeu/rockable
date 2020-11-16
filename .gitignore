@@ -11,5 +11,6 @@ src/postpro
 *kineticEnergy.txt
 *perf.txt
 *staticBalance.txt
+prepro/shapesurvey/shapeSurvey
 doc/html
 .vscode
