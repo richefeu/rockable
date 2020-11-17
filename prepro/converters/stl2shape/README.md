@@ -2,25 +2,31 @@
 It uses the library `tclap` to parse the command line arguments. You can thus use the `-h` or `--help` argument to show all possible arguments: 
 
 ```
-USAGE: 
+USAGE:
 
-   ./stl2Shape  [-m <double>] [-s <double>] -r <double> -i <string> [--]
-                [--version] [-h]
+   ./stl2shape  [-z] [-c] [-m <double>] [-s <double>] -r <double> -i
+                <string> [--] [--version] [-h]
 
 
-Where: 
+Where:
+
+   -z,  --scaleRadius
+     Rescale the radius
+
+   -c,  --clean
+     Remove duplicated edges
 
    -m <double>,  --maxLength <double>
-     Set the maximum length of the output object
+     Set the maximum length (sieving size) of the output object
 
    -s <double>,  --scaleFactor <double>
-     Set the re-scale factor of the output object
+     Set the (re-)scale factor of the output object
 
    -r <double>,  --radius <double>
-     (required)  Minskowski radius to be used
+     (required)  Radius of the rounded edges (Minskowski radius) to be used
 
    -i <string>,  --input <string>
-     (required)  Name to STL binary file
+     (required)  Name of the input STL binary file
 
    --,  --ignore_rest
      Ignores the rest of the labeled arguments following this flag.
@@ -35,4 +41,4 @@ Where:
    Convert a binary STL file to a shape that can be used by Rockable
 ```
 
-The arguments `--maxLength` and `--scaleFactor` will both affect the chosen radius. No extra-data (OBB, inertia, volume, etc.) will be saved in the output shape-file. this means that the application `shapeSurvey` will be used to compute these extra-data.
+The arguments `-m, --maxLength` and `-s, --scaleFactor` will both affect the chosen radius if option `-z, --scaleRadius` is used. No extra-data (OBB, inertia, volume, etc.) will be saved in the output shape-file. this means that the application `shapeSurvey` will be used to compute these extra-data.

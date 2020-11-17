@@ -308,8 +308,8 @@ void exportShape(mesh& Mesh) {
 }
 
 // This function resize the model so that the largest distance between 2 vertices is 'WantedSize'.
-// The radius is also resized
-void setSieveSize(mesh& Mesh, double WantedSize) {
+// The radius is not accounted for in the sieving size
+void setSieveSize(mesh& Mesh, double WantedSize, bool scaleRadius = true) {
   double MaxSize = 0.0;
 
   double s = 0.0;
@@ -331,17 +331,23 @@ void setSieveSize(mesh& Mesh, double WantedSize) {
     Mesh.points[i].y *= scaleFactor;
     Mesh.points[i].z *= scaleFactor;
   }
-  Mesh.radius *= scaleFactor;
+  if (scaleRadius == true) {
+    Mesh.radius *= scaleFactor;
+    std::cout << "radius has been rescaled to " << Mesh.radius << '\n';
+  }
 }
 
 // This function rescale the model (and the radius also)
-void rescale(mesh& Mesh, double scaleFactor) {
+void rescale(mesh& Mesh, double scaleFactor, bool scaleRadius = true) {
   for (size_t i = 0; i < Mesh.points.size(); i++) {
     Mesh.points[i].x *= scaleFactor;
     Mesh.points[i].y *= scaleFactor;
     Mesh.points[i].z *= scaleFactor;
   }
-  Mesh.radius *= scaleFactor;
+  if (scaleRadius == true) {
+    Mesh.radius *= scaleFactor;
+    std::cout << "radius has been rescaled to " << Mesh.radius << '\n';
+  }
 }
 
 int main(int argc, char const* argv[]) {
@@ -350,6 +356,7 @@ int main(int argc, char const* argv[]) {
   double maxLength = 0.0;
   double radius = 1.0;
   bool clean = false;
+  bool scaleRadius = false;
 
   try {
     TCLAP::CmdLine cmd("Convert a binary STL file to a shape that can be used by Rockable", ' ', "0.3");
@@ -361,12 +368,14 @@ int main(int argc, char const* argv[]) {
     TCLAP::ValueArg<double> maxLengthArg("m", "maxLength", "Set the maximum length (sieving size) of the output object",
                                          false, 0.0, "double");
     TCLAP::SwitchArg cleanArg("c", "clean", "Remove duplicated edges", false);
+    TCLAP::SwitchArg scaleRadiusArg("z", "scaleRadius", "Rescale the radius", false);
 
     cmd.add(nameArg);
     cmd.add(radiusArg);
     cmd.add(scaleArg);
     cmd.add(maxLengthArg);
     cmd.add(cleanArg);
+    cmd.add(scaleRadiusArg);
 
     cmd.parse(argc, argv);
 
@@ -375,6 +384,7 @@ int main(int argc, char const* argv[]) {
     maxLength = maxLengthArg.getValue();
     radius = radiusArg.getValue();
     clean = cleanArg.getValue();
+    scaleRadius = scaleRadiusArg.getValue();
   } catch (TCLAP::ArgException& e) {
     std::cerr << "error: " << e.error() << " for argument " << e.argId() << std::endl;
   }
@@ -390,12 +400,12 @@ int main(int argc, char const* argv[]) {
 
   if (maxLength > 0.0) {
     std::cout << "Set sieve size to " << maxLength << '\n';
-    setSieveSize(MESH, maxLength);
+    setSieveSize(MESH, maxLength, scaleRadius);
   }
 
   if (scaleFactor != 1.0) {
     std::cout << "Rescale by factor " << scaleFactor << '\n';
-    rescale(MESH, scaleFactor);
+    rescale(MESH, scaleFactor, scaleRadius);
   }
 
   exportShape(MESH);
