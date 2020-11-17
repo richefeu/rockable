@@ -59,7 +59,6 @@ void adjust_clipping_plans();
 void fit_view();
 int readShapeLib(const char* fileName);
 void saveShapeLib(const char* fileName);
-void exportImageTerrain(const char* fileName);
-void exportPositionning();
+void exportSample();
 
 #endif /* end of include guard: SEE_HPP_E29BD15E */

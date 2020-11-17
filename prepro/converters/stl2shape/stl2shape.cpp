@@ -22,9 +22,9 @@
 #include <functional>
 #include <iostream>
 
-#include <vector>
 #include <map>
 #include <set>
+#include <vector>
 
 #include <sstream>
 #include <stdint.h>
@@ -42,7 +42,6 @@ typedef double real64;
 #include "tclap/CmdLine.h"
 #include "vec3.hpp"
 
-
 // ==================
 // = DATA STRUCTURE =
 // ==================
@@ -58,12 +57,14 @@ struct triangle {
   int i0, i1, i2;  // ID-numbers of points in the mesh
   vec3r normal;
   triangle() : i0(0), i1(0), i2(0), normal() {}
+  triangle(int I0, int I1, int I2) : i0(I0), i1(I1), i2(I2), normal() {}
 };
 
 // edge
 struct edge {
   int i0, i1;  // ID-numbers of points in the mesh
   edge() : i0(0), i1(0) {}
+  edge(int I0, int I1) : i0(I0), i1(I1) {}
 };
 
 // This specialization of less is useful for sorting edges in lexicographic order
@@ -106,6 +107,31 @@ struct mesh {
       if (points[i].z > box.max.z) box.max.z = points[i].z;
     }
     box.enlarge(radius);
+  }
+
+  void clean() {
+    std::set<std::pair<size_t, size_t> > edgeSet;
+    for (size_t e = 0; e < edges.size(); e++) {
+      std::pair<size_t, size_t> P;
+      if (edges[e].i0 < edges[e].i1) {
+        P.first = edges[e].i0;
+        P.second = edges[e].i1;
+      } else {
+        P.first = edges[e].i1;
+        P.second = edges[e].i0;
+      }
+      edgeSet.insert(P);  // That way, duplication is not allowed
+    }
+
+    size_t nbePrev = edges.size();
+    size_t nbeNew = edgeSet.size();
+
+    edges.clear();
+    for (auto it : edgeSet) {
+      edges.push_back(edge(it.first, it.second));
+    }
+
+    std::cout << nbePrev - nbeNew << " duplicated edges have been removed\n";
   }
 };
 
@@ -238,15 +264,15 @@ void readStlBin(const char* name, mesh& Mesh) {
     Mesh.edges.push_back(*it);
   }
 
-  std::cerr << "done." << std::endl;
-  std::cerr << "  Number of vertices  " << Mesh.points.size() << std::endl;
-  std::cerr << "  Number of edges     " << Mesh.edges.size() << std::endl;
-  std::cerr << "  Number of triangles " << Mesh.triangles.size() << std::endl;
+  std::cout << "done." << std::endl;
+  std::cout << "  Number of vertices  " << Mesh.points.size() << std::endl;
+  std::cout << "  Number of edges     " << Mesh.edges.size() << std::endl;
+  std::cout << "  Number of triangles " << Mesh.triangles.size() << std::endl;
 }
 
 // Exportation in shp format (for Rockable)
 void exportShape(mesh& Mesh) {
-  std::ofstream file("Mesh_JustConverted.shp");
+  std::ofstream file("mesh.shp");
   file << "<" << std::endl;
   file << "name " << Mesh.name << std::endl;
   file << "radius " << Mesh.radius << std::endl;
@@ -323,7 +349,7 @@ int main(int argc, char const* argv[]) {
   double scaleFactor = 1.0;
   double maxLength = 0.0;
   double radius = 1.0;
-  // bool clean = false;
+  bool clean = false;
 
   try {
     TCLAP::CmdLine cmd("Convert a binary STL file to a shape that can be used by Rockable", ' ', "0.3");
@@ -334,12 +360,13 @@ int main(int argc, char const* argv[]) {
                                      "double");
     TCLAP::ValueArg<double> maxLengthArg("m", "maxLength", "Set the maximum length (sieving size) of the output object",
                                          false, 0.0, "double");
-    TCLAP::ValueArg<double> cleanArg("c", "clean", "Remove eventually duplicated edges", false, true, "bool");
-    
+    TCLAP::SwitchArg cleanArg("c", "clean", "Remove duplicated edges", false);
+
     cmd.add(nameArg);
     cmd.add(radiusArg);
     cmd.add(scaleArg);
     cmd.add(maxLengthArg);
+    cmd.add(cleanArg);
 
     cmd.parse(argc, argv);
 
@@ -347,6 +374,7 @@ int main(int argc, char const* argv[]) {
     scaleFactor = scaleArg.getValue();
     maxLength = maxLengthArg.getValue();
     radius = radiusArg.getValue();
+    clean = cleanArg.getValue();
   } catch (TCLAP::ArgException& e) {
     std::cerr << "error: " << e.error() << " for argument " << e.argId() << std::endl;
   }
@@ -354,11 +382,19 @@ int main(int argc, char const* argv[]) {
   mesh MESH(stlFileName.c_str(), radius);
   readStlBin(stlFileName.c_str(), MESH);
 
+  if (clean == true) {
+    std::cout << "Remove duplicated edges\n";
+    MESH.clean();
+    std::cout << "  Number of edges     " << MESH.edges.size() << '\n';
+  }
+
   if (maxLength > 0.0) {
+    std::cout << "Set sieve size to " << maxLength << '\n';
     setSieveSize(MESH, maxLength);
   }
 
   if (scaleFactor != 1.0) {
+    std::cout << "Rescale by factor " << scaleFactor << '\n';
     rescale(MESH, scaleFactor);
   }
 

@@ -7,7 +7,7 @@ void printHelp() {
 
   glColor4f(1.0f, 1.0f, 1.0f, 0.6f);
   glBegin(GL_QUADS);
-  int nbLines = 13;  // update this value when a line is added
+  int nbLines = 16;  // update this value when a line is added
   int by = height - nbLines * 15 - 3;
   glVertex2i(0, height);
   glVertex2i(width, height);
@@ -27,15 +27,18 @@ void printHelp() {
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_,
                 "[C]      Compute mass properties of ALL shapes (only if "
                 "preCompDone = n)");
+  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[d]      delete duplicated edges in all shapes");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[e]      print extents of the current shape");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[h]      Show this help");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[K][k]   Tune the level of displayed OBB-tree");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[L][l]   Tune OBB-tree level of the current shape");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[N][n]   Tune number of Monte-Carlo steps");
+  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[p]      Export as particles (Rockable sample)");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[q]      Quit");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[s]      Save the shape library");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[t]      Compute the OBB-tree of the current shape");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[+][-]   Navigate through the shapes");
+  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[*]      reset preCompDone to 'n'");
 #undef _nextLine_
 
   switch2D::back();
@@ -61,6 +64,7 @@ void keyboard(unsigned char Key, int x, int y) {
     case 'c':
       if (Shapes[ishape].preCompDone == 'n') {
         Shapes[ishape].massProperties();
+        Shapes[ishape].preCompDone = 'y';
         fit_view();
       }
       break;
@@ -69,6 +73,7 @@ void keyboard(unsigned char Key, int x, int y) {
       for (size_t i = 0; i < Shapes.size(); i++) {
         if (Shapes[i].preCompDone == 'n') {
           Shapes[i].massProperties();
+          Shapes[i].preCompDone = 'y';
         }
       }
       fit_view();
@@ -123,9 +128,9 @@ void keyboard(unsigned char Key, int x, int y) {
       break;
 
     case 'p':
-      exportPositionning();
+      exportSample();
       break;
-      
+
     case 'q':
       exit(0);
       break;
@@ -139,10 +144,6 @@ void keyboard(unsigned char Key, int x, int y) {
       Shapes[ishape].buildOBBtree();
     } break;
 
-    case 'U': {
-      exportImageTerrain("terrain.pgm");
-    } break;
-
     case '-': {
       if (ishape > 0) ishape--;
       if (Shapes[ishape].preCompDone == 'n') Shapes[ishape].fitObb();
@@ -154,6 +155,10 @@ void keyboard(unsigned char Key, int x, int y) {
       if (ishape >= Shapes.size()) ishape = Shapes.size() - 1;
       if (Shapes[ishape].preCompDone == 'n') Shapes[ishape].fitObb();
       fit_view();
+    } break;
+    
+    case '*': {
+      if (Shapes[ishape].preCompDone == 'y') Shapes[ishape].preCompDone = 'n';
     } break;
   };
 
@@ -235,7 +240,7 @@ void motion(int x, int y) {
 
 void drawInfo() {
   switch2D::go(width, height);
-  glColor3f(1.0f, 0.388f, 0.278f);  // orange foncé
+  glColor3f(1.0f, 0.388f, 0.278f);  // dark-orange
 
   glText::print(GLUT_BITMAP_9_BY_15, 10, 10, "Shape %lu/%lu, named %s", ishape + 1, Shapes.size(),
                 Shapes[ishape].name.c_str());
@@ -447,171 +452,10 @@ void saveShapeLib(const char* fileName) {
   }
 }
 
-void exportImageTerrain(const char* fileName) {
-  std::ofstream file(fileName);
-  AABB aabb;
-  Shapes[ishape].getAABB(aabb);
-  vec3r size = aabb.max - aabb.min;
-  double w = size.x;
-  double h = size.z;
-  double range = size.y;
-  double dAlti = range / 10.0;
+void exportSample() {
+  std::cout << "Export sample " << std::endl;
 
-  double dx;
-  if (w > h)
-    dx = w / 1000.0;
-  else
-    dx = h / 1000.0;
-
-  for (double alti = aabb.min.y; alti < aabb.max.y; alti += dAlti) {
-  }
-
-  //// TODO !!!!!
-}
-
-// Cette fonction sert à exporter une forme pour la lancer sur un plan incliné
-// avec DEMbox (utilisé dans le cadre de la these de Bruna)
-void exportConfigRelease() {
-  std::cout << "Export DEMbox configuration for block releasing" << std::endl;
-
-  double ReleaseHeight;
-  double SlopeInclination;
-  double Density;
-  double vx0 = 0.0;    // TODO
-  double vrot0 = 0.0;  // TODO
-
-  std::cout << "Realease height (m): ";
-  std::cin >> ReleaseHeight;
-
-  std::cout << "Slope inclination (degrees): ";
-  std::cin >> SlopeInclination;
-
-  std::cout << "Block density (kg/m3): ";
-  std::cin >> Density;
-
-  double SwingRadius = 0.0;
-  size_t nv = Shapes[ishape].vertex.size();
-  for (size_t v = 0; v < nv; ++v) {
-    double r = Shapes[ishape].vertex[v].length();
-    if (r > SwingRadius) SwingRadius = r;
-  }
-  std::cout << "SwingRadius = " << SwingRadius << std::endl;
-  if (SwingRadius == 0.0) return;
-
-  ReleaseHeight += SwingRadius;
-  double h0 = SwingRadius / cos(SlopeInclination * 3.14159 / 180.0);
-  std::cout << "h0 = " << h0 << std::endl;
-  // double t0 = sqrt(2.0 * (ReleaseHeight - h0) / 9.81);
-  // double duration = 2.0 * sqrt(2.0 * ReleaseHeight / 9.81) - t0;
-
-  double vy0 = -9.81 * h0;
-  double duration = vy0 + sqrt(vy0 * vy0 + 2.0 * 9.81 * h0);
-  double m = Shapes[ishape].volume * Density;
-
-  std::cout << "kn minimum advised = " << m * 9.81 * ReleaseHeight / (Shapes[ishape].radius * Shapes[ishape].radius)
-            << std::endl;
-  double kn;
-  std::cout << "kn: ";
-  std::cin >> kn;
-
-  double ktkn;
-  std::cout << "kt/kn: ";
-  std::cin >> ktkn;
-
-  double en2;
-  std::cout << "en2: ";
-  std::cin >> en2;
-
-  double mu;
-  std::cout << "mu: ";
-  std::cin >> mu;
-
-  double muR;
-  std::cout << "muR: ";
-  std::cin >> muR;
-
-  double dt = 0.02 * sqrt(m / kn);
-  size_t nstep = ceil(duration / dt);
-
-  // SAVE
-  std::ofstream file("exported.sim");
-  file << "Simulation{" << std::endl;
-  file << "dt    " << dt << std::endl;
-  file << "t     0" << std::endl;
-  file << "nver  " << 2 * nstep << std::endl;
-  file << "nver2 " << 2 * nstep << std::endl;
-  file << "dver  " << 2.0 * SwingRadius << std::endl;
-  file << "dver2 " << 2.0 * SwingRadius << std::endl;
-  file << "nhis  " << nstep / 100 << std::endl;
-  file << "ihis  0" << std::endl;
-  file << "step  0" << std::endl;
-  file << "nstep " << nstep << std::endl;
-  file << "integrator leap_frog_blocks" << std::endl;
-  file << "neighbors_strategy master_bodies_search" << std::endl;
-  file << "result_folder ./RESULT" << std::endl;
-  file << "}" << std::endl;
-
-  file << "Physic{" << std::endl;
-  file << "use linelast_damage" << std::endl;
-  file << "use elastic_coulomb_friction" << std::endl;
-  file << "use soft_soils_rolling_resistance" << std::endl;
-  file << "set 0 0 linelast_damage elastic_coulomb_friction  "
-          "soft_soils_rolling_resistance ."
-       << std::endl;
-  file << "}" << std::endl;
-
-  file << "Data_table{" << std::endl;
-  file << "ngroup 1" << std::endl;
-  file << "set en 0 0 " << en2 << std::endl;
-  file << "set kn 0 0 " << kn << std::endl;
-  file << "set kt 0 0 " << ktkn * kn << std::endl;
-  file << "set mu 0 0 " << mu << std::endl;
-  file << "set gammaR 0 0 1.e6" << std::endl;  // VERIFIER
-  file << "set muR 0 0 " << muR << std::endl;
-  file << "}" << std::endl;
-
-  file << "Properties{" << std::endl;
-  file << "add density" << std::endl;
-  file << "set density 0 " << Density << std::endl;
-  file << "}" << std::endl;
-
-  file << "Sample{" << std::endl;
-  file << "plan 0    0 1 0   0 0 0   0.4 0 0  0 0 0.1   1 0 0 0  0 0 0  0 0 0" << std::endl;
-  file << "}" << std::endl;
-
-  file << "Prepro{" << std::endl;
-  file << "rotate_sample 0 0 0   0 0 1  " << -SlopeInclination << std::endl;
-  file << "}" << std::endl;
-
-  file << "Sample{" << std::endl;
-
-  size_t ne = Shapes[ishape].edge.size();
-  size_t nf = Shapes[ishape].face.size();
-  file << "r_polyh*{ 0 " << Shapes[ishape].radius << " " << nv << " " << ne << " " << nf << std::endl;
-  for (size_t v = 0; v < nv; v++) {
-    file << Shapes[ishape].vertex[v] << std::endl;
-  }
-  for (size_t e = 0; e < ne; e++) {
-    file << Shapes[ishape].edge[e].first << " " << Shapes[ishape].edge[e].second << std::endl;
-  }
-  for (size_t f = 0; f < nf; f++) {
-    file << Shapes[ishape].face[f].size();
-    for (size_t n = 0; n < Shapes[ishape].face[f].size(); n++) {
-      file << " " << Shapes[ishape].face[f][n];
-    }
-    file << std::endl;
-  }
-  file << "0 " << h0 << " 0    " << Shapes[ishape].orientation << "    ";
-  file << vx0 << " " << vy0 << " 0    0 0 " << vrot0 << std::endl;
-
-  file << Shapes[ishape].inertia_mass << " " << Shapes[ishape].volume << " " << Shapes[ishape].obb << std::endl;
-  file << "}" << std::endl;
-}
-
-void exportPositionning() {
-  std::cout << "Export positionning " << std::endl;
-
-  std::ofstream file("exportedPositionning.txt");
+  std::ofstream file("exportedSample.txt");
 
   file << "Particles " << Shapes.size() << '\n';
   for (size_t i = 0; i < Shapes.size(); i++) {
@@ -625,10 +469,6 @@ void menu(int num) {
 
     case 0:
       exit(0);
-      break;
-
-    case 1:
-      exportConfigRelease();
       break;
   };
 
