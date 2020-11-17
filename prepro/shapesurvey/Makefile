@@ -1,3 +1,7 @@
+# Paths
+COMMONPATH = ../../common
+ROCKABLEPATH = ../../src
+
 UNAME_S := $(shell uname -s)
 
 # The compiler to be used
@@ -13,7 +17,7 @@ else
 endif
 
 # The list of flags passed to the compiler
-CXXFLAGS = -O3 -Wall -std=c++11 -I ../../common
+CXXFLAGS = -O3 -Wall -std=c++11 -I $(COMMONPATH) -I $(ROCKABLEPATH)
 
 # All source files (listed in SOURCES) will be compiled into an object file
 # with the following command
@@ -27,7 +31,7 @@ all: shapeSurvey
 clean:
 	rm -f *.o shapeSurvey
 
-Shape.o: ../../src/Shape.cpp ../../src/Shape.hpp
+Shape.o: $(ROCKABLEPATH)/Shape.cpp $(ROCKABLEPATH)/Shape.hpp
 	$(CXX) $(CXXFLAGS) -c $<
 
 # The application that visualize the conf files
