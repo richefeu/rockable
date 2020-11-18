@@ -1,0 +1,45 @@
+Rockable 29-11-2018
+
+#### time #############################
+t 0
+tmax 2.0
+dt 5e-6
+interVerlet 0.001
+interConf 0.01
+
+#### options ##########################
+forceLaw Default
+Integrator Beeman
+
+#### proximity of the particles #######
+DVerlet 0.005
+dVerlet 0.0025
+
+#### properties for particles #########
+density 0 2700
+density 1 2700
+
+#### interaction parameters ###########
+knContact 0 1 1e6
+en2Contact 0 1 0.02
+ktContact 0 1 1e6
+muContact 0 1 0.6
+krContact 0 1 0.0
+murContact 0 1 0.0
+
+knContact 0 0 1e6
+en2Contact 0 0 0.02
+ktContact 0 0 1e6
+muContact 0 0 0.6
+krContact 0 0 0.0
+murContact 0 0 0.0
+
+#### the system #######################
+iconf 0
+shapeFile shapes.txt
+nDriven 6
+Particles XXXX
+
+
+
+
