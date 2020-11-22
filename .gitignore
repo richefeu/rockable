@@ -14,4 +14,5 @@ src/postpro
 prepro/shapesurvey/shapeSurvey
 prepro/converters/stl2shape/stl2shape
 doc/html
+sphinxdoc/build/*
 .vscode

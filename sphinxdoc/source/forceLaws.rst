@@ -1,3 +1,5 @@
+.. _Force-laws:
+
 Force laws
 ==========
 

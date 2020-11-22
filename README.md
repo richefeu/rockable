@@ -10,6 +10,7 @@ The use of the code is not interfaced by any tool (like lua, python or any graph
 
 * `common`: header-only libraries used by Rockable or processing tools
 * `doc`: place to generate the doxygen html documentation of the source files of Rockable
+* `sphinxdoc`: user documentation (sphinx with ReStructuredText)
 * `examples`: examples for usage tutorials or for testing features
 * `prepro`: some pre-processing tools
 * `src`: Rockable C++ source files   
