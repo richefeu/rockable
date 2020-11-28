@@ -86,7 +86,8 @@ DataExtractor_MeanVelocity.cpp \
 BodyForce.cpp \
 BodyForce_PreferredDirection.cpp \
 BodyForce_AttractingPoint.cpp \
-BodyForce_ViscousFluid.cpp
+BodyForce_ViscousFluid.cpp \
+BodyForce_FakeGravitation.cpp
 
 # The list of source files for post-processing (excepted postpro.cpp)
 POSTPROSOURCES = PostProcessor.cpp \

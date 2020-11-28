@@ -1,24 +1,24 @@
 //  Copyright or © or Copr. Rockable
-//  
+//
 //  vincent.richefeu@3sr-grenoble.fr
-//  
-//  This software is a computer program whose purpose is 
+//
+//  This software is a computer program whose purpose is
 //    (i)  to hold sphero-polyhedral shapes,
-//    (ii) to manage breakable interfaces. 
+//    (ii) to manage breakable interfaces.
 //  It is developed for an ACADEMIC USAGE
-//  
+//
 //  This software is governed by the CeCILL-B license under French law and
-//  abiding by the rules of distribution of free software.  You can  use, 
+//  abiding by the rules of distribution of free software.  You can  use,
 //  modify and/ or redistribute the software under the terms of the CeCILL-B
 //  license as circulated by CEA, CNRS and INRIA at the following URL
-//  "http://www.cecill.info". 
-//  
+//  "http://www.cecill.info".
+//
 //  As a counterpart to the access to the source code and  rights to copy,
 //  modify and redistribute granted by the license, users are provided only
 //  with a limited warranty  and the software's author,  the holder of the
 //  economic rights,  and the successive licensors  have only  limited
-//  liability. 
-//  
+//  liability.
+//
 //  In this respect, the user's attention is drawn to the risks associated
 //  with loading,  using,  modifying and/or developing or reproducing the
 //  software by the user in light of its specific status of free software,
@@ -26,10 +26,10 @@
 //  therefore means  that it is reserved for developers  and  experienced
 //  professionals having in-depth computer knowledge. Users are therefore
 //  encouraged to load and test the software's suitability as regards their
-//  requirements in conditions enabling the security of their systems and/or 
-//  data to be ensured and,  more generally, to use and operate it in the 
-//  same conditions as regards security. 
-//  
+//  requirements in conditions enabling the security of their systems and/or
+//  data to be ensured and,  more generally, to use and operate it in the
+//  same conditions as regards security.
+//
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
@@ -231,6 +231,17 @@ void keyboard(unsigned char Key, int x, int y) {
       exit(0);
       break;
 
+    case 'r': {
+      rescaleColorRange = 1 - rescaleColorRange;
+			if (rescaleColorRange == 0) {
+				std::cout << "rescaleColorRange = 0\n";
+				std::cout << "colorRangeMin = " << colorRangeMin << '\n';
+				std::cout << "colorRangeMax = " << colorRangeMax << '\n';
+			} else if (rescaleColorRange == 1) {
+				std::cout << "rescaleColorRange = 1\n";
+			}
+    } break;
+
     case 's':
       show_slice = 1 - show_slice;
       break;
@@ -314,9 +325,56 @@ void keyboard(unsigned char Key, int x, int y) {
       fitView();
       adjustClippingPlans();
     } break;
+
+    case '0': {
+      colorMode = 0;
+      pcolors.clear();
+    } break;
+
+    case '1': {
+      colorMode = 1;
+      pcolors.clear();
+      colorRGBA col;
+      for (size_t i = 0; i < box.Particles.size(); ++i) {
+        CT.getRandomRGB8(&col);
+        pcolors.push_back(col);
+      }
+    } break;
+
+    case '2': {
+      colorMode = 2;
+      resetColors(colorMode, 1);
+    } break;
   };
 
   glutPostRedisplay();
+}
+
+void resetColors(int mode, int rescale) {
+  switch (mode) {
+    case 2: {  // velocity magnitude
+      if (rescale == 1) {
+        colorRangeMin = colorRangeMax = 0.0;
+        for (size_t i = box.nDriven; i < box.Particles.size(); ++i) {
+          double v = norm(box.Particles[i].vel);
+          if (v > colorRangeMax) colorRangeMax = v;
+        }
+				std::cout << "colorRangeMin = " << colorRangeMin << '\n';
+				std::cout << "colorRangeMax = " << colorRangeMax << '\n';
+      }
+
+      CT.setTableID(MATLAB_HOT);
+      CT.setMinMax(colorRangeMin, colorRangeMax);
+			CT.Rebuild();
+      pcolors.clear();
+      colorRGBA col;
+      for (size_t i = 0; i < box.Particles.size(); ++i) {
+        double v = norm(box.Particles[i].vel);
+        CT.getRGB(v, &col);
+        pcolors.push_back(col);
+      }
+    } break;
+  }
 }
 
 #define BUFSIZE 1024
@@ -592,9 +650,14 @@ void drawParticles() {
   glEnable(GL_DEPTH_TEST);
   for (size_t i = box.nDriven; i < box.Particles.size(); ++i) {
     if (selectedParticle >= 0 && i == (size_t)selectedParticle) {
-      glColor4ub(234, 255, 0, (int)floor(alpha_particles * 255));
-    } else
-      glColor4ub(178, 34, 34, (int)floor(alpha_particles * 255));
+      glColor4ub(234, 255, 0, (int)floor(alpha_particles * 255));  // yellow
+    } else {
+      if (i >= pcolors.size()) {
+        glColor4ub(178, 34, 34, (int)floor(alpha_particles * 255));  // brick color
+      } else {
+        glColor4ub(pcolors[i].r, pcolors[i].g, pcolors[i].b, (int)floor(alpha_particles * 255));
+      }
+    }
 
     vec3r pos = box.Particles[i].pos;
 
@@ -784,19 +847,15 @@ void drawProbe() {
   glVertex3f(probe.min.x, probe.max.y, probe.min.z);
   glVertex3f(probe.min.x, probe.max.y, probe.max.z);
   glEnd();
-  
-  
-  
-  
+
   ///// TEST
   /*
   glColor4ub(255, 0, 0, 255);
-  
+
   OBB zone;
   zone.center = 0.5 * (probe.min + probe.max);
-  zone.extent.set(0.5 * (probe.max.x - probe.min.x), 0.5 * (probe.max.y - probe.min.y), 0.5 * (probe.max.z - probe.min.z));
-  std::vector<size_t> pid;
-  for (size_t i = 0; i < box.Particles.size(); ++i) {
+  zone.extent.set(0.5 * (probe.max.x - probe.min.x), 0.5 * (probe.max.y - probe.min.y), 0.5 * (probe.max.z -
+  probe.min.z)); std::vector<size_t> pid; for (size_t i = 0; i < box.Particles.size(); ++i) {
     box.Particles[i].updateObb();
     if (zone.intersect(box.Particles[i].obb)) {
       pid.push_back(i);
@@ -812,15 +871,15 @@ void drawProbe() {
     Mth::sobolSequence(3, vv);
     pt3.set(probe.min.x + vv[0] * (probe.max.x - probe.min.x), probe.min.y + vv[1] * (probe.max.y - probe.min.y),
             probe.min.z + vv[2] * (probe.max.z - probe.min.z));
-    
+
     //bool inSolid = false;
-    for (size_t ii = 0; ii < pid.size(); ii++) {            
+    for (size_t ii = 0; ii < pid.size(); ii++) {
       size_t i = pid[ii];
       vec3r ptTest = pt3 - box.Particles[i].pos;
       quat Qinv = box.Particles[i].Q.get_conjugated();
       ptTest = Qinv * ptTest;
       ptTest /= box.Particles[i].homothety;
-      
+
       if (box.Particles[i].shape->inside(ptTest)) {
         //inSolid = true;
         glVertex3f(pt3.x, pt3.y, pt3.z);
@@ -829,10 +888,9 @@ void drawProbe() {
     }
     //if (inSolid) count++;
   }
-  
+
   glEnd();
   */
-  
 }
 
 void drawInteractionTypes() {
@@ -1185,6 +1243,7 @@ bool tryToReadConf(int num) {
     std::cout << "Read " << file_name << std::endl;
     box.clearMemory();
     box.loadConf(file_name);
+    resetColors(colorMode, rescaleColorRange);
     complexityNumber = 0;
     for (size_t i = 0; i < box.Particles.size(); ++i) {
       complexityNumber += box.Particles[i].shape->vertex.size();
