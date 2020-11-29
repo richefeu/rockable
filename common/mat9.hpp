@@ -1,5 +1,5 @@
-#ifndef MAT9_HPP_FB74D378
-#define MAT9_HPP_FB74D378
+#ifndef MAT9_HPP
+#define MAT9_HPP
 
 /// @file
 /// @brief 3 by 3 matrix
@@ -451,4 +451,4 @@ mat9<U> dyadic_product(const vec3<U> &a, const vec3<U> &b) {
 		);
 }
 
-#endif /* end of include guard: MAT9_HPP_FB74D378 */
+#endif /* end of include guard: MAT9_HPP */
