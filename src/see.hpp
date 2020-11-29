@@ -47,6 +47,7 @@
 #include "glutTools.hpp"
 #include "geoTool.hpp"
 #include "fileTool.hpp"
+#include "ColorTable.hpp"
 
 #include "Rockable.hpp"
 #include "BlockRelease.hpp"
@@ -76,6 +77,13 @@ int show_probe       = 0;
 
 AABB probe;
 size_t probe_MCnsteps = 10000;
+
+ColorTable CT;
+std::vector<colorRGBA> pcolors;
+int colorMode = 0;
+int rescaleColorRange = 1;
+double colorRangeMin = 0.0;
+double colorRangeMax = 1.0;
 
 int complexMode = 0;
 size_t complexityNumber = 0; // it says how the sample will be long to display
@@ -143,5 +151,6 @@ bool tryToReadConf(int num);
 int screenshot(const char *filename);
 void selection(int x, int y);
 void editSelection();
+void resetColors(int mode, int rescale = 1);
 
 #endif /* end of include guard: SEE_HPP */

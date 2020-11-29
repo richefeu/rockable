@@ -13,4 +13,12 @@ The use of the code is not interfaced by any tool (like lua, python or any graph
 * `sphinxdoc`: user documentation (sphinx with ReStructuredText)
 * `examples`: examples for usage tutorials or for testing features
 * `prepro`: some pre-processing tools
-* `src`: Rockable C++ source files   
+* `src`: Rockable C++ source files
+
+## Credits
+
+The code was initially developed by _Vincent Richefeu_, at Laboratoire 3SR, to model rockfalls and rock avalanches. This has been done through The PhD work of _Stiven Cuervo_ and _Bruna Garcia_, but it actually started before in a code named DEMbox (no longer maintained).
+
+Then, the breakable interfaces have been implemented during the PhD work of _Marta Stasiak_. A number of improvements have been added at that time thanks to intensive review with _Gael Combe_, Laboratoire 3SR.
+
+New functionalities are being studied thanks to new collaborations of people from CEA, IATE and CNRS. For example, _Lhassan Amarsid_ (CEA) is working on the introduction of periodic boundary conditions, and multi-processor computing with domain decomposition. _Farhang Radjai_ and students, may introduce new breakable interfaces with energy-based criteria. 

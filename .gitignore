@@ -13,6 +13,9 @@ src/postpro
 *staticBalance.txt
 prepro/shapesurvey/shapeSurvey
 prepro/converters/stl2shape/stl2shape
+prepro/genesis/cpptools/generator
+simuls*
+*.DS_Store
 doc/html
 sphinxdoc/build/*
 .vscode
