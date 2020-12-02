@@ -17,4 +17,5 @@ prepro/genesis/cpptools/generator
 simuls*
 *.DS_Store
 doc/html
+sphinxdoc/build/*
 .vscode
