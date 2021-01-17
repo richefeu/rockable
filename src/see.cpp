@@ -336,7 +336,7 @@ void keyboard(unsigned char Key, int x, int y) {
       pcolors.clear();
       colorRGBA col;
       for (size_t i = 0; i < box.Particles.size(); ++i) {
-        CT.getRandomRGB8(&col);
+        CT.getCyclicRGB8(&col);
         pcolors.push_back(col);
       }
     } break;

@@ -25,9 +25,7 @@
 #include <list>
 #include <utility>
 
-class polyhTool
-{
-public:
+y
 	
 	// =======================================================================================
 	// Basic structures	

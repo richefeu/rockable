@@ -61,28 +61,28 @@ private:
       return ((unsigned int)((A) << 24 | (B) << 16 | (G) << 8 | (R)));
   }
 
-   int UNPACK_RED(unsigned int X) {
+  int UNPACK_RED(unsigned int X) {
     if (big_endian)
       return (((X) >> 24) & 0xff);
     else
       return ((X)&0xff);
   }
 
-   int UNPACK_GREEN(unsigned int X) {
+  int UNPACK_GREEN(unsigned int X) {
     if (big_endian)
       return (((X) >> 16) & 0xff);
     else
       return (((X) >> 8) & 0xff);
   }
 
-   int UNPACK_BLUE(unsigned int X) {
+  int UNPACK_BLUE(unsigned int X) {
     if (big_endian)
       return (((X) >> 8) & 0xff);
     else
       return (((X) >> 16) & 0xff);
   }
 
-   int UNPACK_ALPHA(unsigned int X) {
+  int UNPACK_ALPHA(unsigned int X) {
     if (big_endian)
       return ((X)&0xff);
     else
@@ -498,10 +498,10 @@ public:
   // returns one color among 6 well distinguishable colors
   void getRandomRGB8(colorRGBA *col) {
     static const std::vector<unsigned int> tb = {
-        PACK_COLOR(85, 107, 47, 255), PACK_COLOR(25, 25, 112, 255),
-        PACK_COLOR(255, 69, 0, 255),  PACK_COLOR(255, 215, 0, 255),
-        PACK_COLOR(0, 255, 127, 255), PACK_COLOR(0, 191, 255, 255),
-        PACK_COLOR(0, 0, 255, 255),   PACK_COLOR(255, 20, 147, 255),
+      PACK_COLOR(225, 205, 90, 255),  PACK_COLOR(170, 114, 160, 255),
+      PACK_COLOR(230, 116, 98, 255),  PACK_COLOR(94, 129, 148, 255),
+      PACK_COLOR(226, 221, 147, 255), PACK_COLOR(221, 175, 185, 255),
+      PACK_COLOR(208, 143, 72, 255),  PACK_COLOR(118, 169, 155, 255),
     };
     unsigned int i = (unsigned int)floor(rand() / (double)RAND_MAX * 8);
     if (i >= 8)
@@ -510,6 +510,23 @@ public:
     col->g = UNPACK_GREEN(tb[i]);
     col->b = UNPACK_BLUE(tb[i]);
     col->a = UNPACK_ALPHA(tb[i]);
+  }
+
+  void getCyclicRGB8(colorRGBA *col) {
+    static const std::vector<unsigned int> tb = {
+        PACK_COLOR(225, 205, 90, 255),  PACK_COLOR(170, 114, 160, 255),
+        PACK_COLOR(230, 116, 98, 255),  PACK_COLOR(94, 129, 148, 255),
+        PACK_COLOR(226, 221, 147, 255), PACK_COLOR(221, 175, 185, 255),
+        PACK_COLOR(208, 143, 72, 255),  PACK_COLOR(118, 169, 155, 255),
+    };
+    static unsigned int count = 0;
+    col->r = UNPACK_RED(tb[count]);
+    col->g = UNPACK_GREEN(tb[count]);
+    col->b = UNPACK_BLUE(tb[count]);
+    col->a = UNPACK_ALPHA(tb[count]);
+    count++;
+    if (count >= 8)
+      count = 0;
   }
 
   void Print() {

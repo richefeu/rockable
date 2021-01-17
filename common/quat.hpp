@@ -132,15 +132,15 @@ public:
 	/// @brief Return the rotation angle
 	double get_angle() const { return (2.0 * acos(s)); }
 	
-	/// @brief Return Pitch angle (along x in DEMbox reference frame)
+	/// @brief Return Pitch angle (z-axis rotation)
 	double get_Pitch() const { 
 		return atan2(2.0 * (v.y * v.z + s * v.x), s * s - v.x * v.x - v.y * v.y + v.z * v.z); 
 	}
 	
-	/// @brief Return Yaw angle (along y in DEMbox reference frame)
+	/// @brief Return Yaw angle (z-axis rotation)
 	double get_Yaw() const { return asin(-2.0 * (v.x * v.z - s * v.y)); }
 	
-	/// @brief Return Roll angle (along z in DEMbox reference frame)
+	/// @brief Return Roll angle (x-axis rotation)
 	double get_Roll() const {
 		return atan2(2.0 * (v.x * v.y + s * v.z), s * s + v.x * v.x - v.y * v.y - v.z * v.z);
 	}
