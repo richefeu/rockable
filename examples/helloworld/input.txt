@@ -15,8 +15,9 @@ dVerlet 0.02
 density 0 2700
 density 1 2700
 #BodyForce ViscousFluid 3000
-BodyForce FakeGravitation   0 0 0    1.0
 
+#velocityBarrier 1.1
+#angularVelocityBarrier 1.1
 
 #### interaction model ################
 forceLaw Avalanches
@@ -35,7 +36,7 @@ nDriven 1
 shapeFile shapes.shp
 Particles 3
 Plan 0 0 1.0   0 -0.05 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
-Rice 1 0 1.0   -0.5 0.5 0   0 0 0   0 0 0   0.707 0 0.707 0   0 0 -10   0 0 0
+Rice 1 0 1.0   -0.5 0.5 0   0 0 0   0 0 0   0.707 0 0.707 0   0 0 -1   0 0 0
 Sphere 1 0 1.0   0.3 0.5 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
 
 

@@ -63,6 +63,8 @@ Rockable::Rockable() {
   angleUpdateNL = 1.0;
 
   numericalDampingCoeff = 0.0;
+  VelocityBarrier = 0.0;
+  AngularVelocityBarrier = 0.0;
 
   ParamsInInterfaces = 0;
   idDensity = properties.add("density");
@@ -145,13 +147,13 @@ bool Rockable::isInteractive() const { return interactiveMode; }
 void Rockable::showBanner() {
   std::cout << std::endl;
   std::cout << std::endl;
-	
+
   std::cout << "Rockable  Copyright (C) 2016-2019  <vincent.richefeu@3sr-grenoble.fr>\n";
   std::cout << "This program comes with ABSOLUTELY NO WARRANTY.\n";
   std::cout << "This is academic software\n";
   std::cout << "Documentation: "
                "https://richefeu.gitbook.io/cdm/\n\n";
-	
+
   std::cout << std::endl;
   std::cout << "Compilation options:\n";
 
@@ -277,6 +279,8 @@ void Rockable::saveConf(int i) {
     conf << "angleUpdateNL " << Mth::rad2deg * angleUpdateNL << '\n';
   }
   conf << "numericalDampingCoeff " << numericalDampingCoeff << '\n';
+  conf << "velocityBarrier " << VelocityBarrier << '\n';
+  conf << "angularVelocityBarrier " << AngularVelocityBarrier << '\n';
 
   writeLawData(conf, "knContact");
   writeLawData(conf, "en2Contact");
@@ -442,6 +446,8 @@ void Rockable::loadConf(const char* name) {
     angleUpdateNL *= Mth::deg2rad;
   };
   parser.kwMap["numericalDampingCoeff"] = __GET__(conf, numericalDampingCoeff);
+  parser.kwMap["velocityBarrier"] = __GET__(conf, VelocityBarrier);
+  parser.kwMap["angularVelocityBarrier"] = __GET__(conf, AngularVelocityBarrier);
   parser.kwMap["Tempo"] = [this](std::istream& conf) {
     std::string kw;
     conf >> kw;
@@ -2479,8 +2485,8 @@ void Rockable::accelerations() {
   activeInteractions.clear();
   interfacesToBreak.clear();
 
-  // In the following loop, ALL interactions are updated.
-  // and the interactions that are sticked or with positive dn
+  // In the following loop, ALL interactions are updated,
+  // including the interactions that are sticked or with positive dn
 #pragma omp parallel for default(shared)
   for (size_t k = 0; k < Interactions.size(); ++k) {
     for (auto it = Interactions[k].begin(); it != Interactions[k].end(); ++it) {
@@ -2505,7 +2511,7 @@ void Rockable::accelerations() {
   }
 
   // The increment of resultants (forces and moments) on the bodies
-  // cannot be parallelized (because of possible conflicts).
+  // cannot be parallelised (because of possible conflicts).
   // Pointer to interactions are stored in the vector 'activeInteractions'
   for (size_t k = 0; k < Interactions.size(); ++k) {
     for (auto it = Interactions[k].begin(); it != Interactions[k].end(); ++it) {
@@ -2614,10 +2620,15 @@ void Rockable::accelerations() {
     Particles[i].arot = Particles[i].Q * domega;  // Express arot in the global framework
 #endif
   }
+  
+  // damping solutions based on the weighting of accelerations
+  if (VelocityBarrier > 0.0) velocityBarrier();
+  if (AngularVelocityBarrier > 0.0) angularVelocityBarrier();
 }
 
 /**
     @brief This is the Cundall damping solution
+    @todo Change the implementation so that it acts on acceleration rather than forces/moments 
 */
 void Rockable::numericalDamping() {
   double factor;
@@ -2671,6 +2682,45 @@ void Rockable::numericalDamping() {
     factor = (Particles[i].moment * Particles[i].vrot > 0.0) ? factorMinus : factorPlus;
     Particles[i].moment *= factor;
 #endif
+  }
+}
+
+/**
+    @brief Component-wise weighting of translation acceleration to limit the velocity components to 
+           the value 'VelocityBarrier'
+
+    The weighting factor is equal to 1 when the velocity is of the order of zero, 
+    it tends towards 0 when the velocity approaches 'VelocityBarrier', 
+    and it becomes negative when the velocity exceeds 'VelocityBarrier' 
+    (it tends towards -1 when v tends towards infinity).
+*/
+void Rockable::velocityBarrier() {
+  for (size_t i = 0; i < Particles.size(); ++i) {
+    double vxratio = fabs(Particles[i].vel.x / VelocityBarrier);
+    Particles[i].acc.x *= (1.0 - vxratio) / (1.0 + vxratio);
+    
+    double vyratio = fabs(Particles[i].vel.y / VelocityBarrier);
+    Particles[i].acc.y *= (1.0 - vyratio) / (1.0 + vyratio);
+    
+    double vzratio = fabs(Particles[i].vel.z / VelocityBarrier);
+    Particles[i].acc.z *= (1.0 - vzratio) / (1.0 + vzratio);
+  }
+}
+
+/**
+    @brief Component-wise weighting of rotation acceleration to limit the velocity components to 
+           the value 'AngularVelocityBarrier'
+*/
+void Rockable::angularVelocityBarrier() {
+  for (size_t i = 0; i < Particles.size(); ++i) {
+    double vrotxratio = fabs(Particles[i].vrot.x / AngularVelocityBarrier);
+    Particles[i].arot.x *= (1.0 - vrotxratio) / (1.0 + vrotxratio);
+    
+    double vrotyratio = fabs(Particles[i].vrot.y / AngularVelocityBarrier);
+    Particles[i].arot.y *= (1.0 - vrotyratio) / (1.0 + vrotyratio);
+    
+    double vrotzratio = fabs(Particles[i].vrot.z / AngularVelocityBarrier);
+    Particles[i].arot.z *= (1.0 - vrotzratio) / (1.0 + vrotzratio);
   }
 }
 
