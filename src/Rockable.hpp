@@ -128,7 +128,9 @@ class Rockable {
   double numericalDampingCoeff;   ///< Coefficient of the so-called Cundall damping (0 = disabled)
   double VelocityBarrier;         ///< Velocity Barrier by weighting the particle accelerations (0 = disabled)
   double AngularVelocityBarrier;  ///< Angular velocity Barrier by weighting the particle accelerations (0 = disabled)
-
+  double VelocityBarrierExponent;
+  double AngularVelocityBarrierExponent; 
+  
   // Other parameters
   int iconf;                ///< Current configuration ID
   AABB aabb;                ///< Axis Aligned Bounding Box (AABB) of the entire sample

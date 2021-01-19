@@ -65,6 +65,8 @@ Rockable::Rockable() {
   numericalDampingCoeff = 0.0;
   VelocityBarrier = 0.0;
   AngularVelocityBarrier = 0.0;
+  VelocityBarrierExponent = 1.0;
+  AngularVelocityBarrierExponent = 1.0;
 
   ParamsInInterfaces = 0;
   idDensity = properties.add("density");
@@ -282,6 +284,9 @@ void Rockable::saveConf(int i) {
   conf << "velocityBarrier " << VelocityBarrier << '\n';
   conf << "angularVelocityBarrier " << AngularVelocityBarrier << '\n';
 
+  conf << "VelocityBarrierExponent " << VelocityBarrierExponent << '\n';
+  conf << "AngularVelocityBarrierExponent " << AngularVelocityBarrierExponent << '\n';
+
   writeLawData(conf, "knContact");
   writeLawData(conf, "en2Contact");
   writeLawData(conf, "ktContact");
@@ -448,6 +453,9 @@ void Rockable::loadConf(const char* name) {
   parser.kwMap["numericalDampingCoeff"] = __GET__(conf, numericalDampingCoeff);
   parser.kwMap["velocityBarrier"] = __GET__(conf, VelocityBarrier);
   parser.kwMap["angularVelocityBarrier"] = __GET__(conf, AngularVelocityBarrier);
+  parser.kwMap["velocityBarrierExponent"] = __GET__(conf, VelocityBarrierExponent);
+  parser.kwMap["angularVelocityBarrierExponent"] = __GET__(conf, AngularVelocityBarrierExponent);
+
   parser.kwMap["Tempo"] = [this](std::istream& conf) {
     std::string kw;
     conf >> kw;
@@ -2620,7 +2628,7 @@ void Rockable::accelerations() {
     Particles[i].arot = Particles[i].Q * domega;  // Express arot in the global framework
 #endif
   }
-  
+
   // damping solutions based on the weighting of accelerations
   if (VelocityBarrier > 0.0) velocityBarrier();
   if (AngularVelocityBarrier > 0.0) angularVelocityBarrier();
@@ -2628,7 +2636,7 @@ void Rockable::accelerations() {
 
 /**
     @brief This is the Cundall damping solution
-    @todo Change the implementation so that it acts on acceleration rather than forces/moments 
+    @todo Change the implementation so that it acts on acceleration rather than forces/moments
 */
 void Rockable::numericalDamping() {
   double factor;
@@ -2686,40 +2694,40 @@ void Rockable::numericalDamping() {
 }
 
 /**
-    @brief Component-wise weighting of translation acceleration to limit the velocity components to 
+    @brief Component-wise weighting of translation acceleration to limit the velocity components to
            the value 'VelocityBarrier'
 
-    The weighting factor is equal to 1 when the velocity is of the order of zero, 
-    it tends towards 0 when the velocity approaches 'VelocityBarrier', 
-    and it becomes negative when the velocity exceeds 'VelocityBarrier' 
+    The weighting factor is equal to 1 when the velocity is of the order of zero,
+    it tends towards 0 when the velocity approaches 'VelocityBarrier',
+    and it becomes negative when the velocity exceeds 'VelocityBarrier'
     (it tends towards -1 when v tends towards infinity).
 */
 void Rockable::velocityBarrier() {
   for (size_t i = 0; i < Particles.size(); ++i) {
-    double vxratio = fabs(Particles[i].vel.x / VelocityBarrier);
+    double vxratio = pow(fabs(Particles[i].vel.x / VelocityBarrier), VelocityBarrierExponent);
     Particles[i].acc.x *= (1.0 - vxratio) / (1.0 + vxratio);
-    
-    double vyratio = fabs(Particles[i].vel.y / VelocityBarrier);
+
+    double vyratio = pow(fabs(Particles[i].vel.y / VelocityBarrier), VelocityBarrierExponent);
     Particles[i].acc.y *= (1.0 - vyratio) / (1.0 + vyratio);
-    
-    double vzratio = fabs(Particles[i].vel.z / VelocityBarrier);
+
+    double vzratio = pow(fabs(Particles[i].vel.z / VelocityBarrier), VelocityBarrierExponent);
     Particles[i].acc.z *= (1.0 - vzratio) / (1.0 + vzratio);
   }
 }
 
 /**
-    @brief Component-wise weighting of rotation acceleration to limit the velocity components to 
+    @brief Component-wise weighting of rotation acceleration to limit the velocity components to
            the value 'AngularVelocityBarrier'
 */
 void Rockable::angularVelocityBarrier() {
   for (size_t i = 0; i < Particles.size(); ++i) {
-    double vrotxratio = fabs(Particles[i].vrot.x / AngularVelocityBarrier);
+    double vrotxratio = pow(fabs(Particles[i].vrot.x / AngularVelocityBarrier), AngularVelocityBarrierExponent);
     Particles[i].arot.x *= (1.0 - vrotxratio) / (1.0 + vrotxratio);
-    
-    double vrotyratio = fabs(Particles[i].vrot.y / AngularVelocityBarrier);
+
+    double vrotyratio = pow(fabs(Particles[i].vrot.y / AngularVelocityBarrier), AngularVelocityBarrierExponent);
     Particles[i].arot.y *= (1.0 - vrotyratio) / (1.0 + vrotyratio);
-    
-    double vrotzratio = fabs(Particles[i].vrot.z / AngularVelocityBarrier);
+
+    double vrotzratio = pow(fabs(Particles[i].vrot.z / AngularVelocityBarrier), AngularVelocityBarrierExponent);
     Particles[i].arot.z *= (1.0 - vrotzratio) / (1.0 + vrotzratio);
   }
 }
