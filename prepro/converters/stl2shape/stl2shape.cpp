@@ -337,7 +337,7 @@ void setSieveSize(mesh& Mesh, double WantedSize, bool scaleRadius = true) {
   }
 }
 
-// This function rescale the model (and the radius also)
+// This function rescale the model (and possibly the radius)
 void rescale(mesh& Mesh, double scaleFactor, bool scaleRadius = true) {
   for (size_t i = 0; i < Mesh.points.size(); i++) {
     Mesh.points[i].x *= scaleFactor;

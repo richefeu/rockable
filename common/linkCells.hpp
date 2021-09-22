@@ -125,6 +125,9 @@ public:
 	}
 
 	void add_body(size_t B, vec3r & pos, AABB & aabb) {
+    // FIXME: should be replaced by
+    // add_body(B, pos, aabb.max - aabb.min);
+    
 		int ix, iy, iz;
 	  vec3r diag = aabb.max - aabb.min;
     

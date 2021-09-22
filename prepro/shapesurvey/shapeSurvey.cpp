@@ -31,7 +31,7 @@ void printHelp() {
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[e]      print extents of the current shape");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[h]      Show this help");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[K][k]   Tune the level of displayed OBB-tree");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[L][l]   Tune OBB-tree level of the current shape");
+  //glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[L][l]   Tune OBB-tree level of the current shape");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[N][n]   Tune number of Monte-Carlo steps");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[p]      Export as particles (Rockable sample)");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[q]      Quit");
@@ -95,7 +95,7 @@ void keyboard(unsigned char Key, int x, int y) {
       break;
 
     case 'K':
-      if (maxOBBLevel < Shapes[ishape].OBBtreeLevel) {
+      if (maxOBBLevel < /*Shapes[ishape].OBBtreeLevel*/ 10) {
         maxOBBLevel += 1;
       }
       break;
@@ -104,7 +104,7 @@ void keyboard(unsigned char Key, int x, int y) {
         maxOBBLevel -= 1;
       }
       break;
-
+      /*
     case 'L':
       if (Shapes[ishape].OBBtreeLevel < 50) {
         Shapes[ishape].OBBtreeLevel += 1;
@@ -115,7 +115,7 @@ void keyboard(unsigned char Key, int x, int y) {
         Shapes[ishape].OBBtreeLevel -= 1;
       }
       break;
-
+*/
     case 'N':  // The max is 10,000,000
       if (Shapes[ishape].MCnstep < 100000000) {
         Shapes[ishape].MCnstep *= 10;
@@ -140,7 +140,9 @@ void keyboard(unsigned char Key, int x, int y) {
       break;
 
     case 't': {
-      maxOBBLevel = Shapes[ishape].OBBtreeLevel;
+      //maxOBBLevel = Shapes[ishape].OBBtreeLevel;
+      //Shapes[ishape].buildOBBtree();
+      maxOBBLevel = 0;
       Shapes[ishape].buildOBBtree();
     } break;
 
@@ -244,8 +246,8 @@ void drawInfo() {
 
   glText::print(GLUT_BITMAP_9_BY_15, 10, 10, "Shape %lu/%lu, named %s", ishape + 1, Shapes.size(),
                 Shapes[ishape].name.c_str());
-  glText::print(GLUT_BITMAP_9_BY_15, 10, 25, "Radius = %g, OBBtreeLevel = %d, displayed level = %d",
-                Shapes[ishape].radius, Shapes[ishape].OBBtreeLevel, maxOBBLevel);
+  glText::print(GLUT_BITMAP_9_BY_15, 10, 25, "Radius = %g, OBBtreeLevel = %d",
+                Shapes[ishape].radius, maxOBBLevel);
   glText::print(GLUT_BITMAP_9_BY_15, 10, 40, "nb vertex = %lu, nb edge = %lu, nb face = %lu",
                 Shapes[ishape].vertex.size(), Shapes[ishape].edge.size(), Shapes[ishape].face.size());
   glText::print(GLUT_BITMAP_9_BY_15, 10, 55, "preCompDone %c", Shapes[ishape].preCompDone);
@@ -282,7 +284,7 @@ void display() {
   glColor3f(0.8f, 0.2f, 0.2f);
   glutShape::drawObb(Shapes[ishape].obb);
 
-  drawObbLevel(ishape, 10);
+  drawObbLevel(ishape, maxOBBLevel);
 
   drawInfo();
   if (show_help) printHelp();
@@ -326,14 +328,34 @@ void reshape(int w, int h) {
   glutPostRedisplay();
 }
 
-void drawObbLevel(size_t ishp, size_t level) {
+void recursiveDrawOBB(OBBnode<subBox> * node, int wantedLevel, int level) {
+  if (node == nullptr) {
+    return;
+  }
+  
+  if (level == wantedLevel)
+  glutShape::drawObb(node->boundary);
+  
+  if (node->first != nullptr) {
+    recursiveDrawOBB(node->first, wantedLevel, level + 1);
+  }
+  if (node->second != nullptr) {
+    recursiveDrawOBB(node->second, wantedLevel, level + 1);
+  }
+  return;
+}
+
+void drawObbLevel(size_t ishp, size_t wantedLevel) {
   glDisable(GL_LIGHTING);
   glColor3f(0.2f, 0.2f, 0.8f);
 
-  for (size_t i = 0; i < Shapes[ishp].tree.nodes.size(); i++) {
+  recursiveDrawOBB(Shapes[ishp].tree.root, wantedLevel);
+
+  /*for (size_t i = 0; i < Shapes[ishp].tree.nodes.size(); i++) {
     if (Shapes[ishp].tree.nodes[i].level != maxOBBLevel) continue;
     glutShape::drawObb(Shapes[ishp].tree.nodes[i].obb);
   }
+  */
 }
 
 void drawFrame() {
@@ -487,6 +509,9 @@ void buildMenu() {
 // =====================================================================
 
 int main(int argc, char* argv[]) {
+  
+  StackTracer::initSignals();
+  
   if (argc == 1) {
     if (readShapeLib("shapes") == 0) return 0;
   } else if (argc == 2) {

@@ -281,8 +281,9 @@ void Rockable::saveConf(int i) {
     conf << "angleUpdateNL " << Mth::rad2deg * angleUpdateNL << '\n';
   }
   conf << "numericalDampingCoeff " << numericalDampingCoeff << '\n';
-  conf << "velocityBarrier " << VelocityBarrier << '\n';
-  conf << "angularVelocityBarrier " << AngularVelocityBarrier << '\n';
+
+  conf << "VelocityBarrier " << VelocityBarrier << '\n';
+  conf << "AngularVelocityBarrier " << AngularVelocityBarrier << '\n';
 
   conf << "VelocityBarrierExponent " << VelocityBarrierExponent << '\n';
   conf << "AngularVelocityBarrierExponent " << AngularVelocityBarrierExponent << '\n';
@@ -451,10 +452,10 @@ void Rockable::loadConf(const char* name) {
     angleUpdateNL *= Mth::deg2rad;
   };
   parser.kwMap["numericalDampingCoeff"] = __GET__(conf, numericalDampingCoeff);
-  parser.kwMap["velocityBarrier"] = __GET__(conf, VelocityBarrier);
-  parser.kwMap["angularVelocityBarrier"] = __GET__(conf, AngularVelocityBarrier);
-  parser.kwMap["velocityBarrierExponent"] = __GET__(conf, VelocityBarrierExponent);
-  parser.kwMap["angularVelocityBarrierExponent"] = __GET__(conf, AngularVelocityBarrierExponent);
+  parser.kwMap["VelocityBarrier"] = __GET__(conf, VelocityBarrier);
+  parser.kwMap["AngularVelocityBarrier"] = __GET__(conf, AngularVelocityBarrier);
+  parser.kwMap["VelocityBarrierExponent"] = __GET__(conf, VelocityBarrierExponent);
+  parser.kwMap["AngularVelocityBarrierExponent"] = __GET__(conf, AngularVelocityBarrierExponent);
 
   parser.kwMap["Tempo"] = [this](std::istream& conf) {
     std::string kw;
@@ -886,8 +887,8 @@ void Rockable::loadShapes(const char* fileName) {
     if (token == "<") {
       Shape S;
       S.read(is);
-      S.defineVertexConnectivity();
-      S.buildOBBtree();
+      // S.defineVertexConnectivity();  // FIXME: utile ??
+      // S.buildOBBtree();
       if (S.preCompDone == 'n') {
         S.massProperties();
       }
@@ -899,6 +900,7 @@ void Rockable::loadShapes(const char* fileName) {
   std::cout << "Number of shapes found in the library file " << ModFileName << ": " << Shapes.size() << std::endl;
 
   for (size_t s = 0; s < Shapes.size(); ++s) {
+    Shapes[s].buildOBBtree();
     shapeId[Shapes[s].name] = s;
   }
 }
@@ -909,8 +911,8 @@ void Rockable::loadShapes(const char* fileName) {
 
 /**
     @brief This is the brute-force O(n^2) version of the algorithm.
-           It means that the proximity of all sub-elements i is tested with all
-           sub-elements j
+           It means that the proximity of all sub-elements of i is tested with all
+           sub-elements of j
 */
 int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax) {
 
@@ -967,7 +969,7 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
     Damp = 0.0;
 
   // Remark: we do not put the following 3 loops into omp parallel sections
-  //         because the function is itself called from a parallel for loop
+  //         because the function is called itself from a parallel for loop
   for (size_t isub = 0; isub < nvi; ++isub) {
 
     // First, we check whether the vertex in polyh i intersects the OBB of polyh j.
@@ -1030,25 +1032,22 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
   int nbAdd = 0;
 
   // A helper lambda function
-  auto addOrRemoveSingleInteraction = [&](size_t i, size_t j, size_t isub, size_t type, std::vector<size_t>& jsubVec,
+  auto addOrRemoveSingleInteraction = [&](size_t i, size_t j, size_t isub, size_t type, size_t jsub,
                                           std::function<bool(Particle&, Particle&, size_t, size_t, double)> func) {
     to_find.i = i;
     to_find.j = j;
     to_find.type = type;
     to_find.isub = isub;
-    for (size_t c = 0; c < jsubVec.size(); ++c) {
-      size_t jsub = jsubVec[c];
-      to_find.jsub = jsub;
-      exist_it = (Interactions[i]).find(to_find);
-      bool NEW = (exist_it == Interactions[i].end());
-      bool NEAR = func(Particles[i], Particles[j], isub, jsub, dmax);
-      if (NEAR && NEW) {
-        Interactions[i].insert(Interaction(i, j, type, isub, jsub, Damp));
-        ++nbAdd;
-      } else if (!NEAR && !NEW) {
-        Interactions[i].erase(exist_it);
-        --nbAdd;
-      }
+    to_find.jsub = jsub;
+    exist_it = (Interactions[i]).find(to_find);
+    bool NEW = (exist_it == Interactions[i].end());
+    bool NEAR = func(Particles[i], Particles[j], isub, jsub, dmax);
+    if (NEAR && NEW) {
+      Interactions[i].insert(Interaction(i, j, type, isub, jsub, Damp));
+      ++nbAdd;
+    } else if (!NEAR && !NEW) {
+      Interactions[i].erase(exist_it);
+      --nbAdd;
     }
   };
 
@@ -1072,182 +1071,42 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
   else
     Damp = 0.0;
 
-  // re-compute the OBB
-  OBB obbi = Particles[i].obb;
-  obbi.enlarge(0.5 * dVerlet);
-  OBB obbj = Particles[j].obb;
-  obbj.enlarge(0.5 * dVerlet);
+  std::vector<std::pair<subBox, subBox>> intersections;
 
-  // Use the OBBtree to get the closest sets of faces, edges and vertices
+  quat QAconj = Particles[i].Q.get_conjugated();
+  vec3r posB_relativeTo_posA = QAconj * (Particles[j].pos - Particles[i].pos);
+  quat QB_relativeTo_QA = QAconj * Particles[j].Q;
 
-  std::vector<size_t> currentLevel;
-  std::vector<size_t> leafsOk;
+  OBBtree<subBox>::TreeIntersectionIds(Particles[i].shape->tree.root, Particles[j].shape->tree.root, intersections,
+                                       Particles[i].homothety, Particles[j].homothety, 0.5 * dVerlet,
+                                       posB_relativeTo_posA, QB_relativeTo_QA);
 
-  //____# sub-OBBi vs obbj (which is already placed in the global framework)
-  if (!(Particles[i].shape->tree.nodes.empty())) {
-    if (Particles[i].shape->tree.nodes[0].children.size() == 1) {
-      currentLevel.push_back(0);
-    } else {
-      for (size_t c = 0; c < Particles[i].shape->tree.nodes[0].children.size(); ++c)
-        currentLevel.push_back(Particles[i].shape->tree.nodes[0].children[c]);
-    }
-  }
+  for (size_t c = 0; c < intersections.size(); c++) {
+    size_t isub = intersections[c].first.isub;
+    size_t jsub = intersections[c].second.isub;
+    int i_nbPoints = intersections[c].first.nbPoints;
+    int j_nbPoints = intersections[c].second.nbPoints;
 
-  while (1) {  // FIXME: replace to avoid infinite loop
-    std::vector<size_t> nextLevel;
-    for (size_t c = 0; c < currentLevel.size(); ++c) {
-
-      OBB subObb = Particles[i].shape->tree.nodes[currentLevel[c]].obb;
-      subObb.rotate(Particles[i].Q);
-      subObb.extent *= Particles[i].homothety;
-      subObb.center *= Particles[i].homothety;
-      subObb.center += Particles[i].pos;
-      subObb.enlarge(0.5 * dVerlet);
-
-      if (subObb.intersect(obbj) == true) {
-        if (Particles[i].shape->tree.nodes[currentLevel[c]].children.empty()) {
-          leafsOk.push_back(currentLevel[c]);
-        } else {
-          for (size_t p = 0; p < Particles[i].shape->tree.nodes[currentLevel[c]].children.size(); ++p)
-            nextLevel.push_back(Particles[i].shape->tree.nodes[currentLevel[c]].children[p]);
-        }
+    if (i_nbPoints == 1) {
+      if (j_nbPoints == 1) { // vertex (i, isub) -> vertex (j, jsub)
+        addOrRemoveSingleInteraction(i, j, isub, vvType, jsub, Particle::VertexIsNearVertex);
+      } else if (j_nbPoints == 2) { // vertex (i, isub) -> edge (j, jsub)
+        addOrRemoveSingleInteraction(i, j, isub, veType, jsub, Particle::VertexIsNearEdge);
+      } else if (j_nbPoints == 3) { // vertex (i, isub) -> face (j, jsub)
+        addOrRemoveSingleInteraction(i, j, isub, vfType, jsub, Particle::VertexIsNearFace);
       }
-    }
-    if (nextLevel.empty()) break;
-    currentLevel.clear();
-    for (size_t p = 0; p < nextLevel.size(); ++p) currentLevel.push_back(nextLevel[p]);
-    nextLevel.clear();  // actually not necessary
-  }
-  if (leafsOk.empty()) leafsOk.push_back(0);
-
-  //____# Elements inside the last subOBBs
-  std::set<size_t> if_subset;
-  for (size_t p = 0; p < leafsOk.size(); p++) {
-    for (size_t f = 0; f < Particles[i].shape->tree.nodes[leafsOk[p]].faceID.size(); ++f) {
-      if_subset.insert(Particles[i].shape->tree.nodes[leafsOk[p]].faceID[f]);
-    }
-  }
-  std::vector<size_t> if_sub;
-  std::copy(if_subset.begin(), if_subset.end(), std::back_inserter(if_sub));
-
-  std::set<size_t> iv_subset;
-  std::set<size_t> ie_subset;
-  for (size_t f = 0; f < if_sub.size(); ++f) {
-    size_t fid = if_sub[f];
-    for (size_t v = 0; v < Particles[i].shape->face[fid].size(); ++v) {
-      size_t vid = Particles[i].shape->face[fid][v];
-      iv_subset.insert(vid);
-      for (size_t e = 0; e < Particles[i].shape->edgesConnectedWithVertex[vid].size(); ++e) {
-        ie_subset.insert(Particles[i].shape->edgesConnectedWithVertex[vid][e]);
+    } else if (i_nbPoints == 2) { 
+      if (j_nbPoints == 1) { // vertex (j, jsub) -> edge (i, isub)
+        addOrRemoveSingleInteraction(j, i, jsub, veType, isub, Particle::VertexIsNearEdge);
+      } else if (j_nbPoints == 2) { // vertex (i, isub) -> edge (j, jsub)
+        addOrRemoveSingleInteraction(i, j, isub, eeType, jsub, Particle::EdgeIsNearEdge);
       }
+    } else if (i_nbPoints == 3) {
+      addOrRemoveSingleInteraction(j, i, jsub, vfType, isub, Particle::VertexIsNearFace); 
+      // vertex (j, jsub) -> face (i, isub)
     }
-  }
-  std::vector<size_t> iv_sub;
-  std::copy(iv_subset.begin(), iv_subset.end(), std::back_inserter(iv_sub));
 
-  std::vector<size_t> ie_sub;
-  std::copy(ie_subset.begin(), ie_subset.end(), std::back_inserter(ie_sub));
-
-  //____# sub-OBBj vs obbi (which is already placed in the global framework)
-  currentLevel.clear();
-  leafsOk.clear();
-
-  if (!(Particles[j].shape->tree.nodes.empty())) {
-    if (Particles[j].shape->tree.nodes[0].children.size() == 1) {
-      currentLevel.push_back(0);
-    } else {
-      for (size_t c = 0; c < Particles[j].shape->tree.nodes[0].children.size(); ++c)
-        currentLevel.push_back(Particles[j].shape->tree.nodes[0].children[c]);
-    }
-  }
-
-  while (1) {  // FIXME: could/should be replaced to avoid infinite loop
-    std::vector<size_t> nextLevel;
-    for (size_t c = 0; c < currentLevel.size(); ++c) {
-
-      OBB subObb = Particles[j].shape->tree.nodes[currentLevel[c]].obb;
-      subObb.rotate(Particles[j].Q);
-      subObb.extent *= Particles[j].homothety;
-      subObb.center *= Particles[j].homothety;
-      subObb.center += Particles[j].pos;
-      subObb.enlarge(0.5 * dVerlet);
-
-      if (subObb.intersect(obbi) == true) {
-        if (Particles[j].shape->tree.nodes[currentLevel[c]].children.empty()) {
-          leafsOk.push_back(currentLevel[c]);
-        } else {
-          for (size_t p = 0; p < Particles[j].shape->tree.nodes[currentLevel[c]].children.size(); ++p)
-            nextLevel.push_back(Particles[j].shape->tree.nodes[currentLevel[c]].children[p]);
-        }
-      }
-    }
-    if (nextLevel.empty()) break;
-    currentLevel.clear();
-    for (size_t p = 0; p < nextLevel.size(); ++p) currentLevel.push_back(nextLevel[p]);
-    nextLevel.clear();
-  }
-  if (leafsOk.empty()) leafsOk.push_back(0);
-
-  //____# Elements of j inside the last subOBBs
-  std::set<size_t> jf_subset;
-  for (size_t p = 0; p < leafsOk.size(); ++p) {
-    for (size_t f = 0; f < Particles[j].shape->tree.nodes[leafsOk[p]].faceID.size(); ++f) {
-      jf_subset.insert(Particles[j].shape->tree.nodes[leafsOk[p]].faceID[f]);
-    }
-  }
-  std::vector<size_t> jf_sub;
-  std::copy(jf_subset.begin(), jf_subset.end(), std::back_inserter(jf_sub));
-
-  std::set<size_t> jv_subset;
-  std::set<size_t> je_subset;
-  for (size_t f = 0; f < jf_sub.size(); ++f) {
-    size_t fid = jf_sub[f];
-    for (size_t v = 0; v < Particles[j].shape->face[fid].size(); ++v) {
-      size_t vid = Particles[j].shape->face[fid][v];
-      jv_subset.insert(vid);
-      for (size_t e = 0; e < Particles[j].shape->edgesConnectedWithVertex[vid].size(); ++e) {
-        je_subset.insert(Particles[j].shape->edgesConnectedWithVertex[vid][e]);
-      }
-    }
-  }
-  std::vector<size_t> jv_sub;
-  std::copy(jv_subset.begin(), jv_subset.end(), std::back_inserter(jv_sub));
-
-  std::vector<size_t> je_sub;
-  std::copy(je_subset.begin(), je_subset.end(), std::back_inserter(je_sub));
-
-  // -----
-
-  for (size_t c = 0; c < iv_sub.size(); ++c) {
-    size_t isub = iv_sub[c];
-
-    // vertex-vertex i->j
-    addOrRemoveSingleInteraction(i, j, isub, vvType, jv_sub, Particle::VertexIsNearVertex);
-
-    // vertex-edge i->j
-    addOrRemoveSingleInteraction(i, j, isub, veType, je_sub, Particle::VertexIsNearEdge);
-
-    // vertex-face i->j
-    addOrRemoveSingleInteraction(i, j, isub, vfType, jf_sub, Particle::VertexIsNearFace);
-
-  }  // end for isub (i->j)
-
-  for (size_t c = 0; c < jv_sub.size(); ++c) {
-    size_t jsub = jv_sub[c];
-
-    // vertex-edge j->i
-    addOrRemoveSingleInteraction(j, i, jsub, veType, ie_sub, Particle::VertexIsNearEdge);
-
-    // vertex-face j->i
-    addOrRemoveSingleInteraction(j, i, jsub, vfType, if_sub, Particle::VertexIsNearFace);
-
-  }  // end for isub (j->i)
-
-  // edge-edge i->j
-  for (size_t c = 0; c < ie_sub.size(); ++c) {
-    size_t isub = ie_sub[c];
-    addOrRemoveSingleInteraction(i, j, isub, eeType, je_sub, Particle::EdgeIsNearEdge);
-  }
+  }  // end loop over intersections
 
   return nbAdd;
 }

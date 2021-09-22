@@ -102,8 +102,8 @@ double radiusMin;
 double radiusMax;
 double radiusMean;
 
-int width  = 800;
-int height = 800;
+int width  = 700;
+int height = 700;
 float wh_ratio = (float)width / (float)height;
 
 glTextZone textZone(3, &width, &height);

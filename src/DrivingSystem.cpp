@@ -235,7 +235,7 @@ void DrivingSystem::read(bool warn) {
 
         } else if (servoName == "tritriLodeAngle") {
           // ADD COMMENTS HERE...
-          // **** NOT YET TESTED !!!!!!
+          // **** NOT YET FULLY TESTED !!!!!!
           double pressure;
           double LodeAngle;
           double sigRate;

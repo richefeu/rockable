@@ -36,8 +36,12 @@
 #include <tclap/CmdLine.h>
 
 #include "Rockable.hpp"
+#include "stackTracer.hpp"
 
 int main(int argc, char const* argv[]) {
+  
+  StackTracer::initSignals();
+  
   std::string confFileName;
   int nbThreads = 1;
   int verboseLevel = 0;

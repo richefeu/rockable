@@ -63,7 +63,7 @@ class Interaction {
  public:
   size_t i;  ///< ID-number of the first particle
   size_t j;  ///< ID-number of the second particle
-  // (( Attention: rien ne garanti que i < j ))
+             // !! BE CAREFUL: there's no explicit assertion that i < j
   int type;     ///< The type of contact
   size_t isub;  ///< id of sub-body (that can be vertex, edge or face depending
                 ///< on type) in sphero-polyhedron i
@@ -95,7 +95,7 @@ class Interaction {
   // UpdateDispatcher is the update-dispatcher as a function of the four types
   // (vv, ve, vf, ee). Note: Krishna Kumar advised me to use lambda instead of
   // binded functions in UpdateDispatcher. This change provided a gain (redution
-  // of CPU time) of 12% for the tested example.
+  // of CPU time) of about 12% for the tested example.
   static std::function<bool(Interaction&, Particle&, Particle&)> UpdateDispatcher[4];
 };
 

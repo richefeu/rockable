@@ -1,9 +1,11 @@
-#ifndef SEE_HPP_E29BD15E
-#define SEE_HPP_E29BD15E
+#ifndef SEE_HPP
+#define SEE_HPP
 
 #include <GL/freeglut.h>
 
-#include "../../src/Shape.hpp"
+#include "Shape.hpp"
+#include "stackTracer.hpp"
+
 #include <fstream>
 #include <functional>
 #include <map>
@@ -18,8 +20,8 @@ int main_window;
 int show_background = 0;
 int show_help = 0;
 
-int width = 800;
-int height = 800;
+int width = 700;
+int height = 700;
 float wh_ratio = (float)width / (float)height;
 
 // Miscellaneous global variables
@@ -39,7 +41,8 @@ vec3r center;
 vec3r up;
 
 void drawShape(size_t ishp);
-void drawObbLevel(size_t ishp, size_t level);
+void recursiveDrawOBB(OBBnode<subBox> * node, int wantedLevel, int level=0);
+void drawObbLevel(size_t ishp, size_t wantedLevel);
 void drawFrame();
 void drawInfo();
 
@@ -61,4 +64,4 @@ int readShapeLib(const char* fileName);
 void saveShapeLib(const char* fileName);
 void exportSample();
 
-#endif /* end of include guard: SEE_HPP_E29BD15E */
+#endif /* end of include guard: SEE_HPP */

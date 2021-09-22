@@ -11,8 +11,8 @@
 // People can read the code, but they have no legal right to use it.
 // To use the code, you must contact the author directly and ask permission.
 
-#ifndef POLYHTOOL_HPP_F6351922
-#define POLYHTOOL_HPP_F6351922
+#ifndef POLYHTOOL_HPP
+#define POLYHTOOL_HPP
 
 #include "geoTool.hpp"
 #include "mat9.hpp"
@@ -393,4 +393,4 @@ template <> struct less<polyhTool::pedge> {
 };
 } // namespace std
 
-#endif /* end of include guard: POLYHTOOL_HPP_F6351922 */
+#endif /* end of include guard: POLYHTOOL_HPP */

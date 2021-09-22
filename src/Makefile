@@ -43,15 +43,18 @@ OPTIONS = -DQUAT_ACC -DnFT_CORR -DnROT_MATRIX -DnBREAK_ONCE -DnCOMPONENTWISE_NUM
 #PNGLINK = `pkg-config --libs libpng`
 
 # Paths
-COMMONPATH = ../common
+#COMMONPATH = ../common
+#COMMONPATH = /usr/local/include/toofus
+COMMONPATH = /Users/vrichefeu/Documents/devel/TOOFUS
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
   # The compiler to be used
-  CXX = g++-10
+  CXX = g++-11
   # The list of flags passed to the compiler
   CXXFLAGS := -fopenmp -O3 -Wall -Wextra -Wno-deprecated-declarations -std=c++11 
   CXXFLAGS += -I $(COMMONPATH) $(OPTIONS) $(SVNDEV)
+	CXXFLAGS += `pkg-config --cflags tclap`
   # Link flags for OpenGL and glut
   GLUTFLAGS = `pkg-config --cflags glut`
   GLLINK = `pkg-config --libs glut` -framework OpenGL
@@ -108,7 +111,7 @@ POSTPROHEADERS = $(POSTPROSOURCES:%.cpp=%.hpp)
 
 .PHONY: all clean format
 
-all: run see postpro patatrac
+all: run see # postpro patatrac
 
 clean:
 	rm -f *~ *.o run see postpro patatrac

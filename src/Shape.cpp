@@ -1,24 +1,24 @@
 //  Copyright or © or Copr. Rockable
-//  
+//
 //  vincent.richefeu@3sr-grenoble.fr
-//  
-//  This software is a computer program whose purpose is 
+//
+//  This software is a computer program whose purpose is
 //    (i)  to hold sphero-polyhedral shapes,
-//    (ii) to manage breakable interfaces. 
+//    (ii) to manage breakable interfaces.
 //  It is developed for an ACADEMIC USAGE
-//  
+//
 //  This software is governed by the CeCILL-B license under French law and
-//  abiding by the rules of distribution of free software.  You can  use, 
+//  abiding by the rules of distribution of free software.  You can  use,
 //  modify and/ or redistribute the software under the terms of the CeCILL-B
 //  license as circulated by CEA, CNRS and INRIA at the following URL
-//  "http://www.cecill.info". 
-//  
+//  "http://www.cecill.info".
+//
 //  As a counterpart to the access to the source code and  rights to copy,
 //  modify and redistribute granted by the license, users are provided only
 //  with a limited warranty  and the software's author,  the holder of the
 //  economic rights,  and the successive licensors  have only  limited
-//  liability. 
-//  
+//  liability.
+//
 //  In this respect, the user's attention is drawn to the risks associated
 //  with loading,  using,  modifying and/or developing or reproducing the
 //  software by the user in light of its specific status of free software,
@@ -26,14 +26,14 @@
 //  therefore means  that it is reserved for developers  and  experienced
 //  professionals having in-depth computer knowledge. Users are therefore
 //  encouraged to load and test the software's suitability as regards their
-//  requirements in conditions enabling the security of their systems and/or 
-//  data to be ensured and,  more generally, to use and operate it in the 
-//  same conditions as regards security. 
-//  
+//  requirements in conditions enabling the security of their systems and/or
+//  data to be ensured and,  more generally, to use and operate it in the
+//  same conditions as regards security.
+//
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
-// common hearders
+// toofus hearders
 #include "AABB.hpp"
 #include "kwParser.hpp"
 #include "message.hpp"
@@ -43,8 +43,7 @@
 #include "Shape.hpp"
 
 Shape::Shape()
-    : ConnectionDefined(false),
-      OBBtreeLevel(0),
+    : OBBtreeLevel(0),
       treeComputed(false),
       preCompDone('n'),
       isSurface(false),
@@ -119,24 +118,6 @@ void Shape::read(std::istream& is) {
       face.push_back(ids);
     }
   };
-  /*
-  // The groups must to defined after the elements (vertices, edges and faces)
-  have been defined parser.kwMap["defaultGroup"] = __DO__(is) {
-          // TODO
-  };
-
-  // groupInPolygonXZ
-  // groupInBox
-  // egroup, vgroup, fgroup
-
-
-  // egroup
-  // 0 2
-  // 1 2
-
-  // egroupRange 1 10 2
-
-  */
 
   parser.parse(is);
 
@@ -341,26 +322,25 @@ bool Shape::inside(const vec3r& point) {
 
 // This method aims to remove duplicate edges
 void Shape::clean() {
-  std::set<std::pair<size_t, size_t> > edgeSet;
+  std::set<std::pair<size_t, size_t>> edgeSet;
   for (size_t e = 0; e < edge.size(); e++) {
     std::pair<size_t, size_t> P;
     if (edge[e].first < edge[e].second) {
       P.first = edge[e].first;
       P.second = edge[e].second;
-    }
-    else {
+    } else {
       P.first = edge[e].second;
       P.second = edge[e].first;
     }
-    edgeSet.insert(P); // That way, duplication is not allowed 
+    edgeSet.insert(P);  // That way, duplication is not allowed
   }
-  
+
   size_t nbePrev = edge.size();
   size_t nbeNew = edgeSet.size();
-  
+
   edge.clear();
   std::copy(edgeSet.begin(), edgeSet.end(), std::back_inserter(edge));
-  
+
   std::cout << name << ":\n";
   std::cout << nbePrev - nbeNew << " duplicated edges have been removed\n";
 }
@@ -482,202 +462,46 @@ void Shape::getAABB(AABB& aabb) {
   aabb.enlarge(radius);
 }
 
-void Shape::defineVertexConnectivity() {
-  if (ConnectionDefined == true) {
-    edgesConnectedWithVertex.clear();
-    facesConnectedWithVertex.clear();
-  }
-
-  // Edges connected to Vertices
-  std::vector<std::set<size_t> > edgeConSet(vertex.size());
-  for (size_t e = 0; e < edge.size(); ++e) {
-    edgeConSet[edge[e].first].insert(e);
-    edgeConSet[edge[e].second].insert(e);
-  }
-  edgesConnectedWithVertex.resize(vertex.size());
-  for (size_t i = 0; i < vertex.size(); ++i) {
-    std::copy(edgeConSet[i].begin(), edgeConSet[i].end(), std::back_inserter(edgesConnectedWithVertex[i]));
-  }
-
-  // Faces connected to Vertices
-  std::vector<std::set<size_t> > faceConSet(vertex.size());
-  for (size_t f = 0; f < face.size(); ++f) {
-    for (size_t i = 0; i < face[f].size(); ++i) {
-      faceConSet[face[f][i]].insert(f);
-    }
-  }
-  facesConnectedWithVertex.resize(vertex.size());
-  for (size_t i = 0; i < vertex.size(); ++i) {
-    std::copy(faceConSet[i].begin(), faceConSet[i].end(), std::back_inserter(facesConnectedWithVertex[i]));
-  }
-
-  ConnectionDefined = true;
-}
-
 void Shape::buildOBBtree() {
-  tree.clear();
+  tree.reset(tree.root);
 
-  OBBnode root;
-  root.level = 0;
-  root.obb = obb;
-  for (size_t f = 0; f < face.size(); ++f) root.faceID.push_back(f);
-  tree.add(root);
+  std::vector<OBBbundle<subBox>> OBBs;
 
-  // int p_beg = 0;
-  int p_end = 0;
-  for (int level = 1; level <= OBBtreeLevel; level++) {
-    int p_beg = p_end;
-    p_end = tree.nodes.size();
-    int nAdd = 0;
-    for (int parent = p_beg; parent < p_end; parent++) {
-
-      int ie[3] = {2, 1, 0};
-      if (tree.nodes[parent].obb.extent[ie[0]] < tree.nodes[parent].obb.extent[ie[1]]) {
-        ie[0] = 1;
-        ie[1] = 0;
-      }
-      if (tree.nodes[parent].obb.extent[ie[0]] < tree.nodes[parent].obb.extent[ie[2]]) {
-        int tmp = ie[0];
-        ie[0] = ie[2];
-        ie[2] = tmp;
-      }
-      if (tree.nodes[parent].obb.extent[ie[1]] < tree.nodes[parent].obb.extent[ie[2]]) {
-        int tmp = ie[1];
-        ie[1] = ie[2];
-        ie[2] = tmp;
-      }
-
-      for (int ii = 0; ii < 3; ii++) {
-        vec3r dir = tree.nodes[parent].obb.e[ie[ii]];
-        OBBnode child1, child2;
-        child1.level = level;
-        child2.level = level;
-        for (size_t f = 0; f < tree.nodes[parent].faceID.size(); f++) {
-          size_t fid = tree.nodes[parent].faceID[f];
-          vec3r p;
-          for (size_t v = 0; v < face[fid].size(); v++) p += vertex[face[fid][v]];
-          p /= (double)(face[fid].size());
-          p -= tree.nodes[parent].obb.center;
-          double s = p * dir;
-          if (s >= 0.0)
-            child2.faceID.push_back(fid);
-          else
-            child1.faceID.push_back(fid);
-        }
-
-        if (!(child1.faceID.empty()) && !(child2.faceID.empty())) {
-          updateObb(child1);
-          updateObb(child2);
-          tree.add(parent, child1);
-          tree.add(parent, child2);
-          nAdd++;
-          break;
-        } else {
-          child1.faceID.clear();
-          child2.faceID.clear();
-        }
-      }
-    }  // recursive-loop over parents
-
-    if (nAdd == 0) break;
-
-  }  // loop over levels
-}
-
-/// @brief Define a sub-OBB
-/// @see   http://jamesgregson.blogspot.fr/2011/03/latex-test.html
-void Shape::updateObb(OBBnode& node) {
-  if (node.faceID.empty()) {
-    std::cerr << "@updateObb, No face in this OBBnode. Cannot define the "
-                 "Oriented Bounding Box"
-              << std::endl;
-    return;
+  for (size_t f = 0; f < face.size(); ++f) {
+    OBBbundle<subBox> bundle;
+    bundle.data.isub = (int)f;
+    bundle.data.nbPoints = 3;
+    bundle.points.push_back(vertex[face[f][0]]);
+    bundle.points.push_back(vertex[face[f][1]]);
+    bundle.points.push_back(vertex[face[f][2]]);
+    std::vector<OBBbundle<subBox>> singleOBB;
+    singleOBB.push_back(bundle);
+    bundle.obb = OBBtree<subBox>::fitOBB(singleOBB, radius);
+    OBBs.push_back(bundle);
   }
 
-  std::set<size_t> vertexSet;
-  for (size_t f = 0; f < node.faceID.size(); ++f) {
-    size_t fid = node.faceID[f];
-    for (size_t v = 0; v < face[fid].size(); v++) {
-      vertexSet.insert(face[fid][v]);
-    }
-  }
-  std::vector<size_t> vertexID;
-  std::copy(vertexSet.begin(), vertexSet.end(), std::back_inserter(vertexID));
-
-  // ==== Build the covariance matrix
-  vec3r mu;
-  mat9r C;
-
-  // loop over the points to find the mean point
-  // location
-  for (size_t id = 0; id < vertexID.size(); id++) {
-    size_t i = vertexID[id];
-    mu += vertex[i];
-  }
-  mu /= (double)vertexID.size();
-
-  // loop over the points again to build the
-  // covariance matrix.  Note that we only have
-  // to build terms for the upper trianglular
-  // portion since the matrix is symmetric
-  double cxx = 0.0, cxy = 0.0, cxz = 0.0, cyy = 0.0, cyz = 0.0, czz = 0.0;
-  for (size_t id = 0; id < vertexID.size(); id++) {
-    size_t i = vertexID[id];
-
-    vec3r p = vertex[i];
-    cxx += p.x * p.x - mu.x * mu.x;
-    cxy += p.x * p.y - mu.x * mu.y;
-    cxz += p.x * p.z - mu.x * mu.z;
-    cyy += p.y * p.y - mu.y * mu.y;
-    cyz += p.y * p.z - mu.y * mu.z;
-    czz += p.z * p.z - mu.z * mu.z;
+  for (size_t e = 0; e < edge.size(); ++e) {
+    OBBbundle<subBox> bundle;
+    bundle.data.isub = (int)e;
+    bundle.data.nbPoints = 2;
+    bundle.points.push_back(vertex[edge[e].first]);
+    bundle.points.push_back(vertex[edge[e].second]);
+    std::vector<OBBbundle<subBox>> singleOBB;
+    singleOBB.push_back(bundle);
+    bundle.obb = OBBtree<subBox>::fitOBB(singleOBB, radius);
+    OBBs.push_back(bundle);
   }
 
-  // now build the covariance matrix
-  C.xx = cxx;
-  C.xy = cxy;
-  C.xz = cxz;
-  C.yx = cxy;
-  C.yy = cyy;
-  C.yz = cyz;
-  C.zx = cxz;
-  C.zy = cyz;
-  C.zz = czz;
-
-  // ==== set the OBB parameters from the covariance matrix
-  // extract the eigenvalues and eigenvectors from C
-  mat9r eigvec;
-  vec3r eigval;
-  C.sym_eigen(eigvec, eigval);
-
-  // find the right, up and forward vectors from the eigenvectors
-  vec3r r(eigvec.xx, eigvec.yx, eigvec.zx);
-  vec3r u(eigvec.xy, eigvec.yy, eigvec.zy);
-  vec3r f(eigvec.xz, eigvec.yz, eigvec.zz);
-  r.normalize();
-  u.normalize(), f.normalize();
-
-  // now build the bounding box extents in the rotated frame
-  vec3r minim(1e20, 1e20, 1e20), maxim(-1e20, -1e20, -1e20);
-  for (size_t id = 0; id < vertexID.size(); id++) {
-    size_t i = vertexID[id];
-    vec3r p_prime(r * vertex[i], u * vertex[i], f * vertex[i]);
-    if (minim.x > p_prime.x) minim.x = p_prime.x;
-    if (minim.y > p_prime.y) minim.y = p_prime.y;
-    if (minim.z > p_prime.z) minim.z = p_prime.z;
-    if (maxim.x < p_prime.x) maxim.x = p_prime.x;
-    if (maxim.y < p_prime.y) maxim.y = p_prime.y;
-    if (maxim.z < p_prime.z) maxim.z = p_prime.z;
+  for (size_t v = 0; v < vertex.size(); ++v) {
+    OBBbundle<subBox> bundle;
+    bundle.data.isub = (int)v;
+    bundle.data.nbPoints = 1;
+    bundle.points.push_back(vertex[v]);
+    std::vector<OBBbundle<subBox>> singleOBB;
+    singleOBB.push_back(bundle);
+    bundle.obb = OBBtree<subBox>::fitOBB(singleOBB, radius);
+    OBBs.push_back(bundle);
   }
 
-  // set the center of the OBB to be the average of the
-  // minimum and maximum, and the extents be half of the
-  // difference between the minimum and maximum
-  node.obb.center = eigvec * (0.5 * (maxim + minim));
-  node.obb.e[0] = r;
-  node.obb.e[1] = u;
-  node.obb.e[2] = f;
-  node.obb.extent = 0.5 * (maxim - minim);
-
-  node.obb.enlarge(radius);  // Add the Minskowski radius
+  tree.root = OBBtree<subBox>::recursiveBuild(tree.root, OBBs, radius);
 }
