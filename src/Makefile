@@ -44,8 +44,8 @@ OPTIONS = -DQUAT_ACC -DnFT_CORR -DnROT_MATRIX -DnBREAK_ONCE -DnCOMPONENTWISE_NUM
 
 # Paths
 #COMMONPATH = ../common
-#COMMONPATH = /usr/local/include/toofus
-COMMONPATH = /Users/vrichefeu/Documents/devel/TOOFUS
+COMMONPATH = /usr/local/include/toofus
+#COMMONPATH = /Users/vrichefeu/Documents/devel/TOOFUS
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)

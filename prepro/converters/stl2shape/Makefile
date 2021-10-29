@@ -1,12 +1,12 @@
 # Paths
-COMMONPATH = ../../../common
+COMMONPATH = /usr/local/include/toofus
 
 UNAME_S := $(shell uname -s)
 
 # The compiler to be used
 ifeq ($(UNAME_S),Darwin)
   CXX = clang++
-  CXXFLAGS = -O3 -Wall -std=c++11 -I $(COMMONPATH)
+  CXXFLAGS = -O3 -Wall -std=c++11 -I $(COMMONPATH) `pkg-config --cflags tclap`
 else
   CXX = g++
   CXXFLAGS = -O3 -Wall -std=c++0x -I $(COMMONPATH)

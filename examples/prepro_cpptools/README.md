@@ -12,7 +12,7 @@ To define a sphero-polyhedron that is a cube, we may write the following command
 generateShape:cube Cube 0.0005 0.01
 ```
 
-It means: generate a cubic shape with external size of 1 cm, and Minskowski radius of 5 mm. To generate the shape, the application `generator` is used, and from the current working directory the command is:
+It means: generate a cubic shape with name `Cube`, a Minskowski radius of 5 mm, and an external size of 1 cm. To generate the shape, the application `generator` is used, and from the current working directory the command is:
 
 ```
 ../../prepro/genesis/cpptools/generator genCube.txt > shapes.txt
@@ -73,7 +73,7 @@ generateShape:xyz_walls   0.25 0.25 0.25   0.0005
 ``` 
 
 
-It means: generate 3 walls that form a cubic box with inner size of 25 cm, and Minskowski radius of 5 mm. The normal to each wall is oriented towards x, y and z, and the name of the walls are respectively `x-wall`, `y-wall` and `z-wall`.  To generate the shape and to append it in the file `shapes.txt`, the command is:
+It means: generate 3 walls that form a cubic box with all inner sizes equal to 25 cm, and a Minskowski radius of 5 mm. The normal vector to each wall is oriented towards x, y and z, and the name of the walls are respectively `x-wall`, `y-wall` and `z-wall`.  To generate the shape and to **append** it in the file `shapes.txt`, the command is:
 
 ```
 ../../prepro/genesis/cpptools/generator genBox.txt >> shapes.txt

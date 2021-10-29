@@ -1,4 +1,4 @@
-COMMONPATH = ../../../common
+COMMONPATH = /usr/local/include/toofus
 CPPTOOLSPATH = ../cpptools
 
 UNAME_S := $(shell uname -s)

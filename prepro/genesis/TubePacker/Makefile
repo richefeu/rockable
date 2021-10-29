@@ -1,6 +1,6 @@
 UNAME_S := $(shell uname -s)
 
-COMMONPATH = ../../../common
+COMMONPATH = /usr/local/include/toofus
 CPPTOOLSPATH = ../cpptools
 
 # The compiler to be used

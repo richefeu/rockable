@@ -37,9 +37,10 @@ typedef unsigned int uint;
 typedef float real32;
 typedef double real64;
 
+#include "tclap/CmdLine.h"
+
 #include "AABB.hpp"
 #include "message.hpp"
-#include "tclap/CmdLine.h"
 #include "vec3.hpp"
 
 // ==================

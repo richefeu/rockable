@@ -10,12 +10,12 @@
 #include "vec3.hpp"
 
 #include "addParticle.hpp"
+#include "generatePacking_grid.hpp"
+#include "generatePacking_wallBox.hpp"
 #include "generateShape_cube.hpp"
 #include "generateShape_cuboid.hpp"
 #include "generateShape_sphere.hpp"
 #include "generateShape_xyz_walls.hpp"
-#include "generatePacking_wallBox.hpp"
-#include "generatePacking_grid.hpp"
 
 void readCommands(const char* name) {
   std::ifstream com(name);
@@ -53,7 +53,7 @@ void readCommands(const char* name) {
     generateShape_cube(std::cout, name.c_str(), radius, sideSize);
     std::cerr << "A cubic shape has been generated\n";
   };
-	
+
   parser.kwMap["generateShape:cuboid"] = __DO__(com) {
     std::string name;
     double radius;

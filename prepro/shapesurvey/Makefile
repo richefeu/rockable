@@ -1,5 +1,5 @@
 # Paths
-COMMONPATH = ../../common
+COMMONPATH = /usr/local/include/toofus
 ROCKABLEPATH = ../../src
 
 UNAME_S := $(shell uname -s)
