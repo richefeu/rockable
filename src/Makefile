@@ -57,20 +57,24 @@ ifeq ($(UNAME_S),Darwin)
 	CXXFLAGS += `pkg-config --cflags tclap`
   # Link flags for OpenGL and glut
   GLUTFLAGS = `pkg-config --cflags glut`
-  GLLINK = `pkg-config --libs glut` -framework OpenGL
+  GLUTLINK = `pkg-config --libs glut` -framework OpenGL
+	
+	# need to install glfw3 and glu with brew: 'brew install glfw3', 'brew install mesa-glu'
+	GLFWFLAGS = `pkg-config --cflags glfw3`
+	GLFWLINK = -framework OpenGL `pkg-config --libs glfw3`
 else
   # The compiler to be used
   CXX = g++
   # The list of flags passed to the compiler
   CXXFLAGS = -fopenmp -O3 -std=c++0x -I $(COMMONPATH) $(OPTIONS) $(SVNDEV)
   # Link flags for OpenGL and glut
-  GLLINK = -lGLU -lGL -L/usr/X11R6/lib -lglut -lXmu -lXext -lX11 -lXi
+  GLUTLINK = -lGLU -lGL -L/usr/X11R6/lib -lglut -lXmu -lXext -lX11 -lXi
 endif
 
 # If you don't want to use libpng in 'see', comment this two lines
 # In this case the screenshots will be TGA (not compressed)
 #OPTIONS += -DPNG_SCREENSHOTS
-#GLLINK += -lpng
+#GLUTLINK += -lpng
 
 # The list of source files needed by Rockable (excepted run.cpp)
 SOURCES = Shape.cpp \
@@ -137,6 +141,11 @@ patatrac: patatrac.cpp patatrac.hpp $(HEADERS) $(SOURCES) $(OBJECTS)
 # The application that visualizes the conf files
 see: see.cpp see.hpp $(HEADERS) $(SOURCES) $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(GLUTFLAGS) $(PNGFLAGS) -c $< 
-	$(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(GLLINK) $(PNGLINK)
+	$(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(GLUTLINK) $(PNGLINK)
+	
+# The application that visualizes the conf files
+see2: see2.cpp see2.hpp $(HEADERS) $(SOURCES) $(OBJECTS)
+	$(CXX) $(CXXFLAGS) $(GLFWFLAGS) $(PNGFLAGS) -c $< 
+	$(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(GLFWLINK) $(PNGLINK)
 
 #######################################################################################################################
