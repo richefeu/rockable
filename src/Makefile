@@ -46,6 +46,7 @@ OPTIONS = -DQUAT_ACC -DnFT_CORR -DnROT_MATRIX -DnBREAK_ONCE -DnCOMPONENTWISE_NUM
 #COMMONPATH = ../common
 COMMONPATH = /usr/local/include/toofus
 #COMMONPATH = /Users/vrichefeu/Documents/devel/TOOFUS
+IMGUI_DIR = imgui
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
@@ -59,9 +60,9 @@ ifeq ($(UNAME_S),Darwin)
   GLUTFLAGS = `pkg-config --cflags glut`
   GLUTLINK = `pkg-config --libs glut` -framework OpenGL
 	
-	# need to install glfw3 and glu with brew: 'brew install glfw3', 'brew install mesa-glu'
+	# need to install glfw3 with brew: 'brew install glfw3'
 	GLFWFLAGS = `pkg-config --cflags glfw3`
-	GLFWLINK = -framework OpenGL `pkg-config --libs glfw3`
+	GLFWLINK = -framework OpenGL `pkg-config --libs glfw3`	 
 else
   # The compiler to be used
   CXX = g++
@@ -71,10 +72,6 @@ else
   GLUTLINK = -lGLU -lGL -L/usr/X11R6/lib -lglut -lXmu -lXext -lX11 -lXi
 endif
 
-# If you don't want to use libpng in 'see', comment this two lines
-# In this case the screenshots will be TGA (not compressed)
-#OPTIONS += -DPNG_SCREENSHOTS
-#GLUTLINK += -lpng
 
 # The list of source files needed by Rockable (excepted run.cpp)
 SOURCES = Shape.cpp \
@@ -95,6 +92,14 @@ BodyForce_PreferredDirection.cpp \
 BodyForce_AttractingPoint.cpp \
 BodyForce_ViscousFluid.cpp
 
+IMGUI_SOURCES = $(IMGUI_DIR)/imgui.cpp \
+$(IMGUI_DIR)/imgui_demo.cpp \
+$(IMGUI_DIR)/imgui_draw.cpp \
+$(IMGUI_DIR)/imgui_tables.cpp \
+$(IMGUI_DIR)/imgui_widgets.cpp \
+$(IMGUI_DIR)/backends/imgui_impl_glfw.cpp \
+$(IMGUI_DIR)/backends/imgui_impl_opengl2.cpp
+
 # The list of source files for post-processing (excepted postpro.cpp)
 POSTPROSOURCES = PostProcessor.cpp \
 PostProcessor_ClusterGranulo.cpp \
@@ -103,6 +108,7 @@ PostProcessor_ParticleStress.cpp
 # Each cpp file listed below corresponds to an object file
 OBJECTS = $(SOURCES:%.cpp=%.o)
 POSTPROOBJECTS = $(POSTPROSOURCES:%.cpp=%.o)
+IMGUI_OBJECTS = $(addsuffix .o, $(basename $(notdir $(IMGUI_SOURCES))))
 
 # Each cpp file listed below corresponds to a header file
 HEADERS = $(SOURCES:%.cpp=%.hpp)
@@ -115,7 +121,7 @@ POSTPROHEADERS = $(POSTPROSOURCES:%.cpp=%.hpp)
 
 .PHONY: all clean format
 
-all: run see # postpro patatrac
+all: run see3 # postpro patatrac
 
 clean:
 	rm -f *~ *.o run see postpro patatrac
@@ -128,7 +134,7 @@ run: run.cpp $(HEADERS) $(SOURCES) $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -c $<
 	$(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS)
 
-# The application for post-processing the conf-files
+# An application for post-processing the conf-files
 postpro: postpro.cpp $(HEADERS) $(SOURCES) $(OBJECTS) $(POSTPROHEADERS) $(POSTPROSOURCES) $(POSTPROOBJECTS)
 	$(CXX) $(CXXFLAGS) -c $<
 	$(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(POSTPROOBJECTS)
@@ -138,14 +144,22 @@ patatrac: patatrac.cpp patatrac.hpp $(HEADERS) $(SOURCES) $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -c $<
 	$(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS)
 
-# The application that visualizes the conf files
+# The application that visualizes the conf files (it uses GLUT)
 see: see.cpp see.hpp $(HEADERS) $(SOURCES) $(OBJECTS)
-	$(CXX) $(CXXFLAGS) $(GLUTFLAGS) $(PNGFLAGS) -c $< 
+	$(CXX) $(CXXFLAGS) $(GLUTFLAGS) $(PNGFLAGS) -c $<
 	$(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(GLUTLINK) $(PNGLINK)
 	
-# The application that visualizes the conf files
+# The application that visualizes the conf files (it uses GLFW)
 see2: see2.cpp see2.hpp $(HEADERS) $(SOURCES) $(OBJECTS)
-	$(CXX) $(CXXFLAGS) $(GLFWFLAGS) $(PNGFLAGS) -c $< 
+	$(CXX) $(CXXFLAGS) $(GLFWFLAGS) $(PNGFLAGS) -c $<
 	$(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(GLFWLINK) $(PNGLINK)
+	
+# The application that visualizes the conf files (it uses GLFW and Dear ImGui)
+imguiObjs: $(IMGUI_SOURCES) $(IMGUI_OBJECTS)
+	$(CXX) $(CXXFLAGS) -I $(IMGUI_DIR) -I $(IMGUI_DIR)/backends $(GLFWFLAGS) -c $(IMGUI_SOURCES)
+	
+see3: see3.cpp see3.hpp $(HEADERS) $(SOURCES) $(OBJECTS) $(IMGUI_OBJECTS) imguiObjs	
+	$(CXX) $(CXXFLAGS) -I $(IMGUI_DIR) -I $(IMGUI_DIR)/backends $(GLFWFLAGS) $(PNGFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(IMGUI_OBJECTS) $(GLFWLINK) $(PNGLINK)
 
 #######################################################################################################################

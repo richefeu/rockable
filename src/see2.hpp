@@ -37,9 +37,6 @@
 #define SEE2_HPP
 #include <tclap/CmdLine.h>
 
-//#include <GL/freeglut.h> // FIXME: will be removed after.... !!!!!
-//#include <GL/gl.h>
-//#include <GL/glu.h>
 
 #define GLFW_INCLUDE_GLU
 #include <GLFW/glfw3.h>
@@ -137,10 +134,10 @@ void drawOBBs();
 void drawProbe();
 
 // Callback functions
+void display();
 void keyboard(GLFWwindow* window, int key, int scancode, int action, int mods);
 void mouse (GLFWwindow* window, int button, int action, int mods);
 void motion(GLFWwindow* window, double x, double y);
-void display();
 void reshape(GLFWwindow* window, int x, int y);
 
 

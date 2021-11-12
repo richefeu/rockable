@@ -251,6 +251,16 @@ void Rockable::clearMemory() {
 void Rockable::saveConf(int i) {
   char fname[256];
   sprintf(fname, "conf%d", i);
+  saveConf(fname);
+}
+
+/**
+    @brief Save a configuration-file
+    @param[in]  name  The name of the conf-file
+*/
+void Rockable::saveConf(const char* fname) {
+  //char fname[256];
+  //sprintf(fname, "conf%d", i);
   std::ofstream conf(fname);
 
   conf << "Rockable " << CONF_VERSION_DATE << '\n';  // format: progName version-date(dd-mm-yyyy)
@@ -393,6 +403,16 @@ void Rockable::writeLawData(std::ostream& os, const char* parName) {
       }
     }
   }
+}
+
+
+/**
+    @brief Load a configuration-file named 'conf<i>'
+*/
+void Rockable::loadConf(int i) {
+  char fname[256];
+  sprintf(fname, "conf%d", i);
+  loadConf(fname);
 }
 
 /**
@@ -887,8 +907,6 @@ void Rockable::loadShapes(const char* fileName) {
     if (token == "<") {
       Shape S;
       S.read(is);
-      // S.defineVertexConnectivity();  // FIXME: utile ??
-      // S.buildOBBtree();
       if (S.preCompDone == 'n') {
         S.massProperties();
       }

@@ -168,6 +168,8 @@ class Rockable {
   // Save/Load methods
   void clearMemory();            ///< Clear the Particles and Interactions
   void saveConf(int i);          ///< Save the current configuration in a file named confX, where X=i
+  void saveConf(const char*);    ///< Save a configuration from a conf-file
+  void loadConf(int i);          ///< Load the current configuration in a file named confX, where X=i
   void loadConf(const char*);    ///< Load a configuration from a conf-file
   void loadShapes(const char*);  ///< Load a shape library from a shape-file
   void readDataExtractors();     ///< Read the file dataExtractors.txt

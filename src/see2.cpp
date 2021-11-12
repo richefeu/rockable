@@ -52,31 +52,31 @@ void showKeybinds() {
   int dhline = -15;
   int hline = height;
 #define _nextLine_ (hline += dhline)
-  glText::print(15, _nextLine_, "[+]    load next configuration file");
-  glText::print(15, _nextLine_, "[-]    load previous configuration file");
-  glText::print(15, _nextLine_, "[=]    fit the view");
-  glText::print(15, _nextLine_, "[a][A] decrease/increase alpha (transparence) of driven bodies");
-  glText::print(15, _nextLine_, "[b]    switch ON/OFF the background color");
-  glText::print(15, _nextLine_, "[c]    run 5000 steps of computation (used for debugging)");
-  glText::print(15, _nextLine_, "[e][E] decrease/increase alpha (transparence) of free bodies");
-  glText::print(15, _nextLine_, "[g]    open another file");
-  glText::print(15, _nextLine_, "[k]    print this help");
-  glText::print(15, _nextLine_, "[l]    switch ON/OFF the links (normal vector at contact)");
-  glText::print(15, _nextLine_, "[m]    switch ON/OFF the links colored by type");
-  glText::print(15, _nextLine_, "[n]    switch ON/OFF the body displays");
-  glText::print(15, _nextLine_, "[o]    switch ON/OFF the OBB displays");
-  glText::print(15, _nextLine_, "[O]    switch ON/OFF the enlargement of OBBs by the Verlet distance");
-  glText::print(15, _nextLine_, "[w]    set the view so that gravity appears vertical");
-  glText::print(15, _nextLine_, "[x]    print the space limits of the current scene");
-  glText::print(15, _nextLine_, "[p]    edit selected body");
-  glText::print(15, _nextLine_, "[q]    quit");
-  glText::print(15, _nextLine_, "[y]    make the display faster (and less nice)");
+  glText::print(15, _nextLine_, "[RIGHT] load next configuration file");
+  glText::print(15, _nextLine_, "[LEFT]  load previous configuration file");
+  glText::print(15, _nextLine_, "[=]     fit the view");
+  glText::print(15, _nextLine_, "[a][A]  decrease/increase alpha (transparence) of driven bodies");
+  glText::print(15, _nextLine_, "[b]     switch ON/OFF the background color");
+  glText::print(15, _nextLine_, "[c]     run 5000 steps of computation (used for debugging)");
+  glText::print(15, _nextLine_, "[e][E]  decrease/increase alpha (transparence) of free bodies");
+  glText::print(15, _nextLine_, "[g]     open another file");
+  glText::print(15, _nextLine_, "[k]     print this help");
+  glText::print(15, _nextLine_, "[l]     switch ON/OFF the links (normal vector at contact)");
+  glText::print(15, _nextLine_, "[m]     switch ON/OFF the links colored by type");
+  glText::print(15, _nextLine_, "[n]     switch ON/OFF the body displays");
+  glText::print(15, _nextLine_, "[o]     switch ON/OFF the OBB displays");
+  glText::print(15, _nextLine_, "[O]     switch ON/OFF the enlargement of OBBs by the Verlet distance");
+  glText::print(15, _nextLine_, "[w]     set the view so that gravity appears vertical");
+  glText::print(15, _nextLine_, "[x]     print the space limits of the current scene");
+  glText::print(15, _nextLine_, "[p]     edit selected body");
+  glText::print(15, _nextLine_, "[q]     quit");
+  glText::print(15, _nextLine_, "[y]     make the display faster (and less nice)");
 #ifdef PNG_H
-  glText::print(15, _nextLine_, "[z]    make a screenshot (oneshot.png)");
-  glText::print(15, _nextLine_, "[Z]    make a series of screenshots (shotX.png)");
+  glText::print(15, _nextLine_, "[z]     make a screenshot (oneshot.png)");
+  glText::print(15, _nextLine_, "[Z]     make a series of screenshots (shotX.png)");
 #else
-  glText::print(15, _nextLine_, "[z]    make a screenshot (oneshot.tga)");
-  glText::print(15, _nextLine_, "[Z]    make a series of screenshots (shotX.tga)");
+  glText::print(15, _nextLine_, "[z]     make a screenshot (oneshot.tga)");
+  glText::print(15, _nextLine_, "[Z]     make a series of screenshots (shotX.tga)");
 #endif
 
 #undef _nextLine_
@@ -99,6 +99,7 @@ void keyboardSpecial(int Key, int x, int y) {
 
 void keyboard(GLFWwindow* window, int key, int /*scancode*/, int action, int mods) {
   if (action == GLFW_PRESS) {
+    std::cout << "> " << glfwGetKeyName(key, 0) << '\n';
     switch (key) {
       case GLFW_KEY_ESCAPE:  // ESCAPE
         selectedParticle = -1;
@@ -119,7 +120,8 @@ void keyboard(GLFWwindow* window, int key, int /*scancode*/, int action, int mod
         double SF = box.probeSolidFraction(probe, probe_MCnsteps);
         std::cout << "Solid Fraction in probe: " << SF << '\n';
       } break;
-*/
+      */
+        
       case GLFW_KEY_SPACE:
         textZone.reset();
         break;
@@ -130,13 +132,15 @@ void keyboard(GLFWwindow* window, int key, int /*scancode*/, int action, int mod
         selection((int)floor(x), (int)floor(y));
       } break;
 
+      /*
       case GLFW_KEY_A: {
         if (mods == GLFW_MOD_SHIFT && alpha_fixparticles <= 0.95)
           alpha_fixparticles += 0.05;
         else if (alpha_fixparticles > 0.1)
           alpha_fixparticles -= 0.05;
       } break;
-
+      */
+      
       case GLFW_KEY_B:
         show_background = 1 - show_background;
         break;
@@ -1368,6 +1372,7 @@ int main(int argc, char* argv[]) {
   }
 
   glfwSetKeyCallback(window, keyboard);
+  //glfwSetKeyCallback(window, keyboard);
   glfwSetMouseButtonCallback(window, mouse);
   glfwSetCursorPosCallback(window, motion);
   glfwSetFramebufferSizeCallback(window, reshape);
