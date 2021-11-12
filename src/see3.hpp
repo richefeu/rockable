@@ -79,6 +79,7 @@ ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 // flags with default values
 int show_background  = 1;
+int show_globalFrame = 1;
 int show_particles   = 1;
 int show_driven      = 1;
 int show_velocities  = 0;
@@ -151,6 +152,7 @@ void drawParticles();
 void drawTrajectories();
 void drawInteractionTypes();
 void drawInteractionFrames();
+void drawGlobalFrame();
 void drawOBBs();
 void drawProbe();
 

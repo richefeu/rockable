@@ -123,6 +123,7 @@ void Rockable::setVerboseLevel(int v) {
   }
 }
 
+
 void Rockable::initOutputFiles() {
   if (interactiveMode == true) return;
   perfFile.open("perf.txt");
@@ -518,69 +519,22 @@ void Rockable::loadConf(const char* name) {
   parser.kwMap["forceLaw"] = __DO__(conf) {
     std::string lawName;
     conf >> lawName;
-    if (lawName == "Default") {
-      forceLawPtr = std::bind(&Rockable::forceLawDefault, this, std::placeholders::_1);
-      optionNames["forceLaw"] = "Default";
-    } else if (lawName == "Avalanches") {
-      forceLawPtr = std::bind(&Rockable::forceLawAvalanches, this, std::placeholders::_1);
-      optionNames["forceLaw"] = "Avalanches";
-    } else if (lawName == "StickedLinks") {
-      forceLawPtr = std::bind(&Rockable::forceLawStickedLinks, this, std::placeholders::_1);
-      optionNames["forceLaw"] = "StickedLinks";
-    } else {
-      std::cout << msg::warn() << "forceLaw " << lawName << " is unknown" << msg::normal() << std::endl;
-      std::cout << "Option remains: forceLaw = " << optionNames["forceLaw"] << std::endl;
-    }
+    setForceLaw(lawName);
   };
   parser.kwMap["AddOrRemoveInteractions"] = __DO__(conf) {
     std::string Name;
     conf >> Name;
-    if (Name == "bruteForce") {
-      AddOrRemoveInteractions = std::bind(&Rockable::AddOrRemoveInteractions_bruteForce, this, std::placeholders::_1,
-                                          std::placeholders::_2, std::placeholders::_3);
-      optionNames["AddOrRemoveInteractions"] = "bruteForce";
-    } else if (Name == "OBBtree") {
-      AddOrRemoveInteractions = std::bind(&Rockable::AddOrRemoveInteractions_OBBtree, this, std::placeholders::_1,
-                                          std::placeholders::_2, std::placeholders::_3);
-      optionNames["AddOrRemoveInteractions"] = "OBBtree";
-    } else {
-      std::cout << msg::warn() << "AddOrRemoveInteractions " << Name << " is unknown" << msg::normal() << std::endl;
-      std::cout << "Option remains: AddOrRemoveInteractions = " << optionNames["AddOrRemoveInteractions"] << std::endl;
-    }
+    setAddOrRemoveInteractions(Name);
   };
   parser.kwMap["UpdateNL"] = __DO__(conf) {
     std::string Name;
     conf >> Name;
-    if (Name == "bruteForce") {
-      UpdateNL = std::bind(&Rockable::UpdateNL_bruteForce, this);
-      optionNames["UpdateNL"] = "bruteForce";
-    } else if (Name == "linkCells") {
-      UpdateNL = std::bind(&Rockable::UpdateNL_linkCells, this);
-      optionNames["UpdateNL"] = "linkCells";
-    } else {
-      std::cout << msg::warn() << "UpdateNL " << Name << " is unknown" << msg::normal() << std::endl;
-      std::cout << "Option remains: UpdateNL = " << optionNames["UpdateNL"] << std::endl;
-    }
+    setUpdateNL(Name);
   };
   parser.kwMap["Integrator"] = __DO__(conf) {
     std::string Name;
     conf >> Name;
-    if (Name == "velocityVerlet") {
-      IntegrationStep = std::bind(&Rockable::velocityVerletStep, this);
-      optionNames["Integrator"] = "velocityVerlet";
-    } else if (Name == "Euler") {
-      IntegrationStep = std::bind(&Rockable::EulerStep, this);
-      optionNames["Integrator"] = "Euler";
-    } else if (Name == "Beeman") {
-      IntegrationStep = std::bind(&Rockable::BeemanStep, this);
-      optionNames["Integrator"] = "Beeman";
-    } else if (Name == "RungeKutta4") {
-      IntegrationStep = std::bind(&Rockable::RungeKutta4Step, this);
-      optionNames["Integrator"] = "RungeKutta4";
-    } else {
-      std::cout << msg::warn() << "Integrator " << Name << " is unknown" << msg::normal() << std::endl;
-      std::cout << "Option remains: Integrator = " << optionNames["Integrator"] << std::endl;
-    }
+    setIntegrator(Name);
   };
   parser.kwMap["cellMinSizes"] = __GET__(conf, cellMinSizes);
   parser.kwMap["boxForLinkCellsOpt"] = __GET__(conf, boxForLinkCellsOpt);
@@ -927,6 +881,21 @@ void Rockable::loadShapes(const char* fileName) {
 //  ADD OR REMOVE A SINGLE INTERACTION
 // ==================================================================================================================
 
+void Rockable::setAddOrRemoveInteractions(std::string & Name){
+  if (Name == "bruteForce") {
+    AddOrRemoveInteractions = std::bind(&Rockable::AddOrRemoveInteractions_bruteForce, this, std::placeholders::_1,
+                                        std::placeholders::_2, std::placeholders::_3);
+    optionNames["AddOrRemoveInteractions"] = "bruteForce";
+  } else if (Name == "OBBtree") {
+    AddOrRemoveInteractions = std::bind(&Rockable::AddOrRemoveInteractions_OBBtree, this, std::placeholders::_1,
+                                        std::placeholders::_2, std::placeholders::_3);
+    optionNames["AddOrRemoveInteractions"] = "OBBtree";
+  } else {
+    std::cout << msg::warn() << "AddOrRemoveInteractions " << Name << " is unknown" << msg::normal() << std::endl;
+    std::cout << "Option remains: AddOrRemoveInteractions = " << optionNames["AddOrRemoveInteractions"] << std::endl;
+  }
+}
+
 /**
     @brief This is the brute-force O(n^2) version of the algorithm.
            It means that the proximity of all sub-elements of i is tested with all
@@ -1133,6 +1102,19 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
 //  UPDATING THE NEIGHBOR LIST
 // ==================================================================================================================
 
+void Rockable::setUpdateNL(std::string & Name) {
+  if (Name == "bruteForce") {
+    UpdateNL = std::bind(&Rockable::UpdateNL_bruteForce, this);
+    optionNames["UpdateNL"] = "bruteForce";
+  } else if (Name == "linkCells") {
+    UpdateNL = std::bind(&Rockable::UpdateNL_linkCells, this);
+    optionNames["UpdateNL"] = "linkCells";
+  } else {
+    std::cout << msg::warn() << "UpdateNL " << Name << " is unknown" << msg::normal() << std::endl;
+    std::cout << "Option remains: UpdateNL = " << optionNames["UpdateNL"] << std::endl;
+  }
+}
+
 void Rockable::dynamicCheckUpdateNL() {
 
   for (size_t i = 0; i < deltaPos.size(); ++i) {
@@ -1323,6 +1305,23 @@ void Rockable::UpdateNL_linkCells() {
 // ======================
 // FORCE LAWS
 // ======================
+
+
+void Rockable::setForceLaw(std::string & lawName) {
+  if (lawName == "Default") {
+    forceLawPtr = std::bind(&Rockable::forceLawDefault, this, std::placeholders::_1);
+    optionNames["forceLaw"] = "Default";
+  } else if (lawName == "Avalanches") {
+    forceLawPtr = std::bind(&Rockable::forceLawAvalanches, this, std::placeholders::_1);
+    optionNames["forceLaw"] = "Avalanches";
+  } else if (lawName == "StickedLinks") {
+    forceLawPtr = std::bind(&Rockable::forceLawStickedLinks, this, std::placeholders::_1);
+    optionNames["forceLaw"] = "StickedLinks";
+  } else {
+    std::cout << msg::warn() << "forceLaw " << lawName << " is unknown" << msg::normal() << std::endl;
+    std::cout << "Option remains: forceLaw = " << optionNames["forceLaw"] << std::endl;
+  }
+}
 
 /**
     @brief Since the group number can be zoned in a particle,
@@ -1626,8 +1625,27 @@ bool Rockable::forceLawStickedLinks(Interaction& I) {
 }
 
 // ==============================================================================================================
-//  CORE METHODS OF THE DEM ALGORITHM
+//  INTEGRATORS
 // ==============================================================================================================
+
+void Rockable::setIntegrator(std::string& Name){
+  if (Name == "velocityVerlet") {
+    IntegrationStep = std::bind(&Rockable::velocityVerletStep, this);
+    optionNames["Integrator"] = "velocityVerlet";
+  } else if (Name == "Euler") {
+    IntegrationStep = std::bind(&Rockable::EulerStep, this);
+    optionNames["Integrator"] = "Euler";
+  } else if (Name == "Beeman") {
+    IntegrationStep = std::bind(&Rockable::BeemanStep, this);
+    optionNames["Integrator"] = "Beeman";
+  } else if (Name == "RungeKutta4") {
+    IntegrationStep = std::bind(&Rockable::RungeKutta4Step, this);
+    optionNames["Integrator"] = "RungeKutta4";
+  } else {
+    std::cout << msg::warn() << "Integrator " << Name << " is unknown" << msg::normal() << std::endl;
+    std::cout << "Option remains: Integrator = " << optionNames["Integrator"] << std::endl;
+  }
+}
 
 void Rockable::initIntegrator() {
   if (optionNames["Integrator"] == "Beeman") {
@@ -2159,6 +2177,10 @@ void Rockable::RungeKutta4Step() {
                                               2.0 * Particles[i].RK4Data->k3arot + Particles[i].RK4Data->k4arot);
   }
 }
+
+// ==============================================================================================================
+//  CORE METHODS OF THE DEM ALGORITHM
+// ==============================================================================================================
 
 /**
     @brief The integration LOOP

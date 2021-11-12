@@ -56,21 +56,21 @@ void showKeybinds() {
   glText::print(15, _nextLine_, "[RIGHT] load next configuration file");
   glText::print(15, _nextLine_, "[LEFT]  load previous configuration file");
   glText::print(15, _nextLine_, "[=]     fit the view");
-  //glText::print(15, _nextLine_, "[a][A]  decrease/increase alpha (transparence) of driven bodies");
+  // glText::print(15, _nextLine_, "[a][A]  decrease/increase alpha (transparence) of driven bodies");
   glText::print(15, _nextLine_, "[b]     switch ON/OFF the background color");
-  //glText::print(15, _nextLine_, "[c]     run 5000 steps of computation (used for debugging)");
-  //glText::print(15, _nextLine_, "[e][E]  decrease/increase alpha (transparence) of free bodies");
-  //glText::print(15, _nextLine_, "[g]     open another file");
+  // glText::print(15, _nextLine_, "[c]     run 5000 steps of computation (used for debugging)");
+  // glText::print(15, _nextLine_, "[e][E]  decrease/increase alpha (transparence) of free bodies");
+  // glText::print(15, _nextLine_, "[g]     open another file");
   glText::print(15, _nextLine_, "[k]     print this help");
   glText::print(15, _nextLine_, "[l]     switch ON/OFF the links (normal vector at contact)");
   glText::print(15, _nextLine_, "[m]     switch ON/OFF the links colored by type");
-  //glText::print(15, _nextLine_, "[n]     switch ON/OFF the body displays");
-  //glText::print(15, _nextLine_, "[o]     switch ON/OFF the OBB displays");
-  //glText::print(15, _nextLine_, "[O]     switch ON/OFF the enlargement of OBBs by the Verlet distance");
-  //glText::print(15, _nextLine_, "[w]     set the view so that gravity appears vertical");
-  //glText::print(15, _nextLine_, "[x]     print the space limits of the current scene");
-  //glText::print(15, _nextLine_, "[p]     edit selected body");
-  
+  // glText::print(15, _nextLine_, "[n]     switch ON/OFF the body displays");
+  // glText::print(15, _nextLine_, "[o]     switch ON/OFF the OBB displays");
+  // glText::print(15, _nextLine_, "[O]     switch ON/OFF the enlargement of OBBs by the Verlet distance");
+  // glText::print(15, _nextLine_, "[w]     set the view so that gravity appears vertical");
+  // glText::print(15, _nextLine_, "[x]     print the space limits of the current scene");
+  // glText::print(15, _nextLine_, "[p]     edit selected body");
+
   glText::print(15, _nextLine_, "[y]     make the display faster (and less nice)");
 #ifdef PNG_H
   glText::print(15, _nextLine_, "[z]     make a screenshot (oneshot.png)");
@@ -84,14 +84,13 @@ void showKeybinds() {
   switch2D::back();
 }
 
-
 void keyboard(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int mods) {
   if (ImGui_window_focused == true) return;
   if (action == GLFW_PRESS) {
-    //std::cout << "> " << glfwGetKeyName(key, 0) << '\n';
+    // std::cout << "> " << glfwGetKeyName(key, 0) << '\n';
     switch (key) {
       case GLFW_KEY_ESCAPE:
-        request_quit = true;  
+        request_quit = true;
         break;
 
         /*
@@ -126,7 +125,7 @@ void keyboard(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int
         textZone.addLine("5000 time steps have been done.");
       } break;
 */
-        
+
       case GLFW_KEY_D:
         show_driven = 1 - show_driven;
         break;
@@ -140,7 +139,7 @@ void keyboard(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int
       }
         */
 
-      break;
+        break;
 
       case GLFW_KEY_F:
         show_forces = 1 - show_forces;
@@ -154,7 +153,7 @@ void keyboard(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int
         tryToReadConf(Num);
       } break;
 */
-        
+
       case GLFW_KEY_H: {
         textZone.addLine("");
         textZone.addLine("MOUSE:");
@@ -175,8 +174,8 @@ void keyboard(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int
 
       case GLFW_KEY_M:
         show_interTypes = 1 - show_interTypes;
-        break;        
-      
+        break;
+
       case GLFW_KEY_R: {
         rescaleColorRange = 1 - rescaleColorRange;
         if (rescaleColorRange == 0) {
@@ -199,7 +198,6 @@ void keyboard(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int
           if (forceTubeFactor > 0.2) forceTubeFactor -= 0.05;
         }
       } break;
-
 
       case GLFW_KEY_Z: {
         if (mods == GLFW_MOD_SHIFT) {
@@ -239,7 +237,6 @@ void keyboard(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int
       case GLFW_KEY_RIGHT:
         tryToReadConf(confNum + 1);
         break;
-
 
       case GLFW_KEY_0: {
         colorMode = 0;
@@ -453,7 +450,7 @@ void display() {
   glShadeModel(GL_SMOOTH);
   glEnable(GL_DEPTH_TEST);
 
-  // if (show_velocities) drawVelocities();
+  if (show_globalFrame) drawGlobalFrame();
   if (show_traj) drawTrajectories();
   if (show_forces) drawForces();
   if (show_interFrames) drawInteractionFrames();
@@ -627,6 +624,14 @@ void drawTrajectories() {
   }
 }
 
+void drawGlobalFrame() {
+  glEnable(GL_LIGHTING);
+  glEnable(GL_DEPTH_TEST);
+  
+  vec3r diag = 0.6 * (box.aabb.max - box.aabb.min);
+  glShape::frame(vec3r(0,0,0), diag.x, diag.y, diag.z);
+}
+
 void drawOBBs() {
   glEnable(GL_LIGHTING);
   glEnable(GL_DEPTH_TEST);
@@ -643,49 +648,7 @@ void drawOBBs() {
     if (enlarged_obb) obbi.enlarge(0.5 * box.DVerlet);
 
     glColor4ub(255, 0, 0, 255);  // RED
-    vec3r corner;
-    glBegin(GL_LINE_LOOP);
-    corner = obbi.center + obbi.extent[0] * obbi.e[0] + obbi.extent[1] * obbi.e[1] + obbi.extent[2] * obbi.e[2];
-    glVertex3f(corner.x, corner.y, corner.z);
-    corner -= 2.0 * obbi.extent[1] * obbi.e[1];
-    glVertex3f(corner.x, corner.y, corner.z);
-    corner -= 2.0 * obbi.extent[2] * obbi.e[2];
-    glVertex3f(corner.x, corner.y, corner.z);
-    corner += 2.0 * obbi.extent[1] * obbi.e[1];
-    glVertex3f(corner.x, corner.y, corner.z);
-    corner += 2.0 * obbi.extent[2] * obbi.e[2];
-    glVertex3f(corner.x, corner.y, corner.z);
-    glEnd();
-    glBegin(GL_LINE_LOOP);
-    corner -= 2.0 * obbi.extent[0] * obbi.e[0];
-    glVertex3f(corner.x, corner.y, corner.z);
-    corner -= 2.0 * obbi.extent[1] * obbi.e[1];
-    glVertex3f(corner.x, corner.y, corner.z);
-    corner -= 2.0 * obbi.extent[2] * obbi.e[2];
-    glVertex3f(corner.x, corner.y, corner.z);
-    corner += 2.0 * obbi.extent[1] * obbi.e[1];
-    glVertex3f(corner.x, corner.y, corner.z);
-    corner += 2.0 * obbi.extent[2] * obbi.e[2];
-    glVertex3f(corner.x, corner.y, corner.z);
-    glEnd();
-
-    glBegin(GL_LINES);
-    glVertex3f(corner.x, corner.y, corner.z);
-    corner += 2.0 * obbi.extent[0] * obbi.e[0];
-    glVertex3f(corner.x, corner.y, corner.z);
-    corner -= 2.0 * obbi.extent[1] * obbi.e[1];
-    glVertex3f(corner.x, corner.y, corner.z);
-    corner -= 2.0 * obbi.extent[0] * obbi.e[0];
-    glVertex3f(corner.x, corner.y, corner.z);
-    corner -= 2.0 * obbi.extent[2] * obbi.e[2];
-    glVertex3f(corner.x, corner.y, corner.z);
-    corner += 2.0 * obbi.extent[0] * obbi.e[0];
-    glVertex3f(corner.x, corner.y, corner.z);
-    corner += 2.0 * obbi.extent[1] * obbi.e[1];
-    glVertex3f(corner.x, corner.y, corner.z);
-    corner -= 2.0 * obbi.extent[0] * obbi.e[0];
-    glVertex3f(corner.x, corner.y, corner.z);
-    glEnd();
+    glShape::obb(obbi);
   }
 }
 
@@ -1254,6 +1217,7 @@ void reset_ngroup() {
   size_t new_ngroup = new_group_maxId + 1;
   if (new_ngroup != box.dataTable.get_ngroup()) {
     box.dataTable.set_ngroup(new_ngroup);
+    box.properties.set_ngroup(new_ngroup);
   }
 }
 
@@ -1261,7 +1225,7 @@ void Input_Properties(const char* propertyName) {
   for (size_t grp = 0; grp < box.properties.ngroup; grp++) {
     size_t idDensity = box.properties.get_id(propertyName);
     char label[256];
-    sprintf(label,"density (%ld)", grp);
+    sprintf(label, "density (%ld)", grp);
     ImGui::InputDouble(label, &(box.properties.prop[idDensity][grp]));
   }
 }
@@ -1271,12 +1235,116 @@ void Input_LawData(const char* parName) {
   size_t id = box.dataTable.data_id[parNameStr];
   for (size_t g1 = 0; g1 < box.dataTable.ngroup; ++g1) {
     for (size_t g2 = g1; g2 < box.dataTable.ngroup; ++g2) {
-      if (1/*box.dataTable.isDefined(id, g1, g2)*/) {
+      if (1 /*box.dataTable.isDefined(id, g1, g2)*/) {
         char label[256];
-        sprintf(label,"%s (%ld - %ld)", parNameStr.c_str(), g1, g2);
+        sprintf(label, "%s (%ld - %ld)", parNameStr.c_str(), g1, g2);
         ImGui::InputDouble(label, &(box.dataTable.tables[id][g1][g2]));
       }
     }
+  }
+}
+
+void ForceLaw_Combo() {
+  std::vector<std::string> lawNames = {"Default", "Avalanches", "StickedLinks"};
+  std::string lawName = box.optionNames["forceLaw"];
+  size_t index = 0;
+  for (size_t i = 0; i < lawNames.size(); i++) {
+    if (lawName == lawNames[i]) {
+      index = i;
+      break;
+    }
+  }
+
+  if (ImGui::BeginCombo("forceLaw", lawNames[index].c_str(), 0)) {
+    for (size_t n = 0; n < lawNames.size(); n++) {
+      const bool is_selected = (index == n);
+      if (ImGui::Selectable(lawNames[n].c_str(), is_selected)) {
+        index = n;
+        box.setForceLaw(lawNames[n]);
+      }
+      if (is_selected) {
+        ImGui::SetItemDefaultFocus();
+      }
+    }
+    ImGui::EndCombo();
+  }
+}
+
+void Integrator_Combo() {
+  std::vector<std::string> Names = {"velocityVerlet", "Euler", "Beeman", "RungeKutta4"};
+  std::string Name = box.optionNames["Integrator"];
+  size_t index = 0;
+  for (size_t i = 0; i < Names.size(); i++) {
+    if (Name == Names[i]) {
+      index = i;
+      break;
+    }
+  }
+
+  if (ImGui::BeginCombo("Integrator", Names[index].c_str(), 0)) {
+    for (size_t n = 0; n < Names.size(); n++) {
+      const bool is_selected = (index == n);
+      if (ImGui::Selectable(Names[n].c_str(), is_selected)) {
+        index = n;
+        box.setIntegrator(Names[n]);
+      }
+      if (is_selected) {
+        ImGui::SetItemDefaultFocus();
+      }
+    }
+    ImGui::EndCombo();
+  }
+}
+
+void UpdateNL_Combo() {
+  std::vector<std::string> Names = {"bruteForce", "linkCells"};
+  std::string Name = box.optionNames["UpdateNL"];
+  size_t index = 0;
+  for (size_t i = 0; i < Names.size(); i++) {
+    if (Name == Names[i]) {
+      index = i;
+      break;
+    }
+  }
+
+  if (ImGui::BeginCombo("UpdateNL", Names[index].c_str(), 0)) {
+    for (size_t n = 0; n < Names.size(); n++) {
+      const bool is_selected = (index == n);
+      if (ImGui::Selectable(Names[n].c_str(), is_selected)) {
+        index = n;
+        box.setUpdateNL(Names[n]);
+      }
+      if (is_selected) {
+        ImGui::SetItemDefaultFocus();
+      }
+    }
+    ImGui::EndCombo();
+  }
+}
+
+void AddOrRemoveInteractions_Combo() {
+  std::vector<std::string> Names = {"bruteForce", "OBBtree"};
+  std::string Name = box.optionNames["AddOrRemoveInteractions"];
+  size_t index = 0;
+  for (size_t i = 0; i < Names.size(); i++) {
+    if (Name == Names[i]) {
+      index = i;
+      break;
+    }
+  }
+
+  if (ImGui::BeginCombo("AddOrRemoveInteractions", Names[index].c_str(), 0)) {
+    for (size_t n = 0; n < Names.size(); n++) {
+      const bool is_selected = (index == n);
+      if (ImGui::Selectable(Names[n].c_str(), is_selected)) {
+        index = n;
+        box.setAddOrRemoveInteractions(Names[n]);
+      }
+      if (is_selected) {
+        ImGui::SetItemDefaultFocus();
+      }
+    }
+    ImGui::EndCombo();
   }
 }
 
@@ -1288,11 +1356,32 @@ void window_conf_data() {
   ImGui::Begin("Configuration data...", &show_window_conf_data);
   ImGui::PushItemWidth(100);
 
+  {
+    float g[3];
+    g[0] = box.gravity.x;
+    g[1] = box.gravity.y;
+    g[2] = box.gravity.z;
+    ImGui::PushItemWidth(300);
+    if (ImGui::InputFloat3("gravity", g)) {
+      box.gravity.set(g[0], g[1], g[2]);
+    }
+    ImGui::PopItemWidth();
+  }
+
+  if (ImGui::CollapsingHeader("Options")) {
+    ImGui::PushItemWidth(150);
+    Integrator_Combo();
+    AddOrRemoveInteractions_Combo();
+    ForceLaw_Combo();
+    UpdateNL_Combo();
+    ImGui::PopItemWidth();
+  }
+
   if (ImGui::CollapsingHeader("Time flow")) {
-    ImGui::InputDouble("current time", &(box.t));
-    ImGui::InputDouble("end time", &(box.tmax));
-    ImGui::InputDouble("dt", &(box.dt));
-    ImGui::InputDouble("Save period", &(box.interConf));
+    ImGui::InputDouble("current time", &(box.t), 0.0f, 0.0f, "%.8lf");
+    ImGui::InputDouble("end time", &(box.tmax), 0.0f, 0.0f, "%.8lf");
+    ImGui::InputDouble("dt", &(box.dt), 0.0f, 0.0f, "%.10lf");
+    ImGui::InputDouble("Save period", &(box.interConf), 0.0f, 0.0f, "%.8lf");
   }
 
   if (ImGui::CollapsingHeader("Neighbor list")) {
@@ -1312,46 +1401,48 @@ void window_conf_data() {
     ImGui::InputDouble("Velocity Barrier Exponent", &(box.VelocityBarrierExponent));
     ImGui::InputDouble("Angular Velocity Barrier Exponent", &(box.AngularVelocityBarrierExponent));
   }
-  
+
   if (ImGui::CollapsingHeader("Properties")) {
-    if (ImGui::Button("Reset No of groups")) {   
+    if (ImGui::Button("Reset No of groups")) {
       reset_ngroup();
     }
     ImGui::PushItemWidth(150);
     Input_Properties("density");
-    ImGui::PushItemWidth(100);
+    ImGui::PopItemWidth();
   }
-  
+
   if (ImGui::CollapsingHeader("Data tables")) {
-    if (ImGui::Button("Reset No of groups")) {   
+    if (ImGui::Button("Reset No of groups")) {
       reset_ngroup();
     }
     ImGui::PushItemWidth(150);
-        
+
     Input_LawData("knContact");
     Input_LawData("en2Contact");
     Input_LawData("ktContact");
     Input_LawData("muContact");
     Input_LawData("krContact");
     Input_LawData("murContact");
-    
-    Input_LawData("knInnerBond");
-    Input_LawData("ktInnerBond");
-    Input_LawData("fn0InnerBond");
-    Input_LawData("ft0InnerBond");
-    Input_LawData("powInnerBond");
-    Input_LawData("en2InnerBond");
-    
-    Input_LawData("knOuterBond");
-    Input_LawData("ktOuterBond");
-    Input_LawData("krOuterBond");
-    Input_LawData("fn0OuterBond");
-    Input_LawData("ft0OuterBond");
-    Input_LawData("mom0OuterBond");
-    Input_LawData("powOuterBond");
-    Input_LawData("en2OuterBond");
-    
-    ImGui::PushItemWidth(100);
+
+    if (box.optionNames["forceLaw"] == "StickedLinks") {
+      Input_LawData("knInnerBond");
+      Input_LawData("ktInnerBond");
+      Input_LawData("fn0InnerBond");
+      Input_LawData("ft0InnerBond");
+      Input_LawData("powInnerBond");
+      Input_LawData("en2InnerBond");
+
+      Input_LawData("knOuterBond");
+      Input_LawData("ktOuterBond");
+      Input_LawData("krOuterBond");
+      Input_LawData("fn0OuterBond");
+      Input_LawData("ft0OuterBond");
+      Input_LawData("mom0OuterBond");
+      Input_LawData("powOuterBond");
+      Input_LawData("en2OuterBond");
+    }
+
+    ImGui::PopItemWidth();
   }
 
   if (ImGui::Button("Close")) {
@@ -1383,7 +1474,7 @@ void window_info() {
     ImGui::Text("cwd: %s", cwd);
     ImGui::Text("Total number of particles: %ld", box.Particles.size());
     ImGui::Text("Number of driven particles: %ld", box.nDriven);
-      
+
     ImGui::Text("The current scene fits within:");
     ImGui::Text("    Xmin = %.08f   Xmax = %.08f", box.aabb.min.x, box.aabb.max.x);
     ImGui::Text("    Ymin = %.08f   Ymax = %.08f", box.aabb.min.y, box.aabb.max.y);
@@ -1425,6 +1516,7 @@ void main_imgui_menu() {
 
   if (ImGui::CollapsingHeader("Show")) {
     ImGui::CheckboxFlags("Background", &show_background, 1);
+    ImGui::CheckboxFlags("Scene frame", &show_globalFrame, 1);
     ImGui::CheckboxFlags("All particles", &show_particles, 1);
     ImGui::CheckboxFlags("Also driven particles", &show_driven, 1);
     ImGui::CheckboxFlags("Only faces (faster display)", &complexMode, 1);
@@ -1452,8 +1544,44 @@ void main_imgui_menu() {
       }
       up.normalize();
     }
+    
+    if (ImGui::Button("+X +Y")) {
+      double d = norm(center - eye);
+      eye = center + d * vec3r::unit_z();
+      up.set(0.0, 1.0, 0.0);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("-X +Y")) {
+      double d = norm(center - eye);
+      eye = center - d * vec3r::unit_z();
+      up.set(0.0, 1.0, 0.0);
+    }
+    
+    if (ImGui::Button("+X -Z")) {
+      double d = norm(center - eye);
+      eye = center + d * vec3r::unit_y();
+      up.set(0.0, 0.0, -1.0);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("-X +Z")) {
+      double d = norm(center - eye);
+      eye = center - d * vec3r::unit_y();
+      up.set(0.0, 0.0, 1.0);
+    }
+    
+    if (ImGui::Button("+Z +Y")) {
+      double d = norm(center - eye);
+      eye = center - d * vec3r::unit_x();
+      up.set(0.0, 1.0, 0.0);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("-Z +Y")) {
+      double d = norm(center - eye);
+      eye = center + d * vec3r::unit_x();
+      up.set(0.0, 1.0, 0.0);
+    }
   }
-  
+
   if (ImGui::CollapsingHeader("Interactions")) {
     ImGui::CheckboxFlags("Interaction frames", &show_interFrames, 1);
     ImGui::CheckboxFlags("Interaction types", &show_interTypes, 1);
@@ -1462,7 +1590,6 @@ void main_imgui_menu() {
   }
 
   if (ImGui::CollapsingHeader("Colors")) {
-    
   }
 
   ImGui::End();

@@ -129,8 +129,8 @@ class Rockable {
   double VelocityBarrier;         ///< Velocity Barrier by weighting the particle accelerations (0 = disabled)
   double AngularVelocityBarrier;  ///< Angular velocity Barrier by weighting the particle accelerations (0 = disabled)
   double VelocityBarrierExponent;
-  double AngularVelocityBarrierExponent; 
-  
+  double AngularVelocityBarrierExponent;
+
   // Other parameters
   int iconf;                ///< Current configuration ID
   AABB aabb;                ///< Axis Aligned Bounding Box (AABB) of the entire sample
@@ -143,6 +143,8 @@ class Rockable {
   vec3r cellMinSizes;      ///< Sizes of the linked cells in the 3 directions x, y ad z
   int boxForLinkCellsOpt;  ///< Option for defining the master cell when linkCells' stategy in employed
 
+  std::map<std::string, std::string> optionNames;  ///< All the options refered to as a string and set
+                                                   ///< as a string also
   // Ctor
   Rockable();
 
@@ -164,6 +166,8 @@ class Rockable {
   void integrate();                        ///< Simulation flow (make time increments and check for updates or saving)
   void accelerations();                    ///< Compute accelerations (both for particles and the periodic-cell)
   void incrementResultants(Interaction&);  ///< Project force and moment on the interacting particles
+  std::function<void()> IntegrationStep;   ///< Pointer funtion for integration
+  void setIntegrator(std::string& Name);
 
   // Save/Load methods
   void clearMemory();            ///< Clear the Particles and Interactions
@@ -178,13 +182,13 @@ class Rockable {
   void UpdateNL_linkCells();       ///< Link-cells approach
   std::function<void()> UpdateNL;  ///< Pointer funtion to the updateNL
                                    ///< (update the neighbor-list) method
-
-  std::function<void()> IntegrationStep;  ///< Pointer funtion for integration
+  void setUpdateNL(std::string& Name);
 
   bool forceLawDefault(Interaction&);             ///< Most common force law
   bool forceLawStickedLinks(Interaction&);        ///< Force law for 'glued' bodies
   bool forceLawAvalanches(Interaction&);          ///< Force law specific for rock avalanches
-  std::function<bool(Interaction&)> forceLawPtr;  ///< Pointer funtion to the force-law used
+  std::function<bool(Interaction&)> forceLawPtr;  ///< Pointer function to the force-law used
+  void setForceLaw(std::string& lawName);
 
   // Processing methods
   void computeAABB(size_t first = 0, size_t last = 0);  ///< Compute Axis Aligned Bounding
@@ -223,7 +227,7 @@ class Rockable {
   void particlesClonage(size_t idFirst, size_t idLast, vec3r& translation);
 
   // =============================================================================================================
- private:
+
   void velocityControlledDrive();
   void numericalDamping();        ///< The Cundall damping solution
   void velocityBarrier();         ///< The velocity barrier solution
@@ -236,6 +240,7 @@ class Rockable {
   int AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax);  ///< OBB-tree approach
   std::function<int(size_t, size_t, double)> AddOrRemoveInteractions;    ///< (Pointer function) Add or remove an
                                                                          ///< interaction according to the distance dmax
+  void setAddOrRemoveInteractions(std::string& Name);
 
   void getInteractingGroups(Interaction& I, int& g1, int& g2);
 
@@ -244,9 +249,7 @@ class Rockable {
                                                           ///< write law in
                                                           ///< saveConf
 
-  std::map<std::string, std::string> optionNames;  ///< All the options refered to as a string and set
-                                                   ///< as a string also
-  bool interactiveMode;                            ///< computation (false) or visualization (true) modes
+  bool interactiveMode;  ///< computation (false) or visualization (true) modes
   int verbose;
 
   // Some predefined identifiers to get (quickly) data from input tables

@@ -46,14 +46,14 @@ OPTIONS = -DQUAT_ACC -DnFT_CORR -DnROT_MATRIX -DnBREAK_ONCE -DnCOMPONENTWISE_NUM
 #COMMONPATH = ../common
 COMMONPATH = /usr/local/include/toofus
 #COMMONPATH = /Users/vrichefeu/Documents/devel/TOOFUS
-IMGUI_DIR = imgui
+IMGUI_DIR = ./imgui
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
   # The compiler to be used
   CXX = g++-11
   # The list of flags passed to the compiler
-  CXXFLAGS := -fopenmp -O3 -Wall -Wextra -Wno-deprecated-declarations -std=c++11 
+  CXXFLAGS := -fopenmp -O3 -Wall -Wextra -Wno-deprecated-declarations -std=c++11
   CXXFLAGS += -I $(COMMONPATH) $(OPTIONS) $(SVNDEV)
 	CXXFLAGS += `pkg-config --cflags tclap`
   # Link flags for OpenGL and glut
@@ -62,7 +62,7 @@ ifeq ($(UNAME_S),Darwin)
 	
 	# need to install glfw3 with brew: 'brew install glfw3'
 	GLFWFLAGS = `pkg-config --cflags glfw3`
-	GLFWLINK = -framework OpenGL `pkg-config --libs glfw3`	 
+	GLFWLINK = -framework OpenGL `pkg-config --libs glfw3`
 else
   # The compiler to be used
   CXX = g++
@@ -116,15 +116,18 @@ POSTPROHEADERS = $(POSTPROSOURCES:%.cpp=%.hpp)
 
 # All source files (listed in SOURCES or POSTPROSOURCES) will be compiled into an object file
 # with the following command
-%.o:%.cpp Makefile
+%.o:%.cpp
 	$(CXX) $(CXXFLAGS) -c $<
 
 .PHONY: all clean format
 
 all: run see3 # postpro patatrac
 
+toto: 
+	@echo $(IMGUI_SOURCES)
+
 clean:
-	rm -f *~ *.o run see postpro patatrac
+	rm -f *~ *.o run see see2 see3 postpro patatrac
 
 format:
 	clang-format -i $(HEADERS) $(SOURCES) $(POSTPROHEADERS) $(POSTPROSOURCES) run.cpp see.cpp patatrac.cpp postpro.cpp
@@ -155,10 +158,10 @@ see2: see2.cpp see2.hpp $(HEADERS) $(SOURCES) $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(GLFWLINK) $(PNGLINK)
 	
 # The application that visualizes the conf files (it uses GLFW and Dear ImGui)
-imguiObjs: $(IMGUI_SOURCES) $(IMGUI_OBJECTS)
-	$(CXX) $(CXXFLAGS) -I $(IMGUI_DIR) -I $(IMGUI_DIR)/backends $(GLFWFLAGS) -c $(IMGUI_SOURCES)
+$(IMGUI_OBJECTS): $(IMGUI_SOURCES)
+	$(CXX) $(CXXFLAGS) -I $(IMGUI_DIR) -I $(IMGUI_DIR)/backends -Wno-unused-function $(GLFWFLAGS) -c $(IMGUI_SOURCES)
 	
-see3: see3.cpp see3.hpp $(HEADERS) $(SOURCES) $(OBJECTS) $(IMGUI_OBJECTS) imguiObjs	
+see3: see3.cpp see3.hpp $(HEADERS) $(OBJECTS) $(IMGUI_OBJECTS)
 	$(CXX) $(CXXFLAGS) -I $(IMGUI_DIR) -I $(IMGUI_DIR)/backends $(GLFWFLAGS) $(PNGFLAGS) -c $<
 	$(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(IMGUI_OBJECTS) $(GLFWLINK) $(PNGLINK)
 
