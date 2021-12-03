@@ -440,7 +440,10 @@ void motion(GLFWwindow* /*window*/, double x, double y) {
 
 void display() {
   sleep(0);  // it is supposed to accelerate the display
-  glTools::clearBackground(show_background);
+  glTools::clearBackground(show_background, (int)floor(255 * clear_bottom_color[0]),
+                           (int)floor(255 * clear_bottom_color[1]), (int)floor(255 * clear_bottom_color[2]),
+                           (int)floor(255 * clear_top_color[0]), (int)floor(255 * clear_top_color[1]),
+                           (int)floor(255 * clear_top_color[2]));
   adjustClippingPlans();
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
@@ -627,9 +630,9 @@ void drawTrajectories() {
 void drawGlobalFrame() {
   glEnable(GL_LIGHTING);
   glEnable(GL_DEPTH_TEST);
-  
+
   vec3r diag = 0.6 * (box.aabb.max - box.aabb.min);
-  glShape::frame(vec3r(0,0,0), diag.x, diag.y, diag.z);
+  glShape::frame(vec3r(0, 0, 0), diag.x, diag.y, diag.z);
 }
 
 void drawOBBs() {
@@ -1172,6 +1175,17 @@ void error(int error, const char* description) {
 // IMGUI INPUT TOOLS FOR ROCKABLE
 // =====================================================================
 
+static void HelpPopup(const char* desc) {
+  ImGui::TextDisabled("(?)");
+  if (ImGui::IsItemHovered()) {
+    ImGui::BeginTooltip();
+    ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+    ImGui::TextUnformatted(desc);
+    ImGui::PopTextWrapPos();
+    ImGui::EndTooltip();
+  }
+}
+
 void Input_vec3r(const char* label, vec3r& myVec) {
   vec3<float> tmp(myVec.x, myVec.y, myVec.z);
   if (ImGui::InputFloat3(label, &(tmp.x))) {
@@ -1371,6 +1385,8 @@ void window_conf_data() {
   if (ImGui::CollapsingHeader("Options")) {
     ImGui::PushItemWidth(150);
     Integrator_Combo();
+    ImGui::SameLine();
+    HelpPopup("The integrator to be used");
     AddOrRemoveInteractions_Combo();
     ForceLaw_Combo();
     UpdateNL_Combo();
@@ -1387,7 +1403,15 @@ void window_conf_data() {
   if (ImGui::CollapsingHeader("Neighbor list")) {
     ImGui::InputDouble("Verlet update period", &(box.interVerlet));
     ImGui::InputDouble("R-shape alert distance", &(box.DVerlet));
+    ImGui::SameLine();
+    HelpPopup(
+        "The size of each OBB is incremented by this value, "
+        "and when two oversized-OBB intersect, they are add in the neighbor-list");
     ImGui::InputDouble("sub-element alert distance", &(box.dVerlet));
+    ImGui::SameLine();
+    HelpPopup(
+        "When two R-shapes are neighbors, this distance is used for checking the proximity "
+        "in-between the sub-elements (vertices, edges, and thick faces)");
 
     ImGui::CheckboxFlags("Dynamic update", &(box.dynamicUpdateNL), 1);
     ImGui::InputDouble("Distance for updating", &(box.dispUpdateNL));
@@ -1544,7 +1568,7 @@ void main_imgui_menu() {
       }
       up.normalize();
     }
-    
+
     if (ImGui::Button("+X +Y")) {
       double d = norm(center - eye);
       eye = center + d * vec3r::unit_z();
@@ -1556,7 +1580,7 @@ void main_imgui_menu() {
       eye = center - d * vec3r::unit_z();
       up.set(0.0, 1.0, 0.0);
     }
-    
+
     if (ImGui::Button("+X -Z")) {
       double d = norm(center - eye);
       eye = center + d * vec3r::unit_y();
@@ -1568,7 +1592,7 @@ void main_imgui_menu() {
       eye = center - d * vec3r::unit_y();
       up.set(0.0, 0.0, 1.0);
     }
-    
+
     if (ImGui::Button("+Z +Y")) {
       double d = norm(center - eye);
       eye = center - d * vec3r::unit_x();
@@ -1590,6 +1614,10 @@ void main_imgui_menu() {
   }
 
   if (ImGui::CollapsingHeader("Colors")) {
+    ImGui::PushItemWidth(150);
+    ImGui::ColorEdit3("Background bottom", (float*)&clear_bottom_color);
+    ImGui::ColorEdit3("Background top", (float*)&clear_top_color);
+    ImGui::PopItemWidth();
   }
 
   ImGui::End();

@@ -1,5 +1,3 @@
-
-
 #include <cmath>
 #include <cstdlib>
 #include <fstream>
@@ -21,13 +19,13 @@ unsigned int seed = 143502;
 
 // =========================================================
 // =========================================================
-double Rw = 0.0002;  // wall radius
-double baseLength = 10.e-3;
+double Rw = 0.5e-3;  // wall radius
+double baseLength = 20.e-3; // inner width or diameter of the container
 
-double Dmax = 1.0e-3;
-double Dmin = 0.9e-3;
+double Dmax = 1.2e-3;
+double Dmin = 0.8e-3;
 
-size_t nb_spheres = 500;
+size_t nb_spheres = 4000;
 size_t nb_trials_max = nb_spheres * 30;
 
 double SolidFractionTarget = 0.29;

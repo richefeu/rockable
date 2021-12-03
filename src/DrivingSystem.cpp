@@ -276,7 +276,7 @@ void DrivingSystem::read(bool warn) {
         double A, freq;  // amplitude and frequency
         Control C;
         is >> C.i >> dir >> A >> freq;
-        dir.normalize();  // in case the user enter a non-normalized one
+        dir.normalize();  // in case the user enters a non-normalized one
         double omega = 2.0 * M_PI * freq;
         C.value = 0.0;  // will be set by the servo controller
         size_t icontr = controls.size();
@@ -288,6 +288,30 @@ void DrivingSystem::read(bool warn) {
         controls.push_back(C);
         ServoFunction = [icontr, dir, A, omega](Rockable& box) -> void {
           vec3r v = A * omega * cos(omega * box.t) * dir;
+          box.System.controls[icontr].value = v.x;
+          box.System.controls[icontr + 1].value = v.y;
+          box.System.controls[icontr + 2].value = v.z;
+        };
+      } else if (servoName == "triangle_shaker") {
+        vec3r dir;       // direction of oscillation
+        double A, freq;  // amplitude and frequency
+        Control C;
+        is >> C.i >> dir >> A >> freq;
+        dir.normalize();  // in case the user enters a non-normalized one
+        double T = 1.0 / freq;
+        C.value = 0.0;  // will be set by the servo controller
+        size_t icontr = controls.size();
+        C.type = _x_Vel_;
+        controls.push_back(C);
+        C.type = _y_Vel_;
+        controls.push_back(C);
+        C.type = _z_Vel_;
+        controls.push_back(C);
+        ServoFunction = [icontr, dir, A, T](Rockable& box) -> void {
+          vec3r v = (4.0 * A / T) * dir;
+          double phase = box.t - std::floor(box.t / T) * T;
+          phase /= T;
+          if (phase >= 0.25 && phase < 0.75) v *= -1.0;
           box.System.controls[icontr].value = v.x;
           box.System.controls[icontr + 1].value = v.y;
           box.System.controls[icontr + 2].value = v.z;

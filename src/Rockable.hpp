@@ -168,6 +168,9 @@ class Rockable {
   void incrementResultants(Interaction&);  ///< Project force and moment on the interacting particles
   std::function<void()> IntegrationStep;   ///< Pointer funtion for integration
   void setIntegrator(std::string& Name);
+  
+  // Core CD method (TODO)
+  // 
 
   // Save/Load methods
   void clearMemory();            ///< Clear the Particles and Interactions

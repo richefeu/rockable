@@ -2658,8 +2658,6 @@ void Rockable::computeAABB(size_t first, size_t last) {
     paabb[i].enlarge(radius);
   }
 
-  // aabb.set_single(Particles[first].GlobVertex(0));
-  // aabb.enlarge(Particles[first].MinskowskiRadius());
   aabb = paabb[first];
 
   for (size_t i = first + 1; i <= last; i++) {
