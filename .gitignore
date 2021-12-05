@@ -8,6 +8,7 @@ src/run
 src/patatrac
 src/postpro
 *conf*
+!imconfig.h
 *kineticEnergy.txt
 *perf.txt
 *staticBalance.txt

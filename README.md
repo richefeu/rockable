@@ -8,7 +8,7 @@ The use of the code is not interfaced by any tool (like lua, python or any graph
 
 ## Folders
 
-* `common`: header-only libraries used by Rockable or processing tools
+* `common`: header-only libraries used by Rockable or processing tools. This is now replace by the library `toofus` that can be found on [GitHub](https://richefeu.github.io/toofus/).
 * `doc`: place to generate the doxygen html documentation of the source files of Rockable
 * `sphinxdoc`: user documentation (sphinx with ReStructuredText)
 * `examples`: examples for usage tutorials or for testing features
