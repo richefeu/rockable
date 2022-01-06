@@ -123,7 +123,6 @@ void Rockable::setVerboseLevel(int v) {
   }
 }
 
-
 void Rockable::initOutputFiles() {
   if (interactiveMode == true) return;
   perfFile.open("perf.txt");
@@ -260,8 +259,8 @@ void Rockable::saveConf(int i) {
     @param[in]  name  The name of the conf-file
 */
 void Rockable::saveConf(const char* fname) {
-  //char fname[256];
-  //sprintf(fname, "conf%d", i);
+  // char fname[256];
+  // sprintf(fname, "conf%d", i);
   std::ofstream conf(fname);
 
   conf << "Rockable " << CONF_VERSION_DATE << '\n';  // format: progName version-date(dd-mm-yyyy)
@@ -405,7 +404,6 @@ void Rockable::writeLawData(std::ostream& os, const char* parName) {
     }
   }
 }
-
 
 /**
     @brief Load a configuration-file named 'conf<i>'
@@ -881,7 +879,7 @@ void Rockable::loadShapes(const char* fileName) {
 //  ADD OR REMOVE A SINGLE INTERACTION
 // ==================================================================================================================
 
-void Rockable::setAddOrRemoveInteractions(std::string & Name){
+void Rockable::setAddOrRemoveInteractions(std::string& Name) {
   if (Name == "bruteForce") {
     AddOrRemoveInteractions = std::bind(&Rockable::AddOrRemoveInteractions_bruteForce, this, std::placeholders::_1,
                                         std::placeholders::_2, std::placeholders::_3);
@@ -1075,21 +1073,21 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
     int j_nbPoints = intersections[c].second.nbPoints;
 
     if (i_nbPoints == 1) {
-      if (j_nbPoints == 1) { // vertex (i, isub) -> vertex (j, jsub)
+      if (j_nbPoints == 1) {  // vertex (i, isub) -> vertex (j, jsub)
         addOrRemoveSingleInteraction(i, j, isub, vvType, jsub, Particle::VertexIsNearVertex);
-      } else if (j_nbPoints == 2) { // vertex (i, isub) -> edge (j, jsub)
+      } else if (j_nbPoints == 2) {  // vertex (i, isub) -> edge (j, jsub)
         addOrRemoveSingleInteraction(i, j, isub, veType, jsub, Particle::VertexIsNearEdge);
-      } else if (j_nbPoints == 3) { // vertex (i, isub) -> face (j, jsub)
+      } else if (j_nbPoints == 3) {  // vertex (i, isub) -> face (j, jsub)
         addOrRemoveSingleInteraction(i, j, isub, vfType, jsub, Particle::VertexIsNearFace);
       }
-    } else if (i_nbPoints == 2) { 
-      if (j_nbPoints == 1) { // vertex (j, jsub) -> edge (i, isub)
+    } else if (i_nbPoints == 2) {
+      if (j_nbPoints == 1) {  // vertex (j, jsub) -> edge (i, isub)
         addOrRemoveSingleInteraction(j, i, jsub, veType, isub, Particle::VertexIsNearEdge);
-      } else if (j_nbPoints == 2) { // vertex (i, isub) -> edge (j, jsub)
+      } else if (j_nbPoints == 2) {  // vertex (i, isub) -> edge (j, jsub)
         addOrRemoveSingleInteraction(i, j, isub, eeType, jsub, Particle::EdgeIsNearEdge);
       }
     } else if (i_nbPoints == 3) {
-      addOrRemoveSingleInteraction(j, i, jsub, vfType, isub, Particle::VertexIsNearFace); 
+      addOrRemoveSingleInteraction(j, i, jsub, vfType, isub, Particle::VertexIsNearFace);
       // vertex (j, jsub) -> face (i, isub)
     }
 
@@ -1102,7 +1100,7 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
 //  UPDATING THE NEIGHBOR LIST
 // ==================================================================================================================
 
-void Rockable::setUpdateNL(std::string & Name) {
+void Rockable::setUpdateNL(std::string& Name) {
   if (Name == "bruteForce") {
     UpdateNL = std::bind(&Rockable::UpdateNL_bruteForce, this);
     optionNames["UpdateNL"] = "bruteForce";
@@ -1306,8 +1304,7 @@ void Rockable::UpdateNL_linkCells() {
 // FORCE LAWS
 // ======================
 
-
-void Rockable::setForceLaw(std::string & lawName) {
+void Rockable::setForceLaw(std::string& lawName) {
   if (lawName == "Default") {
     forceLawPtr = std::bind(&Rockable::forceLawDefault, this, std::placeholders::_1);
     optionNames["forceLaw"] = "Default";
@@ -1628,7 +1625,7 @@ bool Rockable::forceLawStickedLinks(Interaction& I) {
 //  INTEGRATORS
 // ==============================================================================================================
 
-void Rockable::setIntegrator(std::string& Name){
+void Rockable::setIntegrator(std::string& Name) {
   if (Name == "velocityVerlet") {
     IntegrationStep = std::bind(&Rockable::velocityVerletStep, this);
     optionNames["Integrator"] = "velocityVerlet";
@@ -1692,6 +1689,12 @@ void Rockable::velocityControlledDrive() {
         Particles[i].Q += ((Particles[i].Q.dot(vrot)) *= dt);
         Particles[i].Q.normalize();
       } break;
+      case _xyzrot_Vel_: {
+        size_t i = System.controls[c].i;
+        vec3r vrot = System.controls[c].vec_value;
+        Particles[i].Q += ((Particles[i].Q.dot(vrot)) *= dt);
+        Particles[i].Q.normalize();
+      } break;
       default:
         break;
     }
@@ -1723,6 +1726,30 @@ void Rockable::EulerStep() {
         size_t i = System.controls[c].i;
         Particles[i].pos.z += dt * Particles[i].vel.z;
         Particles[i].vel.z += dt * Particles[i].acc.z;
+      } break;
+      case _xrot_Mom_: {
+        size_t i = System.controls[c].i;
+        Particles[i].Q += ((Particles[i].Q.dot(Particles[i].vrot.x * vec3r::unit_x())) *= dt);
+        Particles[i].Q.normalize();
+        Particles[i].vrot.x += dt * Particles[i].arot.x;
+      } break;
+      case _yrot_Mom_: {
+        size_t i = System.controls[c].i;
+        Particles[i].Q += ((Particles[i].Q.dot(Particles[i].vrot.y * vec3r::unit_y())) *= dt);
+        Particles[i].Q.normalize();
+        Particles[i].vrot.y += dt * Particles[i].arot.y;
+      } break;
+      case _zrot_Mom_: {
+        size_t i = System.controls[c].i;
+        Particles[i].Q += ((Particles[i].Q.dot(Particles[i].vrot.z * vec3r::unit_z())) *= dt);
+        Particles[i].Q.normalize();
+        Particles[i].vrot.z += dt * Particles[i].arot.z;
+      } break;
+      case _xyzrot_Mom_: {
+        size_t i = System.controls[c].i;
+        Particles[i].Q += ((Particles[i].Q.dot(Particles[i].vrot)) *= dt);
+        Particles[i].Q.normalize();
+        Particles[i].vrot += dt * Particles[i].arot;
       } break;
       default:
         break;
@@ -1772,6 +1799,30 @@ void Rockable::velocityVerletStep() {
         Particles[i].pos.z += dt * Particles[i].vel.z + dt2_2 * Particles[i].acc.z;
         Particles[i].vel.z += dt_2 * Particles[i].acc.z;
       } break;
+      case _xrot_Mom_: {
+        size_t i = System.controls[c].i;
+        Particles[i].Q += ((Particles[i].Q.dot(Particles[i].vrot.x * vec3r::unit_x())) *= dt);
+        Particles[i].Q.normalize();
+        Particles[i].vrot.x += dt_2 * Particles[i].arot.x;
+      } break;
+      case _yrot_Mom_: {
+        size_t i = System.controls[c].i;
+        Particles[i].Q += ((Particles[i].Q.dot(Particles[i].vrot.y * vec3r::unit_y())) *= dt);
+        Particles[i].Q.normalize();
+        Particles[i].vrot.y += dt_2 * Particles[i].arot.y;
+      } break;
+      case _zrot_Mom_: {
+        size_t i = System.controls[c].i;
+        Particles[i].Q += ((Particles[i].Q.dot(Particles[i].vrot.z * vec3r::unit_z())) *= dt);
+        Particles[i].Q.normalize();
+        Particles[i].vrot.z += dt_2 * Particles[i].arot.z;
+      } break;
+      case _xyzrot_Mom_: {
+        size_t i = System.controls[c].i;
+        Particles[i].Q += ((Particles[i].Q.dot(Particles[i].vrot)) *= dt);
+        Particles[i].Q.normalize();
+        Particles[i].vrot += dt_2 * Particles[i].arot;
+      } break;
       default:
         break;
     }
@@ -1810,6 +1861,22 @@ void Rockable::velocityVerletStep() {
       case _z_For_: {
         size_t i = System.controls[c].i;
         Particles[i].vel.z += dt_2 * Particles[i].acc.z;
+      } break;
+      case _xrot_Mom_: {
+        size_t i = System.controls[c].i;
+        Particles[i].vrot.x += dt_2 * Particles[i].arot.x;
+      } break;
+      case _yrot_Mom_: {
+        size_t i = System.controls[c].i;
+        Particles[i].vrot.y += dt_2 * Particles[i].arot.y;
+      } break;
+      case _zrot_Mom_: {
+        size_t i = System.controls[c].i;
+        Particles[i].vrot.z += dt_2 * Particles[i].arot.z;
+      } break;
+      case _xyzrot_Mom_: {
+        size_t i = System.controls[c].i;
+        Particles[i].vrot += dt_2 * Particles[i].arot;
       } break;
       default:
         break;
@@ -1867,6 +1934,7 @@ void Rockable::BeemanStep() {
         Particles[i].beemanData->velPrevious.z = Particles[i].vel.z;
         Particles[i].vel.z += dt * (1.5 * Particles[i].acc.z - 0.5 * Particles[i].beemanData->accPrevious.z);
       } break;
+      // TODO imposed moments with Beeman scheme
       default:
         break;
     }
@@ -1924,6 +1992,7 @@ void Rockable::BeemanStep() {
                   CST_1_DIV_12 * Particles[i].beemanData->accPrevious.z);
         Particles[i].beemanData->accPrevious.z = Particles[i].beemanData->accCurrent.z;
       } break;
+      // TODO imposed moments with Beeman scheme
       default:
         break;
     }
@@ -1974,6 +2043,7 @@ void Rockable::RungeKutta4Step() {
         Particles[i].RK4Data->pos0.z = Particles[i].pos.z;
         Particles[i].RK4Data->vel0.z = Particles[i].vel.z;
       } break;
+      // TODO imposed moments with RK4 scheme
       default:
         break;
     }
@@ -2013,6 +2083,7 @@ void Rockable::RungeKutta4Step() {
             Particles[i].RK4Data->pos0.z + dt_2 * Particles[i].RK4Data->vel0.z + dt2_8 * Particles[i].RK4Data->k1acc.z;
         Particles[i].vel.z = Particles[i].RK4Data->vel0.z + dt_2 * Particles[i].RK4Data->k1acc.z;
       } break;
+      // TODO imposed moments with RK4 scheme
       default:
         break;
     }
@@ -2054,6 +2125,7 @@ void Rockable::RungeKutta4Step() {
         size_t i = System.controls[c].i;
         Particles[i].vel.z = Particles[i].RK4Data->vel0.z + dt_2 * Particles[i].RK4Data->k2acc.z;
       } break;
+      // TODO imposed moments with RK4 scheme
       default:
         break;
     }
@@ -2094,6 +2166,7 @@ void Rockable::RungeKutta4Step() {
             Particles[i].RK4Data->pos0.z + dt * Particles[i].RK4Data->vel0.z + dt2_2 * Particles[i].RK4Data->k3acc.z;
         Particles[i].vel.z = Particles[i].RK4Data->vel0.z + dt * Particles[i].RK4Data->k3acc.z;
       } break;
+      // TODO imposed moments with RK4 scheme
       default:
         break;
     }
@@ -2150,6 +2223,7 @@ void Rockable::RungeKutta4Step() {
             Particles[i].RK4Data->vel0.z + dt_6 * (Particles[i].RK4Data->k1acc.z + 2.0 * Particles[i].RK4Data->k2acc.z +
                                                    2.0 * Particles[i].RK4Data->k3acc.z + Particles[i].RK4Data->k4acc.z);
       } break;
+      // TODO imposed moments with RK4 scheme
       default:
         break;
     }
@@ -2383,6 +2457,18 @@ void Rockable::accelerations() {
       case _z_For_:
         Particles[System.controls[c].i].force.z = System.controls[c].value;
         break;
+      case _xrot_Mom_:
+        Particles[System.controls[c].i].moment.x = System.controls[c].value;
+        break;
+      case _yrot_Mom_:
+        Particles[System.controls[c].i].moment.y = System.controls[c].value;
+        break;
+      case _zrot_Mom_:
+        Particles[System.controls[c].i].moment.z = System.controls[c].value;
+        break;
+      case _xyzrot_Mom_:
+        Particles[System.controls[c].i].moment = System.controls[c].vec_value;
+        break;
     }
   }
 
@@ -2496,7 +2582,57 @@ void Rockable::accelerations() {
       case _z_For_:
         Particles[i].acc.z = Particles[i].force.z / Particles[i].mass;
         break;
-        // case Moments... _xrot_Mom_ _yrot_Mom_ _zrot_Mom_
+      case _xrot_Mom_: {
+        quat Qinv = Particles[i].Q.get_conjugated();
+        vec3r vrotx(Particles[i].vrot.x, 0.0, 0.0);
+        vec3r omega = Qinv * vrotx;            // Express omega in the body framework
+        vec3r M = Qinv * Particles[i].moment;  // Express torque in the body framework
+        vec3r domega((M[0] - (Particles[i].inertia[2] - Particles[i].inertia[1]) * omega[1] * omega[2]) /
+                         Particles[i].inertia[0],
+                     (M[1] - (Particles[i].inertia[0] - Particles[i].inertia[2]) * omega[2] * omega[0]) /
+                         Particles[i].inertia[1],
+                     (M[2] - (Particles[i].inertia[1] - Particles[i].inertia[0]) * omega[0] * omega[1]) /
+                         Particles[i].inertia[2]);
+        Particles[i].arot.x = (Particles[i].Q * domega).x;  // Express arot in the global framework
+      } break;
+      case _yrot_Mom_: {
+        quat Qinv = Particles[i].Q.get_conjugated();
+        vec3r vroty(0.0, Particles[i].vrot.y, 0.0);
+        vec3r omega = Qinv * vroty;            // Express omega in the body framework
+        vec3r M = Qinv * Particles[i].moment;  // Express torque in the body framework
+        vec3r domega((M[0] - (Particles[i].inertia[2] - Particles[i].inertia[1]) * omega[1] * omega[2]) /
+                         Particles[i].inertia[0],
+                     (M[1] - (Particles[i].inertia[0] - Particles[i].inertia[2]) * omega[2] * omega[0]) /
+                         Particles[i].inertia[1],
+                     (M[2] - (Particles[i].inertia[1] - Particles[i].inertia[0]) * omega[0] * omega[1]) /
+                         Particles[i].inertia[2]);
+        Particles[i].arot.y = (Particles[i].Q * domega).y;  // Express arot in the global framework
+      } break;
+      case _zrot_Mom_: {
+        quat Qinv = Particles[i].Q.get_conjugated();
+        vec3r vrotz(0.0, 0.0, Particles[i].vrot.z);
+        vec3r omega = Qinv * vrotz;            // Express omega in the body framework
+        vec3r M = Qinv * Particles[i].moment;  // Express torque in the body framework
+        vec3r domega((M[0] - (Particles[i].inertia[2] - Particles[i].inertia[1]) * omega[1] * omega[2]) /
+                         Particles[i].inertia[0],
+                     (M[1] - (Particles[i].inertia[0] - Particles[i].inertia[2]) * omega[2] * omega[0]) /
+                         Particles[i].inertia[1],
+                     (M[2] - (Particles[i].inertia[1] - Particles[i].inertia[0]) * omega[0] * omega[1]) /
+                         Particles[i].inertia[2]);
+        Particles[i].arot.z = (Particles[i].Q * domega).z;  // Express arot in the global framework
+      } break;
+      case _xyzrot_Mom_: {
+        quat Qinv = Particles[i].Q.get_conjugated();
+        vec3r omega = Qinv * Particles[i].vrot;  // Express omega in the body framework
+        vec3r M = Qinv * Particles[i].moment;    // Express torque in the body framework
+        vec3r domega((M[0] - (Particles[i].inertia[2] - Particles[i].inertia[1]) * omega[1] * omega[2]) /
+                         Particles[i].inertia[0],
+                     (M[1] - (Particles[i].inertia[0] - Particles[i].inertia[2]) * omega[2] * omega[0]) /
+                         Particles[i].inertia[1],
+                     (M[2] - (Particles[i].inertia[1] - Particles[i].inertia[0]) * omega[0] * omega[1]) /
+                         Particles[i].inertia[2]);
+        Particles[i].arot = (Particles[i].Q * domega);  // Express arot in the global framework
+      } break;
     }
   }
 

@@ -41,6 +41,8 @@
 #include <utility>
 #include <vector>
 
+#include "vec3.hpp"
+
 class Rockable;
 
 const bool ForceDriven = true;
@@ -55,17 +57,20 @@ const bool VelocityDriven = false;
 #define _x_For_ 6
 #define _y_For_ 7
 #define _z_For_ 8
-
-// Not implemented yet (actually, not yet necessary)
 #define _xrot_Mom_ 9
 #define _yrot_Mom_ 10
 #define _zrot_Mom_ 11
 
+// values larger or equal to 100 are imposed vector (rather than single value)
+#define _xyzrot_Vel_ 100
+#define _xyzrot_Mom_ 101
+
 /// @brief Control of ONE degree of freedom
 struct Control {
-  int type;      // type of control (_x_Vel, etc.)
+  int type;      // type of control (_x_Vel_, etc.)
   size_t i;      // identifier number of the controlled particle
   double value;  // imposed value (translation/rotation velocity or force/moment)
+  vec3r vec_value; // in case we impose a velocity or force vector
 };
 
 /// @brief This class hold the controls (force or velocity on the 'nContr' first

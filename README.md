@@ -22,3 +22,19 @@ The code was initially developed by _Vincent Richefeu_, at Laboratoire 3SR, to m
 Then, the breakable interfaces have been implemented during the PhD work of _Marta Stasiak_. A number of improvements have been added at that time thanks to intensive review with _Gael Combe_, Laboratoire 3SR.
 
 New functionalities are being studied thanks to new collaborations of people from CEA, IATE and CNRS. For example, _Lhassan Amarsid_ (CEA) is working on the introduction of periodic boundary conditions, and multi-processor computing with domain decomposition. _Farhang Radjai_ and students, may introduce new breakable interfaces with energy-based criteria. 
+
+## How to install
+
+The source code can be cloned from the SourceSup git repository. Obvioulsly, you need to be allowed. The git command may look something like:
+
+```sh
+git clone https://yourLogin@git.renater.fr/authscm/yourLogin/git/rockable/rockable.git
+```
+
+where `yourLogin` is your own login in SourceSup. Another way to get this command line is to go in "Ma Page" in SourceSup site, find "Rockable" and then "Code Source". The command can be copy-pasted (choose "via smart HTTP").
+
+`Rockable` uses a header-only library named `toofus`. It needs to be downloaded from [https://richefeu.github.io/toofus/](https://richefeu.github.io/toofus/) (ZIP, TAR or *via* GitHub), and unzipped somewhere. The installation consists simply to copy all the header files in `/usr/local/include/toofus`. To do so, type `make` in `toofus`' folder.
+
+Other libraries are required and need to be installed using the OS package manager (use `brew` for apple). They are `tclap`, `glfw3`, `libpng2` (optionnal).
+
+If you are lucky, the compilation is as simple as `make` in the `src`folder of `Rockable` sources.

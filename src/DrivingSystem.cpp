@@ -1,24 +1,24 @@
 //  Copyright or © or Copr. Rockable
-//  
+//
 //  vincent.richefeu@3sr-grenoble.fr
-//  
-//  This software is a computer program whose purpose is 
+//
+//  This software is a computer program whose purpose is
 //    (i)  to hold sphero-polyhedral shapes,
-//    (ii) to manage breakable interfaces. 
+//    (ii) to manage breakable interfaces.
 //  It is developed for an ACADEMIC USAGE
-//  
+//
 //  This software is governed by the CeCILL-B license under French law and
-//  abiding by the rules of distribution of free software.  You can  use, 
+//  abiding by the rules of distribution of free software.  You can  use,
 //  modify and/ or redistribute the software under the terms of the CeCILL-B
 //  license as circulated by CEA, CNRS and INRIA at the following URL
-//  "http://www.cecill.info". 
-//  
+//  "http://www.cecill.info".
+//
 //  As a counterpart to the access to the source code and  rights to copy,
 //  modify and redistribute granted by the license, users are provided only
 //  with a limited warranty  and the software's author,  the holder of the
 //  economic rights,  and the successive licensors  have only  limited
-//  liability. 
-//  
+//  liability.
+//
 //  In this respect, the user's attention is drawn to the risks associated
 //  with loading,  using,  modifying and/or developing or reproducing the
 //  software by the user in light of its specific status of free software,
@@ -26,10 +26,10 @@
 //  therefore means  that it is reserved for developers  and  experienced
 //  professionals having in-depth computer knowledge. Users are therefore
 //  encouraged to load and test the software's suitability as regards their
-//  requirements in conditions enabling the security of their systems and/or 
-//  data to be ensured and,  more generally, to use and operate it in the 
-//  same conditions as regards security. 
-//  
+//  requirements in conditions enabling the security of their systems and/or
+//  data to be ensured and,  more generally, to use and operate it in the
+//  same conditions as regards security.
+//
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
@@ -43,10 +43,11 @@ DrivingSystem::DrivingSystem() : ServoFunction(nullptr) {}
 
 void DrivingSystem::read(bool warn) {
   static std::map<std::string, int> typeMap{
-      {"_x_Vel_", _x_Vel_},       {"_y_Vel_", _y_Vel_},       {"_z_Vel_", _z_Vel_},       {"_xrot_Vel_", _xrot_Vel_},
-      {"_yrot_Vel_", _yrot_Vel_}, {"_zrot_Vel_", _zrot_Vel_}, {"_x_For_", _x_For_},       {"_y_For_", _y_For_},
-      {"_z_For_", _z_For_},       {"_xrot_Mom_", _xrot_Mom_}, {"_yrot_Mom_", _yrot_Mom_}, {"_zrot_Mom_", _zrot_Mom_},
-  };
+      {"_x_Vel_", _x_Vel_},           {"_y_Vel_", _y_Vel_},          {"_z_Vel_", _z_Vel_},
+      {"_xrot_Vel_", _xrot_Vel_},     {"_yrot_Vel_", _yrot_Vel_},    {"_zrot_Vel_", _zrot_Vel_},
+      {"_x_For_", _x_For_},           {"_y_For_", _y_For_},          {"_z_For_", _z_For_},
+      {"_xrot_Mom_", _xrot_Mom_},     {"_yrot_Mom_", _yrot_Mom_},    {"_zrot_Mom_", _zrot_Mom_},
+      {"_xyzrot_Vel_", _xyzrot_Vel_}, {"_xyzrot_Mom_", _xyzrot_Mom_}};
 
   if (!fileTool::fileExists("drivingSystem.txt")) {
     if (warn) {
@@ -69,8 +70,13 @@ void DrivingSystem::read(bool warn) {
     else if (token == "Control") {
       std::string typeStr;
       Control C;
-      is >> typeStr >> C.i >> C.value;
+      is >> typeStr >> C.i;
       C.type = typeMap[typeStr];
+      if (C.type >= 100) {
+        is >> C.vec_value;
+      } else {
+        is >> C.value;
+      }
       controls.push_back(C);
     } else if (token == "Servo") {
       std::string servoName;
@@ -243,8 +249,8 @@ void DrivingSystem::read(bool warn) {
           if (LodeAngle < 0.0 || LodeAngle > 60.0) {
             std::cerr << "@DrivingSystem::read, LodeAngle must be set in the range [0° 60°]" << std::endl;
           }
-          ServoFunction = [icontr, idXmin, idXmax, idYmin, idYmax, idZmin, idZmax, pressure, LodeAngle, sigRate]
-          (Rockable& box) -> void {
+          ServoFunction = [icontr, idXmin, idXmax, idYmin, idYmax, idZmin, idZmax, pressure, LodeAngle,
+                           sigRate](Rockable& box) -> void {
             const double Xmin = box.Particles[idXmin].pos.x + box.Particles[idXmin].MinskowskiRadius();
             const double Xmax = box.Particles[idXmax].pos.x - box.Particles[idXmax].MinskowskiRadius();
             const double Ymin = box.Particles[idYmin].pos.y + box.Particles[idYmin].MinskowskiRadius();
@@ -257,8 +263,8 @@ void DrivingSystem::read(bool warn) {
             const double surfX = dY * dZ;
             const double surfY = dX * dZ;
             const double surfZ = dY * dX;
-            
-            double dSig = sigRate * box.t; // WARNING: initial time MUST be ZERO; dSig(t=0) = 0
+
+            double dSig = sigRate * box.t;  // WARNING: initial time MUST be ZERO; dSig(t=0) = 0
             double LodeRadians = LodeAngle * M_PI / 180.0;
             double a = (3.0 * tan(LodeRadians) - sqrt(3.0)) / (2.0 * sqrt(3.0));
             double b = -(1.0 + a);
