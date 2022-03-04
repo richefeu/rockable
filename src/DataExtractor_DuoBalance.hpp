@@ -38,6 +38,10 @@
 
 #include "DataExtractor.hpp"
 
+/**
+ * @brief xxx
+ * 
+ */
 class DuoBalance : public DataExtractor {
  public:
   DuoBalance();

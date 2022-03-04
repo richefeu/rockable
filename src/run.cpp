@@ -38,6 +38,10 @@
 #include "Rockable.hpp"
 #include "stackTracer.hpp"
 
+/**
+ * @brief This is the command line interface (CLI) for using Rockable
+ * 
+ */
 int main(int argc, char const* argv[]) {
   
   StackTracer::initSignals();
@@ -47,7 +51,7 @@ int main(int argc, char const* argv[]) {
   int verboseLevel = 0;
 
   try {
-    TCLAP::CmdLine cmd("This is the main runner application for Rockable", ' ', "0.3");
+    TCLAP::CmdLine cmd("This is the comand line interface for Rockable", ' ', "0.3");
     TCLAP::UnlabeledValueArg<std::string> nameArg("input", "Name of the conf-file", true, "conf0", "conf-file");
     TCLAP::ValueArg<int> nbThreadsArg("j", "nbThreads", "Number of threads to be used", false, 1, "int");
     TCLAP::ValueArg<int> verboseArg("v", "verbose", "Verbose level", false, 0, "int");

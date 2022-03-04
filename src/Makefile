@@ -67,7 +67,9 @@ else
   # The compiler to be used
   CXX = g++
   # The list of flags passed to the compiler
-  CXXFLAGS = -fopenmp -O3 -std=c++0x -I $(COMMONPATH) $(OPTIONS) $(SVNDEV)
+  CXXFLAGS := -fopenmp -O3 -std=c++0x
+	CXXFLAGS += -I $(COMMONPATH) $(OPTIONS) $(SVNDEV)
+	# CXXFLAGS += `pkg-config --cflags tclap`
   # Link flags for OpenGL and glut
   GLUTLINK = -lGLU -lGL -L/usr/X11R6/lib -lglut -lXmu -lXext -lX11 -lXi
 endif

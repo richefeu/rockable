@@ -771,6 +771,11 @@ void Rockable::loadConf(const char* name) {
     conf >> vel >> opt;
     randomlyOrientedVelocitiesClusters(vel, opt);
   };
+  parser.kwMap["setAllVelocities"] = __DO__(conf) {
+    vec3r vel;
+    conf >> vel;
+    setAllVelocities(vel);
+  };
   parser.kwMap["homothetyRange"] = __DO__(conf) {
     size_t ifirst, ilast;
     double hmin, hmax;
@@ -2371,7 +2376,7 @@ void Rockable::integrate() {
       if (step % dataExtractors[d]->nrec == 0) dataExtractors[d]->record();
     }
 
-    // velocityVerletStep();
+    // It will use the selected integration scheme
     IntegrationStep();
 
     t += dt;
@@ -2801,6 +2806,13 @@ void Rockable::computeAABB(size_t first, size_t last) {
   }
 }
 
+/**
+ * @brief xxx
+ * 
+ * @param aabb    The probe as an Axis Aligned Bounding Box 
+ * @param MCnstep Number of Monte Carlo steps 
+ * @return double Estimate of the solid fraction inside the probe
+ */
 double Rockable::probeSolidFraction(AABB& aabb, size_t MCnstep) {
   if (MCnstep == 0) return -1.0;
 
@@ -3646,6 +3658,12 @@ void Rockable::randomlyOrientedVelocitiesClusters(double velocityMagnitude, int 
     for (size_t i = 0; i < clusters[c].particleId.size(); i++) {
       Particles[clusters[c].particleId[i]].vel = v;
     }
+  }
+}
+
+void Rockable::setAllVelocities(vec3r & vel) {
+  for (size_t i = nDriven; i < Particles.size(); i++) {
+    Particles[i].vel = vel;
   }
 }
 

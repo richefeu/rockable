@@ -50,7 +50,7 @@ void DrivingSystem::read(bool warn) {
       {"_xyzrot_Vel_", _xyzrot_Vel_}, {"_xyzrot_Mom_", _xyzrot_Mom_}};
 
   if (!fileTool::fileExists("drivingSystem.txt")) {
-    if (warn) {
+    if (warn == true) {
       std::cout << msg::info() << "No file 'drivingSystem.txt' has been found." << std::endl;
       std::cout << " >      The first 'nDriven' bodies are frozen (velocities = 0)." << msg::normal() << std::endl
                 << std::endl;
@@ -81,7 +81,7 @@ void DrivingSystem::read(bool warn) {
     } else if (token == "Servo") {
       std::string servoName;
       is >> servoName;
-      if (servoName.substr(0, 6) == "tritri") {
+      if (servoName.substr(0, 6) == "tritri") { // if the name of the servo starts with "tritri"
         size_t idXmin, idXmax;
         size_t idYmin, idYmax;
         size_t idZmin, idZmax;

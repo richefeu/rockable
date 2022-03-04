@@ -54,7 +54,7 @@
 #include <omp.h>
 #endif
 
-// common headers
+// toofus headers
 #include "AABB.hpp"
 #include "DataTable.hpp"
 #include "Mth.hpp"
@@ -167,10 +167,10 @@ class Rockable {
   void accelerations();                    ///< Compute accelerations (both for particles and the periodic-cell)
   void incrementResultants(Interaction&);  ///< Project force and moment on the interacting particles
   std::function<void()> IntegrationStep;   ///< Pointer funtion for integration
-  void setIntegrator(std::string& Name);
+  void setIntegrator(std::string& Name);   ///< Select the time-integration scheme
   
   // Core CD method (TODO)
-  // 
+  // ...
 
   // Save/Load methods
   void clearMemory();            ///< Clear the Particles and Interactions
@@ -185,13 +185,13 @@ class Rockable {
   void UpdateNL_linkCells();       ///< Link-cells approach
   std::function<void()> UpdateNL;  ///< Pointer funtion to the updateNL
                                    ///< (update the neighbor-list) method
-  void setUpdateNL(std::string& Name);
+  void setUpdateNL(std::string& Name); ///< select the Neighbor list updator
 
   bool forceLawDefault(Interaction&);             ///< Most common force law
   bool forceLawStickedLinks(Interaction&);        ///< Force law for 'glued' bodies
   bool forceLawAvalanches(Interaction&);          ///< Force law specific for rock avalanches
   std::function<bool(Interaction&)> forceLawPtr;  ///< Pointer function to the force-law used
-  void setForceLaw(std::string& lawName);
+  void setForceLaw(std::string& lawName);         ///< Force law selector
 
   // Processing methods
   void computeAABB(size_t first = 0, size_t last = 0);  ///< Compute Axis Aligned Bounding
@@ -211,8 +211,8 @@ class Rockable {
 
   // Pre-processing methods
   void stickVerticesInClusters(double);  ///< Create bonds between vertices if
-                                         ///< they belong to the same cluster
-  void stickClusters(double);            ///< Create bonds in-between clusters
+                                         ///< they belong to the same cluster (same cluster ID)
+  void stickClusters(double);            ///< Create bonds in-between different clusters (different cluster IDs)
   void copyParamsToInterfaces(std::string& isInnerStr);
   void setStiffnessRatioInterfaces(double ratio);
 
@@ -226,6 +226,7 @@ class Rockable {
                                                          ///< to all free clusters (same
                                                          ///< velocity for the bodies belonging
                                                          ///< to the same cluster)
+  void setAllVelocities(vec3r & vel); 
   void homothetyRange(size_t idFirst, size_t idLast, double hmin, double hmax, bool timeSeeded);
   void particlesClonage(size_t idFirst, size_t idLast, vec3r& translation);
 

@@ -6,6 +6,7 @@
 #include <math.h>
 #include <random>
 #include <vector>
+#include <algorithm>
 
 #include "addParticle.hpp"
 #include "consoleProgressBar.hpp"
