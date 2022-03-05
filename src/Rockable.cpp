@@ -327,21 +327,21 @@ void Rockable::saveConf(const char* fname) {
   conf << "iconf " << iconf << '\n';
   conf << "nDriven " << nDriven << '\n';
   conf << "shapeFile " << shapeFile << '\n';
-  if (CommBox().sep != ' ') conf << "separator " << CommBox().keywordFromSep() << '\n';
+  //if (CommBox().sep != ' ') conf << "separator " << CommBox().keywordFromSep() << '\n';
   conf << "precision " << CommBox().precision << '\n';
   conf << std::scientific << std::setprecision(CommBox().precision);
   conf << "Particles " << Particles.size() << '\n';
-  conf << "#name" << CommBox().sep << "group" << CommBox().sep << "cluster" << CommBox().sep << "homothety"
-       << CommBox().sep << "pos.x" << CommBox().sep << "pos.y" << CommBox().sep << "pos.z" << CommBox().sep << "vel.x"
-       << CommBox().sep << "vel.y" << CommBox().sep << "vel.z" << CommBox().sep << "acc.x" << CommBox().sep << "acc.y"
-       << CommBox().sep << "acc.z" << CommBox().sep << "Q.w" << CommBox().sep << "Q.x" << CommBox().sep << "Q.y"
-       << CommBox().sep << "Q.z" << CommBox().sep << "vrot.x" << CommBox().sep << "vrot.y" << CommBox().sep << "vrot.z"
-       << CommBox().sep << "arot.x" << CommBox().sep << "arot.y" << CommBox().sep << "arot.z" << '\n';
+  conf << "#name" << ' ' << "group" << ' ' << "cluster" << ' ' << "homothety"
+       << ' ' << "pos.x" << ' ' << "pos.y" << ' ' << "pos.z" << ' ' << "vel.x"
+       << ' ' << "vel.y" << ' ' << "vel.z" << ' ' << "acc.x" << ' ' << "acc.y"
+       << ' ' << "acc.z" << ' ' << "Q.w" << ' ' << "Q.x" << ' ' << "Q.y"
+       << ' ' << "Q.z" << ' ' << "vrot.x" << ' ' << "vrot.y" << ' ' << "vrot.z"
+       << ' ' << "arot.x" << ' ' << "arot.y" << ' ' << "arot.z" << '\n';
   for (size_t i = 0; i < Particles.size(); i++) {
-    conf << Particles[i].shape->name << CommBox().sep << Particles[i].group << CommBox().sep << Particles[i].cluster
-         << CommBox().sep << Particles[i].homothety << CommBox().sep << Particles[i].pos << CommBox().sep
-         << Particles[i].vel << CommBox().sep << Particles[i].acc << CommBox().sep << Particles[i].Q << CommBox().sep
-         << Particles[i].vrot << CommBox().sep << Particles[i].arot << '\n';
+    conf << Particles[i].shape->name << ' ' << Particles[i].group << ' ' << Particles[i].cluster
+         << ' ' << Particles[i].homothety << ' ' << Particles[i].pos << ' '
+         << Particles[i].vel << ' ' << Particles[i].acc << ' ' << Particles[i].Q << ' '
+         << Particles[i].vrot << ' ' << Particles[i].arot << '\n';
   }
 
   conf << "Interactions " << activeInteractions.size() << '\n';
@@ -349,15 +349,15 @@ void Rockable::saveConf(const char* fname) {
   std::sort(activeInteractions.begin(), activeInteractions.end(), std::less<Interaction*>());
   const auto prev_round = std::fegetround();
   for (size_t i = 0; i < activeInteractions.size(); i++) {
-    conf << activeInteractions[i]->i << CommBox().sep << activeInteractions[i]->j << CommBox().sep
-         << activeInteractions[i]->type << CommBox().sep << activeInteractions[i]->isub << CommBox().sep
-         << activeInteractions[i]->jsub << CommBox().sep;
+    conf << activeInteractions[i]->i << ' ' << activeInteractions[i]->j << ' '
+         << activeInteractions[i]->type << ' ' << activeInteractions[i]->isub << ' '
+         << activeInteractions[i]->jsub << ' ';
     std::fesetround(FE_TOWARDZERO);  // value will be trunc to the given precision
-    conf << activeInteractions[i]->n << CommBox().sep;
+    conf << activeInteractions[i]->n << ' ';
     std::fesetround(prev_round);
-    conf << activeInteractions[i]->dn << CommBox().sep << activeInteractions[i]->pos << CommBox().sep
-         << activeInteractions[i]->vel << CommBox().sep << activeInteractions[i]->fn << CommBox().sep
-         << activeInteractions[i]->ft << CommBox().sep << activeInteractions[i]->mom << CommBox().sep
+    conf << activeInteractions[i]->dn << ' ' << activeInteractions[i]->pos << ' '
+         << activeInteractions[i]->vel << ' ' << activeInteractions[i]->fn << ' '
+         << activeInteractions[i]->ft << ' ' << activeInteractions[i]->mom << ' '
          << activeInteractions[i]->damp << '\n';
   }
 
@@ -470,6 +470,7 @@ void Rockable::loadConf(const char* name) {
     conf >> angleUpdateNL;
     angleUpdateNL *= Mth::deg2rad;
   };
+  
   parser.kwMap["numericalDampingCoeff"] = __GET__(conf, numericalDampingCoeff);
   parser.kwMap["VelocityBarrier"] = __GET__(conf, VelocityBarrier);
   parser.kwMap["AngularVelocityBarrier"] = __GET__(conf, AngularVelocityBarrier);
@@ -576,7 +577,7 @@ void Rockable::loadConf(const char* name) {
       loadShapes(shapeFile.c_str());
     }
   };
-  parser.kwMap["separator"] = __DO__(conf) {
+  parser.kwMap["separator"] = __DO__(conf) { // TODO: remove it !!!!
     std::string keyword;
     conf >> keyword;
     CommBox().sepFromKeyword(keyword);

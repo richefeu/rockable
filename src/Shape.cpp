@@ -106,7 +106,7 @@ void Shape::read(std::istream& is) {
     size_t nf;
     is >> nf;
     std::vector<size_t> faceNodes;
-    for (uint f = 0; f < nf; ++f) {
+    for (size_t f = 0; f < nf; ++f) {
       size_t nb_node_face;
       is >> nb_node_face;
       std::vector<size_t> ids;
@@ -193,7 +193,7 @@ void Shape::fitObb() {
     double ext0_max, ext1_max, ext2_max;
     ext0_min = ext1_min = ext2_min = 1.0e20;
     ext0_max = ext1_max = ext2_max = -1.0e20;
-    for (uint v = 0; v < vertex.size(); ++v) {
+    for (size_t v = 0; v < vertex.size(); ++v) {
       Vtest = vertex[v] - P0;
       ext_test = Vtest * e0;
       if (ext_test < ext0_min)

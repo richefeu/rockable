@@ -208,13 +208,13 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
       // Then, we check whether the projected point is inside the face (a 3D
       // polygon). We use the crossing number algorithm (also known as
       // even-odd rule algorithm)
-      uint ODD = 0;
+      size_t ODD = 0;
       v2 = cross(I.n, v1);
       double ori1 = P * v1;
       double ori2 = P * v2;
       double pa1, pa2;
       double pb1, pb2;
-      uint iva, ivb;
+      size_t iva, ivb;
       for (iva = 0; iva < nb_vertices; ++iva) {
         ivb = iva + 1;
         if (ivb == nb_vertices) ivb = 0;

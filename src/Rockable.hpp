@@ -66,6 +66,7 @@
 #include "kwParser.hpp"
 #include "linkCells.hpp"
 #include "message.hpp"
+#include "common.hpp"
 
 // local headers
 #include "BodyForce.hpp"
