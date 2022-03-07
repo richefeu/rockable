@@ -327,21 +327,18 @@ void Rockable::saveConf(const char* fname) {
   conf << "iconf " << iconf << '\n';
   conf << "nDriven " << nDriven << '\n';
   conf << "shapeFile " << shapeFile << '\n';
-  //if (CommBox().sep != ' ') conf << "separator " << CommBox().keywordFromSep() << '\n';
+  // if (CommBox().sep != ' ') conf << "separator " << CommBox().keywordFromSep() << '\n';
   conf << "precision " << CommBox().precision << '\n';
   conf << std::scientific << std::setprecision(CommBox().precision);
   conf << "Particles " << Particles.size() << '\n';
-  conf << "#name" << ' ' << "group" << ' ' << "cluster" << ' ' << "homothety"
-       << ' ' << "pos.x" << ' ' << "pos.y" << ' ' << "pos.z" << ' ' << "vel.x"
-       << ' ' << "vel.y" << ' ' << "vel.z" << ' ' << "acc.x" << ' ' << "acc.y"
-       << ' ' << "acc.z" << ' ' << "Q.w" << ' ' << "Q.x" << ' ' << "Q.y"
-       << ' ' << "Q.z" << ' ' << "vrot.x" << ' ' << "vrot.y" << ' ' << "vrot.z"
-       << ' ' << "arot.x" << ' ' << "arot.y" << ' ' << "arot.z" << '\n';
+  conf << "#name" << ' ' << "group" << ' ' << "cluster" << ' ' << "homothety" << ' ' << "pos.x" << ' ' << "pos.y" << ' '
+       << "pos.z" << ' ' << "vel.x" << ' ' << "vel.y" << ' ' << "vel.z" << ' ' << "acc.x" << ' ' << "acc.y" << ' '
+       << "acc.z" << ' ' << "Q.w" << ' ' << "Q.x" << ' ' << "Q.y" << ' ' << "Q.z" << ' ' << "vrot.x" << ' ' << "vrot.y"
+       << ' ' << "vrot.z" << ' ' << "arot.x" << ' ' << "arot.y" << ' ' << "arot.z" << '\n';
   for (size_t i = 0; i < Particles.size(); i++) {
-    conf << Particles[i].shape->name << ' ' << Particles[i].group << ' ' << Particles[i].cluster
-         << ' ' << Particles[i].homothety << ' ' << Particles[i].pos << ' '
-         << Particles[i].vel << ' ' << Particles[i].acc << ' ' << Particles[i].Q << ' '
-         << Particles[i].vrot << ' ' << Particles[i].arot << '\n';
+    conf << Particles[i].shape->name << ' ' << Particles[i].group << ' ' << Particles[i].cluster << ' '
+         << Particles[i].homothety << ' ' << Particles[i].pos << ' ' << Particles[i].vel << ' ' << Particles[i].acc
+         << ' ' << Particles[i].Q << ' ' << Particles[i].vrot << ' ' << Particles[i].arot << '\n';
   }
 
   conf << "Interactions " << activeInteractions.size() << '\n';
@@ -349,15 +346,13 @@ void Rockable::saveConf(const char* fname) {
   std::sort(activeInteractions.begin(), activeInteractions.end(), std::less<Interaction*>());
   const auto prev_round = std::fegetround();
   for (size_t i = 0; i < activeInteractions.size(); i++) {
-    conf << activeInteractions[i]->i << ' ' << activeInteractions[i]->j << ' '
-         << activeInteractions[i]->type << ' ' << activeInteractions[i]->isub << ' '
-         << activeInteractions[i]->jsub << ' ';
+    conf << activeInteractions[i]->i << ' ' << activeInteractions[i]->j << ' ' << activeInteractions[i]->type << ' '
+         << activeInteractions[i]->isub << ' ' << activeInteractions[i]->jsub << ' ';
     std::fesetround(FE_TOWARDZERO);  // value will be trunc to the given precision
     conf << activeInteractions[i]->n << ' ';
     std::fesetround(prev_round);
-    conf << activeInteractions[i]->dn << ' ' << activeInteractions[i]->pos << ' '
-         << activeInteractions[i]->vel << ' ' << activeInteractions[i]->fn << ' '
-         << activeInteractions[i]->ft << ' ' << activeInteractions[i]->mom << ' '
+    conf << activeInteractions[i]->dn << ' ' << activeInteractions[i]->pos << ' ' << activeInteractions[i]->vel << ' '
+         << activeInteractions[i]->fn << ' ' << activeInteractions[i]->ft << ' ' << activeInteractions[i]->mom << ' '
          << activeInteractions[i]->damp << '\n';
   }
 
@@ -470,7 +465,7 @@ void Rockable::loadConf(const char* name) {
     conf >> angleUpdateNL;
     angleUpdateNL *= Mth::deg2rad;
   };
-  
+
   parser.kwMap["numericalDampingCoeff"] = __GET__(conf, numericalDampingCoeff);
   parser.kwMap["VelocityBarrier"] = __GET__(conf, VelocityBarrier);
   parser.kwMap["AngularVelocityBarrier"] = __GET__(conf, AngularVelocityBarrier);
@@ -545,6 +540,13 @@ void Rockable::loadConf(const char* name) {
 
   parser.kwMap["knContact"] = __DO__(conf) { readLawData(conf, idKnContact); };
   parser.kwMap["en2Contact"] = __DO__(conf) { readLawData(conf, idEn2Contact); };
+  parser.kwMap["en2ContactFromViscRate"] = __DO__(conf) {
+    size_t g1, g2;
+    double viscRate;
+    conf >> g1 >> g2 >> viscRate;
+    double en2 = exp(-viscRate * Mth::pi / sqrt(1.0 - viscRate * viscRate));
+    dataTable.set(idEn2Contact, g1, g2, en2);
+  };
   parser.kwMap["ktContact"] = __DO__(conf) { readLawData(conf, idKtContact); };
   parser.kwMap["muContact"] = __DO__(conf) { readLawData(conf, idMuContact); };
   parser.kwMap["krContact"] = __DO__(conf) { readLawData(conf, idKrContact); };
@@ -577,7 +579,7 @@ void Rockable::loadConf(const char* name) {
       loadShapes(shapeFile.c_str());
     }
   };
-  parser.kwMap["separator"] = __DO__(conf) { // TODO: remove it !!!!
+  parser.kwMap["separator"] = __DO__(conf) {  // TODO: remove it !!!!
     std::string keyword;
     conf >> keyword;
     CommBox().sepFromKeyword(keyword);
@@ -1355,7 +1357,7 @@ bool Rockable::forceLawDefault(Interaction& I) {
   double mu = dataTable.get(idMuContact, g1, g2);
   double kr = dataTable.get(idKrContact, g1, g2);
   double mur = dataTable.get(idMurContact, g1, g2);
-  double damp = I.damp;
+  double damp = I.damp;  // It has been precomputed
 
   if (ctcPartnership.getWeight != nullptr) {
     double w = ctcPartnership.getWeight(I);
@@ -1370,6 +1372,7 @@ bool Rockable::forceLawDefault(Interaction& I) {
   double fne = -kn * I.dn;
   double fnv = damp * vn;
   I.fn = fne + fnv;
+  if (I.fn < 0.0) I.fn = 0.0;  // Because viscous damping can make the normal force negative
 
   // === Tangential force (friction)
   vec3r vt = I.vel - vn * I.n;
@@ -2809,9 +2812,9 @@ void Rockable::computeAABB(size_t first, size_t last) {
 
 /**
  * @brief xxx
- * 
- * @param aabb    The probe as an Axis Aligned Bounding Box 
- * @param MCnstep Number of Monte Carlo steps 
+ *
+ * @param aabb    The probe as an Axis Aligned Bounding Box
+ * @param MCnstep Number of Monte Carlo steps
  * @return double Estimate of the solid fraction inside the probe
  */
 double Rockable::probeSolidFraction(AABB& aabb, size_t MCnstep) {
@@ -3662,7 +3665,7 @@ void Rockable::randomlyOrientedVelocitiesClusters(double velocityMagnitude, int 
   }
 }
 
-void Rockable::setAllVelocities(vec3r & vel) {
+void Rockable::setAllVelocities(vec3r& vel) {
   for (size_t i = nDriven; i < Particles.size(); i++) {
     Particles[i].vel = vel;
   }
