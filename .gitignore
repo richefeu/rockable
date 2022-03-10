@@ -4,6 +4,8 @@
 *#*
 *.o
 src/see
+src/see2
+src/see3
 src/run
 src/patatrac
 src/postpro
@@ -20,3 +22,5 @@ simuls*
 doc/html
 sphinxdoc/build/*
 .vscode
+src/imgui/examples
+*imgui.ini
