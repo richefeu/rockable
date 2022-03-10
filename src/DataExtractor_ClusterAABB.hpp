@@ -43,11 +43,11 @@
 class ClusterAABB : public DataExtractor {
  public:
   ClusterAABB();
-  void read(std::istream& is);
+  void read(std::istream& is) override;
 
-  void exec();
-  void record();
-  void end();
+  void exec() override;
+  void record() override;
+  void end() override;
 
  private:
   int icluster;

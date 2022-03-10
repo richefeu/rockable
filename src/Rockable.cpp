@@ -1573,7 +1573,7 @@ bool Rockable::forceLawStickedLinks(Interaction& I) {
 #endif
     }
   } else {  // =============== Contact
-    if (I.dn > 0.0) {
+    if (I.dn > 0.0) [[likely]] {
       I.fn = 0.0;
       I.ft.reset();
       I.mom.reset();
@@ -2269,7 +2269,7 @@ void Rockable::RungeKutta4Step() {
     @brief The integration LOOP
 */
 void Rockable::integrate() {
-  if (interactiveMode == true) {
+  if (interactiveMode == true) [[unlikely]] {
     std::cout << "It is not possible to invoke Rockable::integrate if "
                  "interactiveMode is true"
               << std::endl;
@@ -2308,7 +2308,7 @@ void Rockable::integrate() {
   timeInForceComputation = 0.0;
   while (t < tmax) {
 
-    if (interConfC >= interConf - dt_2) {
+    if (interConfC >= interConf - dt_2) [[unlikely]] {
       iconf++;
 
       std::cout << "+-----------------------------------------------------------------------------------\n";
@@ -3665,6 +3665,9 @@ void Rockable::randomlyOrientedVelocitiesClusters(double velocityMagnitude, int 
   }
 }
 
+/**
+   @brief Set the velocity of ALL free bodies to a given velocity vector
+*/
 void Rockable::setAllVelocities(vec3r& vel) {
   for (size_t i = nDriven; i < Particles.size(); i++) {
     Particles[i].vel = vel;

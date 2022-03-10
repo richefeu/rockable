@@ -52,7 +52,7 @@ class DataExtractor {
   int nstep;  ///< Call-period for exec
   int nrec;   ///< Call-period for record
 
-  virtual void plug(Rockable* Box);
+  virtual void plug(Rockable* Box) final;
   virtual void init();
 
   virtual void read(std::istream& is) = 0;

@@ -41,12 +41,12 @@
 class MeanVelocity : public DataExtractor {
  public:
   MeanVelocity();
-  void init();
-  void read(std::istream& is);
+  void init() override;
+  void read(std::istream& is) override;
 
-  void exec();
-  void record();
-  void end();
+  void exec() override;
+  void record() override;
+  void end() override;
 
  private:
 };

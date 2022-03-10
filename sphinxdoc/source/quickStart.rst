@@ -4,7 +4,7 @@ Quick-start guid
 What is Rockable?
 -----------------
 
-Rockable is a DEM code written in C++. The two main specificities of the code are (i) to hold sphero-polyhedral shapes, (ii) to manage breakable interfaces. This technique has been developed in DEMbox which was designed to do more things, with a higher degree of abstraction. Also, it is developed for an academic usage.
+``Rockable`` is a DEM code written in C++11. The two main specificities of the code are (i) to hold sphero-polyhedral shapes, (ii) to manage breakable interfaces. This technique has been developed in another code named ``DEMbox`` which was designed to do more things, with a higher degree of abstraction. Also, it is developed for an academic usage.
 
 Compilation
 -----------

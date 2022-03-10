@@ -1,3 +1,5 @@
+.. _IntegrationSchemes:
+
 Integration schemes
 ===================
 

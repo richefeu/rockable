@@ -46,7 +46,7 @@ class BodyForce {
   Rockable* box;
 
   virtual ~BodyForce();
-  virtual void plug(Rockable* Box);
+  virtual void plug(Rockable* Box) final;
   virtual void read(std::istream& is) = 0;
   virtual void write(std::ostream& os) = 0;
   virtual void getForceAndMoment(size_t ibody, vec3r& force, vec3r& moment) = 0;

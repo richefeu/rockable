@@ -41,11 +41,11 @@
 class ClusterGranulo : public PostProcessor {
  public:
   ClusterGranulo();
-  void init();
-  void end();
-  void read(std::istream& is);
+  void init() override;
+  void end() override;
+  void read(std::istream& is) override;
 
-  void exec();
+  void exec() override;
 
  private:
    std::vector<double> SievingSizes;

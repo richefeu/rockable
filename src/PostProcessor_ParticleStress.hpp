@@ -41,11 +41,11 @@
 class ParticleStress : public PostProcessor {
  public:
   ParticleStress();
-  void init();
-  void end();
-  void read(std::istream& is);
+  void init() override;
+  void end() override;
+  void read(std::istream& is) override;
 
-  void exec();
+  void exec() override;
 
  private:
    double Volume;

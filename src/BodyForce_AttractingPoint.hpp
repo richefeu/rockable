@@ -43,9 +43,9 @@ public:
   
   AttractingPoint();
   
-  void read(std::istream& is);
-  void write(std::ostream& os);
-  void getForceAndMoment(size_t ibody, vec3r & force, vec3r & moment);
+  void read(std::istream& is) override;
+  void write(std::ostream& os) override;
+  void getForceAndMoment(size_t ibody, vec3r & force, vec3r & moment) override;
   
 private:
   vec3r point;

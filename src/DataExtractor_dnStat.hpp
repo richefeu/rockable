@@ -41,12 +41,12 @@
 class dnStat : public DataExtractor {
  public:
   dnStat();
-  void init();
-  void read(std::istream& is);
+  void init() override;
+  void read(std::istream& is) override;
 
-  void exec();
-  void record();
-  void end();
+  void exec() override;
+  void record() override;
+  void end() override;
 };
 
 #endif /* end of include guard: DNSTAT_HPP */

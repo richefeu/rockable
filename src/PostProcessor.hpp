@@ -47,7 +47,7 @@ class PostProcessor {
  public:
   Rockable* box;  ///< The Rockable instance from which data will be extracted
 
-  virtual void plug(Rockable* Box);
+  virtual void plug(Rockable* Box) final;
   virtual void init();
   virtual void end();
 

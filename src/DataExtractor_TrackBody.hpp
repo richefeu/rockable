@@ -41,12 +41,12 @@
 class TrackBody : public DataExtractor {
  public:
   TrackBody();
-  void init();
-  void read(std::istream& is);
+  void init() override;
+  void read(std::istream& is) override;
 
-  void exec();
-  void record();
-  void end();
+  void exec() override;
+  void record() override;
+  void end() override;
 
  private:
   size_t ibody;
