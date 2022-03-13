@@ -81,7 +81,7 @@ void DrivingSystem::read(bool warn) {
     } else if (token == "Servo") {
       std::string servoName;
       is >> servoName;
-      if (servoName.substr(0, 6) == "tritri") { // if the name of the servo starts with "tritri"
+      if (servoName.substr(0, 6) == "tritri") {  // if the name of the servo starts with "tritri"
         size_t idXmin, idXmax;
         size_t idYmin, idYmax;
         size_t idZmin, idZmax;
@@ -316,6 +316,32 @@ void DrivingSystem::read(bool warn) {
         ServoFunction = [icontr, dir, A, T](Rockable& box) -> void {
           vec3r v = (4.0 * A / T) * dir;
           double phase = box.t - std::floor(box.t / T) * T;
+          phase /= T;
+          if (phase >= 0.25 && phase < 0.75) v *= -1.0;
+          box.System.controls[icontr].value = v.x;
+          box.System.controls[icontr + 1].value = v.y;
+          box.System.controls[icontr + 2].value = v.z;
+        };
+      } else if (servoName == "sawtooth_shaker") {
+        // version de triangle_shaker avec possibilité de définir un temps initial
+        vec3r dir;       // direction of oscillation
+        double A, freq;  // amplitude and frequency
+        Control C;
+        double t_ini;
+        is >> C.i >> dir >> A >> freq >> t_ini;
+        dir.normalize();  // in case the user enters a non-normalized one
+        double T = 1.0 / freq;
+        C.value = 0.0;  // will be set by the servo controller
+        size_t icontr = controls.size();
+        C.type = _x_Vel_;
+        controls.push_back(C);
+        C.type = _y_Vel_;
+        controls.push_back(C);
+        C.type = _z_Vel_;
+        controls.push_back(C);
+        ServoFunction = [icontr, dir, A, T, t_ini](Rockable& box) -> void {
+          vec3r v = (4.0 * A / T) * dir;
+          double phase = box.t - std::floor((box.t - t_ini) / T) * T;
           phase /= T;
           if (phase >= 0.25 && phase < 0.75) v *= -1.0;
           box.System.controls[icontr].value = v.x;
