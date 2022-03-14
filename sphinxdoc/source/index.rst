@@ -9,6 +9,6 @@ Welcome to Rockable's documentation!
    syntaxConf
    syntaxShapes
    forceLaws
+   dissipation
    integrationSchemes
-
-
+   servoControllers

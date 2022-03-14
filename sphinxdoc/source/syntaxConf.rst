@@ -23,7 +23,7 @@ Timing
 - ``tmax`` (*double*) **value**  
   Maximum time (the simulation will end when time is ``tmax``)
 
-- ``dt`` (*double*) **value**  
+- ``dt`` (*double*) **value**
   Time step increments
 
 
@@ -34,7 +34,9 @@ Neighbor list (``NL``)
   Elapsed time between each rebuilding of the neighbor list
 
 - ``DVerlet`` (*double*) **value**  
-  Distance to define if two sphero-polyhedra are neighbors
+  Distance to define if two sphero-polyhedra are neighbors. 
+  This the length added to the OBBs before testing if they overlap.
+  In other words, half this length is added at each side of the OBBs.
 
 - ``dVerlet`` (*double*) **value**  
    Distance to define if two sub-elements (sphere for vertices, tubes for edges, 
@@ -44,7 +46,7 @@ Neighbor list (``NL``)
   If the dynamic update of the neighbor list is activated (set to 1), 
   then an update will be made if the maximum distance of a body since the last update becomes 
   larger than ``dispUpdateNL``. 
-  An update will also be made when the maximum rotation becomes larger than ``angleUpdateNL``.
+  An update will also be made when the maximum rotation becomes larger than ``angleUpdateNL``
 
    - ``dispUpdateNL`` (*double*) **distance**
 
@@ -57,23 +59,31 @@ Configuration backups
   Elapsed time between each backup of the configuration
 
 - ``iconf`` (*double*) **value**  
-  Number of the current configuration
+  Number of the current configuration (the number that is used to name the conf-file)
 
   
-Options
--------
+Computation options
+-------------------
 
-- ``AddOrRemoveInteractions`` (*string*) **Option** where **Option** can be ``bruteForce`` or ``OBBtree``. Default is ``bruteForce``
+- ``AddOrRemoveInteractions`` (*string*) **Option** where **Option** can be ``bruteForce`` or ``OBBtree`` (default is ``bruteForce``).
+  
+  Because the interactions between particles (sphero-polyhedra) implies 
+  different types of interaction (sphere-sphere, sphere-tube, sphere-polygon and tube-tube), 
+  the best strategy to be used depends on the complexity of the involved shapes 
 
 - ``UpdateNLStrategy`` (*string*) **Option** where **Option** can be ``bruteForce`` or ``linkCells``. Default is ``bruteForce``
 
-  In case of ``linkCells`` strategy, the vector ``cellMinSizes`` needs to be set. Each value is the minimum size of a cell in the corresponding direction. In addition, ``boxForLinkCellsOpt`` is a flag (0 or 1) to state if the first driven bodies are part of the overall bounding box (that will be split in to cells)
+  In case of ``linkCells`` strategy, the vector ``cellMinSizes`` needs to be set. 
+  Each value is the minimum size of a cell in the corresponding direction. In addition, 
+  ``boxForLinkCellsOpt`` is a flag (0 or 1) to state if the first driven bodies are part 
+  of the overall bounding box (that will be split in to cells)
   
   -  ``cellMinSizes`` (*double*) **xmin** (*double*) **ymin** (*double*) **zmin**
 
   -  ``boxForLinkCellsOpt`` (0 | 1)
 
-- ``Integrator`` (string) **Option** where **Option** can be ``Euler``, ``velocityVerlet``, ``Beeman`` or ``RungeKutta4``. Default is ``velocityVerlet`` 
+- ``Integrator`` (string) **Option** where **Option** can be ``Euler``, ``velocityVerlet``, ``Beeman`` or ``RungeKutta4`` (default is ``velocityVerlet``) 
+  This is simply the time-integration scheme to be used. For details see :ref:`IntegrationSchemes`
 
 Library of particle shapes
 --------------------------
@@ -85,7 +95,8 @@ Library of particle shapes
 Particles
 ---------
 
-- ``density`` (*int*) **groupNumber** (*double*) **density**
+- ``density`` (*int*) **groupNumber** (*double*) **density** 
+  The density (e.g., kilogram per cubic meter set to the particles belonging to a given  group number)
 
 - ``Particles`` (*int*) **numberOfParticles**  
 
@@ -111,18 +122,18 @@ Force laws
 ----------
 
 - ``forceLaw`` (*string*) **Name**  
-  Select a model for the computation of forces. For possible **Name** see :ref:`Force-laws`
+  It selects a model for the computation of forces. For possible **Name** see :ref:`Force-laws`
 
 Time-integration scheme
 -----------------------
 
-- ``xxxxx`` (*string*) **Name**  
-  Select a scheme for the time integration. For possible **Name** see :ref:`IntegrationSchemes`
+- ``Integrator`` (*string*) **Name**  
+  It select a scheme for the time integration. For possible **Name** see :ref:`IntegrationSchemes`
 
 Dissipation
 -----------
 
-There are several dissipation strategies.
+There are several dissipation strategies that can be used (see :ref:`Dissipation`)
 
 Loading
 -------
@@ -144,9 +155,10 @@ File drivingSystem.txt
             (a vector of 3 components):  ``_xyzrot_Vel_`` and ``_xyzrot_Mom_``
   
 - ``Servo`` (*string*) **servoName** <*PARAMETERS*>
+  where the parameter list depends on the selected servo (see :ref:`Servo-controllers`) 
 
-Processing commands
--------------------
+Pre-processing commands
+-----------------------
 
 * ``stickVerticesInClusters`` (*double*) **Epsilon** 
   This command will add glued interfaces between bodies having the same cluster identifier. 

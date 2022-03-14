@@ -3,9 +3,13 @@
 Integration schemes
 ===================
 
-In a ``conf-file``, the integration scheme to be used is set with the keyword ``Integrator`` followed by the name of the scheme (defined below). The position, velocity and acceleration vectors is noted :math:`\vec{r}`, :math:`\vec{v}` and :math:`\vec{a}`, respectively; and for rotations they are :math:`\mathbf{Q}`, :math:`\vec{\omega}` and :math:`\vec{\dot{\omega}}`. 
+In a ``conf-file``, the integration scheme to be used is set with the keyword ``Integrator`` 
+followed by the name of the scheme (defined below). The position, velocity and acceleration 
+vectors is noted :math:`\vec{r}`, :math:`\vec{v}` and :math:`\vec{a}`, respectively; 
+and for rotations they are :math:`\mathbf{Q}`, :math:`\vec{\omega}` and :math:`\vec{\dot{\omega}}`. 
 
-For all these schemes, the driven bodies with force or moment are updated similarly to the chosen scheme, and the driven bodies with velocity imposed (translation or rotation) are updated that way:
+For all these schemes, the driven bodies with force or moment are updated similarly to the chosen scheme, 
+and the driven bodies with velocity imposed (translation or rotation) are updated that way:
 
 .. math::
    \begin{cases}
@@ -13,8 +17,8 @@ For all these schemes, the driven bodies with force or moment are updated simila
    \mathbf{Q}(t+\delta t) &\leftarrow \mathbf{Q}(t) + \mathbf{\dot{Q}}\left(\vec{\omega}^\mbox{imp}(t)\right) \delta t 
    \end{cases}
 
-Euler scheme (``Euler``)
-------------------------
+Euler scheme (keyword ``Euler``)
+--------------------------------
 
 This is the most simple scheme:
 
@@ -34,8 +38,8 @@ And the same for rotations
    \vec{\dot{\omega}}(t+\delta t) &\leftarrow \ldots
    \end{cases}
 
-Velocity-Verlet scheme (``velocityVerlet``, Default)
-----------------------------------------------------
+Velocity-Verlet scheme (keyword ``velocityVerlet``, Default)
+------------------------------------------------------------
 
 .. math::
    \begin{cases}
@@ -54,12 +58,12 @@ Velocity-Verlet scheme (``velocityVerlet``, Default)
    \end{cases}
 
 
-Beeman scheme (``Beeman``)
---------------------------
+Beeman scheme (keyword ``Beeman``)
+----------------------------------
 
 
 
-Runge-Kutta-Nyström 4th-order scheme (``RungeKutta4``)
-------------------------------------------------------
+Runge-Kutta-Nyström 4th-order scheme (keyword ``RungeKutta4``)
+--------------------------------------------------------------
 
 
