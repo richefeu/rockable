@@ -1,3 +1,4 @@
+.. _syntaxShape:
 
 Format of shape-files
 =====================
@@ -5,7 +6,8 @@ Format of shape-files
 Definition of a shape
 ---------------------
 
-A shape-file is a library of shapes, which is in fact a file with a number of shapes defined between brackets (starting with ``<`` and ending with ``>``). To run a simulation, we need that all required shapes are defined in a single shape-file. The keywords are given here after:
+A shape-file is a library of shapes, which is in fact a file with a number of shapes defined between brackets (starting with ``<`` and ending with ``>``). 
+To run a simulation, we need that all required shapes are defined in a single shape-file. The keywords are given here after:
 
 - ``name`` (*string*) **shapeName**
   The name of the shape. When the particles are listed in a conf-file, its shape is referred to as this defined keyword

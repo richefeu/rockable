@@ -1,5 +1,7 @@
 .. _Dissipation:
 
+Global dissipation features
+===========================
 
 Cundall damping
 ---------------

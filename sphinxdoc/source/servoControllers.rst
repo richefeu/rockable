@@ -1,8 +1,10 @@
 .. _Servo-controllers:
 
+Available servo-controllers
+===========================
 
-"tritri"-type servos
---------------------
+The ``tritri`` series servos
+----------------------------
 
 TODO
 

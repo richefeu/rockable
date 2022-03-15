@@ -11,8 +11,9 @@ The conf-files are the files that hold the whole configuration at a given time. 
 Header
 ------
 
-A conf-file always starts with the header: ``Rockable dd-mm-yyyy`` (*e.g.*, ``Rockable 20-02-2017``). 
-Each time a noticeable change is made in the format, the date of this change is also changed in the header of the file. It is used as the version of the format.
+A conf-file always starts with the header: ``Rockable dd-mm-yyyy`` (*e.g.*, ``Rockable 29-11-2018``). 
+Each time a noticeable change is made in the format, the date of this change is also changed in the header of the file. 
+It is used as the version of the format. In the source of the code it is defined in the preprocessor define of ``CONF_VERSION_DATE``
 
 Timing
 ------
@@ -31,7 +32,7 @@ Neighbor list (``NL``)
 ----------------------
 
 - ``interVerlet`` (*double*) **value**  
-  Elapsed time between each rebuilding of the neighbor list
+  Elapsed time between each rebuilding of the neighbor list.
 
 - ``DVerlet`` (*double*) **value**  
   Distance to define if two sphero-polyhedra are neighbors. 
@@ -46,7 +47,9 @@ Neighbor list (``NL``)
   If the dynamic update of the neighbor list is activated (set to 1), 
   then an update will be made if the maximum distance of a body since the last update becomes 
   larger than ``dispUpdateNL``. 
-  An update will also be made when the maximum rotation becomes larger than ``angleUpdateNL``
+  An update will also be made when the maximum rotation becomes larger than ``angleUpdateNL``. 
+  These "dynamic updates" will not affect the regular updates (every `interVerlet`).
+  The additional parameters to be set are:
 
    - ``dispUpdateNL`` (*double*) **distance**
 
@@ -54,6 +57,9 @@ Neighbor list (``NL``)
 
 Configuration backups
 ---------------------
+
+As said before, the so called "conf-files" are where a configuration (i.e., the whole dataset of a simulation state) is stored. 
+The format is the one described here, and it is important to understand that it can be used as input or output of a simulation.
 
 - ``interConf`` (*double*) **value**  
   Elapsed time between each backup of the configuration
@@ -76,7 +82,8 @@ Computation options
   In case of ``linkCells`` strategy, the vector ``cellMinSizes`` needs to be set. 
   Each value is the minimum size of a cell in the corresponding direction. In addition, 
   ``boxForLinkCellsOpt`` is a flag (0 or 1) to state if the first driven bodies are part 
-  of the overall bounding box (that will be split in to cells)
+  of the overall bounding box (that will be split in to cells).
+  The commands are:
   
   -  ``cellMinSizes`` (*double*) **xmin** (*double*) **ymin** (*double*) **zmin**
 
@@ -90,7 +97,7 @@ Library of particle shapes
 
 - ``shapeFile`` (*string*) **path**  
   Path of the file that define the shapes used. 
-  The format to define a shape is explained in a separated document (``SyntaxShape.pdf``)
+  The format to define a shape is explained here :ref:`syntaxShape`
 
 Particles
 ---------
@@ -160,16 +167,10 @@ File drivingSystem.txt
 Pre-processing commands
 -----------------------
 
-* ``stickVerticesInClusters`` (*double*) **Epsilon** 
-  This command will add glued interfaces between bodies having the same cluster identifier. 
-  Only bonds between vertices (spheres) are added when the distance is less than **Epsilon**.
+``Rockable`` provides a number of commands to perform some preprocessing.
+In general, these commands are entered at the very end of an input conf file, after the definition of particles and interactions.
+They are described here: :ref:`prePro`
 
-* ``stickClusters`` (*double*) **Epsilon**  
-  This command will add glued interfaces between bodies having different cluster identifier. 
-  Bonds are added when the distance is less than **Epsilon**.
-  
-* ``setAllVelocities`` (*vec3r*) **velocity**
-  Set the velocity vector of all particles (that are not driven) to the prescribed value **velocity**.
 
 Data Extractors
 ---------------
