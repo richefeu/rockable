@@ -10,8 +10,8 @@ These parameters ``[?PARAMETER?]`` are to be defined in the input file in the fo
 - ``[?PARAMETER?]`` (*int*) **firstGroupNumber** (*int*) **secondGroupNumber** (*double*) **value**
 
 
-Default (keywork ``Default``)
------------------------------
+Default model (keywork ``Default``)
+-----------------------------------
 
 This is the force law to be used in most cases. 
 In short, the model includes elastic linear contact, normal viscosity, constant normal contact force, 
@@ -25,27 +25,55 @@ The elastic part of the normal contact force is
 .. math::
    f_n^{el} = -k_n d_n
 
-where :math:`d_n`` is the normal negative or null distance, so :math:`f_n^{el} \geq 0`. The value of :math:`k_n` can be set with the keyword ``knContact``
+where :math:`d_n \leq 0` is the normal distance, so :math:`f_n^{el} \geq 0`. 
+The value of :math:`k_n` can be set with the keyword ``knContact``
+
+The viscuous part of the normal contact force is
 
 .. math::
-   f_n^{visc} = \alpha_n \sqrt{2 m_{eff}} v_n
+   f_n^{visc} = \alpha_n \sqrt{2 m_\text{eff}} v_n
+
+where :math:`v_n` is the relative velocity,  :math:`m_\text{eff}=(m_i m_j)/(m_i+m_j)` is the effective mass, 
+and :math:`\alpha_n \in [0, 1[` is the rate of viscuous damping. There are two solutions to set the value of :math:`\alpha_n`:
+
+1. The keyword ``en2Contact`` that is the energy normal restitution rate (:math:`e_n^2`). In this case, the viscuous damping rate will be set associated
+
+.. math::
+   \alpha_n = \frac{- \ln e_n}{\sqrt{\ln^2 e_n + \pi^2}}
+
+1. The keyword ``en2ContactFromViscRate`` that will  
+
+.. math:: 
+   e_n^2 = e^{-\frac{\alpha_n \pi}{  \sqrt{1.0 - \alpha_n^2}}}
+
+Because of the viscuous part of the normal force, the total normal force :math:`f_n = f_n^{el} + f_n^{visc}` can be negative. 
+Although the physical meaning of this negative value is arguable, 
+the normal force is restricted to remain positive or zero
 
 
 Tangential component
 """"""""""""""""""""
 
+TODO
+
 .. math::
    \Delta f_t^{el} = -k_t (v_t \delta t)
 
 
-Avalanche (keywork ``Avalanche``)
----------------------------------
+Moment  component
+"""""""""""""""""
 
 TODO
 
 
-Breakable elastic solid bonds 
------------------------------
+Law for rock avalanches (keywork ``Avalanche``)
+-----------------------------------------------
+
+TODO
+
+
+Breakable elastic solid bonds (keywork ``StickedLinks``)
+--------------------------------------------------------
 
 TODO
 

@@ -53,9 +53,9 @@ ifeq ($(UNAME_S),Darwin)
   # The compiler to be used
   CXX = g++-11
   # The list of flags passed to the compiler
-  CXXFLAGS := -fopenmp -O3 -Wall -Wextra -Wno-deprecated-declarations -std=c++20
+  CXXFLAGS := -fopenmp -O3 -Wall -Wextra -Wno-deprecated-declarations -std=c++17
   CXXFLAGS += -I $(COMMONPATH) $(OPTIONS) $(SVNDEV)
-	CXXFLAGS += `pkg-config --cflags tclap`
+  CXXFLAGS += `pkg-config --cflags tclap`
 	
   # Link flags for OpenGL and glut
   GLUTFLAGS = `pkg-config --cflags glut`
@@ -68,8 +68,8 @@ else
   # The compiler to be used
   CXX = g++
   # The list of flags passed to the compiler
-  CXXFLAGS := -fopenmp -O3 -std=c++0x
-	CXXFLAGS += -I $(COMMONPATH) $(OPTIONS) $(SVNDEV)
+  CXXFLAGS := -fopenmp -O3 -std=c++17
+  CXXFLAGS += -I $(COMMONPATH) $(OPTIONS) $(SVNDEV)
 	
 	# CXXFLAGS += `pkg-config --cflags tclap`
   # Link flags for OpenGL and glut

@@ -150,11 +150,13 @@ void Rockable::showBanner() {
   std::cout << std::endl;
   std::cout << std::endl;
 
+  std::cout << msg::bold();
   std::cout << "Rockable  Copyright (C) 2016-2019  <vincent.richefeu@3sr-grenoble.fr>\n";
   std::cout << "This program comes with ABSOLUTELY NO WARRANTY.\n";
   std::cout << "This is academic software\n";
   std::cout << "Documentation: "
                "https://richefeu.gitbook.io/cdm/\n\n";
+  std::cout << msg::resetBold();
 
   std::cout << std::endl;
   std::cout << "Compilation options:\n";
@@ -259,8 +261,6 @@ void Rockable::saveConf(int i) {
     @param[in]  name  The name of the conf-file
 */
 void Rockable::saveConf(const char* fname) {
-  // char fname[256];
-  // sprintf(fname, "conf%d", i);
   std::ofstream conf(fname);
 
   conf << "Rockable " << CONF_VERSION_DATE << '\n';  // format: progName version-date(dd-mm-yyyy)
@@ -724,7 +724,8 @@ void Rockable::loadConf(const char* name) {
       BF->read(conf);
       bodyForce = BF;
       if (verbose == 1) {
-        std::cout << "The BodyForce named " << BodyForceName << " has been activated\n";
+        std::cout << msg::info() << "The BodyForce named " << BodyForceName << " has been activated" << msg::normal()
+                  << std::endl;
       }
     } else {
       std::cerr << msg::warn() << "The BodyForce named " << BodyForceName << " is unknown!" << msg::normal()
@@ -2303,14 +2304,23 @@ void Rockable::integrate() {
   std::cout << "#  iconf = " << iconf << ", Time = " << t << std::endl;
 
   PerfTimer ptimer;
-  size_t step = (size_t)(t / dt);
+  size_t step = (size_t)(t / dt);  // suppose that the time-step has not been changed
   timeInUpdateNL = 0.0;
   timeInForceComputation = 0.0;
-  while (t < tmax) {
+
+  while (t <= tmax) {
+
+    t += dt;
+    interConfC += dt;
+    interVerletC += dt;
+
+    // It will use the selected integration scheme
+    IntegrationStep();
 
     if (interConfC >= interConf - dt_2) [[unlikely]] {
       iconf++;
 
+      std::cout << msg::normal();
       std::cout << "+-----------------------------------------------------------------------------------\n";
       std::cout << "|  #iconf = " << iconf << ", Time = " << t << '\n';
       double elapsedTime = ptimer.getIntermediateElapsedTimeSeconds();
@@ -2379,13 +2389,6 @@ void Rockable::integrate() {
       if (step % dataExtractors[d]->nstep == 0) dataExtractors[d]->exec();
       if (step % dataExtractors[d]->nrec == 0) dataExtractors[d]->record();
     }
-
-    // It will use the selected integration scheme
-    IntegrationStep();
-
-    t += dt;
-    interConfC += dt;
-    interVerletC += dt;
 
     for (size_t p = 0; p < Tempos.size(); p++) {
       if (Tempos[p].update != nullptr) Tempos[p].update(t);

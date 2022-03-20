@@ -9,7 +9,7 @@ src/see3
 src/run
 src/patatrac
 src/postpro
-*/conf*
+/examples/**/conf*
 !imconfig.h
 *kineticEnergy.txt
 *perf.txt

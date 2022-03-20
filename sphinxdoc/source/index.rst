@@ -12,3 +12,4 @@ Welcome to Rockable's documentation!
    dissipation
    integrationSchemes
    servoControllers
+   preProcessing

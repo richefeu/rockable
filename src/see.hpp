@@ -44,7 +44,8 @@
 # endif
 
 #include "message.hpp"
-#include "glutTools.hpp"
+//#include "glutTools.hpp"
+#include "glTools.hpp"
 #include "geoTool.hpp"
 #include "fileTool.hpp"
 #include "ColorTable.hpp"
@@ -128,6 +129,8 @@ void drawParticles();
 void drawTrajectories();
 void drawInteractionTypes();
 void drawInteractionFrames();
+void drawGlobalFrame();
+void drawGlobalAABB();
 void drawOBBs();
 void drawProbe();
 

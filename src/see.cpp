@@ -52,32 +52,31 @@ void showKeybinds() {
   int dhline = -15;
   int hline = height;
 #define _nextLine_ (hline += dhline)
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[+]    load next configuration file");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[-]    load previous configuration file");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[=]    fit the view");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[a][A] decrease/increase alpha (transparence) of driven bodies");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[b]    switch ON/OFF the background color");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[c]    run 5000 steps of computation (used for debugging)");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[e][E] decrease/increase alpha (transparence) of free bodies");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[g]    open another file");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[k]    print this help");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[l]    switch ON/OFF the links (normal vector at contact)");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[m]    switch ON/OFF the links colored by type");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[n]    switch ON/OFF the body displays");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[o]    switch ON/OFF the OBB displays");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_,
-                "[O]    switch ON/OFF the enlargement of OBBs by the Verlet distance");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[w]    set the view so that gravity appears vertical");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[x]    print the space limits of the current scene");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[p]    edit selected body");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[q]    quit");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[y]    make the display faster (and less nice)");
+  glText::print(15, _nextLine_, "[+]    load next configuration file");
+  glText::print(15, _nextLine_, "[-]    load previous configuration file");
+  glText::print(15, _nextLine_, "[=]    fit the view");
+  glText::print(15, _nextLine_, "[a][A] decrease/increase alpha (transparence) of driven bodies");
+  glText::print(15, _nextLine_, "[b]    switch ON/OFF the background color");
+  glText::print(15, _nextLine_, "[c]    run 5000 steps of computation (used for debugging)");
+  glText::print(15, _nextLine_, "[e][E] decrease/increase alpha (transparence) of free bodies");
+  glText::print(15, _nextLine_, "[g]    open another file");
+  glText::print(15, _nextLine_, "[k]    print this help");
+  glText::print(15, _nextLine_, "[l]    switch ON/OFF the links (normal vector at contact)");
+  glText::print(15, _nextLine_, "[m]    switch ON/OFF the links colored by type");
+  glText::print(15, _nextLine_, "[n]    switch ON/OFF the body displays");
+  glText::print(15, _nextLine_, "[o]    switch ON/OFF the OBB displays");
+  glText::print(15, _nextLine_, "[O]    switch ON/OFF the enlargement of OBBs by the Verlet distance");
+  glText::print(15, _nextLine_, "[w]    set the view so that gravity appears vertical");
+  glText::print(15, _nextLine_, "[x]    print the space limits of the current scene");
+  glText::print(15, _nextLine_, "[p]    edit selected body");
+  glText::print(15, _nextLine_, "[q]    quit");
+  glText::print(15, _nextLine_, "[y]    make the display faster (and less nice)");
 #ifdef PNG_H
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[z]    make a screenshot (oneshot.png)");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[Z]    make a series of screenshots (shotX.png)");
+  glText::print(15, _nextLine_, "[z]    make a screenshot (oneshot.png)");
+  glText::print(15, _nextLine_, "[Z]    make a series of screenshots (shotX.png)");
 #else
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[z]    make a screenshot (oneshot.tga)");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[Z]    make a series of screenshots (shotX.tga)");
+  glText::print(15, _nextLine_, "[z]    make a screenshot (oneshot.tga)");
+  glText::print(15, _nextLine_, "[Z]    make a series of screenshots (shotX.tga)");
 #endif
 
 #undef _nextLine_
@@ -233,13 +232,13 @@ void keyboard(unsigned char Key, int x, int y) {
 
     case 'r': {
       rescaleColorRange = 1 - rescaleColorRange;
-			if (rescaleColorRange == 0) {
-				std::cout << "rescaleColorRange = 0\n";
-				std::cout << "colorRangeMin = " << colorRangeMin << '\n';
-				std::cout << "colorRangeMax = " << colorRangeMax << '\n';
-			} else if (rescaleColorRange == 1) {
-				std::cout << "rescaleColorRange = 1\n";
-			}
+      if (rescaleColorRange == 0) {
+        std::cout << "rescaleColorRange = 0\n";
+        std::cout << "colorRangeMin = " << colorRangeMin << '\n';
+        std::cout << "colorRangeMax = " << colorRangeMax << '\n';
+      } else if (rescaleColorRange == 1) {
+        std::cout << "rescaleColorRange = 1\n";
+      }
     } break;
 
     case 's':
@@ -359,13 +358,13 @@ void resetColors(int mode, int rescale) {
           double v = norm(box.Particles[i].vel);
           if (v > colorRangeMax) colorRangeMax = v;
         }
-				std::cout << "colorRangeMin = " << colorRangeMin << '\n';
-				std::cout << "colorRangeMax = " << colorRangeMax << '\n';
+        std::cout << "colorRangeMin = " << colorRangeMin << '\n';
+        std::cout << "colorRangeMax = " << colorRangeMax << '\n';
       }
 
       CT.setTableID(MATLAB_HOT);
       CT.setMinMax(colorRangeMin, colorRangeMax);
-			CT.Rebuild();
+      CT.Rebuild();
       pcolors.clear();
       colorRGBA col;
       for (size_t i = 0; i < box.Particles.size(); ++i) {
@@ -462,10 +461,12 @@ void mouse(int button, int state, int x, int y) {
     mouse_mode = NOTHING;
     display();
   } else if (state == GLUT_DOWN) {
+    
     mouse_start[0] = x;
     mouse_start[1] = y;
+    
     switch (button) {
-      case GLUT_LEFT_BUTTON:
+      case GLUT_LEFT_BUTTON: {
         if (glutGetModifiers() == GLUT_ACTIVE_SHIFT)
           mouse_mode = PAN;
         else if (glutGetModifiers() == GLUT_ACTIVE_ALT)
@@ -474,10 +475,16 @@ void mouse(int button, int state, int x, int y) {
           mouse_mode = ZOOM;
         else
           mouse_mode = ROTATION;
-        break;
-      case GLUT_MIDDLE_BUTTON:
-        mouse_mode = ZOOM;
-        break;
+      }
+      break;
+      
+      case GLUT_MIDDLE_BUTTON: {
+        if (glutGetModifiers() == GLUT_ACTIVE_SHIFT)
+          selection(x, y);
+        else
+          mouse_mode = ZOOM;
+      }
+      break;
     }
   }
 }
@@ -524,7 +531,7 @@ void motion(int x, int y) {
 
 void display() {
   sleep(0);  // it is supposed to accelerate the display
-  glutTools::clearBackground(show_background);
+  glTools::clearBackground(show_background);
   adjustClippingPlans();
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
@@ -611,7 +618,7 @@ void drawShape(Shape* s, double homothety) {
       vec3r orig = homothety * s->vertex[s->edge[e].first];
       vec3r arrow = homothety * s->vertex[s->edge[e].second];
       arrow -= orig;
-      glutShape::drawTube(orig, arrow, 2.0 * R);
+      glShape::tube(orig, arrow, 2.0 * R);
     }
   }
 
@@ -641,9 +648,17 @@ void drawShape(Shape* s, double homothety) {
 }
 
 void drawParticles() {
-  if (mouse_mode != NOTHING && complexityNumber > 100) {
-    drawOBBs();
-    return;
+  if (mouse_mode != NOTHING) {
+    if (complexityNumber > 500) {
+      drawGlobalAABB();
+      drawGlobalFrame();
+      return;
+    }
+    if (complexityNumber > 100) {
+      drawOBBs();
+      drawGlobalFrame();
+      return;
+    }
   }
 
   glEnable(GL_LIGHTING);
@@ -708,6 +723,23 @@ void drawTrajectories() {
       glEnd();
     }
   }
+}
+
+void drawGlobalFrame() {
+  glEnable(GL_LIGHTING);
+  glEnable(GL_DEPTH_TEST);
+  vec3r diag = 0.6 * (box.aabb.max - box.aabb.min);
+  glShape::frame(vec3r(0, 0, 0), diag.x, diag.y, diag.z);
+}
+
+void drawGlobalAABB() {
+  glEnable(GL_LIGHTING);
+  glEnable(GL_DEPTH_TEST);
+  OBB obb;
+  obb.extent = 0.5 * (box.aabb.max - box.aabb.min);
+  obb.center = 0.5 * (box.aabb.min + box.aabb.max);
+  glColor3f(1.0f, 0.0f, 0.0f);
+  glShape::obb(obb);
 }
 
 void drawOBBs() {
@@ -1415,6 +1447,8 @@ int main(int argc, char* argv[]) {
   view_angle = 45.0;
   znear = 0.01;
   zfar = 10.0;
+
+  glText::init();
 
   glDisable(GL_CULL_FACE);
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
