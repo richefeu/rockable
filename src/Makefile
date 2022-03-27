@@ -53,7 +53,7 @@ ifeq ($(UNAME_S),Darwin)
   # The compiler to be used
   CXX = g++-11
   # The list of flags passed to the compiler
-  CXXFLAGS := -fopenmp -O3 -Wall -Wextra -Wno-deprecated-declarations -std=c++17
+  CXXFLAGS := -fopenmp -O3 -Wall -Wextra -Wno-deprecated-declarations -std=c++11
   CXXFLAGS += -I $(COMMONPATH) $(OPTIONS) $(SVNDEV)
   CXXFLAGS += `pkg-config --cflags tclap`
 	
@@ -125,7 +125,7 @@ POSTPROHEADERS = $(POSTPROSOURCES:%.cpp=%.hpp)
 
 .PHONY: all clean format
 
-all: run see3 # postpro patatrac
+all: run see # postpro patatrac
 
 toto: 
 	@echo $(IMGUI_SOURCES)
