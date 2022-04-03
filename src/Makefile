@@ -35,7 +35,7 @@
 #######################################################################################################################
 
 # An option can be disable by adding 'n' before
-OPTIONS = -DQUAT_ACC -DnFT_CORR -DnROT_MATRIX -DnBREAK_ONCE -DnCOMPONENTWISE_NUM_DAMPING
+OPTIONS = -DQUAT_ACC -DnFT_CORR -DnROT_MATRIX -DnBREAK_ONCE -DnCOMPONENTWISE_NUM_DAMPING -DnBIND_METHODS
 
 # If you don't want to use libpng in 'see', comment this two lines
 # In this case the screenshots will be TGA (not compressed)
@@ -43,9 +43,7 @@ OPTIONS = -DQUAT_ACC -DnFT_CORR -DnROT_MATRIX -DnBREAK_ONCE -DnCOMPONENTWISE_NUM
 #PNGLINK = `pkg-config --libs libpng`
 
 # Paths
-#COMMONPATH = ../common
 COMMONPATH = /usr/local/include/toofus
-#COMMONPATH = /Users/vrichefeu/Documents/devel/TOOFUS
 IMGUI_DIR = ./imgui
 
 UNAME_S := $(shell uname -s)
@@ -126,9 +124,6 @@ POSTPROHEADERS = $(POSTPROSOURCES:%.cpp=%.hpp)
 .PHONY: all clean format
 
 all: run see3 # postpro patatrac
-
-toto: 
-	@echo $(IMGUI_SOURCES)
 
 clean:
 	rm -f *~ *.o run see see2 see3 postpro patatrac

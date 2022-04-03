@@ -167,7 +167,7 @@ class Rockable {
   void integrate();                        ///< Simulation flow (make time increments and check for updates or saving)
   void accelerations();                    ///< Compute accelerations (both for particles and the periodic-cell)
   void incrementResultants(Interaction&);  ///< Project force and moment on the interacting particles
-  std::function<void()> IntegrationStep;   ///< Pointer funtion for integration
+  std::function<void()> IntegrationStep;   ///< Pointer function for integration
   void setIntegrator(std::string& Name);   ///< Select the time-integration scheme
   
   // Core CD method (TODO)

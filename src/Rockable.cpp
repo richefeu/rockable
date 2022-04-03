@@ -71,19 +71,37 @@ Rockable::Rockable() {
   ParamsInInterfaces = 0;
   idDensity = properties.add("density");
 
+#ifdef BIND_METHODS
   forceLawPtr = std::bind(&Rockable::forceLawAvalanches, this, std::placeholders::_1);
+#else
+  forceLawPtr = [this](Interaction& I) -> bool { return this->forceLawDefault(I); };
+#endif
   optionNames["forceLaw"] = "Default";
 
+#ifdef BIND_METHODS
   AddOrRemoveInteractions = std::bind(&Rockable::AddOrRemoveInteractions_bruteForce, this, std::placeholders::_1,
                                       std::placeholders::_2, std::placeholders::_3);
+#else
+  AddOrRemoveInteractions = [this](size_t i, size_t j, double dmax) -> int {
+    return this->AddOrRemoveInteractions_bruteForce(i, j, dmax);
+  };
+#endif
   optionNames["AddOrRemoveInteractions"] = "bruteForce";
 
+#ifdef BIND_METHODS
   UpdateNL = std::bind(&Rockable::UpdateNL_bruteForce, this);
+#else
+  UpdateNL = [this]() { this->UpdateNL_bruteForce(); };
+#endif
   optionNames["UpdateNL"] = "bruteForce";
   cellMinSizes.set(1.0, 1.0, 1.0);
   boxForLinkCellsOpt = 0;
 
+#ifdef BIND_METHODS
   IntegrationStep = std::bind(&Rockable::velocityVerletStep, this);
+#else
+  IntegrationStep = [this]() { this->velocityVerletStep(); };
+#endif
   optionNames["Integrator"] = "velocityVerlet";
 
   idKnContact = dataTable.add("knContact");
@@ -890,12 +908,24 @@ void Rockable::loadShapes(const char* fileName) {
 
 void Rockable::setAddOrRemoveInteractions(std::string& Name) {
   if (Name == "bruteForce") {
+#ifdef BIND_METHODS
     AddOrRemoveInteractions = std::bind(&Rockable::AddOrRemoveInteractions_bruteForce, this, std::placeholders::_1,
                                         std::placeholders::_2, std::placeholders::_3);
+#else
+    AddOrRemoveInteractions = [this](size_t i, size_t j, double dmax) -> int {
+      return this->AddOrRemoveInteractions_bruteForce(i, j, dmax);
+    };
+#endif
     optionNames["AddOrRemoveInteractions"] = "bruteForce";
   } else if (Name == "OBBtree") {
+#ifdef BIND_METHODS
     AddOrRemoveInteractions = std::bind(&Rockable::AddOrRemoveInteractions_OBBtree, this, std::placeholders::_1,
                                         std::placeholders::_2, std::placeholders::_3);
+#else
+    AddOrRemoveInteractions = [this](size_t i, size_t j, double dmax) -> int {
+      return this->AddOrRemoveInteractions_OBBtree(i, j, dmax);
+    };
+#endif
     optionNames["AddOrRemoveInteractions"] = "OBBtree";
   } else {
     std::cout << msg::warn() << "AddOrRemoveInteractions " << Name << " is unknown" << msg::normal() << std::endl;
@@ -1111,10 +1141,18 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
 
 void Rockable::setUpdateNL(std::string& Name) {
   if (Name == "bruteForce") {
+#ifdef BIND_METHODS
     UpdateNL = std::bind(&Rockable::UpdateNL_bruteForce, this);
+#else
+    UpdateNL = [this]() { this->UpdateNL_bruteForce(); };
+#endif
     optionNames["UpdateNL"] = "bruteForce";
   } else if (Name == "linkCells") {
+#ifdef BIND_METHODS
     UpdateNL = std::bind(&Rockable::UpdateNL_linkCells, this);
+#else
+    UpdateNL = [this]() { this->UpdateNL_linkCells(); };
+#endif
     optionNames["UpdateNL"] = "linkCells";
   } else {
     std::cout << msg::warn() << "UpdateNL " << Name << " is unknown" << msg::normal() << std::endl;
@@ -1315,13 +1353,25 @@ void Rockable::UpdateNL_linkCells() {
 
 void Rockable::setForceLaw(std::string& lawName) {
   if (lawName == "Default") {
+#if BIND_METHODS
     forceLawPtr = std::bind(&Rockable::forceLawDefault, this, std::placeholders::_1);
+#else
+    forceLawPtr = [this](Interaction& I) -> bool { return this->forceLawDefault(I); };
+#endif
     optionNames["forceLaw"] = "Default";
   } else if (lawName == "Avalanches") {
+#if BIND_METHODS
     forceLawPtr = std::bind(&Rockable::forceLawAvalanches, this, std::placeholders::_1);
+#else
+    forceLawPtr = [this](Interaction& I) -> bool { return this->forceLawAvalanches(I); };
+#endif
     optionNames["forceLaw"] = "Avalanches";
   } else if (lawName == "StickedLinks") {
+#if BIND_METHODS
     forceLawPtr = std::bind(&Rockable::forceLawStickedLinks, this, std::placeholders::_1);
+#else
+    forceLawPtr = [this](Interaction& I) -> bool { return this->forceLawStickedLinks(I); };
+#endif
     optionNames["forceLaw"] = "StickedLinks";
   } else {
     std::cout << msg::warn() << "forceLaw " << lawName << " is unknown" << msg::normal() << std::endl;
@@ -1637,16 +1687,32 @@ bool Rockable::forceLawStickedLinks(Interaction& I) {
 
 void Rockable::setIntegrator(std::string& Name) {
   if (Name == "velocityVerlet") {
+#ifdef BIND_METHODS
     IntegrationStep = std::bind(&Rockable::velocityVerletStep, this);
+#else
+    IntegrationStep = [this]() { this->velocityVerletStep(); };
+#endif
     optionNames["Integrator"] = "velocityVerlet";
   } else if (Name == "Euler") {
+#ifdef BIND_METHODS
     IntegrationStep = std::bind(&Rockable::EulerStep, this);
+#else
+    IntegrationStep = [this]() { this->EulerStep(); };
+#endif
     optionNames["Integrator"] = "Euler";
   } else if (Name == "Beeman") {
+#ifdef BIND_METHODS
     IntegrationStep = std::bind(&Rockable::BeemanStep, this);
+#else
+    IntegrationStep = [this]() { this->BeemanStep(); };
+#endif
     optionNames["Integrator"] = "Beeman";
   } else if (Name == "RungeKutta4") {
+#ifdef BIND_METHODS
     IntegrationStep = std::bind(&Rockable::RungeKutta4Step, this);
+#else
+    IntegrationStep = [this]() { this->RungeKutta4Step(); };
+#endif
     optionNames["Integrator"] = "RungeKutta4";
   } else {
     std::cout << msg::warn() << "Integrator " << Name << " is unknown" << msg::normal() << std::endl;
