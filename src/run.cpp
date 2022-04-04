@@ -54,7 +54,7 @@ int main(int argc, char const* argv[]) {
     TCLAP::CmdLine cmd("This is the comand line interface for Rockable", ' ', "0.3");
     TCLAP::UnlabeledValueArg<std::string> nameArg("input", "Name of the conf-file", true, "conf0", "conf-file");
     TCLAP::ValueArg<int> nbThreadsArg("j", "nbThreads", "Number of threads to be used", false, 1, "int");
-    TCLAP::ValueArg<int> verboseArg("v", "verbose", "Verbose level", false, 0, "int");
+    TCLAP::ValueArg<int> verboseArg("v", "verbose", "Verbose level", false, 4, "int");
 
     cmd.add(nameArg);
     cmd.add(nbThreadsArg);
@@ -69,17 +69,18 @@ int main(int argc, char const* argv[]) {
     std::cerr << "error: " << e.error() << " for argument " << e.argId() << std::endl;
   }
 
-#ifdef _OPENMP
-  omp_set_num_threads(nbThreads);
-  std::cout << "OpenMP acceleration (Number of threads = " << nbThreads << ")\n";
-#else
-  std::cout << "No acceleration" << std::endl;
-  if (nbThreads != 1) std::cout << "nbThreads = 1\n";
-#endif
+
 
   Rockable box;
   box.setVerboseLevel(verboseLevel);
   box.showBanner();
+  
+#ifdef _OPENMP
+  omp_set_num_threads(nbThreads);
+  box.console->info("OpenMP acceleration (Number of threads = {})", nbThreads);
+#else
+  box.console->info("No multithreading");
+#endif
 
   box.loadConf(confFileName.c_str());
   box.initOutputFiles();
@@ -101,10 +102,13 @@ int main(int argc, char const* argv[]) {
   }
 
   std::cout << std::endl << std::endl;
-  std::cout << msg::info() << "COMPUTATION STARTS" << msg::normal() << std::endl;
+
+  box.console->info("INITIAL UPDATE OF NEIGHBOR LIST");
   box.UpdateNL();
+
+  box.console->info("COMPUTATION STARTS");
   box.integrate();
-  std::cout << msg::info() << "COMPUTATION NORMALLY STOPPED" << msg::normal() << std::endl;
+  box.console->info("COMPUTATION NORMALLY STOPPED");
 
   return 0;
 }

@@ -51,9 +51,7 @@ void DrivingSystem::read(bool warn) {
 
   if (!fileTool::fileExists("drivingSystem.txt")) {
     if (warn == true) {
-      std::cout << msg::info() << "No file 'drivingSystem.txt' has been found." << std::endl;
-      std::cout << " >      The first 'nDriven' bodies are frozen (velocities = 0)." << msg::normal() << std::endl
-                << std::endl;
+      spdlog::get("console")->info("No file 'drivingSystem.txt' has been found. The first 'nDriven' bodies are frozen (velocities = 0)");
     }
     return;
   }

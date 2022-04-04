@@ -43,8 +43,9 @@ OPTIONS = -DQUAT_ACC -DnFT_CORR -DnROT_MATRIX -DnBREAK_ONCE -DnCOMPONENTWISE_NUM
 #PNGLINK = `pkg-config --libs libpng`
 
 # Paths
-COMMONPATH = /usr/local/include/toofus
+TOOFUSPATH = /usr/local/include/toofus
 IMGUI_DIR = ./imgui
+SPDLOGPATH = /usr/local/include
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
@@ -52,7 +53,7 @@ ifeq ($(UNAME_S),Darwin)
   CXX = g++-11
   # The list of flags passed to the compiler
   CXXFLAGS := -fopenmp -O3 -Wall -Wextra -Wno-deprecated-declarations -std=c++11
-  CXXFLAGS += -I $(COMMONPATH) $(OPTIONS) $(SVNDEV)
+  CXXFLAGS += -I $(TOOFUSPATH) -I $(SPDLOGPATH) $(OPTIONS) $(SVNDEV)
   CXXFLAGS += `pkg-config --cflags tclap`
 	
   # Link flags for OpenGL and glut
@@ -67,7 +68,7 @@ else
   CXX = g++
   # The list of flags passed to the compiler
   CXXFLAGS := -fopenmp -O3 -std=c++17
-  CXXFLAGS += -I $(COMMONPATH) $(OPTIONS) $(SVNDEV)
+  CXXFLAGS += -I $(TOOFUSPATH) $(OPTIONS) $(SVNDEV)
 	
 	# CXXFLAGS += `pkg-config --cflags tclap`
   # Link flags for OpenGL and glut

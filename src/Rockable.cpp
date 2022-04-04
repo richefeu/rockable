@@ -129,15 +129,46 @@ Rockable::Rockable() {
 
   needUpdate = false;
   interactiveMode = false;
-  verbose = 0;
   glue_with_walls = false;
+
+  console = spdlog::stdout_color_mt("console");
 }
 
+/*
+    trace    =  6
+    debug    =  5
+    info     =  4
+    warn     =  3
+    err      =  2
+    critical =  1
+    off      =  0
+*/
 void Rockable::setVerboseLevel(int v) {
-  if (v > 0) {
-    verbose = v;
-  } else {
-    verbose = 0;
+  switch (v) {
+    case 6:
+      console->set_level(spdlog::level::trace);
+      break;
+    case 5:
+      console->set_level(spdlog::level::debug);
+      break;
+    case 4:
+      console->set_level(spdlog::level::info);
+      break;
+    case 3:
+      console->set_level(spdlog::level::warn);
+      break;
+    case 2:
+      console->set_level(spdlog::level::err);
+      break;
+    case 1:
+      console->set_level(spdlog::level::critical);
+      break;
+    case 0:
+      console->set_level(spdlog::level::off);
+      break;
+    default:
+      console->set_level(spdlog::level::info);
+      break;
   }
 }
 
@@ -165,45 +196,37 @@ bool Rockable::isInteractive() const { return interactiveMode; }
     @brief Print in the terminal a Banner with some information
 */
 void Rockable::showBanner() {
-  std::cout << std::endl;
-  std::cout << std::endl;
-
-  std::cout << msg::bold();
-  std::cout << "Rockable  Copyright (C) 2016-2019  <vincent.richefeu@3sr-grenoble.fr>\n";
+  std::cout << "\n\n";
+  std::cout << "Rockable  Copyright (C) 2016-2022  <vincent.richefeu@3sr-grenoble.fr>\n";
   std::cout << "This program comes with ABSOLUTELY NO WARRANTY.\n";
   std::cout << "This is academic software\n";
   std::cout << "Documentation: "
                "https://richefeu.gitbook.io/cdm/\n\n";
-  std::cout << msg::resetBold();
-
   std::cout << std::endl;
-  std::cout << "Compilation options:\n";
 
 #ifdef QUAT_ACC
-  std::cout << "    QUAT_ACC.............YES\n";
+  console->info("Compilation options: QUAT_ACC = YES");
 #else
-  std::cout << "    QUAT_ACC.............NO\n";
+  console->info("Compilation options: QUAT_ACC = NO");
 #endif
 
 #ifdef FT_CORR
-  std::cout << "    FT_CORR..............YES\n";
+  console->info("Compilation options: FT_CORR = YES");
 #else
-  std::cout << "    FT_CORR..............NO\n";
+  console->info("Compilation options: FT_CORR = NO");
 #endif
 
 #ifdef ROT_MATRIX
-  std::cout << "    ROT_MATRIX...........YES\n";
+  console->info("Compilation options: ROT_MATRIX = YES");
 #else
-  std::cout << "    ROT_MATRIX...........NO\n";
+  console->info("Compilation options: ROT_MATRIX = NO");
 #endif
 
 #ifdef BREAK_ONCE
-  std::cout << "    BREAK_ONCE...........YES (** SHOULD NOT BE USED! **)\n";
+  console->info("Compilation options: BREAK_ONCE = YES (** SHOULD NOT BE USED! **)");
 #else
-  std::cout << "    BREAK_ONCE...........NO\n";
+  console->info("Compilation options: BREAK_ONCE = NO");
 #endif
-
-  std::cout << std::endl;
 }
 
 // ==================================================================================================================
@@ -212,38 +235,25 @@ void Rockable::showBanner() {
 
 void Rockable::initialChecks() {
 
-  if (verbose >= 1) {
-    std::cout << "\n OPTIONS:\n";
-    std::cout << "forceLaw                = " << optionNames["forceLaw"] << '\n';
-    std::cout << "AddOrRemoveInteractions = " << optionNames["AddOrRemoveInteractions"] << '\n';
-    std::cout << "UpdateNL                = " << optionNames["UpdateNL"] << '\n';
-    std::cout << "Integrator              = " << optionNames["Integrator"] << '\n';
-  }
+  console->debug("Option forceLaw is {}", optionNames["forceLaw"]);
+  console->debug("Option AddOrRemoveInteractions is {}", optionNames["AddOrRemoveInteractions"]);
+  console->debug("Option UpdateNL is {}", optionNames["UpdateNL"]);
+  console->debug("Option Integrator is {}", optionNames["Integrator"]);
 
-  if (verbose >= 2) {
-    std::cout << "\n DataTable size " << dataTable.ngroup << "x" << dataTable.ngroup << " for parameters:\n";
-    for (auto& d : dataTable.data_id) {
-      std::cout << "      " << d.first << '\n';
-    }
-  }
+  console->trace("DataTable size {}x{}", dataTable.ngroup, dataTable.ngroup);
 
-  // Always displayed:
   double dtc;
   estimateCriticalTimeStep(dtc);
-  std::cout << msg::info()
-            << "Considering a single contact between two particles\n"
-               "        (this can be done by using a 'ContactPartnership')\n"
-               "  dt_critical / dt = "
-            << dtc / dt << " (estimated)" << std::endl;
+  console->info("Considering a single contact between two particles, dt_critical / dt = {} (estimated)", dtc / dt);
 
   getCriticalTimeStep(dtc);
   if (dtc > 0.0) {
-    std::cout << "  dt_critical / dt = " << dtc / dt << " (over ALL Interactions)" << std::endl;
+    console->info("dt_critical / dt = {} (over ALL Interactions)", dtc / dt);
   }
 
   getCurrentCriticalTimeStep(dtc);
   if (dtc > 0.0) {
-    std::cout << "  dt_critical / dt = " << dtc / dt << " (over ACTIVE Interactions)" << msg::normal() << std::endl;
+    console->info("dt_critical / dt = {} (over ACTIVE Interactions)", dtc / dt);
   }
 }
 
@@ -434,7 +444,7 @@ void Rockable::loadConf(int i) {
 void Rockable::loadConf(const char* name) {
   std::ifstream conf(name);
   if (!conf.is_open()) {
-    std::cerr << msg::warn() << "@Rockable::loadConf, Cannot read " << name << msg::normal() << std::endl;
+    console->warn("@Rockable::loadConf, Cannot read {}", name);
     return;
   }
 
@@ -442,14 +452,13 @@ void Rockable::loadConf(const char* name) {
   std::string prog;
   conf >> prog;
   if (prog != "Rockable") {
-    std::cerr << msg::warn() << "@Rockable::loadConf, This is not a file for the code Rockable!" << msg::normal()
-              << std::endl;
+    console->warn("@Rockable::loadConf, This is not a file for the code Rockable!");
   }
   std::string date;
   conf >> date;
   if (date != CONF_VERSION_DATE) {
-    std::cerr << msg::warn() << "@Rockable::loadConf, The version-date should be '" << CONF_VERSION_DATE << "'!\n"
-              << "                     in most cases, this should not be a problem." << msg::normal() << std::endl;
+    console->warn("@Rockable::loadConf, The version-date should be '{}'\n(in most cases, this should not be a problem)",
+                  CONF_VERSION_DATE);
   }
 
   kwParser parser;
@@ -591,7 +600,7 @@ void Rockable::loadConf(const char* name) {
   parser.kwMap["shapeFile"] = __DO__(conf) {
     std::string wantedLib;
     conf >> wantedLib;
-    std::cout << "wantedLib is " << wantedLib << std::endl;
+    console->info("wantedLib is {}", wantedLib);
     if (wantedLib != shapeFile) {  // it means that the library is not already loaded
       shapeFile = wantedLib;
       loadShapes(shapeFile.c_str());
@@ -615,7 +624,7 @@ void Rockable::loadConf(const char* name) {
   parser.kwMap["Particles"] = __DO__(conf) {
     size_t nb;
     conf >> nb;
-    std::cout << "Number of bodies: " << nb << std::endl;
+    console->info("Number of bodies: {}", nb);
     Particles.clear();
     Particle P;
     std::string shpName;
@@ -651,7 +660,7 @@ void Rockable::loadConf(const char* name) {
   parser.kwMap["Interactions"] = __DO__(conf) {
     size_t nb;
     conf >> nb;
-    std::cout << "Number of interactions: " << nb << std::endl;
+    console->info("Number of interactions: {}", nb);
 
     if (Interactions.size() != Particles.size()) Interactions.resize(Particles.size());
     for (size_t i = 0; i < Particles.size(); ++i) Interactions[i].clear();
@@ -670,7 +679,7 @@ void Rockable::loadConf(const char* name) {
   parser.kwMap["Interfaces"] = __DO__(conf) {
     size_t nbInterf;
     conf >> nbInterf;
-    std::cout << "Number of interfaces: " << nbInterf << std::endl;
+    console->info("Number of interfaces: {}", nbInterf);
 
     if (Interfaces.size() != Particles.size()) Interfaces.resize(Particles.size());
     for (size_t i = 0; i < Particles.size(); ++i) Interfaces[i].clear();
@@ -696,8 +705,8 @@ void Rockable::loadConf(const char* name) {
           BI.concernedBonds[u] = const_cast<Interaction*>(std::addressof(*it));
         } else {
           missed = true;
-          std::cerr << msg::warn() << "Cannot find interaction: " << ItoFind.i << " " << ItoFind.j << " "
-                    << ItoFind.type << " " << ItoFind.isub << " " << ItoFind.jsub << msg::normal() << std::endl;
+          console->warn("Cannot find interaction: i={} j={} type={} isub={} jsub={}", ItoFind.i, ItoFind.j,
+                        ItoFind.type, ItoFind.isub, ItoFind.jsub);
         }
       }
       // Connection of the BreakableInterface with the Interactions
@@ -717,9 +726,10 @@ void Rockable::loadConf(const char* name) {
     std::string ExtractorName;
     conf >> ExtractorName;
 
-    std::cerr << msg::warn() << "The DataExtractor named " << ExtractorName
-              << " is defined in the input file! It will not be saved in conf-files\n"
-              << "A better solution is to put them in a file named 'dataExtractors.txt'" << msg::normal() << std::endl;
+    console->warn(
+        "The DataExtractor named {} is defined in the input file! It will not be saved in conf-files\nA better "
+        "solution is to put them in a file named 'dataExtractors.txt'",
+        ExtractorName);
 
     DataExtractor* DE = Factory<DataExtractor>::Instance()->Create(ExtractorName);
     if (DE != nullptr) {
@@ -727,8 +737,7 @@ void Rockable::loadConf(const char* name) {
       DE->read(conf);
       dataExtractors.push_back(DE);
     } else {
-      std::cerr << msg::warn() << "The DataExtractor named " << ExtractorName << " is unknown!" << msg::normal()
-                << std::endl;
+      console->warn("The DataExtractor named {} is unknown", ExtractorName);
     }
   };
   parser.kwMap["BodyForce"] = __DO__(conf) {
@@ -741,13 +750,9 @@ void Rockable::loadConf(const char* name) {
       BF->plug(this);
       BF->read(conf);
       bodyForce = BF;
-      if (verbose == 1) {
-        std::cout << msg::info() << "The BodyForce named " << BodyForceName << " has been activated" << msg::normal()
-                  << std::endl;
-      }
+      console->trace("The BodyForce named {} has been activated", BodyForceName);
     } else {
-      std::cerr << msg::warn() << "The BodyForce named " << BodyForceName << " is unknown!" << msg::normal()
-                << std::endl;
+      console->warn("The BodyForce named {} is unknown!", BodyForceName);
     }
   };
 
@@ -847,8 +852,7 @@ void Rockable::readDataExtractors() {
         DE->read(is);
         dataExtractors.push_back(DE);
       } else {
-        std::cerr << msg::warn() << "The DataExtractor named " << ExtractorName << " is unknown!" << msg::normal()
-                  << std::endl;
+        console->warn("The DataExtractor named {} is unknown!", ExtractorName);
       }
     }
     is >> ExtractorName;
@@ -869,9 +873,7 @@ void Rockable::loadShapes(const char* fileName) {
   }
 
   if (!fileTool::fileExists(ModFileName.c_str())) {
-    std::cerr << msg::warn() << "@Rockable::loadShapes, shape library named '" << ModFileName << "' has not been found."
-              << msg::normal() << std::endl
-              << std::endl;
+    console->warn("@Rockable::loadShapes, shape library named '{}' has not been found", ModFileName);
     return;
   }
 
@@ -894,7 +896,7 @@ void Rockable::loadShapes(const char* fileName) {
     is >> token;
   }
 
-  std::cout << "Number of shapes found in the library file " << ModFileName << ": " << Shapes.size() << std::endl;
+  console->info("Number of shapes found in the library file {}: {}", ModFileName, Shapes.size());
 
   for (size_t s = 0; s < Shapes.size(); ++s) {
     Shapes[s].buildOBBtree();
@@ -928,8 +930,8 @@ void Rockable::setAddOrRemoveInteractions(std::string& Name) {
 #endif
     optionNames["AddOrRemoveInteractions"] = "OBBtree";
   } else {
-    std::cout << msg::warn() << "AddOrRemoveInteractions " << Name << " is unknown" << msg::normal() << std::endl;
-    std::cout << "Option remains: AddOrRemoveInteractions = " << optionNames["AddOrRemoveInteractions"] << std::endl;
+    console->warn("AddOrRemoveInteractions {} is unknown, Option remains: AddOrRemoveInteractions = {}", Name,
+                  optionNames["AddOrRemoveInteractions"]);
   }
 }
 
@@ -1155,8 +1157,7 @@ void Rockable::setUpdateNL(std::string& Name) {
 #endif
     optionNames["UpdateNL"] = "linkCells";
   } else {
-    std::cout << msg::warn() << "UpdateNL " << Name << " is unknown" << msg::normal() << std::endl;
-    std::cout << "Option remains: UpdateNL = " << optionNames["UpdateNL"] << std::endl;
+    console->warn("UpdateNL {} is unknown, Option remains: UpdateNL = {}", Name, optionNames["UpdateNL"]);
   }
 }
 
@@ -1374,8 +1375,7 @@ void Rockable::setForceLaw(std::string& lawName) {
 #endif
     optionNames["forceLaw"] = "StickedLinks";
   } else {
-    std::cout << msg::warn() << "forceLaw " << lawName << " is unknown" << msg::normal() << std::endl;
-    std::cout << "Option remains: forceLaw = " << optionNames["forceLaw"] << std::endl;
+    console->warn("forceLaw {} is unknown, Option remains: forceLaw = {}", lawName, optionNames["forceLaw"]);
   }
 }
 
@@ -1715,8 +1715,7 @@ void Rockable::setIntegrator(std::string& Name) {
 #endif
     optionNames["Integrator"] = "RungeKutta4";
   } else {
-    std::cout << msg::warn() << "Integrator " << Name << " is unknown" << msg::normal() << std::endl;
-    std::cout << "Option remains: Integrator = " << optionNames["Integrator"] << std::endl;
+    console->warn("Integrator {} is unknown, Option remains: Integrator = {}", Name, optionNames["Integrator"]);
   }
 }
 
@@ -2337,9 +2336,7 @@ void Rockable::RungeKutta4Step() {
 */
 void Rockable::integrate() {
   if (interactiveMode == true) [[unlikely]] {
-    std::cout << "It is not possible to invoke Rockable::integrate if "
-                 "interactiveMode is true"
-              << std::endl;
+    console->warn("It is not possible to invoke Rockable::integrate if interactiveMode is true");
     return;
   }
 
@@ -2363,14 +2360,21 @@ void Rockable::integrate() {
   dt2_6 = dt2 / 6.0;
   dt_6 = dt / 6.0;
 
+  console->trace("initIntegrator");
   initIntegrator();
 
   // Save the current configuration
+  int frameWidth = 80;
+  fmt::print("┌{0:─^{1}}┐\n", "", frameWidth);
+  fmt::print("│{0: <{1}}│\n", "  Initial configuration", frameWidth);
+  fmt::print("│{0: <{1}}│\n", fmt::format("  iconf: {:<6d}   Time: {:<13.8e}", iconf, t), frameWidth);
+  fmt::print("└{0:─^{1}}┘\n", "", frameWidth);
+  console->trace("start saving first conf");
   saveConf(iconf);
-  std::cout << "#  iconf = " << iconf << ", Time = " << t << std::endl;
+  console->trace("end saving first conf");
 
   PerfTimer ptimer;
-  size_t step = (size_t)(t / dt);  // suppose that the time-step has not been changed
+  size_t step = (size_t)(t / dt); // suppose that the time-step has not been changed
   timeInUpdateNL = 0.0;
   timeInForceComputation = 0.0;
 
@@ -2386,47 +2390,62 @@ void Rockable::integrate() {
     if (interConfC >= interConf - dt_2) [[unlikely]] {
       iconf++;
 
-      std::cout << msg::normal();
-      std::cout << "+-----------------------------------------------------------------------------------\n";
-      std::cout << "|  #iconf = " << iconf << ", Time = " << t << '\n';
       double elapsedTime = ptimer.getIntermediateElapsedTimeSeconds();
-      double NLPercent = std::round(1000.0 * timeInUpdateNL / elapsedTime) /
-                         10.0;  // It's a way to obtain a 1/10 precision (in percents)
+
+      // following 2 lines is a way to obtain a 1/10 precision (in percents)
+      double NLPercent = std::round(1000.0 * timeInUpdateNL / elapsedTime) / 10.0;
       double ForcePercent = std::round(1000.0 * timeInForceComputation / elapsedTime) / 10.0;
-      std::cout << "|   Elapsed time since last configuration: " << msg::HumanReadableSeconds(elapsedTime) << '\n';
-      std::cout << "|   " << __printNamedCell(10, "%NL:", 13, NLPercent)
-                << __printNamedCell(13, "%Forces:", 13, ForcePercent)
-                << __printNamedCell(13, "%Rest:", 13, 100.0 - NLPercent - ForcePercent) << '\n';
-
-      double efficiency = interConf / elapsedTime;
-      perfFile << t << " " << efficiency << " " << NLPercent << " " << ForcePercent << '\n' << std::flush;
-
       timeInUpdateNL = 0.0;
       timeInForceComputation = 0.0;
 
+      double efficiency = interConf / elapsedTime;
+      perfFile << t << ' ' << efficiency << ' ' << NLPercent << ' ' << ForcePercent << '\n' << std::flush;
+
       double Fmax, F_fnmax, Fmean, Fstddev;
       getResultantQuickStats(Fmax, F_fnmax, Fmean, Fstddev, nDriven);
-      std::cout << "|   Resultant forces on particles:\n|   " << __printNamedCell(13, "Fmax:", 13, Fmax)
-                << __printNamedCell(13, "Fmean:", 13, Fmean) << __printNamedCell(13, "Fstddev:", 13, Fstddev) << '\n';
+
       double fnMin, fnMax, fnMean, fnStddev;
       getInteractionQuickStats(fnMin, fnMax, fnMean, fnStddev);
-      std::cout << "|   Interaction forces:\n|   " << __printNamedCell(13, "fnMin:", 13, fnMin)
-                << __printNamedCell(13, "fnMax:", 13, fnMax) << "\n|   " << __printNamedCell(13, "fnMean:", 13, fnMean)
-                << __printNamedCell(13, "fnStddev:", 13, fnStddev) << '\n';
+
+      // Display a frame with some values
+      fmt::print("┌{0:─^{1}}┐\n", "", frameWidth);
+      fmt::print("│{0: <{1}}│\n", fmt::format("  iconf: {:<6d}   Time: {:<13.8e}", iconf, t), frameWidth);
+      fmt::print(
+          "│{0: <{1}}│\n",
+          fmt::format("  Elapsed time since last configuration: {:<20s}", msg::HumanReadableSeconds(elapsedTime)),
+          frameWidth);
+      fmt::print("│{0: <{1}}│\n",
+                 fmt::format("  Neighbor List: {:>6.2f}%   Forces: {:>6.2f}%   Other: {:>6.2f}% ", NLPercent,
+                             ForcePercent, 100.0 - NLPercent - ForcePercent),
+                 frameWidth);
+
+      fmt::print("│{0: <{1}}│\n", "  Resultant forces on particles:", frameWidth);
+      fmt::print("│{0: <{1}}│\n",
+                 fmt::format("    Fmax: {:<13.8e}   Fmean: {:<13.8e}   Fstddev: {:<13.8e} ", Fmax, Fmean, Fstddev),
+                 frameWidth);
+
+      fmt::print("│{0: <{1}}│\n", "  Interaction forces:", frameWidth);
+      fmt::print("│{0: <{1}}│\n", fmt::format("    fnMin: {:<13.8e}   fnMax: {:<13.8e} ", fnMin, fnMax), frameWidth);
+      fmt::print("│{0: <{1}}│\n", fmt::format("    fnMean: {:<13.8e}   fnStddev: {:<13.8e} ", fnMean, fnStddev),
+                 frameWidth);
 
       if (fnMax != 0.0 && fnMean != 0.0) {
         double Fmax_fnMean = fabs(Fmax / fnMean);
-        std::cout << "|   Static balance:\n|   " << __printNamedCell(13, "max(F/fnMax):", 13, F_fnmax)
-                  << __printNamedCell(13, "Fmax/fnMean:", 13, Fmax_fnMean) << '\n';
-        staticBalanceFile << t << " " << F_fnmax << " " << Fmax_fnMean << '\n' << std::flush;
+        fmt::print("│{0: <{1}}│\n", "  Static balance:", frameWidth);
+        fmt::print("│{0: <{1}}│\n",
+                   fmt::format("    max(F/fnMax): {:<13.8e}   Fmax/fnMean: {:<13.8e}", F_fnmax, Fmax_fnMean),
+                   frameWidth);
+        staticBalanceFile << t << ' ' << F_fnmax << ' ' << Fmax_fnMean << '\n' << std::flush;
       }
 
       double Etrans, Erot;
       getKineticEnergy(Etrans, Erot);
-      std::cout << "|   Kinetic energy:\n|   " << __printNamedCell(13, "Etrans:", 13, Etrans)
-                << __printNamedCell(13, "Erot:", 13, Erot) << '\n';
-      kineticEnergyFile << t << " " << Etrans << " " << Erot << '\n' << std::flush;
-      std::cout << "+-----------------------------------------------------------------------------------\n\n";
+
+      fmt::print("│{0: <{1}}│\n", "  Kinetic energy:", frameWidth);
+      fmt::print("│{0: <{1}}│\n", fmt::format("    Etrans: {:<13.8e}   Erot: {:<13.8e}", Etrans, Erot), frameWidth);
+      kineticEnergyFile << t << ' ' << Etrans << ' ' << Erot << '\n' << std::flush;
+      
+      fmt::print("└{0:─^{1}}┘\n", "", frameWidth);
 
       saveConf(iconf);
 
@@ -3148,10 +3167,9 @@ void Rockable::getResultantQuickStats(double& Fmax, double& F_fnmax, double& Fme
   }
 
   // Computation of the standard deviation of resultant forces
+  Fstddev = 0.0;
   if (n > 1) {
     Fmean /= (double)n;
-
-    Fstddev = 0.0;
     for (size_t i = first; i <= last; i++) {
       if (nbCtc[i] <= 1) continue;
       F = norm(Particles[i].force);
@@ -3507,8 +3525,7 @@ void Rockable::stickClusters(double epsilonDist) {
   }
 
   if (ctc_packets.empty()) {
-    std::cout << msg::info() << "@Rockable::stickClusters, No possible glued points, ctc_packets is empty.\n"
-              << msg::normal();
+    console->info("@Rockable::stickClusters, No possible glued points, ctc_packets is empty");
     return;
   }
 

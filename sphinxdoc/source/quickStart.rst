@@ -67,7 +67,7 @@ The compilation is managed by a makefile that should be similar to that one:
      $(CXX) $(CXXFLAGS) -c $< -Wno-deprecated
      $(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(GLLINK)
 
-As we can see, 3 options can be set at compile time: QUAT_ACC, FT_CORR and ROT_MATRIX. To disable an option it is advised to rename it by adding a letter 'n' at the beginning.
+As we can see, some options can be set at compile time: QUAT_ACC, FT_CORR, ROT_MATRIX, BREAK_ONCE, COMPONENTWISE_NUM_DAMPING, and BIND_METHODS. To disable an option it is advised to rename it by adding a letter 'n' at the beginning.
 
 - QUAT_ACC: with this option, the angular position (given by a quaternion) 
   is updated by accounting as prescribed by the chose intergator. 
@@ -78,9 +78,14 @@ As we can see, 3 options can be set at compile time: QUAT_ACC, FT_CORR and ROT_M
 - ROT_MATRIX: with this option, the computation of the angular accelerations 
   uses rotation matrices instead of quaternion
 
+- BREAK_ONCE: this option allows cohesive (solid) bonds belonging to the same interface to break one by one
+
+- COMPONENTWISE_NUM_DAMPING: it activates the component-wise numerical damping (so called Cundall damping)
+
+- BIND_METHODS: the options are class methods that can be plug with binding or using lambdas  
 
 Depending on the computer you use (Apple or PC with Linux) CXX, CXXFLAGS and GLLINK have to be set in the right section for setting, respectively, the compiler name, the options of compilation, and the options of linkage with openGL.
-The rest of the file should normally never be changed.
+The rest of the file should normally not be changed.
 Finally, the applications run and see can be compiled with the following command:
 
 .. code-block:: sh

@@ -50,6 +50,11 @@
 #include <utility>
 #include <vector>
 
+#define SPGLOG_HEADER_ONLY
+#define FMT_HEADER_ONLY
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -135,7 +140,7 @@ class Rockable {
   // Other parameters
   int iconf;                ///< Current configuration ID
   AABB aabb;                ///< Axis Aligned Bounding Box (AABB) of the entire sample
-  std::vector<AABB> paabb;  ///< AABB associated to each particle (evolves during computation)
+  std::vector<AABB> paabb;  ///< AABBs of all particles
   vec3r gravity;            ///< Gravity acceleration
   int ParamsInInterfaces;   ///< Flag saying if the parameters for sticked blonds
                             ///< are embedded within the interfaces
@@ -255,7 +260,8 @@ class Rockable {
                                                           ///< saveConf
 
   bool interactiveMode;  ///< computation (false) or visualization (true) modes
-  int verbose;
+
+  std::shared_ptr<spdlog::logger> console;
 
   // Some predefined identifiers to get (quickly) data from input tables
   size_t idDensity;  ///< Identifier of the density parameter
