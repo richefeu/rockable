@@ -367,8 +367,8 @@ void drawTube(double origx, double origy, double origz, double arrowx, double ar
 void drawParticles() {
   if (mouse_mode != NOTHING && spheres.size() > 2000) return;
 
-  //glColor3f(0.1f, 0.6f, 0.6f);
-  //glColor3f(1.0f, 0.0f, 1.0f);
+  // glColor3f(0.1f, 0.6f, 0.6f);
+  // glColor3f(1.0f, 0.0f, 1.0f);
   glColor3f(0.337254901960784, 0.505882352941176, 0.768627450980392);
 
   glEnable(GL_LIGHTING);
@@ -429,6 +429,19 @@ bool fileExists(const char* fileName) {
   return false;
 }
 
+void bounding_box() {
+  xmin = ymin = zmin = 1e20;
+  xmax = ymax = zmax = -1e20;
+  for (size_t i = 0; i < spheres.size(); ++i) {
+    if (spheres[i].x - spheres[i].r < xmin) xmin = spheres[i].x - spheres[i].r;
+    if (spheres[i].y - spheres[i].r < ymin) ymin = spheres[i].y - spheres[i].r;
+    if (spheres[i].z - spheres[i].r < zmin) zmin = spheres[i].z - spheres[i].r;
+    if (spheres[i].x + spheres[i].r > xmax) xmax = spheres[i].x + spheres[i].r;
+    if (spheres[i].y + spheres[i].r > ymax) ymax = spheres[i].y + spheres[i].r;
+    if (spheres[i].z + spheres[i].r > zmax) zmax = spheres[i].z + spheres[i].r;
+  }
+}
+
 void readSpheres(const char* name) {
   if (!fileExists(name)) {
     std::cout << name << " does not exist" << std::endl;
@@ -438,8 +451,8 @@ void readSpheres(const char* name) {
   std::cout << "Read " << name << std::endl;
   std::ifstream is(name);
 
-  is >> xmin >> ymin >> zmin;
-  is >> xmax >> ymax >> zmax;
+  //is >> xmin >> ymin >> zmin;
+  //is >> xmax >> ymax >> zmax;
 
   while (is.good()) {
     Sphere S;
@@ -451,6 +464,7 @@ void readSpheres(const char* name) {
   }
   if (spheres.empty()) return;
   std::cout << "Number of spheres: " << spheres.size() << std::endl;
+  bounding_box();
 }
 
 // =====================================================================

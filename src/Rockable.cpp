@@ -444,7 +444,7 @@ void Rockable::loadConf(int i) {
 void Rockable::loadConf(const char* name) {
   std::ifstream conf(name);
   if (!conf.is_open()) {
-    console->warn("@Rockable::loadConf, Cannot read {}", name);
+    console->warn("@Rockable::loadConf, cannot read {}", name);
     return;
   }
 
@@ -452,12 +452,12 @@ void Rockable::loadConf(const char* name) {
   std::string prog;
   conf >> prog;
   if (prog != "Rockable") {
-    console->warn("@Rockable::loadConf, This is not a file for the code Rockable!");
+    console->warn("@Rockable::loadConf, this doesn't seem to be a file for the code Rockable!");
   }
   std::string date;
   conf >> date;
   if (date != CONF_VERSION_DATE) {
-    console->warn("@Rockable::loadConf, The version-date should be '{}'\n(in most cases, this should not be a problem)",
+    console->warn("@Rockable::loadConf, the version-date should be '{}'\n(in most cases, this should not be a problem)",
                   CONF_VERSION_DATE);
   }
 
@@ -636,7 +636,7 @@ void Rockable::loadConf(const char* name) {
         --i;
         continue;
       }
-      if (shpName[0] == '!') {  // to 'remove' a line of particle (the number of
+      if (shpName[0] == '!') {  // to 'disable' a line of particle (the number of
                                 // particles is decreased but you don't need to change
                                 // the number of particles in the input file)
         std::string trash;
@@ -758,6 +758,7 @@ void Rockable::loadConf(const char* name) {
 
   // ======== FROM HERE, THESE ARE PREPRO COMMANDS (not saved in further conf-files)
   //          They are generally put at the end of the input file
+  //          so that they apply on a system already set
 
   parser.kwMap["stickVerticesInClusters"] = __DO__(conf) {
     double epsilonDist;
@@ -1118,7 +1119,7 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
         addOrRemoveSingleInteraction(i, j, isub, vvType, jsub, Particle::VertexIsNearVertex);
       } else if (j_nbPoints == 2) {  // vertex (i, isub) -> edge (j, jsub)
         addOrRemoveSingleInteraction(i, j, isub, veType, jsub, Particle::VertexIsNearEdge);
-      } else if (j_nbPoints == 3) {  // vertex (i, isub) -> face (j, jsub)
+      } else if (j_nbPoints >= 3) {  // vertex (i, isub) -> face (j, jsub)
         addOrRemoveSingleInteraction(i, j, isub, vfType, jsub, Particle::VertexIsNearFace);
       }
     } else if (i_nbPoints == 2) {
@@ -1127,9 +1128,10 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
       } else if (j_nbPoints == 2) {  // vertex (i, isub) -> edge (j, jsub)
         addOrRemoveSingleInteraction(i, j, isub, eeType, jsub, Particle::EdgeIsNearEdge);
       }
-    } else if (i_nbPoints == 3) {
-      addOrRemoveSingleInteraction(j, i, jsub, vfType, isub, Particle::VertexIsNearFace);
-      // vertex (j, jsub) -> face (i, isub)
+    } else if (i_nbPoints >= 3) {
+      if (j_nbPoints == 1) {  // vertex (j, jsub) -> face (i, isub)
+        addOrRemoveSingleInteraction(j, i, jsub, vfType, isub, Particle::VertexIsNearFace);
+      }
     }
 
   }  // end loop over intersections

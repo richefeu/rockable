@@ -33,23 +33,23 @@ unsigned int seed = 3503; //  3503 143502  29292983  26
 // =========================================================
 int containerType = CONTAINER_CYL;
 int nSecCyl = 18;                  // number of sectors of the cylindrical container
-double baseLength = 3.5e-2;        // diameter of cylindrical container or squared baselength of rectangular container
-double R = 0.5e-3;                 // radius of the sticks
-int distriMode = DISTRI_MODE_TAB;  // 0: uniform in [Lmin Lmax]; 1: length defined in LDefTab[] and Lrate[]
+double baseLength = 7e-2;        // diameter of cylindrical container or squared baselength of rectangular container
+double R = 1e-3;                 // radius of the sticks
+int distriMode = DISTRI_MODE_UNIF;  // 0: uniform in [Lmin Lmax]; 1: length defined in LDefTab[] and Lrate[]
 
 // for uniformly distributed lengths
-double Lmax = 10.0e-3;
-double Lmin = 5e-3;
+double Lmax = 2.5e-2;
+double Lmin = 2.5e-2;
 
 // for tabulated lengths
 int nbLen = 1;                // number of different lengths
 double LDefTab[] = {1.5e-3};  // lengths (largest first)
 int Lrate[] = {100};          // percentages
 
-size_t nb_tubes = 10000;
-size_t nb_trials_max = nb_tubes * 50;
+size_t nb_tubes = 1000;
+size_t nb_trials_max = nb_tubes * 100;
 
-double SolidFractionTarget = 0.2;  // the algorithm will do its best for obtaining this solid fraction
+double SolidFractionTarget = 0.08;  // the algorithm will do its best for obtaining this solid fraction
 int sortBottomTop = SORT_AFTER;
 int nbPostCompact = 0;
 // =========================================================
@@ -101,8 +101,8 @@ void save_pack(const char* fname, vector<tube>& g, double xmin, double ymin, dou
   if (fog) {
     fog.precision(5);
     fog << scientific;
-    fog << xmin << ' ' << ymin << ' ' << zmin << "\n";
-    fog << xmax << ' ' << ymax << ' ' << zmax << "\n";
+    //fog << xmin << ' ' << ymin << ' ' << zmin << "\n";
+    //fog << xmax << ' ' << ymax << ' ' << zmax << "\n";
     for (int i = 0; i < g.size(); i++) {
       fog << g[i].x0 << " " << g[i].y0 << " " << g[i].z0 << " " << g[i].x1 << " " << g[i].y1 << " " << g[i].z1 << " "
           << g[i].R << endl;

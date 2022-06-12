@@ -470,10 +470,10 @@ void Shape::buildOBBtree() {
   for (size_t f = 0; f < face.size(); ++f) {
     OBBbundle<subBox> bundle;
     bundle.data.isub = (int)f;
-    bundle.data.nbPoints = 3;
-    bundle.points.push_back(vertex[face[f][0]]);
-    bundle.points.push_back(vertex[face[f][1]]);
-    bundle.points.push_back(vertex[face[f][2]]);
+    bundle.data.nbPoints = (int)(face[f].size());
+    for (size_t vf = 0; vf < face[f].size(); ++vf) {
+      bundle.points.push_back(vertex[face[f][vf]]);
+    }
     std::vector<OBBbundle<subBox>> singleOBB;
     singleOBB.push_back(bundle);
     bundle.obb = OBBtree<subBox>::fitOBB(singleOBB, radius);

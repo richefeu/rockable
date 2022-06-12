@@ -79,6 +79,7 @@ void rotatePoint(double p_x, double p_y, double p_z, double center_x, double cen
                  double axis_y, double axis_z, double& ret_x, double& ret_y, double& ret_z, double theta);
 void adjust_clipping_plans();
 void fit_view();
+void bounding_box();
 bool fileExists(const char* fileName);
 void readTubes(int num);
 

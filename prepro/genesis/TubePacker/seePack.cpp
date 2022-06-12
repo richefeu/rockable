@@ -436,17 +436,36 @@ bool fileExists(const char* fileName) {
   return false;
 }
 
+void bounding_box() {
+  xmin = ymin = zmin = 1e20;
+  xmax = ymax = zmax = -1e20;
+  for (size_t i = 0; i < tubes.size(); ++i) {
+    if (tubes[i].x0 - tubes[i].r < xmin) xmin = tubes[i].x0 - tubes[i].r;
+    if (tubes[i].y0 - tubes[i].r < ymin) ymin = tubes[i].y0 - tubes[i].r;
+    if (tubes[i].z0 - tubes[i].r < zmin) zmin = tubes[i].z0 - tubes[i].r;
+    if (tubes[i].x0 + tubes[i].r > xmax) xmax = tubes[i].x0 + tubes[i].r;
+    if (tubes[i].y0 + tubes[i].r > ymax) ymax = tubes[i].y0 + tubes[i].r;
+    if (tubes[i].z0 + tubes[i].r > zmax) zmax = tubes[i].z0 + tubes[i].r;
+    if (tubes[i].x1 - tubes[i].r < xmin) xmin = tubes[i].x1 - tubes[i].r;
+    if (tubes[i].y1 - tubes[i].r < ymin) ymin = tubes[i].y1 - tubes[i].r;
+    if (tubes[i].z1 - tubes[i].r < zmin) zmin = tubes[i].z1 - tubes[i].r;
+    if (tubes[i].x1 + tubes[i].r > xmax) xmax = tubes[i].x1 + tubes[i].r;
+    if (tubes[i].y1 + tubes[i].r > ymax) ymax = tubes[i].y1 + tubes[i].r;
+    if (tubes[i].z1 + tubes[i].r > zmax) zmax = tubes[i].z1 + tubes[i].r;
+  }
+}
+
 void readTubes(const char* name) {
   if (!fileExists(name)) {
     std::cout << name << " does not exist" << std::endl;
     return;
   }
 
-  std::cout << "Read " << name << std::endl;
+  std::cout << "Read " << name << '\n';
   std::ifstream is(name);
 
-  is >> xmin >> ymin >> zmin;
-  is >> xmax >> ymax >> zmax;
+  //is >> xmin >> ymin >> zmin;
+  //is >> xmax >> ymax >> zmax;
 
   while (is.good()) {
     Tube S;
@@ -457,7 +476,8 @@ void readTubes(const char* name) {
     if (is.eof()) break;
   }
   if (tubes.empty()) return;
-  std::cout << "Number of tubes: " << tubes.size() << std::endl;
+  std::cout << "Number of tubes: " << tubes.size() << '\n';
+  bounding_box();
 }
 
 // =====================================================================

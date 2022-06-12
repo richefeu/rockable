@@ -6,7 +6,7 @@ The conf-files are the files that hold the whole configuration at a given time. 
 
  1. for defining the initial configuration and parameters of a simulation, 
  2. for running some preprocessing commands,
- 3. for saving the history of a simulation. The keywords are defined in the following.
+ 3. for saving periodically the history of a simulation. The keywords are defined in the following.
 
 Header
 ------
@@ -36,7 +36,7 @@ Neighbor list (``NL``)
 
 - ``DVerlet`` (*double*) **value**  
   Distance to define if two sphero-polyhedra are neighbors. 
-  This the length added to the OBBs before testing if they overlap.
+  This is the length added to the OBBs before testing if they overlap.
   In other words, half this length is added at each side of the OBBs.
 
 - ``dVerlet`` (*double*) **value**  

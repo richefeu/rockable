@@ -182,7 +182,7 @@ The shape-file as described in the section Syntax for shape-files is a file name
    I/m 0.00493333 0.00493333 0.0032
    >
 
-Supposing that the executable named run stands in the same folder as the configuration and shape files, the simulation is launched that way:
+Supposing that the executable named ``run`` stands in the same folder as the configuration and shape files, the simulation is launched that way:
 
 .. code-block:: sh
    
@@ -195,6 +195,12 @@ If the executable has been compiled with openMP abilities, the number of threads
    ./run bouncingSphere.txt -j 24
 
 In this particular example, it is clearly not a good idea to use so much threads because the number of particles is to small and the computation duration will be worst.
+
+The verbosity of logs is set with a number that way (highest number is highest verbosity):
+
+.. code-block:: sh
+
+  ./run bouncingSphere.txt -v xx
 
 Visualising the simulations
 ---------------------------

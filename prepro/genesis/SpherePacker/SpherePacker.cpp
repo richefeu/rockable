@@ -56,8 +56,8 @@ void save_pack(const char* fname, vector<sphere>& g, double xmin, double ymin, d
   if (fog) {
     fog.precision(5);
     fog << scientific;
-    fog << xmin << ' ' << ymin << ' ' << zmin << "\n";
-    fog << xmax << ' ' << ymax << ' ' << zmax << "\n";
+    //fog << xmin << ' ' << ymin << ' ' << zmin << "\n";
+    //fog << xmax << ' ' << ymax << ' ' << zmax << "\n";
     for (int i = 0; i < g.size(); i++) {
       fog << g[i].x << " " << g[i].y << " " << g[i].z << " " << g[i].R << endl;
     }
