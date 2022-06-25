@@ -43,7 +43,7 @@ OPTIONS = -DQUAT_ACC -DnFT_CORR -DnROT_MATRIX -DnBREAK_ONCE -DnCOMPONENTWISE_NUM
 #PNGLINK = `pkg-config --libs libpng`
 
 # Paths
-TOOFUSPATH = /usr/local/include/toofus
+TOOFUSPATH = ~/toofus
 IMGUI_DIR = ./imgui
 SPDLOGPATH = /usr/local/include
 
@@ -60,9 +60,9 @@ ifeq ($(UNAME_S),Darwin)
   GLUTFLAGS = `pkg-config --cflags glut`
   GLUTLINK = `pkg-config --libs glut` -framework OpenGL
 	
-	# need to install glfw3 with brew: 'brew install glfw3'
-	GLFWFLAGS = `pkg-config --cflags glfw3`
-	GLFWLINK = -framework OpenGL `pkg-config --libs glfw3`
+  # need to install glfw3 with brew: 'brew install glfw3'
+  GLFWFLAGS = `pkg-config --cflags glfw3`
+  GLFWLINK = -framework OpenGL `pkg-config --libs glfw3`
 else
   # The compiler to be used
   CXX = g++
@@ -70,9 +70,12 @@ else
   CXXFLAGS := -fopenmp -O3 -std=c++17
   CXXFLAGS += -I $(TOOFUSPATH) $(OPTIONS) $(SVNDEV)
 	
-	# CXXFLAGS += `pkg-config --cflags tclap`
+  # CXXFLAGS += `pkg-config --cflags tclap`
   # Link flags for OpenGL and glut
   GLUTLINK = -lGLU -lGL -L/usr/X11R6/lib -lglut -lXmu -lXext -lX11 -lXi
+  
+  GLFWFLAGS = `pkg-config --cflags glfw3`
+  GLFWLINK = -lGLU -lGL `pkg-config --libs glfw3`
 endif
 
 
