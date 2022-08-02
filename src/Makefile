@@ -42,17 +42,22 @@ OPTIONS = -DQUAT_ACC -DnFT_CORR -DnROT_MATRIX -DnBREAK_ONCE -DnCOMPONENTWISE_NUM
 #PNGFLAGS = -DPNG_H `pkg-config --cflags libpng`
 #PNGLINK = `pkg-config --libs libpng`
 
+# For the compilation, toofus is required. 
+# It can be installed with the following command: 
+#    cd ~ && rm -rf toofus && git clone https://github.com/richefeu/toofus.git && cd -
+
 # Paths
-TOOFUSPATH = /usr/local/include/toofus
+TOOFUSPATH = ~/toofus
 IMGUI_DIR = ./imgui
 SPDLOGPATH = /usr/local/include
+CHAISCRIPTPATH = ~/ChaiScript-6.1.0/include
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
   # The compiler to be used
   CXX = g++-11
   # The list of flags passed to the compiler
-  CXXFLAGS := -fopenmp -O3 -Wall -Wextra -Wno-deprecated-declarations -std=c++11
+  CXXFLAGS := -fopenmp -O3 -Wall -Wextra -Wno-deprecated-declarations -std=c++17
   CXXFLAGS += -I $(TOOFUSPATH) -I $(SPDLOGPATH) $(OPTIONS) $(SVNDEV)
   CXXFLAGS += `pkg-config --cflags tclap`
 	
@@ -135,6 +140,11 @@ format:
 # The application that runs a simulation
 run: run.cpp $(HEADERS) $(SOURCES) $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS)
+	
+# Scripting with chaiscript
+script: script.cpp $(HEADERS) $(SOURCES) $(OBJECTS)
+	$(CXX) $(CXXFLAGS) -I $(CHAISCRIPTPATH)  -c $<
 	$(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS)
 
 # An application for post-processing the conf-files

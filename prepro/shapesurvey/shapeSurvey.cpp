@@ -145,6 +145,21 @@ void keyboard(unsigned char Key, int x, int y) {
       maxOBBLevel = 0;
       Shapes[ishape].buildOBBtree();
     } break;
+    
+    case 'w': {
+      vec3r axis = center - eye;
+      axis.normalize();
+      
+      up = rotatePoint(up, eye, axis, -0.005 * M_PI);
+      up.normalize();
+    } break;
+    case 'W': {
+      vec3r axis = center - eye;
+      axis.normalize();
+      
+      up = rotatePoint(up, eye, axis, 0.005 * M_PI);
+      up.normalize();
+    } break;
 
     case '-': {
       if (ishape > 0) ishape--;

@@ -37,6 +37,7 @@
 #define BLOCKRELEASE_HPP
 
 #include "freeFlight.hpp"
+
 #include "vec3.hpp"
 #include "quat.hpp"
 

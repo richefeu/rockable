@@ -44,20 +44,17 @@ class Patatrac {
  public:
   Rockable box;
   std::vector<BlockRelease> releases;
-  double epsilon_dn;  // -> private
-  size_t iblock;      // -> private
-  double distCol;     // surrounding radius
+  double epsilon_dn; // TODO remove
+  size_t iblock;  // block being processed 
 
   Patatrac();  // Ctor
   void loadDropConfigsFromFile(const char* name);
   void saveTrajectories(const char* name);
   double getDnMin();
   int getCollisionTime(freeFlight& F);
-  int getCollisionTime_v2(freeFlight& F);
   void refineCollisionTime(freeFlight& F);
   int computeCollision(freeFlight& F);
   void dropAll();
-  void dropAll_v2();
 };
 
 #endif /* end of include guard: PATATRAC_HPP */

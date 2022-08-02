@@ -144,6 +144,8 @@ Rockable::Rockable() {
     off      =  0
 */
 void Rockable::setVerboseLevel(int v) {
+  std::string levelNames[] = {"off", "critical", "err", "warn", "info", "debug", "trace"};
+
   switch (v) {
     case 6:
       console->set_level(spdlog::level::trace);
@@ -169,6 +171,12 @@ void Rockable::setVerboseLevel(int v) {
     default:
       console->set_level(spdlog::level::info);
       break;
+  }
+  
+  if (v >= 0 && v <= 6) {
+    fmt::print("Verbosity level has been set to '{}'\n", levelNames[v]);  
+  } else {
+    fmt::print("The asked-level of verbosity should be in the range 0 to 6. It has been set to {}\n", levelNames[4]);
   }
 }
 
@@ -904,6 +912,38 @@ void Rockable::loadShapes(const char* fileName) {
     shapeId[Shapes[s].name] = s;
   }
 }
+
+
+void Rockable::console_run(std::string& confFileName) {
+  loadConf(confFileName.c_str());
+  initOutputFiles();
+
+  initialChecks();
+
+  System.read(true);
+  readDataExtractors();
+
+  if (!dataExtractors.empty()) {
+    std::ofstream docfile("extractedDataDoc.txt");
+    for (size_t d = 0; d < dataExtractors.size(); d++) {
+      dataExtractors[d]->generateHelp(docfile);
+      // The initialisation of dataExtractors can be necessary after conf is loaded
+      // and the System is read
+      dataExtractors[d]->init();
+    }
+    docfile.close();
+  }
+
+  std::cout << std::endl << std::endl;
+
+  console->info("INITIAL UPDATE OF NEIGHBOR LIST");
+  UpdateNL();
+
+  console->info("COMPUTATION STARTS");
+  integrate();
+  console->info("COMPUTATION NORMALLY STOPPED");
+}
+
 
 // ==================================================================================================================
 //  ADD OR REMOVE A SINGLE INTERACTION
@@ -2376,7 +2416,7 @@ void Rockable::integrate() {
   console->trace("end saving first conf");
 
   PerfTimer ptimer;
-  size_t step = (size_t)(t / dt); // suppose that the time-step has not been changed
+  size_t step = (size_t)(t / dt);  // suppose that the time-step has not been changed
   timeInUpdateNL = 0.0;
   timeInForceComputation = 0.0;
 
@@ -2446,7 +2486,7 @@ void Rockable::integrate() {
       fmt::print("│{0: <{1}}│\n", "  Kinetic energy:", frameWidth);
       fmt::print("│{0: <{1}}│\n", fmt::format("    Etrans: {:<13.8e}   Erot: {:<13.8e}", Etrans, Erot), frameWidth);
       kineticEnergyFile << t << ' ' << Etrans << ' ' << Erot << '\n' << std::flush;
-      
+
       fmt::print("└{0:─^{1}}┘\n", "", frameWidth);
 
       saveConf(iconf);

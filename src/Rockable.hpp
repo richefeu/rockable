@@ -52,8 +52,8 @@
 
 #define SPGLOG_HEADER_ONLY
 #define FMT_HEADER_ONLY
-#include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -66,12 +66,12 @@
 #include "PerfTimer.hpp"
 #include "Properties.hpp"
 #include "Tempo.hpp"
+#include "common.hpp"
 #include "factory.hpp"
 #include "fileTool.hpp"
 #include "kwParser.hpp"
 #include "linkCells.hpp"
 #include "message.hpp"
-#include "common.hpp"
 
 // local headers
 #include "BodyForce.hpp"
@@ -170,11 +170,11 @@ class Rockable {
   void RungeKutta4Step();                  ///< Make a time increment with the Runge-Kutta scheme (4th order)
   void initIntegrator();                   ///< Set additionally stored data required by some integrator
   void integrate();                        ///< Simulation flow (make time increments and check for updates or saving)
-  void accelerations();                    ///< Compute accelerations (both for particles and the periodic-cell)
+  void accelerations();                    ///< Compute accelerations
   void incrementResultants(Interaction&);  ///< Project force and moment on the interacting particles
   std::function<void()> IntegrationStep;   ///< Pointer function for integration
   void setIntegrator(std::string& Name);   ///< Select the time-integration scheme
-  
+
   // Core CD method (TODO)
   // ...
 
@@ -186,12 +186,14 @@ class Rockable {
   void loadConf(const char*);    ///< Load a configuration from a conf-file
   void loadShapes(const char*);  ///< Load a shape library from a shape-file
   void readDataExtractors();     ///< Read the file dataExtractors.txt
+  
+  void console_run(std::string& confFileName);
 
-  void UpdateNL_bruteForce();      ///< Brute-force approach
-  void UpdateNL_linkCells();       ///< Link-cells approach
-  std::function<void()> UpdateNL;  ///< Pointer funtion to the updateNL
-                                   ///< (update the neighbor-list) method
-  void setUpdateNL(std::string& Name); ///< select the Neighbor list updator
+  void UpdateNL_bruteForce();           ///< Brute-force approach
+  void UpdateNL_linkCells();            ///< Link-cells approach
+  std::function<void()> UpdateNL;       ///< Pointer funtion to the updateNL
+                                        ///< (update the neighbor-list) method
+  void setUpdateNL(std::string& Name);  ///< select the Neighbor list updator
 
   bool forceLawDefault(Interaction&);             ///< Most common force law
   bool forceLawStickedLinks(Interaction&);        ///< Force law for 'glued' bodies
@@ -228,11 +230,10 @@ class Rockable {
                                                               ///< velocity to all free bodies
 
   void randomlyOrientedVelocitiesClusters(double velocityMagnitude,
-                                          int opt = 0);  ///< Set a randomly oriented velocity
-                                                         ///< to all free clusters (same
-                                                         ///< velocity for the bodies belonging
+                                          int opt = 0);  ///< Set a randomly oriented velocity to all free clusters
+                                                         ///< (same velocity for the bodies belonging
                                                          ///< to the same cluster)
-  void setAllVelocities(vec3r & vel); 
+  void setAllVelocities(vec3r& vel);
   void homothetyRange(size_t idFirst, size_t idLast, double hmin, double hmax, bool timeSeeded);
   void particlesClonage(size_t idFirst, size_t idLast, vec3r& translation);
 

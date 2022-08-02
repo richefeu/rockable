@@ -51,7 +51,7 @@ int main(int argc, char const* argv[]) {
   int verboseLevel = 0;
 
   try {
-    TCLAP::CmdLine cmd("This is the comand line interface for Rockable", ' ', "0.3");
+    TCLAP::CmdLine cmd("This is the command line interface for Rockable", ' ', "0.3");
     TCLAP::UnlabeledValueArg<std::string> nameArg("input", "Name of the conf-file", true, "conf0", "conf-file");
     TCLAP::ValueArg<int> nbThreadsArg("j", "nbThreads", "Number of threads to be used", false, 1, "int");
     TCLAP::ValueArg<int> verboseArg("v", "verbose", "Verbose level", false, 4, "int");
@@ -69,8 +69,6 @@ int main(int argc, char const* argv[]) {
     std::cerr << "error: " << e.error() << " for argument " << e.argId() << std::endl;
   }
 
-
-
   Rockable box;
   box.setVerboseLevel(verboseLevel);
   box.showBanner();
@@ -82,33 +80,7 @@ int main(int argc, char const* argv[]) {
   box.console->info("No multithreading");
 #endif
 
-  box.loadConf(confFileName.c_str());
-  box.initOutputFiles();
-
-  box.initialChecks();
-
-  box.System.read(true);
-  box.readDataExtractors();
-
-  if (!box.dataExtractors.empty()) {
-    std::ofstream docfile("extractedDataDoc.txt");
-    for (size_t d = 0; d < box.dataExtractors.size(); d++) {
-      box.dataExtractors[d]->generateHelp(docfile);
-      // The initialisation of dataExtractors can be necessary after conf is loaded
-      // and the System is read
-      box.dataExtractors[d]->init();
-    }
-    docfile.close();
-  }
-
-  std::cout << std::endl << std::endl;
-
-  box.console->info("INITIAL UPDATE OF NEIGHBOR LIST");
-  box.UpdateNL();
-
-  box.console->info("COMPUTATION STARTS");
-  box.integrate();
-  box.console->info("COMPUTATION NORMALLY STOPPED");
-
+  box.console_run(confFileName.c_str());
+  
   return 0;
 }
