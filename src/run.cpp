@@ -80,7 +80,7 @@ int main(int argc, char const* argv[]) {
   box.console->info("No multithreading");
 #endif
 
-  box.console_run(confFileName.c_str());
+  box.console_run(confFileName);
   
   return 0;
 }

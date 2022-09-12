@@ -54,8 +54,10 @@ CHAISCRIPTPATH = ~/ChaiScript-6.1.0/include
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
-  # The compiler to be used
-  CXX = g++-11
+  # The compiler and linker to be used
+  CXX = g++-12
+	LINK = $(CXX)
+	
   # The list of flags passed to the compiler
   CXXFLAGS := -fopenmp -O3 -Wall -Wextra -Wno-deprecated-declarations -std=c++17
   CXXFLAGS += -I $(TOOFUSPATH) -I $(SPDLOGPATH) $(OPTIONS) $(SVNDEV)
@@ -65,12 +67,17 @@ ifeq ($(UNAME_S),Darwin)
   GLUTFLAGS = `pkg-config --cflags glut`
   GLUTLINK = `pkg-config --libs glut` -framework OpenGL
 	
+	FLTKFLAGS = `fltk-config --use-gl --cxxflags`
+	FLTKLINK = `fltk-config --use-gl --ldstaticflags`
+	
 	# need to install glfw3 with brew: 'brew install glfw3'
 	GLFWFLAGS = `pkg-config --cflags glfw3`
 	GLFWLINK = -framework OpenGL `pkg-config --libs glfw3`
 else
-  # The compiler to be used
+  # The compiler and linker to be used
   CXX = g++
+  LINK = $(CXX)
+	
   # The list of flags passed to the compiler
   CXXFLAGS := -fopenmp -O3 -std=c++17
   CXXFLAGS += -I $(TOOFUSPATH) $(OPTIONS) $(SVNDEV)
@@ -81,7 +88,7 @@ else
 endif
 
 
-# The list of source files needed by Rockable (excepted run.cpp)
+# The list of source files needed by Rockable (the library)
 SOURCES = Shape.cpp \
 Particle.cpp \
 Interaction.cpp \
@@ -140,32 +147,37 @@ format:
 # The application that runs a simulation
 run: run.cpp $(HEADERS) $(SOURCES) $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -c $<
-	$(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS)
+	$(LINK) $(CXXFLAGS) -o $@ $@.o $(OBJECTS)
 	
-# Scripting with chaiscript
+# Scripting with chaiscript (TEST!!!)
 script: script.cpp $(HEADERS) $(SOURCES) $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -I $(CHAISCRIPTPATH)  -c $<
-	$(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS)
+	$(LINK) $(CXXFLAGS) -o $@ $@.o $(OBJECTS)
+	
+# The application that edits and visualize the conf files (it uses FLTK)
+edt: edt.cpp edt.hpp $(HEADERS) $(SOURCES) $(OBJECTS)
+	$(CXX) $(CXXFLAGS) $(FLTKFLAGS) -c $<
+	$(LINK) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(FLTKLINK) 
 
 # An application for post-processing the conf-files
 postpro: postpro.cpp $(HEADERS) $(SOURCES) $(OBJECTS) $(POSTPROHEADERS) $(POSTPROSOURCES) $(POSTPROOBJECTS)
 	$(CXX) $(CXXFLAGS) -c $<
-	$(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(POSTPROOBJECTS)
+	$(LINK) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(POSTPROOBJECTS)
 
 # An application to use Rockable as a "trajectography-analysis" tool
 patatrac: patatrac.cpp patatrac.hpp $(HEADERS) $(SOURCES) $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -c $<
-	$(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS)
+	$(LINK) $(CXXFLAGS) -o $@ $@.o $(OBJECTS)
 
 # The application that visualizes the conf files (it uses GLUT)
 see: see.cpp see.hpp $(HEADERS) $(SOURCES) $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(GLUTFLAGS) $(PNGFLAGS) -c $<
-	$(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(GLUTLINK) $(PNGLINK)
+	$(LINK) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(GLUTLINK) $(PNGLINK)
 	
 # The application that visualizes the conf files (it uses GLFW)
 see2: see2.cpp see2.hpp $(HEADERS) $(SOURCES) $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(GLFWFLAGS) $(PNGFLAGS) -c $<
-	$(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(GLFWLINK) $(PNGLINK)
+	$(LINK) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(GLFWLINK) $(PNGLINK)
 	
 # The application that visualizes the conf files (it uses GLFW and Dear ImGui)
 $(IMGUI_OBJECTS): $(IMGUI_SOURCES)
@@ -173,6 +185,6 @@ $(IMGUI_OBJECTS): $(IMGUI_SOURCES)
 	
 see3: see3.cpp see3.hpp $(HEADERS) $(OBJECTS) $(IMGUI_OBJECTS)
 	$(CXX) $(CXXFLAGS) -I $(IMGUI_DIR) -I $(IMGUI_DIR)/backends $(GLFWFLAGS) $(PNGFLAGS) -c $<
-	$(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(IMGUI_OBJECTS) $(GLFWLINK) $(PNGLINK)
+	$(LINK) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(IMGUI_OBJECTS) $(GLFWLINK) $(PNGLINK)
 
 #######################################################################################################################

@@ -33,7 +33,7 @@
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
-#define CONF_VERSION_DATE "29-11-2018"
+#define CONF_VERSION_DATE "21-08-2022"
 #include "Rockable.hpp"
 
 // ==============================================================================================================
@@ -63,12 +63,12 @@ Rockable::Rockable() {
   angleUpdateNL = 1.0;
 
   numericalDampingCoeff = 0.0;
-  VelocityBarrier = 0.0;
-  AngularVelocityBarrier = 0.0;
-  VelocityBarrierExponent = 1.0;
-  AngularVelocityBarrierExponent = 1.0;
+  velocityBarrier = 0.0;
+  angularVelocityBarrier = 0.0;
+  velocityBarrierExponent = 1.0;
+  angularVelocityBarrierExponent = 1.0;
 
-  ParamsInInterfaces = 0;
+  paramsInInterfaces = 0;
   idDensity = properties.add("density");
 
 #ifdef BIND_METHODS
@@ -100,7 +100,7 @@ Rockable::Rockable() {
 #ifdef BIND_METHODS
   IntegrationStep = std::bind(&Rockable::velocityVerletStep, this);
 #else
-  IntegrationStep = [this]() { this->velocityVerletStep(); };
+  integrationStep = [this]() { this->velocityVerletStep(); };
 #endif
   optionNames["Integrator"] = "velocityVerlet";
 
@@ -132,6 +132,7 @@ Rockable::Rockable() {
   glue_with_walls = false;
 
   console = spdlog::stdout_color_mt("console");
+  initParser();
 }
 
 /*
@@ -172,14 +173,43 @@ void Rockable::setVerboseLevel(int v) {
       console->set_level(spdlog::level::info);
       break;
   }
-  
+
   if (v >= 0 && v <= 6) {
-    fmt::print("Verbosity level has been set to '{}'\n", levelNames[v]);  
+    fmt::print("Verbosity level has been set to '{}'\n", levelNames[v]);
   } else {
     fmt::print("The asked-level of verbosity should be in the range 0 to 6. It has been set to {}\n", levelNames[4]);
   }
 }
 
+/**
+ * @brief A version of setVerboseLevel that takes a string as argument
+ *
+ * @param levelName Name of the verbose level 
+ */
+void Rockable::setVerboseLevel(std::string& levelName) {
+  if (levelName == "off")
+    setVerboseLevel(0);
+  else if (levelName == "critical")
+    setVerboseLevel(1);
+  else if (levelName == "err")
+    setVerboseLevel(2);
+  else if (levelName == "warn")
+    setVerboseLevel(3);
+  else if (levelName == "info")
+    setVerboseLevel(4);
+  else if (levelName == "debug")
+    setVerboseLevel(5);
+  else if (levelName == "trace")
+    setVerboseLevel(6);
+  else {
+    fmt::print("Unknown verbosity level: '{}'\n", levelName);
+  }
+}
+
+/**
+ * @brief It opens some files if interactiveMode is false
+ * 
+ */
 void Rockable::initOutputFiles() {
   if (interactiveMode == true) return;
   perfFile.open("perf.txt");
@@ -263,6 +293,9 @@ void Rockable::initialChecks() {
   if (dtc > 0.0) {
     console->info("dt_critical / dt = {} (over ACTIVE Interactions)", dtc / dt);
   }
+
+  // TODO: ajouter des verifs par rapport aux groupes définies et le nombre de groupes dans properties et dataTable
+
 }
 
 // ==================================================================================================================
@@ -279,7 +312,7 @@ void Rockable::clearMemory() {
   dataExtractors.clear();
   activeInteractions.clear();
   Tempos.clear();
-  // Shape is not erased because it will not be reread
+  // Shape is not erased because it will not be read another time
   // if the filename has not been changed
 }
 
@@ -312,7 +345,7 @@ void Rockable::saveConf(const char* fname) {
   conf << "dVerlet " << dVerlet << '\n';
   for (size_t grp = 0; grp < properties.ngroup; grp++) {
     double density = properties.get(idDensity, grp);
-    if (density > 0.0)  // TODO implement properties.isDefined(idDensity, grp)
+    if (density > 0.0)
       conf << "density " << grp << " " << density << '\n';
   }
   conf << "gravity " << gravity << '\n';
@@ -320,7 +353,7 @@ void Rockable::saveConf(const char* fname) {
     conf << "BodyForce ";
     bodyForce->write(conf);
   }
-  conf << "ParamsInInterfaces " << ParamsInInterfaces << '\n';
+  conf << "ParamsInInterfaces " << paramsInInterfaces << '\n';
   conf << "dynamicUpdateNL " << dynamicUpdateNL << '\n';
   if (dynamicUpdateNL != 0) {
     conf << "dispUpdateNL " << dispUpdateNL << '\n';
@@ -328,11 +361,11 @@ void Rockable::saveConf(const char* fname) {
   }
   conf << "numericalDampingCoeff " << numericalDampingCoeff << '\n';
 
-  conf << "VelocityBarrier " << VelocityBarrier << '\n';
-  conf << "AngularVelocityBarrier " << AngularVelocityBarrier << '\n';
+  conf << "VelocityBarrier " << velocityBarrier << '\n';
+  conf << "AngularVelocityBarrier " << angularVelocityBarrier << '\n';
 
-  conf << "VelocityBarrierExponent " << VelocityBarrierExponent << '\n';
-  conf << "AngularVelocityBarrierExponent " << AngularVelocityBarrierExponent << '\n';
+  conf << "VelocityBarrierExponent " << velocityBarrierExponent << '\n';
+  conf << "AngularVelocityBarrierExponent " << angularVelocityBarrierExponent << '\n';
 
   writeLawData(conf, "knContact");
   writeLawData(conf, "en2Contact");
@@ -402,7 +435,7 @@ void Rockable::saveConf(const char* fname) {
     std::set<BreakableInterface>::iterator it = Interfaces[i].begin();
     for (; it != Interfaces[i].end(); ++it) {
       conf << it->i << ' ' << it->j << "  " << it->concernedBonds.size() << ' ' << it->dn0;
-      if (ParamsInInterfaces == 1) {
+      if (paramsInInterfaces == 1) {
         conf << ' ' << it->kn << ' ' << it->kt << ' ' << it->kr << ' ' << it->fn0 << ' ' << it->ft0 << ' ' << it->mom0
              << ' ' << it->power << ' ';
       }
@@ -436,40 +469,7 @@ void Rockable::writeLawData(std::ostream& os, const char* parName) {
   }
 }
 
-/**
-    @brief Load a configuration-file named 'conf<i>'
-*/
-void Rockable::loadConf(int i) {
-  char fname[256];
-  sprintf(fname, "conf%d", i);
-  loadConf(fname);
-}
-
-/**
-    @brief Load a configuration file named name
-    @param[in]  name  The name of the conf-file
-*/
-void Rockable::loadConf(const char* name) {
-  std::ifstream conf(name);
-  if (!conf.is_open()) {
-    console->warn("@Rockable::loadConf, cannot read {}", name);
-    return;
-  }
-
-  // Check header
-  std::string prog;
-  conf >> prog;
-  if (prog != "Rockable") {
-    console->warn("@Rockable::loadConf, this doesn't seem to be a file for the code Rockable!");
-  }
-  std::string date;
-  conf >> date;
-  if (date != CONF_VERSION_DATE) {
-    console->warn("@Rockable::loadConf, the version-date should be '{}'\n(in most cases, this should not be a problem)",
-                  CONF_VERSION_DATE);
-  }
-
-  kwParser parser;
+void Rockable::initParser() {
 
   parser.kwMap["t"] = __GET__(conf, t);
   parser.kwMap["tmax"] = __GET__(conf, tmax);
@@ -493,7 +493,7 @@ void Rockable::loadConf(const char* name) {
     properties.set(idDensity, grp, density);
   };
   parser.kwMap["gravity"] = __GET__(conf, gravity);
-  parser.kwMap["ParamsInInterfaces"] = __GET__(conf, ParamsInInterfaces);
+  parser.kwMap["ParamsInInterfaces"] = __GET__(conf, paramsInInterfaces);
   parser.kwMap["dynamicUpdateNL"] = __GET__(conf, dynamicUpdateNL);
   parser.kwMap["dispUpdateNL"] = __GET__(conf, dispUpdateNL);
   parser.kwMap["angleUpdateNL"] = __DO__(conf) {
@@ -502,15 +502,15 @@ void Rockable::loadConf(const char* name) {
   };
 
   parser.kwMap["numericalDampingCoeff"] = __GET__(conf, numericalDampingCoeff);
-  parser.kwMap["VelocityBarrier"] = __GET__(conf, VelocityBarrier);
-  parser.kwMap["AngularVelocityBarrier"] = __GET__(conf, AngularVelocityBarrier);
-  parser.kwMap["VelocityBarrierExponent"] = __GET__(conf, VelocityBarrierExponent);
-  parser.kwMap["AngularVelocityBarrierExponent"] = __GET__(conf, AngularVelocityBarrierExponent);
+  parser.kwMap["VelocityBarrier"] = __GET__(conf, velocityBarrier);
+  parser.kwMap["AngularVelocityBarrier"] = __GET__(conf, angularVelocityBarrier);
+  parser.kwMap["VelocityBarrierExponent"] = __GET__(conf, velocityBarrierExponent);
+  parser.kwMap["AngularVelocityBarrierExponent"] = __GET__(conf, angularVelocityBarrierExponent);
 
   parser.kwMap["Tempo"] = [this](std::istream& conf) {
     std::string kw;
     conf >> kw;
-    if (kw == "numericalDampingCoeff") {
+    if (kw == "NDCoeff") {
       double t1, t2, val1, val2;
       std::string command;
       conf >> command >> t1 >> t2 >> val1 >> val2;
@@ -614,7 +614,7 @@ void Rockable::loadConf(const char* name) {
       loadShapes(shapeFile.c_str());
     }
   };
-  parser.kwMap["separator"] = __DO__(conf) {  // TODO: remove it !!!!
+  parser.kwMap["separator"] = __DO__(conf) {  // TODO: remove it !?
     std::string keyword;
     conf >> keyword;
     CommBox().sepFromKeyword(keyword);
@@ -701,7 +701,7 @@ void Rockable::loadConf(const char* name) {
       ItoFind.j = BI.j;
       BI.concernedBonds.resize(nbBonds);
 
-      if (ParamsInInterfaces == 1) {
+      if (paramsInInterfaces == 1) {
         conf >> BI.kn >> BI.kt >> BI.kr >> BI.fn0 >> BI.ft0 >> BI.mom0 >> BI.power;
       }
 
@@ -825,6 +825,42 @@ void Rockable::loadConf(const char* name) {
     conf >> ifirst >> ilast >> translation;
     particlesClonage(ifirst, ilast, translation);
   };
+}
+
+/**
+    @brief Load a configuration-file named 'conf<i>'
+*/
+void Rockable::loadConf(int i) {
+  char fname[256];
+  sprintf(fname, "conf%d", i);
+  loadConf(fname);
+}
+
+/**
+    @brief Load a configuration file named name
+    @param[in]  name  The name of the conf-file
+*/
+void Rockable::loadConf(const char* name) {
+  std::ifstream conf(name);
+  if (!conf.is_open()) {
+    console->warn("@Rockable::loadConf, cannot read {}", name);
+    return;
+  }
+
+  // Check header
+  std::string prog;
+  conf >> prog;
+  if (prog != "Rockable") {
+    console->warn("@Rockable::loadConf, this doesn't seem to be a file for the code Rockable!");
+  }
+  std::string date;
+  conf >> date;
+  if (date != CONF_VERSION_DATE) {
+    console->warn("@Rockable::loadConf, the version-date should be '{}'\n(in most cases, this should not be a problem)",
+                  CONF_VERSION_DATE);
+  }
+
+  // kwParser parser;
 
   // This single line actually parses the file
   parser.parse(conf);
@@ -913,7 +949,6 @@ void Rockable::loadShapes(const char* fileName) {
   }
 }
 
-
 void Rockable::console_run(std::string& confFileName) {
   loadConf(confFileName.c_str());
   initOutputFiles();
@@ -943,7 +978,6 @@ void Rockable::console_run(std::string& confFileName) {
   integrate();
   console->info("COMPUTATION NORMALLY STOPPED");
 }
-
 
 // ==================================================================================================================
 //  ADD OR REMOVE A SINGLE INTERACTION
@@ -1582,7 +1616,7 @@ bool Rockable::forceLawStickedLinks(Interaction& I) {
     bool isInner = false;
 
     // First we need to get the parameters
-    if (ParamsInInterfaces == 1) {
+    if (paramsInInterfaces == 1) {
       isInner = I.stick->isInner;
       kn = I.stick->kn;
       kt = I.stick->kt;
@@ -1732,28 +1766,28 @@ void Rockable::setIntegrator(std::string& Name) {
 #ifdef BIND_METHODS
     IntegrationStep = std::bind(&Rockable::velocityVerletStep, this);
 #else
-    IntegrationStep = [this]() { this->velocityVerletStep(); };
+    integrationStep = [this]() { this->velocityVerletStep(); };
 #endif
     optionNames["Integrator"] = "velocityVerlet";
   } else if (Name == "Euler") {
 #ifdef BIND_METHODS
     IntegrationStep = std::bind(&Rockable::EulerStep, this);
 #else
-    IntegrationStep = [this]() { this->EulerStep(); };
+    integrationStep = [this]() { this->EulerStep(); };
 #endif
     optionNames["Integrator"] = "Euler";
   } else if (Name == "Beeman") {
 #ifdef BIND_METHODS
     IntegrationStep = std::bind(&Rockable::BeemanStep, this);
 #else
-    IntegrationStep = [this]() { this->BeemanStep(); };
+    integrationStep = [this]() { this->BeemanStep(); };
 #endif
     optionNames["Integrator"] = "Beeman";
   } else if (Name == "RungeKutta4") {
 #ifdef BIND_METHODS
     IntegrationStep = std::bind(&Rockable::RungeKutta4Step, this);
 #else
-    IntegrationStep = [this]() { this->RungeKutta4Step(); };
+    integrationStep = [this]() { this->RungeKutta4Step(); };
 #endif
     optionNames["Integrator"] = "RungeKutta4";
   } else {
@@ -2427,7 +2461,7 @@ void Rockable::integrate() {
     interVerletC += dt;
 
     // It will use the selected integration scheme
-    IntegrationStep();
+    integrationStep();
 
     if (interConfC >= interConf - dt_2) [[unlikely]] {
       iconf++;
@@ -2804,8 +2838,8 @@ void Rockable::accelerations() {
   }
 
   // damping solutions based on the weighting of accelerations
-  if (VelocityBarrier > 0.0) velocityBarrier();
-  if (AngularVelocityBarrier > 0.0) angularVelocityBarrier();
+  if (velocityBarrier > 0.0) applyVelocityBarrier();
+  if (angularVelocityBarrier > 0.0) applyAngularVelocityBarrier();
 }
 
 /**
@@ -2876,15 +2910,15 @@ void Rockable::numericalDamping() {
     and it becomes negative when the velocity exceeds 'VelocityBarrier'
     (it tends towards -1 when v tends towards infinity).
 */
-void Rockable::velocityBarrier() {
+void Rockable::applyVelocityBarrier() {
   for (size_t i = 0; i < Particles.size(); ++i) {
-    double vxratio = pow(fabs(Particles[i].vel.x / VelocityBarrier), VelocityBarrierExponent);
+    double vxratio = pow(fabs(Particles[i].vel.x / velocityBarrier), velocityBarrierExponent);
     Particles[i].acc.x *= (1.0 - vxratio) / (1.0 + vxratio);
 
-    double vyratio = pow(fabs(Particles[i].vel.y / VelocityBarrier), VelocityBarrierExponent);
+    double vyratio = pow(fabs(Particles[i].vel.y / velocityBarrier), velocityBarrierExponent);
     Particles[i].acc.y *= (1.0 - vyratio) / (1.0 + vyratio);
 
-    double vzratio = pow(fabs(Particles[i].vel.z / VelocityBarrier), VelocityBarrierExponent);
+    double vzratio = pow(fabs(Particles[i].vel.z / velocityBarrier), velocityBarrierExponent);
     Particles[i].acc.z *= (1.0 - vzratio) / (1.0 + vzratio);
   }
 }
@@ -2893,15 +2927,15 @@ void Rockable::velocityBarrier() {
     @brief Component-wise weighting of rotation acceleration to limit the velocity components to
            the value 'AngularVelocityBarrier'
 */
-void Rockable::angularVelocityBarrier() {
+void Rockable::applyAngularVelocityBarrier() {
   for (size_t i = 0; i < Particles.size(); ++i) {
-    double vrotxratio = pow(fabs(Particles[i].vrot.x / AngularVelocityBarrier), AngularVelocityBarrierExponent);
+    double vrotxratio = pow(fabs(Particles[i].vrot.x / angularVelocityBarrier), angularVelocityBarrierExponent);
     Particles[i].arot.x *= (1.0 - vrotxratio) / (1.0 + vrotxratio);
 
-    double vrotyratio = pow(fabs(Particles[i].vrot.y / AngularVelocityBarrier), AngularVelocityBarrierExponent);
+    double vrotyratio = pow(fabs(Particles[i].vrot.y / angularVelocityBarrier), angularVelocityBarrierExponent);
     Particles[i].arot.y *= (1.0 - vrotyratio) / (1.0 + vrotyratio);
 
-    double vrotzratio = pow(fabs(Particles[i].vrot.z / AngularVelocityBarrier), AngularVelocityBarrierExponent);
+    double vrotzratio = pow(fabs(Particles[i].vrot.z / angularVelocityBarrier), angularVelocityBarrierExponent);
     Particles[i].arot.z *= (1.0 - vrotzratio) / (1.0 + vrotzratio);
   }
 }
@@ -3692,7 +3726,7 @@ void Rockable::copyParamsToInterfaces(std::string& isInnerStr) {
       }
     }
   }
-  ParamsInInterfaces = 1;  // so that they are stored in the conf files (within interfaces)
+  paramsInInterfaces = 1;  // so that they are stored in the conf files (within interfaces)
 }
 
 /**
@@ -3753,7 +3787,7 @@ void Rockable::setVariableStickParams(std::string& paramName, std::string& isInn
     }
   }
 
-  ParamsInInterfaces = 1;  // so that they are stored in the conf files (within interfaces)
+  paramsInInterfaces = 1;  // so that they are stored in the conf files (within interfaces)
 }
 
 /**

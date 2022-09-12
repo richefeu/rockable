@@ -132,17 +132,17 @@ class Rockable {
 
   // Numerical Damping
   double numericalDampingCoeff;   ///< Coefficient of the so-called Cundall damping (0 = disabled)
-  double VelocityBarrier;         ///< Velocity Barrier by weighting the particle accelerations (0 = disabled)
-  double AngularVelocityBarrier;  ///< Angular velocity Barrier by weighting the particle accelerations (0 = disabled)
-  double VelocityBarrierExponent;
-  double AngularVelocityBarrierExponent;
+  double velocityBarrier;         ///< Velocity Barrier by weighting the particle accelerations (0 = disabled)
+  double angularVelocityBarrier;  ///< Angular velocity Barrier by weighting the particle accelerations (0 = disabled)
+  double velocityBarrierExponent;
+  double angularVelocityBarrierExponent;
 
   // Other parameters
   int iconf;                ///< Current configuration ID
   AABB aabb;                ///< Axis Aligned Bounding Box (AABB) of the entire sample
   std::vector<AABB> paabb;  ///< AABBs of all particles
   vec3r gravity;            ///< Gravity acceleration
-  int ParamsInInterfaces;   ///< Flag saying if the parameters for sticked blonds
+  int paramsInInterfaces;   ///< Flag saying if the parameters for sticked blonds
                             ///< are embedded within the interfaces
   bool glue_with_walls;     ///< flag to say if the glue can be also set between free and controlled particles
 
@@ -155,11 +155,12 @@ class Rockable {
   Rockable();
 
   // Initialization methods
-  void setVerboseLevel(int v);             ///< Defines verbosity
-  void initOutputFiles();                  ///< Open the output files
-  void setInteractive(bool imode = true);  ///< Set in a computation mode
-  bool isInteractive() const;              ///< Set in a visualization mode
-  void showBanner();                       ///< Display a banner about the code
+  void setVerboseLevel(int v);                   ///< Defines verbosity with an integer
+  void setVerboseLevel(std::string& levelName);  ///< Defines verbosity with a string label
+  void initOutputFiles();                        ///< Open the output files
+  void setInteractive(bool imode = true);        ///< Set in a computation mode
+  bool isInteractive() const;                    ///< Set in a visualization mode
+  void showBanner();                             ///< Display a banner about the code
 
   void initialChecks();  ///< Checks before runing a computation
 
@@ -172,21 +173,23 @@ class Rockable {
   void integrate();                        ///< Simulation flow (make time increments and check for updates or saving)
   void accelerations();                    ///< Compute accelerations
   void incrementResultants(Interaction&);  ///< Project force and moment on the interacting particles
-  std::function<void()> IntegrationStep;   ///< Pointer function for integration
+  std::function<void()> integrationStep;   ///< Pointer function for integration
   void setIntegrator(std::string& Name);   ///< Select the time-integration scheme
 
   // Core CD method (TODO)
   // ...
 
   // Save/Load methods
-  void clearMemory();            ///< Clear the Particles and Interactions
+  kwParser parser;
+  void clearMemory();  ///< Clear the Particles and Interactions
+  void initParser();
   void saveConf(int i);          ///< Save the current configuration in a file named confX, where X=i
   void saveConf(const char*);    ///< Save a configuration from a conf-file
   void loadConf(int i);          ///< Load the current configuration in a file named confX, where X=i
   void loadConf(const char*);    ///< Load a configuration from a conf-file
   void loadShapes(const char*);  ///< Load a shape library from a shape-file
   void readDataExtractors();     ///< Read the file dataExtractors.txt
-  
+
   void console_run(std::string& confFileName);
 
   void UpdateNL_bruteForce();           ///< Brute-force approach
@@ -241,8 +244,8 @@ class Rockable {
 
   void velocityControlledDrive();
   void numericalDamping();        ///< The Cundall damping solution
-  void velocityBarrier();         ///< The velocity barrier solution
-  void angularVelocityBarrier();  ///< The velocity barrier solution for rotations
+  void applyVelocityBarrier();         ///< The velocity barrier solution
+  void applyAngularVelocityBarrier();  ///< The velocity barrier solution for rotations
   void dynamicCheckUpdateNL();    ///< Ask for NL reconstruction if the maximum
                                   ///< displacement of rotation is more than given values
 
