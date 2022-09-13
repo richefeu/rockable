@@ -5,7 +5,7 @@
 
 #include "vec3.hpp"
 
-// sideSize = external size of the cuboid block (it includes the radius)
+// sideSize = external sizes of the cuboid block (it includes the radius)
 void generateShape_cuboid(std::ostream& os, const char* name, double radius, vec3r& sideSize) {
   using namespace std;
   double lx = 0.5 * sideSize.x - radius;

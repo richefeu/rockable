@@ -14,6 +14,7 @@
 #include "generatePacking_wallBox.hpp"
 #include "generateShape_cube.hpp"
 #include "generateShape_cuboid.hpp"
+#include "generateShape_rhombicuboctahedron.hpp"
 #include "generateShape_sphere.hpp"
 #include "generateShape_xyz_walls.hpp"
 
@@ -61,6 +62,15 @@ void readCommands(const char* name) {
     com >> name >> radius >> sideSize;
     generateShape_cuboid(std::cout, name.c_str(), radius, sideSize);
     std::cerr << "A cuboid shape has been generated\n";
+  };
+  
+  parser.kwMap["generateShape:rhombicuboctahedron"] = __DO__(com) {
+    std::string name;
+    double radius;
+    vec3r sideSize;
+    com >> name >> radius >> sideSize;
+    generateShape_rhombicuboctahedron(std::cout, name.c_str(), radius, sideSize);
+    std::cerr << "A rhombicuboctahedron shape has been generated\n";
   };
 
   parser.kwMap["generateShape:xyz_walls"] = __DO__(com) {

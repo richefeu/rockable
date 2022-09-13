@@ -41,7 +41,7 @@
 
 DrivingSystem::DrivingSystem() : ServoFunction(nullptr) {}
 
-void DrivingSystem::read(bool warn) {
+void DrivingSystem::read(bool allow_warn) {
   static std::map<std::string, int> typeMap{
       {"_x_Vel_", _x_Vel_},           {"_y_Vel_", _y_Vel_},          {"_z_Vel_", _z_Vel_},
       {"_xrot_Vel_", _xrot_Vel_},     {"_yrot_Vel_", _yrot_Vel_},    {"_zrot_Vel_", _zrot_Vel_},
@@ -50,8 +50,9 @@ void DrivingSystem::read(bool warn) {
       {"_xyzrot_Vel_", _xyzrot_Vel_}, {"_xyzrot_Mom_", _xyzrot_Mom_}};
 
   if (!fileTool::fileExists("drivingSystem.txt")) {
-    if (warn == true) {
-      spdlog::get("console")->info("No file 'drivingSystem.txt' has been found. The first 'nDriven' bodies are frozen (velocities = 0)");
+    if (allow_warn == true) {
+      auto log = spdlog::get("console");
+      log->warn("No file 'drivingSystem.txt' has been found. The first 'nDriven' bodies will not move");
     }
     return;
   }

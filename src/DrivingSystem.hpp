@@ -84,7 +84,7 @@ class DrivingSystem {
 
   DrivingSystem();  // Ctor
 
-  void read(bool warn = true);
+  void read(bool allow_warn = true);
 };
 
 #endif /* end of include guard: DRIVING_SYSTEM_HPP */
