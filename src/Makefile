@@ -70,9 +70,10 @@ ifeq ($(UNAME_S),Darwin)
 	FLTKFLAGS = `fltk-config --use-gl --cxxflags`
 	FLTKLINK = `fltk-config --use-gl --ldstaticflags`
 	
-	# need to install glfw3 with brew: 'brew install glfw3'
-	GLFWFLAGS = `pkg-config --cflags glfw3`
-	GLFWLINK = -framework OpenGL `pkg-config --libs glfw3`
+  # need to install glfw3 with brew: 'brew install glfw3'
+  GLFWFLAGS = `pkg-config --cflags glfw3`
+  GLFWLINK = -framework OpenGL `pkg-config --libs glfw3`
+
 else
   # The compiler and linker to be used
   CXX = g++
@@ -82,9 +83,12 @@ else
   CXXFLAGS := -fopenmp -O3 -std=c++17
   CXXFLAGS += -I $(TOOFUSPATH) $(OPTIONS) $(SVNDEV)
 	
-	# CXXFLAGS += `pkg-config --cflags tclap`
+  # CXXFLAGS += `pkg-config --cflags tclap`
   # Link flags for OpenGL and glut
   GLUTLINK = -lGLU -lGL -L/usr/X11R6/lib -lglut -lXmu -lXext -lX11 -lXi
+  
+  GLFWFLAGS = `pkg-config --cflags glfw3`
+  GLFWLINK = -lGLU -lGL `pkg-config --libs glfw3`
 endif
 
 

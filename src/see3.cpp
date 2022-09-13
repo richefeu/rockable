@@ -1168,7 +1168,7 @@ void readTraj(const char* name) {
 }
 
 void error(int error, const char* description) {
-  cout << "GLFW error code: " << error << ", description: " << description << endl;
+  std::cout << "GLFW error code: " << error << ", description: " << description << std::endl;
 }
 
 // =====================================================================
