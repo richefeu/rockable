@@ -44,6 +44,7 @@ Rockable::Rockable() {
   // Some default values (actually, most of them will be reset after)
   t = 0.0;
   tmax = 1.0;
+  computationStopAsked = 0;
   dt = 1e-6;
   interVerletC = 0.0;
   interVerlet = 0.01;
@@ -2462,6 +2463,10 @@ void Rockable::integrate() {
 
     // It will use the selected integration scheme
     integrationStep();
+    
+    if (computationStopAsked > 0) [[unilikely]] {
+      break;
+    }
 
     if (interConfC >= interConf - dt_2) [[unlikely]] {
       iconf++;

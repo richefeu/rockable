@@ -111,6 +111,7 @@ class Rockable {
   double t;     ///< Current Time
   double tmax;  ///< End time
   double dt;    ///< Time increment
+  int computationStopAsked;
 
   // Simulation flow
   double interVerlet;  ///< Time interval between each update of the
@@ -173,7 +174,7 @@ class Rockable {
   void integrate();                        ///< Simulation flow (make time increments and check for updates or saving)
   void accelerations();                    ///< Compute accelerations
   void incrementResultants(Interaction&);  ///< Project force and moment on the interacting particles
-  std::function<void()> integrationStep;   ///< Pointer function for integration
+  std::function<void()> integrationStep;   ///< Pointer function for  tion
   void setIntegrator(std::string& Name);   ///< Select the time-integration scheme
 
   // Core CD method (TODO)

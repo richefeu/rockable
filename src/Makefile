@@ -102,6 +102,7 @@ BreakableInterface.cpp \
 ContactPartnership.cpp \
 DataExtractor.cpp \
 DataExtractor_TrackBody.cpp \
+DataExtractor_TrackRockfall.cpp \
 DataExtractor_ClusterAABB.cpp \
 DataExtractor_dnStat.cpp \
 DataExtractor_DuoBalance.cpp \
