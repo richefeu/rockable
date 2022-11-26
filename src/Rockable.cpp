@@ -78,8 +78,9 @@ Rockable::Rockable() {
 #else
   forceLawPtr = [this](Interaction& I) -> bool { return this->forceLawDefault(I); };
 #endif
+  */
   optionNames["forceLaw"] = "Default";
-   */
+  
 
 #ifdef BIND_METHODS
   AddOrRemoveInteractions = std::bind(&Rockable::AddOrRemoveInteractions_bruteForce, this, std::placeholders::_1,
@@ -276,7 +277,7 @@ void Rockable::showBanner() {
 
 void Rockable::initialChecks() {
 
-  //console->debug("Option forceLaw is {}", optionNames["forceLaw"]);
+  console->debug("Option forceLaw is {}", optionNames["forceLaw"]);
   console->debug("Option AddOrRemoveInteractions is {}", optionNames["AddOrRemoveInteractions"]);
   console->debug("Option UpdateNL is {}", optionNames["UpdateNL"]);
   console->debug("Option Integrator is {}", optionNames["Integrator"]);
@@ -552,19 +553,20 @@ void Rockable::initParser() {
   parser.kwMap["forceLaw"] = __DO__(conf) {
     std::string lawName;
     conf >> lawName;
-    //setForceLaw(lawName);
 
     ForceLaw* FL = Factory<ForceLaw>::Instance()->Create(lawName);
     if (FL != nullptr) {
       FL->plug(this);
       FL->init();
       forceLaw = FL;
+      optionNames["forceLaw"] = lawName;
       console->trace("The ForceLaw named {} has been activated", lawName);
     } else {
       console->warn("The ForceLaw named {} is unknown! -> set to Default", lawName);
       forceLaw = Factory<ForceLaw>::Instance()->Create("Default");
       forceLaw->plug(this);
       forceLaw->init();
+      optionNames["forceLaw"] = "Default";
     }  
   };
   
@@ -583,6 +585,7 @@ void Rockable::initParser() {
     conf >> Name;
     setIntegrator(Name);
   };
+  
   parser.kwMap["cellMinSizes"] = __GET__(conf, cellMinSizes);
   parser.kwMap["boxForLinkCellsOpt"] = __GET__(conf, boxForLinkCellsOpt);
   parser.kwMap["ContactPartnership"] = __DO__(conf) {
@@ -785,12 +788,23 @@ void Rockable::initParser() {
   // ======== FROM HERE, THESE ARE PREPRO COMMANDS (not saved in further conf-files)
   //          They are generally put at the end of the input file
   //          so that they apply on a system already set
-
+  
+  std::string commands[] = {"stickVerticesInClusters"};
+  for(const std::string &command : commands) {
+    PreproCommand* PC = Factory<PreproCommand>::Instance()->Create(command);
+    if (PC != nullptr) {
+      PC->plug(this);
+      PC->addCommand();
+    }  
+  }
+  /*
   parser.kwMap["stickVerticesInClusters"] = __DO__(conf) {
     double epsilonDist;
     conf >> epsilonDist;
     stickVerticesInClusters(epsilonDist);
   };
+  */
+  
   parser.kwMap["stickClusters"] = __DO__(conf) {
     double epsilonDist;
     conf >> epsilonDist;
@@ -877,8 +891,6 @@ void Rockable::loadConf(const char* name) {
     console->warn("@Rockable::loadConf, the version-date should be '{}'\n(in most cases, this should not be a problem)",
                   CONF_VERSION_DATE);
   }
-
-  // kwParser parser;
 
   // This single line actually parses the file
   parser.parse(conf);
@@ -1442,345 +1454,6 @@ void Rockable::UpdateNL_linkCells() {
   }      // ix
 }
 
-// ======================
-// FORCE LAWS
-// ======================
-/*
-void Rockable::setForceLaw(std::string& lawName) {
-  if (lawName == "Default") {
-#if BIND_METHODS
-    forceLawPtr = std::bind(&Rockable::forceLawDefault, this, std::placeholders::_1);
-#else
-    forceLawPtr = [this](Interaction& I) -> bool { return this->forceLawDefault(I); };
-#endif
-    optionNames["forceLaw"] = "Default";
-  } else if (lawName == "Avalanches") {
-#if BIND_METHODS
-    forceLawPtr = std::bind(&Rockable::forceLawAvalanches, this, std::placeholders::_1);
-#else
-    forceLawPtr = [this](Interaction& I) -> bool { return this->forceLawAvalanches(I); };
-#endif
-    optionNames["forceLaw"] = "Avalanches";
-  } else if (lawName == "StickedLinks") {
-#if BIND_METHODS
-    forceLawPtr = std::bind(&Rockable::forceLawStickedLinks, this, std::placeholders::_1);
-#else
-    forceLawPtr = [this](Interaction& I) -> bool { return this->forceLawStickedLinks(I); };
-#endif
-    optionNames["forceLaw"] = "StickedLinks";
-  } else {
-    console->warn("forceLaw {} is unknown, Option remains: forceLaw = {}", lawName, optionNames["forceLaw"]);
-  }
-}
-*/
-
-/**
-    @brief Since the group number can be zoned in a particle,
-           this method is meant to get these right numbers
-*/
-void Rockable::getInteractingGroups(Interaction& I, int& g1, int& g2) {
-  g1 = Particles[I.i].group;
-  g2 = Particles[I.j].group;
-}
-
-/**
-    @brief   Maybe the simplest law to use.
-             It includes Linear normal repulsion, normal viscosity, Coulomb Friction, and moment resistance
-    @return  Return true if the interaction is active (ie. with a non-zero force)
-*/
-/*
-bool Rockable::forceLawDefault(Interaction& I) {
-  if (I.dn > 0.0) {
-    I.fn = 0.0;
-    I.ft.reset();
-    I.mom.reset();
-    return false;
-  }
-
-  int g1 = Particles[I.i].group;
-  int g2 = Particles[I.j].group;
-  double kn = dataTable.get(idKnContact, g1, g2);
-  double kt = dataTable.get(idKtContact, g1, g2);
-  double mu = dataTable.get(idMuContact, g1, g2);
-  double kr = dataTable.get(idKrContact, g1, g2);
-  double mur = dataTable.get(idMurContact, g1, g2);
-  double damp = I.damp;  // It has been precomputed
-
-  if (ctcPartnership.getWeight != nullptr) {
-    double w = ctcPartnership.getWeight(I);
-    kn *= w;
-    kt *= w;
-    kr *= w;
-    damp *= sqrt(w);
-  }
-
-  // === Normal force (elatic contact + viscous damping)
-  double vn = I.vel * I.n;
-  double fne = -kn * I.dn;
-  double fnv = damp * vn;
-  I.fn = fne + fnv;
-  if (I.fn < 0.0) I.fn = 0.0;  // Because viscous damping can make the normal force negative
-
-  // === Tangential force (friction)
-  vec3r vt = I.vel - vn * I.n;
-#ifdef FT_CORR
-  vec3r ft_corr = I.ft;
-  ft_corr -= cross(ft_corr, cross(I.prev_n, I.n));
-  ft_corr -= cross(ft_corr, (dt_2 * (Particles[I.i].vrot + Particles[I.j].vrot) * I.n) * I.n);
-  I.ft = ft_corr + kt * (vt * dt);
-#else
-  I.ft += kt * (vt * dt);
-#endif
-
-  double threshold = fabs(mu * fne);
-  double ft_square = I.ft * I.ft;
-  if (ft_square > 0.0 && ft_square >= threshold * threshold) I.ft *= threshold / sqrt(ft_square);
-  // Remark: in fact, the test (ft_square > 0.0) means that ft_square is not
-  // zero, because ft_square >= 0 by definition.
-
-  // === Resistant moment
-  if (kr > 0.0) {
-    I.mom += kr * (Particles[I.j].vrot - Particles[I.i].vrot) * dt;
-    double threshold_mom = fabs(mur * I.fn);  // in this case mur is a *length*
-    double mom_square = I.mom * I.mom;
-    if (mom_square > 0.0 && mom_square >= threshold_mom * threshold_mom) I.mom *= threshold_mom / sqrt(mom_square);
-  }
-
-  return true;
-}
-*/
-
-/**
-    @brief   Force-law used for rock avalanches at Laboratoire 3SR
-    @return  Return true if the interaction is active (ie. with a non-zero force)
-*/
-/*
-bool Rockable::forceLawAvalanches(Interaction& I) {
-  if (I.dn > 0.0) {
-    I.fn = 0.0;
-    I.ft.reset();
-    I.mom.reset();
-    return false;
-  }
-
-  // getInteractingGroups(I, g1, g2);
-  int g1 = Particles[I.i].group;
-  int g2 = Particles[I.j].group;
-  double kn = dataTable.get(idKnContact, g1, g2);
-  double en2 = dataTable.get(idEn2Contact, g1, g2);
-  double kt = dataTable.get(idKtContact, g1, g2);
-  double mu = dataTable.get(idMuContact, g1, g2);
-  double kr = dataTable.get(idKrContact, g1, g2);
-  double mur = dataTable.get(idMurContact, g1, g2);
-
-  if (ctcPartnership.getWeight != nullptr) {
-    double w = ctcPartnership.getWeight(I);
-    kn *= w;
-    kt *= w;
-    kr *= w;
-  }
-
-  // === Normal force
-  if (I.prev_dn > 0.0) I.prev_dn = 0.0;
-  double delta_Dn = I.dn - I.prev_dn;
-  if (delta_Dn > 0.0)
-    I.fn = -kn * en2 * I.dn;  // Unloading
-  else if (delta_Dn < 0.0)
-    I.fn += -kn * delta_Dn;  // Loading
-  if (I.fn < 0.0) I.fn = 0.0;
-
-  // === Tangential force (friction)
-  vec3r vt = I.vel - (I.vel * I.n) * I.n;
-#ifdef FT_CORR
-  vec3r ft_corr = I.ft;
-  ft_corr -= cross(ft_corr, cross(I.prev_n, I.n));
-  ft_corr -= cross(ft_corr, (dt_2 * (Particles[I.i].vrot + Particles[I.j].vrot) * I.n) * I.n);
-  I.ft = ft_corr + kt * (vt * dt);
-#else
-  I.ft += kt * (dt * vt);
-#endif
-  double threshold_ft = fabs(mu * I.fn);  // even without fabs the value should be positive
-  double ft_square = I.ft * I.ft;
-  if (ft_square > 0.0 && ft_square > threshold_ft * threshold_ft) I.ft *= threshold_ft / sqrt(ft_square);
-  // Remark: in fact, the test (ft * ft > 0.0) means that ft_square is NOT null,
-  // because ft * ft >= 0 by definition.
-
-  // === Resistant moment
-  I.mom += kr * (Particles[I.j].vrot - Particles[I.i].vrot) * dt;
-  vec3r branch;
-  if (I.i < nDriven) {  // j is the free body (a rock block)
-    branch = I.pos - Particles[I.j].pos;
-    double r = (branch * Particles[I.j].vrot) / (Particles[I.j].vrot * Particles[I.j].vrot);
-    branch -= r * Particles[I.j].vrot;
-  } else {  // i is the free body (a rock block)
-    branch = I.pos - Particles[I.i].pos;
-    double r = (branch * Particles[I.i].vrot) / (Particles[I.i].vrot * Particles[I.i].vrot);
-    branch -= r * Particles[I.i].vrot;
-  }
-  double threshold_mom = fabs(mur * norm(branch) * I.fn);  // even without fabs, the value should
-                                                           // be positive
-  double mom_square = I.mom * I.mom;
-  if (mom_square > 0.0 && mom_square > threshold_mom * threshold_mom) I.mom *= threshold_mom / sqrt(mom_square);
-
-  return true;
-}
-*/
-
-/**
-   This is the force-law initiated by ANDRA's study (PhD of Marta Stasiak)
-   Bodies can be glued and when the glue is 'broken', it is irreversibly
-   switched to frictional contact
-*/
-/*
-bool Rockable::forceLawStickedLinks(Interaction& I) {
-  if (I.stick != nullptr) {  // =========== Cohesive bond
-    double kn = 0.0, kt = 0.0, kr = 0.0;
-    double fn0 = 1.0, ft0 = 1.0, mom0 = 1.0, power = 1.0;
-    double dn0 = I.stick->dn0;
-    bool isInner = false;
-
-    // First we need to get the parameters
-    if (paramsInInterfaces == 1) {
-      isInner = I.stick->isInner;
-      kn = I.stick->kn;
-      kt = I.stick->kt;
-      kr = I.stick->kr;
-      fn0 = I.stick->fn0;
-      ft0 = I.stick->ft0;
-      mom0 = I.stick->mom0;
-      power = I.stick->power;
-    } else {  // set parameters according to the group-numbers
-      int g1 = Particles[I.i].group;
-      int g2 = Particles[I.j].group;
-
-      if (Particles[I.i].cluster == Particles[I.j].cluster) {  // Inner
-        isInner = true;
-        kn = dataTable.get(idKnInnerBond, g1, g2);
-        kt = dataTable.get(idKtInnerBond, g1, g2);
-        fn0 = dataTable.get(idFn0InnerBond, g1, g2);
-        ft0 = dataTable.get(idFt0InnerBond, g1, g2);
-        power = dataTable.get(idPowInnerBond, g1, g2);
-        dn0 = 0.0;
-      } else {  // Outer
-        isInner = false;
-        kn = dataTable.get(idKnOuterBond, g1, g2);
-        kt = dataTable.get(idKtOuterBond, g1, g2);
-        kr = dataTable.get(idKrOuterBond, g1, g2);
-        fn0 = dataTable.get(idFn0OuterBond, g1, g2);
-        ft0 = dataTable.get(idFt0OuterBond, g1, g2);
-        mom0 = dataTable.get(idMom0OuterBond, g1, g2);
-        power = dataTable.get(idPowOuterBond, g1, g2);
-      }
-    }
-
-    // === Normal force (elastic contact + viscous damping)
-    double vn = I.vel * I.n;
-    double fne = -kn * (I.dn - dn0);
-    double fnv = I.damp * vn;
-    I.fn = fne + fnv;
-
-    // === Tangential force (friction)
-    vec3r vt = (I.vel - (vn * I.n));
-#ifdef FT_CORR
-    vec3r ft_corr = I.ft;
-    ft_corr -= cross(ft_corr, cross(I.prev_n, I.n));
-    ft_corr -= cross(ft_corr, (dt_2 * (Particles[I.i].vrot + Particles[I.j].vrot) * I.n) * I.n);
-    I.ft = ft_corr + kt * (vt * dt);
-#else
-    I.ft += kt * (vt * dt);
-#endif
-
-    // Tangential viscosity ========
-    // This term should be added only on the elastic part of ft
-    // So it is somehow wrong because the viscosity is cumulated... Be carreful!
-    vec3r ftv = I.damp * vt;
-    I.ft += ftv;
-    // =============================
-
-    // === Rupture criterion (and resistant moment for outer bonds)
-    double f;  // it defines the yield surface
-    if (isInner == true) {
-      f = pow(norm(I.ft) / ft0, power) - I.fn / fn0 - 1.0;
-    } else {
-      I.mom += kr * (Particles[I.j].vrot - Particles[I.i].vrot) * dt;
-      f = pow(norm(I.ft) / ft0, power) + pow(norm(I.mom) / mom0, power) - I.fn / fn0 - 1.0;
-    }
-
-    if (f > 0.0) {
-#ifdef BREAK_ONCE
-#pragma message "It is not recommanded to use BREAK_ONCE"
-      I.fn = 0.0;
-      I.ft.reset();
-      I.mom.reset();
-      I.stick = nullptr;
-      needUpdate = true;
-#else
-      // All the bonds (Interactions) of the interface are broken.
-      // The Interactions pointer inserted in this std::set
-      // will be 'broken' just after all the forces are computed
-      interfacesToBreak.insert(I.stick);
-      // The breakage is postponed to avoid assymetry in the tangential forces
-      // that are computed incrementally
-#endif
-    }
-  } else {  // =============== Contact
-    if (I.dn > 0.0) [[likely]] {
-      I.fn = 0.0;
-      I.ft.reset();
-      I.mom.reset();
-      return false;
-    }
-
-    int g1 = Particles[I.i].group;
-    int g2 = Particles[I.j].group;
-    double kn = dataTable.get(idKnContact, g1, g2);
-    double kt = dataTable.get(idKtContact, g1, g2);
-    double mu = dataTable.get(idMuContact, g1, g2);
-    double kr = dataTable.get(idKrContact, g1, g2);
-    double mur = dataTable.get(idMurContact, g1, g2);
-    double damp = I.damp;
-
-    if (ctcPartnership.getWeight != nullptr) {
-      double w = ctcPartnership.getWeight(I);
-      kn *= w;
-      kt *= w;
-      kr *= w;
-      damp *= sqrt(w);
-    }
-
-    // === Normal force (elatic contact + viscous damping)
-    double vn = I.vel * I.n;
-    double fne = -kn * I.dn;
-    double fnv = damp * vn;
-    I.fn = fne + fnv;
-    if (I.fn < 0.0) I.fn = 0.0;  // Because viscous damping can make the normal force negative
-
-    // === Tangential force (friction)
-    vec3r vt = I.vel - vn * I.n;
-#ifdef FT_CORR
-    vec3r ft_corr = I.ft;
-    ft_corr -= cross(ft_corr, cross(I.prev_n, I.n));
-    ft_corr -= cross(ft_corr, (dt_2 * (Particles[I.i].vrot + Particles[I.j].vrot) * I.n) * I.n);
-    I.ft = ft_corr + kt * (vt * dt);
-#else
-    I.ft += kt * (vt * dt);
-#endif
-
-    double threshold = fabs(mu * I.fn);
-    double ft_square = I.ft * I.ft;
-    if (ft_square > 0.0 && ft_square >= threshold * threshold) I.ft *= threshold / sqrt(ft_square);
-    // Remark: in fact, the test (ft_square > 0.0) means that ft_square is not
-    // zero, because ft_square >= 0 by definition.
-
-    // === Resistant moment
-    I.mom += kr * (Particles[I.j].vrot - Particles[I.i].vrot) * dt;
-    double threshold_mom = fabs(mur * I.fn);  // in this case mur is a *length*
-    double mom_square = I.mom * I.mom;
-    if (mom_square > 0.0 && mom_square >= threshold_mom * threshold_mom) I.mom *= threshold_mom / sqrt(mom_square);
-  }
-  return true;
-}
-*/
 
 // ==============================================================================================================
 //  INTEGRATORS
@@ -3095,7 +2768,10 @@ void Rockable::getInteractionGroups(std::vector<size_t>& nbInt) {
   nbInt.push_back(nb);
 }
 
-///
+/**
+    @brief  Estimate the critical time step according to the stiffness values in dataTable.
+    @param[out]  dtc  minimum value of square root of meff/kn.
+*/
 void Rockable::estimateCriticalTimeStep(double& dtc) {
   // find the particle with the smallest mass
   // (this particle can also be the driven one)

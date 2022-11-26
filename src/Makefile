@@ -104,6 +104,8 @@ ForceLaw.cpp \
 ForceLaw_Default.cpp \
 ForceLaw_Avalanche.cpp \
 ForceLaw_StickedLinks.cpp \
+PreproCommand.cpp \
+PreproCommand_stickVerticesInClusters.cpp \
 DataExtractor.cpp \
 DataExtractor_TrackBody.cpp \
 DataExtractor_TrackRockfall.cpp \
@@ -148,7 +150,7 @@ POSTPROHEADERS = $(POSTPROSOURCES:%.cpp=%.hpp)
 all: run see # postpro patatrac
 
 clean:
-	rm -f *~ *.o run see see2 see3 postpro patatrac
+	rm -f *~ *.o run see see2 see3 postpro patatrac edt
 
 format:
 	clang-format -i $(HEADERS) $(SOURCES) $(POSTPROHEADERS) $(POSTPROSOURCES) run.cpp see.cpp patatrac.cpp postpro.cpp

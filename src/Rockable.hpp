@@ -74,6 +74,7 @@
 #include "message.hpp"
 
 // local headers
+#include "PreproCommand.hpp"
 #include "ForceLaw.hpp"
 #include "BodyForce.hpp"
 #include "BreakableInterface.hpp"
@@ -263,7 +264,7 @@ class Rockable {
                                                                          ///< interaction according to the distance dmax
   void setAddOrRemoveInteractions(std::string& Name);
 
-  void getInteractingGroups(Interaction& I, int& g1, int& g2);
+  //void getInteractingGroups(Interaction& I, int& g1, int& g2);
 
   void readLawData(std::istream&, size_t id);             ///< Helper method to read a law in loadConf
   void writeLawData(std::ostream&, const char* parName);  ///< Helper method to
