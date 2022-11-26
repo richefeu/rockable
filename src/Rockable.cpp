@@ -72,12 +72,14 @@ Rockable::Rockable() {
   paramsInInterfaces = 0;
   idDensity = properties.add("density");
 
+  /*
 #ifdef BIND_METHODS
   forceLawPtr = std::bind(&Rockable::forceLawAvalanches, this, std::placeholders::_1);
 #else
   forceLawPtr = [this](Interaction& I) -> bool { return this->forceLawDefault(I); };
 #endif
   optionNames["forceLaw"] = "Default";
+   */
 
 #ifdef BIND_METHODS
   AddOrRemoveInteractions = std::bind(&Rockable::AddOrRemoveInteractions_bruteForce, this, std::placeholders::_1,
@@ -274,7 +276,7 @@ void Rockable::showBanner() {
 
 void Rockable::initialChecks() {
 
-  console->debug("Option forceLaw is {}", optionNames["forceLaw"]);
+  //console->debug("Option forceLaw is {}", optionNames["forceLaw"]);
   console->debug("Option AddOrRemoveInteractions is {}", optionNames["AddOrRemoveInteractions"]);
   console->debug("Option UpdateNL is {}", optionNames["UpdateNL"]);
   console->debug("Option Integrator is {}", optionNames["Integrator"]);
@@ -546,11 +548,26 @@ void Rockable::initParser() {
       Tempos.back().plug(&(properties.prop[id][grp]));
     }
   };
+  
   parser.kwMap["forceLaw"] = __DO__(conf) {
     std::string lawName;
     conf >> lawName;
-    setForceLaw(lawName);
+    //setForceLaw(lawName);
+
+    ForceLaw* FL = Factory<ForceLaw>::Instance()->Create(lawName);
+    if (FL != nullptr) {
+      FL->plug(this);
+      FL->init();
+      forceLaw = FL;
+      console->trace("The ForceLaw named {} has been activated", lawName);
+    } else {
+      console->warn("The ForceLaw named {} is unknown! -> set to Default", lawName);
+      forceLaw = Factory<ForceLaw>::Instance()->Create("Default");
+      forceLaw->plug(this);
+      forceLaw->init();
+    }  
   };
+  
   parser.kwMap["AddOrRemoveInteractions"] = __DO__(conf) {
     std::string Name;
     conf >> Name;
@@ -1428,7 +1445,7 @@ void Rockable::UpdateNL_linkCells() {
 // ======================
 // FORCE LAWS
 // ======================
-
+/*
 void Rockable::setForceLaw(std::string& lawName) {
   if (lawName == "Default") {
 #if BIND_METHODS
@@ -1455,6 +1472,7 @@ void Rockable::setForceLaw(std::string& lawName) {
     console->warn("forceLaw {} is unknown, Option remains: forceLaw = {}", lawName, optionNames["forceLaw"]);
   }
 }
+*/
 
 /**
     @brief Since the group number can be zoned in a particle,
@@ -1470,6 +1488,7 @@ void Rockable::getInteractingGroups(Interaction& I, int& g1, int& g2) {
              It includes Linear normal repulsion, normal viscosity, Coulomb Friction, and moment resistance
     @return  Return true if the interaction is active (ie. with a non-zero force)
 */
+/*
 bool Rockable::forceLawDefault(Interaction& I) {
   if (I.dn > 0.0) {
     I.fn = 0.0;
@@ -1529,11 +1548,13 @@ bool Rockable::forceLawDefault(Interaction& I) {
 
   return true;
 }
+*/
 
 /**
     @brief   Force-law used for rock avalanches at Laboratoire 3SR
     @return  Return true if the interaction is active (ie. with a non-zero force)
 */
+/*
 bool Rockable::forceLawAvalanches(Interaction& I) {
   if (I.dn > 0.0) {
     I.fn = 0.0;
@@ -1603,12 +1624,14 @@ bool Rockable::forceLawAvalanches(Interaction& I) {
 
   return true;
 }
+*/
 
 /**
    This is the force-law initiated by ANDRA's study (PhD of Marta Stasiak)
    Bodies can be glued and when the glue is 'broken', it is irreversibly
    switched to frictional contact
 */
+/*
 bool Rockable::forceLawStickedLinks(Interaction& I) {
   if (I.stick != nullptr) {  // =========== Cohesive bond
     double kn = 0.0, kt = 0.0, kr = 0.0;
@@ -1757,6 +1780,7 @@ bool Rockable::forceLawStickedLinks(Interaction& I) {
   }
   return true;
 }
+*/
 
 // ==============================================================================================================
 //  INTEGRATORS
@@ -2464,7 +2488,7 @@ void Rockable::integrate() {
     // It will use the selected integration scheme
     integrationStep();
     
-    if (computationStopAsked > 0) [[unilikely]] {
+    if (computationStopAsked > 0) [[unlikely]] {
       break;
     }
 
@@ -2676,7 +2700,8 @@ void Rockable::accelerations() {
     for (auto it = Interactions[k].begin(); it != Interactions[k].end(); ++it) {
       Interaction* I = const_cast<Interaction*>(std::addressof(*it));
       if (it->dn < 0.0 || it->stick != nullptr) {
-        forceLawPtr(*I);
+        //forceLawPtr(*I);
+        forceLaw->computeInteraction(*I);
       }
     }
   }

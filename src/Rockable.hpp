@@ -74,6 +74,7 @@
 #include "message.hpp"
 
 // local headers
+#include "ForceLaw.hpp"
 #include "BodyForce.hpp"
 #include "BreakableInterface.hpp"
 #include "ContactPartnership.hpp"
@@ -152,6 +153,9 @@ class Rockable {
 
   std::map<std::string, std::string> optionNames;  ///< All the options refered to as a string and set
                                                    ///< as a string also
+  
+  ForceLaw * forceLaw;
+  
   // Ctor
   Rockable();
 
@@ -199,12 +203,14 @@ class Rockable {
                                         ///< (update the neighbor-list) method
   void setUpdateNL(std::string& Name);  ///< select the Neighbor list updator
 
+  /*
   bool forceLawDefault(Interaction&);             ///< Most common force law
   bool forceLawStickedLinks(Interaction&);        ///< Force law for 'glued' bodies
   bool forceLawAvalanches(Interaction&);          ///< Force law specific for rock avalanches
   std::function<bool(Interaction&)> forceLawPtr;  ///< Pointer function to the force-law used
   void setForceLaw(std::string& lawName);         ///< Force law selector
-
+  */
+  
   // Processing methods
   void computeAABB(size_t first = 0, size_t last = 0);  ///< Compute Axis Aligned Bounding
                                                         ///< Box of a part of the sample

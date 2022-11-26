@@ -100,6 +100,10 @@ Rockable.cpp \
 DrivingSystem.cpp \
 BreakableInterface.cpp \
 ContactPartnership.cpp \
+ForceLaw.cpp \
+ForceLaw_Default.cpp \
+ForceLaw_Avalanche.cpp \
+ForceLaw_StickedLinks.cpp \
 DataExtractor.cpp \
 DataExtractor_TrackBody.cpp \
 DataExtractor_TrackRockfall.cpp \
