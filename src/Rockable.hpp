@@ -214,28 +214,14 @@ class Rockable {
                               size_t last = 0);
   void getInteractionQuickStats(double& fnMin, double& fnMax, double& fnMean, double& fnStddev);
   void getKineticEnergy(double& Etrans, double& Erot, size_t first = 0, size_t last = 0);
-  
-  //void getClusters(std::vector<clusterParticles>& clusters);
-  //void getBrokenSubClusters(std::vector<clusterParticles>& subclusters);
-  //void getInteractionGroups(std::vector<size_t>& nbInt);
-  // double probeSolidFraction(AABB& aabb, size_t MCnstep = 100000);
+
 
   // Pre-processing methods
-  //void stickVerticesInClusters(double);  ///< Create bonds between vertices if
-                                         ///< they belong to the same cluster (same cluster ID)
-  //void stickClusters(double);            ///< Create bonds in-between different clusters (different cluster IDs)
   void copyParamsToInterfaces(std::string& isInnerStr);
   void setStiffnessRatioInterfaces(double ratio);
 
   void setVariableStickParams(std::string& paramName, std::string& isInnerStr, double lambda, double m,
                               bool timeSeeded);
-  //void randomlyOrientedVelocities(double velocityMagnitude);  ///< Set a randomly oriented
-                                                              ///< velocity to all free bodies
-
-  //void randomlyOrientedVelocitiesClusters(double velocityMagnitude,
-  //                                        int opt = 0);  ///< Set a randomly oriented velocity to all free clusters
-                                                         ///< (same velocity for the bodies belonging
-                                                         ///< to the same cluster)
   void setAllVelocities(vec3r& vel);
   void homothetyRange(size_t idFirst, size_t idLast, double hmin, double hmax, bool timeSeeded);
   void particlesClonage(size_t idFirst, size_t idLast, vec3r& translation);

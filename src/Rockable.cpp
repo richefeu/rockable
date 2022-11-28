@@ -72,40 +72,19 @@ Rockable::Rockable() {
   paramsInInterfaces = 0;
   idDensity = properties.add("density");
 
-  /*
-#ifdef BIND_METHODS
-  forceLawPtr = std::bind(&Rockable::forceLawAvalanches, this, std::placeholders::_1);
-#else
-  forceLawPtr = [this](Interaction& I) -> bool { return this->forceLawDefault(I); };
-#endif
-  */
   optionNames["forceLaw"] = "Default";
-  
 
-#ifdef BIND_METHODS
-  AddOrRemoveInteractions = std::bind(&Rockable::AddOrRemoveInteractions_bruteForce, this, std::placeholders::_1,
-                                      std::placeholders::_2, std::placeholders::_3);
-#else
   AddOrRemoveInteractions = [this](size_t i, size_t j, double dmax) -> int {
     return this->AddOrRemoveInteractions_bruteForce(i, j, dmax);
   };
-#endif
   optionNames["AddOrRemoveInteractions"] = "bruteForce";
-
-#ifdef BIND_METHODS
-  UpdateNL = std::bind(&Rockable::UpdateNL_bruteForce, this);
-#else
   UpdateNL = [this]() { this->UpdateNL_bruteForce(); };
-#endif
+
   optionNames["UpdateNL"] = "bruteForce";
   cellMinSizes.set(1.0, 1.0, 1.0);
   boxForLinkCellsOpt = 0;
 
-#ifdef BIND_METHODS
-  IntegrationStep = std::bind(&Rockable::velocityVerletStep, this);
-#else
   integrationStep = [this]() { this->velocityVerletStep(); };
-#endif
   optionNames["Integrator"] = "velocityVerlet";
 
   idKnContact = dataTable.add("knContact");
@@ -188,7 +167,7 @@ void Rockable::setVerboseLevel(int v) {
 /**
  * @brief A version of setVerboseLevel that takes a string as argument
  *
- * @param levelName Name of the verbose level 
+ * @param levelName Name of the verbose level
  */
 void Rockable::setVerboseLevel(std::string& levelName) {
   if (levelName == "off")
@@ -212,7 +191,7 @@ void Rockable::setVerboseLevel(std::string& levelName) {
 
 /**
  * @brief It opens some files if interactiveMode is false
- * 
+ *
  */
 void Rockable::initOutputFiles() {
   if (interactiveMode == true) return;
@@ -263,12 +242,6 @@ void Rockable::showBanner() {
 #else
   console->info("Compilation options: ROT_MATRIX = NO");
 #endif
-
-#ifdef BREAK_ONCE
-  console->info("Compilation options: BREAK_ONCE = YES (** SHOULD NOT BE USED! **)");
-#else
-  console->info("Compilation options: BREAK_ONCE = NO");
-#endif
 }
 
 // ==================================================================================================================
@@ -299,7 +272,6 @@ void Rockable::initialChecks() {
   }
 
   // TODO: ajouter des verifs par rapport aux groupes définies et le nombre de groupes dans properties et dataTable
-
 }
 
 // ==================================================================================================================
@@ -349,8 +321,7 @@ void Rockable::saveConf(const char* fname) {
   conf << "dVerlet " << dVerlet << '\n';
   for (size_t grp = 0; grp < properties.ngroup; grp++) {
     double density = properties.get(idDensity, grp);
-    if (density > 0.0)
-      conf << "density " << grp << " " << density << '\n';
+    if (density > 0.0) conf << "density " << grp << " " << density << '\n';
   }
   conf << "gravity " << gravity << '\n';
   if (bodyForce != nullptr) {
@@ -549,7 +520,7 @@ void Rockable::initParser() {
       Tempos.back().plug(&(properties.prop[id][grp]));
     }
   };
-  
+
   parser.kwMap["forceLaw"] = __DO__(conf) {
     std::string lawName;
     conf >> lawName;
@@ -567,9 +538,9 @@ void Rockable::initParser() {
       forceLaw->plug(this);
       forceLaw->init();
       optionNames["forceLaw"] = "Default";
-    }  
+    }
   };
-  
+
   parser.kwMap["AddOrRemoveInteractions"] = __DO__(conf) {
     std::string Name;
     conf >> Name;
@@ -585,7 +556,7 @@ void Rockable::initParser() {
     conf >> Name;
     setIntegrator(Name);
   };
-  
+
   parser.kwMap["cellMinSizes"] = __GET__(conf, cellMinSizes);
   parser.kwMap["boxForLinkCellsOpt"] = __GET__(conf, boxForLinkCellsOpt);
   parser.kwMap["ContactPartnership"] = __DO__(conf) {
@@ -788,9 +759,9 @@ void Rockable::initParser() {
   // ======== FROM HERE, THESE ARE PREPRO COMMANDS (not saved in further conf-files)
   //          They are generally put at the end of the input file
   //          so that they apply on a system already set
-  
+
   std::string commands[] = {"stickVerticesInClusters", "stickClusters", "randomlyOrientedVelocities"};
-  for(const std::string &command : commands) {
+  for (const std::string& command : commands) {
     PreproCommand* PC = Factory<PreproCommand>::Instance()->Create(command);
     if (PC != nullptr) {
       PC->plug(this);
@@ -805,8 +776,8 @@ void Rockable::initParser() {
     conf >> epsilonDist;
     stickVerticesInClusters(epsilonDist);
   };
-  
-  
+
+
   parser.kwMap["stickClusters"] = __DO__(conf) {
     double epsilonDist;
     conf >> epsilonDist;
@@ -837,7 +808,7 @@ void Rockable::initParser() {
     conf >> vel;
     randomlyOrientedVelocities(vel);
   };
-  
+
   parser.kwMap["randomlyOrientedVelocitiesClusters"] = __DO__(conf) {
     double vel;
     int opt;
@@ -1021,24 +992,17 @@ void Rockable::console_run(std::string& confFileName) {
 
 void Rockable::setAddOrRemoveInteractions(std::string& Name) {
   if (Name == "bruteForce") {
-#ifdef BIND_METHODS
-    AddOrRemoveInteractions = std::bind(&Rockable::AddOrRemoveInteractions_bruteForce, this, std::placeholders::_1,
-                                        std::placeholders::_2, std::placeholders::_3);
-#else
+
     AddOrRemoveInteractions = [this](size_t i, size_t j, double dmax) -> int {
       return this->AddOrRemoveInteractions_bruteForce(i, j, dmax);
     };
-#endif
     optionNames["AddOrRemoveInteractions"] = "bruteForce";
   } else if (Name == "OBBtree") {
-#ifdef BIND_METHODS
-    AddOrRemoveInteractions = std::bind(&Rockable::AddOrRemoveInteractions_OBBtree, this, std::placeholders::_1,
-                                        std::placeholders::_2, std::placeholders::_3);
-#else
+
     AddOrRemoveInteractions = [this](size_t i, size_t j, double dmax) -> int {
       return this->AddOrRemoveInteractions_OBBtree(i, j, dmax);
     };
-#endif
+
     optionNames["AddOrRemoveInteractions"] = "OBBtree";
   } else {
     console->warn("AddOrRemoveInteractions {} is unknown, Option remains: AddOrRemoveInteractions = {}", Name,
@@ -1255,18 +1219,10 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
 
 void Rockable::setUpdateNL(std::string& Name) {
   if (Name == "bruteForce") {
-#ifdef BIND_METHODS
-    UpdateNL = std::bind(&Rockable::UpdateNL_bruteForce, this);
-#else
     UpdateNL = [this]() { this->UpdateNL_bruteForce(); };
-#endif
     optionNames["UpdateNL"] = "bruteForce";
   } else if (Name == "linkCells") {
-#ifdef BIND_METHODS
-    UpdateNL = std::bind(&Rockable::UpdateNL_linkCells, this);
-#else
     UpdateNL = [this]() { this->UpdateNL_linkCells(); };
-#endif
     optionNames["UpdateNL"] = "linkCells";
   } else {
     console->warn("UpdateNL {} is unknown, Option remains: UpdateNL = {}", Name, optionNames["UpdateNL"]);
@@ -1307,10 +1263,8 @@ void Rockable::UpdateNL_bruteForce() {
 
 #pragma omp parallel for default(shared)
   for (size_t i = 0; i < Particles.size(); ++i) {
-#ifndef BREAK_ONCE
     BreakableInterface BI_to_find;
     BI_to_find.i = i;
-#endif
 
     OBB obbi = Particles[i].obb;
     obbi.enlarge(0.5 * DVerlet);
@@ -1320,14 +1274,12 @@ void Rockable::UpdateNL_bruteForce() {
     if (jnext < nDriven) jnext = nDriven;
 
     for (size_t j = jnext; j < Particles.size(); j++) {
-
-#ifndef BREAK_ONCE
       // if interface (i,j) is still 'active' (ie. no bond has been broken),
       // then NO contact will be possible between bodies i and j.
       BI_to_find.j = j;
       std::set<BreakableInterface>::iterator BI_it = (Interfaces[i]).find(BI_to_find);
       if (BI_it != Interfaces[i].end()) continue;  // Continue the loop (next j) if an interface is found
-#endif
+
 
       OBB obbj = Particles[j].obb;
       obbj.enlarge(0.5 * DVerlet);
@@ -1376,10 +1328,10 @@ void Rockable::UpdateNL_linkCells() {
           for (size_t icc = 0; icc < Cc->bodies.size(); ++icc) {
 
             size_t i = Cc->bodies[icc];
-#ifndef BREAK_ONCE
+
             BreakableInterface BI_to_find;
             BI_to_find.i = i;
-#endif
+
             OBB obbi = Particles[i].obb;
             obbi.enlarge(0.5 * DVerlet);
 
@@ -1388,13 +1340,12 @@ void Rockable::UpdateNL_linkCells() {
               if (j < nDriven && i < nDriven) continue;
               if (j <= i) continue;
 
-#ifndef BREAK_ONCE
               // if interface (i,j) is still 'active' (ie. no bond has been broken),
               // then NO contact will be possible between bodies i and j.
               BI_to_find.j = j;
               std::set<BreakableInterface>::iterator BI_it = (Interfaces[i]).find(BI_to_find);
               if (BI_it != Interfaces[i].end()) continue;  // Continue the loop if an interface is found
-#endif
+
 
               OBB obbj = Particles[j].obb;
               obbj.enlarge(0.5 * DVerlet);
@@ -1423,10 +1374,10 @@ void Rockable::UpdateNL_linkCells() {
         for (size_t icc = 0; icc < Cc->bodies.size(); ++icc) {
 
           size_t i = Cc->bodies[icc];
-#ifndef BREAK_ONCE
+
           BreakableInterface BI_to_find;
           BI_to_find.i = i;
-#endif
+
           OBB obbi = Particles[i].obb;
           obbi.enlarge(0.5 * DVerlet);
 
@@ -1436,13 +1387,12 @@ void Rockable::UpdateNL_linkCells() {
             if (j < nDriven && i < nDriven) continue;
             if (j <= i) continue;
 
-#ifndef BREAK_ONCE
             // if interface (i,j) is still 'active' (ie. no bond has been broken),
             // then NO contact will be possible between bodies i and j.
             BI_to_find.j = j;
             std::set<BreakableInterface>::iterator BI_it = (Interfaces[i]).find(BI_to_find);
             if (BI_it != Interfaces[i].end()) continue;  // Continue the loop if an interface is found
-#endif
+
 
             OBB obbj = Particles[j].obb;
             obbj.enlarge(0.5 * DVerlet);
@@ -1460,39 +1410,22 @@ void Rockable::UpdateNL_linkCells() {
   }      // ix
 }
 
-
 // ==============================================================================================================
 //  INTEGRATORS
 // ==============================================================================================================
 
 void Rockable::setIntegrator(std::string& Name) {
   if (Name == "velocityVerlet") {
-#ifdef BIND_METHODS
-    IntegrationStep = std::bind(&Rockable::velocityVerletStep, this);
-#else
     integrationStep = [this]() { this->velocityVerletStep(); };
-#endif
     optionNames["Integrator"] = "velocityVerlet";
   } else if (Name == "Euler") {
-#ifdef BIND_METHODS
-    IntegrationStep = std::bind(&Rockable::EulerStep, this);
-#else
     integrationStep = [this]() { this->EulerStep(); };
-#endif
     optionNames["Integrator"] = "Euler";
   } else if (Name == "Beeman") {
-#ifdef BIND_METHODS
-    IntegrationStep = std::bind(&Rockable::BeemanStep, this);
-#else
     integrationStep = [this]() { this->BeemanStep(); };
-#endif
     optionNames["Integrator"] = "Beeman";
   } else if (Name == "RungeKutta4") {
-#ifdef BIND_METHODS
-    IntegrationStep = std::bind(&Rockable::RungeKutta4Step, this);
-#else
     integrationStep = [this]() { this->RungeKutta4Step(); };
-#endif
     optionNames["Integrator"] = "RungeKutta4";
   } else {
     console->warn("Integrator {} is unknown, Option remains: Integrator = {}", Name, optionNames["Integrator"]);
@@ -1557,7 +1490,7 @@ void Rockable::velocityControlledDrive() {
 }
 
 /**
-    @brief Makes ONE step with the Euler scheme.
+    @brief Makes a single step with the Euler scheme.
 */
 void Rockable::EulerStep() {
   // If a ServoFunction exists, then it is called
@@ -1629,7 +1562,7 @@ void Rockable::EulerStep() {
 }
 
 /**
-    @brief Makes ONE step with the velocity-Verlet scheme.
+    @brief Makes a single step with the velocity-Verlet scheme.
 */
 void Rockable::velocityVerletStep() {
   // If a ServoFunction exists, then it is called
@@ -1747,7 +1680,7 @@ void Rockable::velocityVerletStep() {
 }
 
 /**
-    @brief Makes ONE step with the Beeman scheme.
+    @brief Makes a single step with the Beeman scheme.
 */
 void Rockable::BeemanStep() {
   static const double CST_2_DIV_3 = 2.0 / 3.0;
@@ -1869,7 +1802,7 @@ void Rockable::BeemanStep() {
 }
 
 /**
-    @brief Makes ONE step with the Runge-Kutta-Nystrom (4th order) scheme.
+    @brief Makes a single step with the Runge-Kutta-Nystrom (4th order) scheme.
 */
 void Rockable::RungeKutta4Step() {
   // If a ServoFunction exists, then it is called
@@ -2166,7 +2099,7 @@ void Rockable::integrate() {
 
     // It will use the selected integration scheme
     integrationStep();
-    
+
     if (computationStopAsked > 0) [[unlikely]] {
       break;
     }
@@ -2379,7 +2312,7 @@ void Rockable::accelerations() {
     for (auto it = Interactions[k].begin(); it != Interactions[k].end(); ++it) {
       Interaction* I = const_cast<Interaction*>(std::addressof(*it));
       if (it->dn < 0.0 || it->stick != nullptr) {
-        //forceLawPtr(*I);
+        // forceLawPtr(*I);
         forceLaw->computeInteraction(*I);
       }
     }
@@ -2398,7 +2331,6 @@ void Rockable::accelerations() {
     }
   }
 
-#ifndef BREAK_ONCE
   // In this loop, all the bonds that are identified to be broken will actually be broken now
   for (std::set<BreakableInterface*>::iterator BI = interfacesToBreak.begin(); BI != interfacesToBreak.end(); ++BI) {
     std::string whichBond;
@@ -2445,7 +2377,7 @@ void Rockable::accelerations() {
 
     needUpdate = true;
   }
-#endif
+
 
   timeInForceComputation += tm.getElapsedTimeSeconds();
 
@@ -2552,8 +2484,9 @@ void Rockable::accelerations() {
 }
 
 /**
-    @brief This is the Cundall damping solution
-    @todo Change the implementation so that it acts on acceleration rather than forces/moments
+    @brief This is the so-called Cundall damping solution
+    @attention It acts on forces, so call this method after the summation of forces/moment
+               and before the computation of accelerations
 */
 void Rockable::numericalDamping() {
   double factor;
@@ -2684,58 +2617,6 @@ void Rockable::computeAABB(size_t first, size_t last) {
 }
 
 /**
- * @brief xxx
- *
- * @param aabb    The probe as an Axis Aligned Bounding Box
- * @param MCnstep Number of Monte Carlo steps
- * @return double Estimate of the solid fraction inside the probe
- */
-/*
-double Rockable::probeSolidFraction(AABB& aabb, size_t MCnstep) {
-  if (MCnstep == 0) return -1.0;
-
-  // select the concerned particles
-  OBB zone;
-  zone.center = 0.5 * (aabb.min + aabb.max);
-  zone.extent.set(0.5 * (aabb.max.x - aabb.min.x), 0.5 * (aabb.max.y - aabb.min.y), 0.5 * (aabb.max.z - aabb.min.z));
-  std::vector<size_t> pid;
-  for (size_t i = 0; i < Particles.size(); ++i) {
-    Particles[i].updateObb();
-    if (zone.intersect(Particles[i].obb)) {
-      pid.push_back(i);
-    }
-  }
-
-  vec3r pt3;
-  std::vector<double> vv(3);
-  Mth::sobolSequence(-3, vv);  // Initialize the Sobol sequence
-  size_t count = 0;
-  for (size_t imc = 0; imc < MCnstep; ++imc) {
-    Mth::sobolSequence(3, vv);
-    pt3.set(aabb.min.x + vv[0] * (aabb.max.x - aabb.min.x), aabb.min.y + vv[1] * (aabb.max.y - aabb.min.y),
-            aabb.min.z + vv[2] * (aabb.max.z - aabb.min.z));
-
-    bool inSolid = false;
-    for (size_t ii = 0; ii < pid.size(); ii++) {
-      size_t i = pid[ii];
-      vec3r ptTest = pt3 - Particles[i].pos;
-      quat Qinv = Particles[i].Q.get_conjugated();
-      ptTest = Qinv * ptTest;
-      ptTest /= Particles[i].homothety;
-
-      if (Particles[i].shape->inside(ptTest)) {
-        inSolid = true;
-        break;
-      }
-    }
-    if (inSolid) count++;
-  }
-
-  return ((double)count / (double)MCnstep);
-}
-*/
-
-/**
     @brief  Get the global kinetic energy for translations and for rotations.
 
     @param[out]  Etrans  The translation kinetic energy (for particles id in range[first last])
@@ -2756,27 +2637,6 @@ void Rockable::getKineticEnergy(double& Etrans, double& Erot, size_t first, size
   Etrans *= 0.5;
   Erot *= 0.5;
 }
-
-/*
-void Rockable::getInteractionGroups(std::vector<size_t>& nbInt) {
-  nbInt.clear();
-  std::sort(activeInteractions.begin(), activeInteractions.end(), std::less<Interaction*>());
-  size_t igrp = activeInteractions[0]->i;
-  size_t jgrp = activeInteractions[0]->j;
-  size_t nb = 1;
-  for (size_t k = 1; k < activeInteractions.size(); k++) {
-    if (activeInteractions[k]->i == igrp && activeInteractions[k]->j == jgrp) {
-      nb++;
-    } else {
-      nbInt.push_back(nb);
-      igrp = activeInteractions[k]->i;
-      jgrp = activeInteractions[k]->j;
-      nb = 1;
-    }
-  }
-  nbInt.push_back(nb);
-}
-*/
 
 /**
     @brief  Estimate the critical time step according to the stiffness values in dataTable.
@@ -2905,25 +2765,6 @@ void Rockable::getCurrentCriticalTimeStep(double& dtc) {
 }
 
 /**
-   @brief  Get the range of masses
-
-   @param[out]  massMin  The lightest mass (for particles id in range[first last])
-   @param[out]  massMax  The heaviest mass (for particles id in range[first last])
-   @param[in]   first    Smallest ID of particles (default value is 0)
-   @param[in]   last     Largest ID of particles (default value corresponds to the last particle)
-*/
-/*
-void Rockable::getMassRange(double& massMin, double& massMax, size_t first, size_t last) {
-  if (last == 0) last = Particles.size() - 1;
-  massMin = massMax = Particles[first].mass;
-  for (size_t i = first + 1; i <= last; i++) {
-    if (Particles[i].mass < massMin) massMin = Particles[i].mass;
-    if (Particles[i].mass > massMax) massMax = Particles[i].mass;
-  }
-}
-*/
-
-/**
    Fmax is the maximum value of resultant-force norms
    F_fnmax is the maximum value over all resultant-force norms divided by the maximum normal force acting on them
    Fmean is the mean value of the resultant-force norms
@@ -3019,168 +2860,9 @@ void Rockable::getInteractionQuickStats(double& fnMin, double& fnMax, double& fn
   }
 }
 
-/**
-   @brief Get the set of clusters according to the cluster-ID that each particle has.
-          Each cluster holds a vector of particle numbers (index in the vector @c Rockable::Particles)
-
-   @param[out]  clusters  A vector of 'clusterParticles' that hold the clusterId and the list of involved particleId
-*/
-/*
-void Rockable::getClusters(std::vector<clusterParticles>& clusters) {
-  clusters.clear();  // clear clusters if not empty
-  std::set<clusterParticles> clusterSet;
-  clusterParticles C;
-  for (size_t i = nDriven; i < Particles.size(); i++) {
-    C.clusterId = Particles[i].cluster;
-    auto itClust = clusterSet.find(C);
-    if (itClust == clusterSet.end()) {  // if not found
-      auto p = clusterSet.insert(C);
-      itClust = p.first;
-    }
-
-    // An element in the set clusterSet cannot be modified (because a set is
-    // ordered) so we get a pointer to it, and change only the parameters that
-    // will not affect the order
-    clusterParticles* cp = const_cast<clusterParticles*>(std::addressof(*itClust));
-    cp->particleId.push_back(i);
-  }
-
-  clusters.assign(clusterSet.begin(), clusterSet.end());
-
-#if 0
-  for (size_t c = 0 ; c < clusters.size() ; c++) {
-    std::cout << std::endl;
-    __SHOW(c);
-    __SHOW( clusters[c].particleId.size() );
-    for (size_t i = 0 ; i < clusters[c].particleId.size() ; i++) {
-      __SHOW( clusters[c].particleId[i] );
-    }
-  }
-#endif
-}
-*/
-
-/**
-    @brief      Get the set of sub-parts (broken clusters).
-    @attention  The clusterId in subParts is NOT the original cluster number (when it was not broken).
-                Let say clusterId should be called partId in 'clusterParticles'
-
-    @param[out]   subParts   A vector of 'clusterParticles'
-
-    @remark This method has been carfully checked with Marta. It seems to work correctly
-*/
-/*
-void Rockable::getBrokenSubClusters(std::vector<clusterParticles>& subParts) {
-  subParts.clear();  // clear clusters in case it's not empty
-
-  std::vector<std::set<int>> subs;
-  std::set<int> addedParticles;
-  for (size_t i = 0; i < Interfaces.size(); i++) {
-    for (auto it = Interfaces[i].begin(); it != Interfaces[i].end(); ++it) {
-      size_t I = it->i;
-      size_t J = it->j;
-      if (Particles[I].cluster == Particles[J].cluster) {
-
-        int afound = -1;
-        if (!subs.empty()) {
-          for (size_t a = subs.size(); a-- > 0;) {
-            auto itI = subs[a].find(I);
-            if (itI != subs[a].end()) {
-              afound = a;
-              break;
-            }
-            auto itJ = subs[a].find(J);
-            if (itJ != subs[a].end()) {
-              afound = a;
-              break;
-            }
-          }
-        }
-
-        if (afound >= 0) {
-          subs[afound].insert(I);
-          subs[afound].insert(J);
-          addedParticles.insert(I);
-          addedParticles.insert(J);
-        } else {
-          std::set<int> s;
-          s.insert(I);
-          s.insert(J);
-          subs.push_back(s);
-          addedParticles.insert(I);
-          addedParticles.insert(J);
-        }
-
-      }  // end 'if same cluster'
-    }    // end 'for it'
-  }      // end 'for i'
-
-  // Merge sets that have common particle.
-  // Remark: the merge of more than 2 sets is not possible because an interface can onle involve 2 particles
-  std::vector<std::set<int>> subsFinal;
-  for (size_t a = 0; a < subs.size(); a++) {
-    bool hasBeenMerged = false;
-    for (size_t b = a + 1; b < subs.size(); b++) {
-      bool hasCommon = false;
-      for (auto it = subs[a].begin(); it != subs[a].end(); ++it) {
-        if (subs[b].find(*it) != subs[b].end()) {  // found
-          hasCommon = true;
-          break;
-        }
-      }
-      if (hasCommon == true) {
-        std::set<int> s;
-        for (auto ia = subs[a].begin(); ia != subs[a].end(); ++ia) s.insert(*ia);
-        for (auto ib = subs[b].begin(); ib != subs[b].end(); ++ib) s.insert(*ib);
-        subsFinal.push_back(s);
-        subs.erase(subs.begin() + b);
-        hasBeenMerged = true;
-        break;
-      }
-    }
-
-    if (hasBeenMerged == false) {
-      // add a to subsFinal
-      std::set<int> s;
-      for (auto ia = subs[a].begin(); ia != subs[a].end(); ++ia) s.insert(*ia);
-      subsFinal.push_back(s);
-    }
-  }
-
-  // Add parts composed of single particle
-  for (int n = nDriven; n < (int)Particles.size(); n++) {
-    if (addedParticles.find(n) == addedParticles.end()) {
-      std::set<int> s;
-      s.insert(n);
-      subsFinal.push_back(s);
-    }
-  }
-
-  for (size_t a = 0; a < subsFinal.size(); a++) {
-    clusterParticles C;
-    C.clusterId = a;
-    C.particleId.assign(subsFinal[a].begin(), subsFinal[a].end());
-    subParts.push_back(C);
-  }
-
-#if 0
-  std::cout << " --------- " << std::endl;
-  for (size_t c = 0 ; c < subParts.size() ; c++) {
-    std::cout << std::endl;
-    __SHOW(c);
-    __SHOW( subParts[c].particleId.size() );
-    for (size_t i = 0 ; i < subParts[c].particleId.size() ; i++) {
-      __SHOW( subParts[c].particleId[i] );
-    }
-  }
-#endif
-}
-*/
-
 // ==============================================================================================================
 //  PRE-PROCESSING METHODS
 // ==============================================================================================================
-
 
 /**
    @attention  We suppose that the Damp parameter has already been set
@@ -3281,47 +2963,6 @@ void Rockable::setVariableStickParams(std::string& paramName, std::string& isInn
 
   paramsInInterfaces = 1;  // so that they are stored in the conf files (within interfaces)
 }
-
-/**
-   @brief  Set randomly oriented velocity vectors (the magnitudes are all the same).
-           The velocities of the driven bodies are not modified
-*/
-/*
-void Rockable::randomlyOrientedVelocities(double velocityMagnitude) {
-  quat q;
-  q.randomize(true);
-  vec3r u(velocityMagnitude, 0.0, 0.0);
-  for (size_t i = nDriven; i < Particles.size(); i++) {
-    q.randomize();
-    Particles[i].vel = q * u;
-  }
-}
-*/
-
-/**
-   @brief Set random orientation to the clusters
-   @param[in]  velocityMagnitude  Magnitude of all velocities (only orientations change)
-   @param[in]  opt                An option. if opt = 1 then all the velocity vectors
-                                  will be oriented towards negative y (downward)
-*/
-/*
-void Rockable::randomlyOrientedVelocitiesClusters(double velocityMagnitude, int opt) {
-  std::vector<clusterParticles> clusters;
-  getClusters(clusters);
-
-  quat q;
-  q.randomize(true);
-  vec3r u(velocityMagnitude, 0.0, 0.0);
-  for (size_t c = 0; c < clusters.size(); c++) {
-    q.randomize();
-    vec3r v = q * u;
-    if (opt == 1) v.y = -fabs(v.y);
-    for (size_t i = 0; i < clusters[c].particleId.size(); i++) {
-      Particles[clusters[c].particleId[i]].vel = v;
-    }
-  }
-}
-*/
 
 /**
    @brief Set the velocity of ALL free bodies to a given velocity vector

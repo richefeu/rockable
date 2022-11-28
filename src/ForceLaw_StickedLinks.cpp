@@ -147,21 +147,12 @@ bool StickedLinks::computeInteraction(Interaction& I) {
     }
 
     if (f > 0.0) {
-#ifdef BREAK_ONCE
-#pragma message "It is not recommanded to use BREAK_ONCE"
-      I.fn = 0.0;
-      I.ft.reset();
-      I.mom.reset();
-      I.stick = nullptr;
-      needUpdate = true;
-#else
       // All the bonds (Interactions) of the interface are broken.
       // The Interactions pointer inserted in this std::set
       // will be 'broken' just after all the forces are computed
       box->interfacesToBreak.insert(I.stick);
       // The breakage is postponed to avoid assymetry in the tangential forces
       // that are computed incrementally
-#endif
     }
   } else {  // =============== Contact
     if (I.dn > 0.0) [[likely]] {
