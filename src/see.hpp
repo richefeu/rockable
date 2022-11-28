@@ -52,6 +52,7 @@
 
 #include "Rockable.hpp"
 #include "BlockRelease.hpp"
+#include "processingTool_probeSolidFraction.hpp"
 
 Rockable box;
 int confNum = 0;

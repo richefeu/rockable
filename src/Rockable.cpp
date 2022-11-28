@@ -2687,6 +2687,7 @@ void Rockable::computeAABB(size_t first, size_t last) {
  * @param MCnstep Number of Monte Carlo steps
  * @return double Estimate of the solid fraction inside the probe
  */
+/*
 double Rockable::probeSolidFraction(AABB& aabb, size_t MCnstep) {
   if (MCnstep == 0) return -1.0;
 
@@ -2729,6 +2730,7 @@ double Rockable::probeSolidFraction(AABB& aabb, size_t MCnstep) {
 
   return ((double)count / (double)MCnstep);
 }
+*/
 
 /**
     @brief  Get the global kinetic energy for translations and for rotations.
@@ -2752,6 +2754,7 @@ void Rockable::getKineticEnergy(double& Etrans, double& Erot, size_t first, size
   Erot *= 0.5;
 }
 
+/*
 void Rockable::getInteractionGroups(std::vector<size_t>& nbInt) {
   nbInt.clear();
   std::sort(activeInteractions.begin(), activeInteractions.end(), std::less<Interaction*>());
@@ -2770,6 +2773,7 @@ void Rockable::getInteractionGroups(std::vector<size_t>& nbInt) {
   }
   nbInt.push_back(nb);
 }
+*/
 
 /**
     @brief  Estimate the critical time step according to the stiffness values in dataTable.
@@ -2905,6 +2909,7 @@ void Rockable::getCurrentCriticalTimeStep(double& dtc) {
    @param[in]   first    Smallest ID of particles (default value is 0)
    @param[in]   last     Largest ID of particles (default value corresponds to the last particle)
 */
+/*
 void Rockable::getMassRange(double& massMin, double& massMax, size_t first, size_t last) {
   if (last == 0) last = Particles.size() - 1;
   massMin = massMax = Particles[first].mass;
@@ -2913,6 +2918,7 @@ void Rockable::getMassRange(double& massMin, double& massMax, size_t first, size
     if (Particles[i].mass > massMax) massMax = Particles[i].mass;
   }
 }
+*/
 
 /**
    Fmax is the maximum value of resultant-force norms
@@ -3058,6 +3064,7 @@ void Rockable::getClusters(std::vector<clusterParticles>& clusters) {
 
     @remark This method has been carfully checked with Marta. It seems to work correctly
 */
+/*
 void Rockable::getBrokenSubClusters(std::vector<clusterParticles>& subParts) {
   subParts.clear();  // clear clusters in case it's not empty
 
@@ -3163,245 +3170,12 @@ void Rockable::getBrokenSubClusters(std::vector<clusterParticles>& subParts) {
   }
 #endif
 }
+*/
 
 // ==============================================================================================================
 //  PRE-PROCESSING METHODS
 // ==============================================================================================================
 
-/**
-   @brief  Apply a transformation (rotation followed by translation)
-           to the bodies having number in a given range (boundaries included)
-
-   @param[in]  center  Rotation point
-   @param[in]  axis    Rotation axis
-   @param[in]  angle   Rotation angle
-   @param[in]  trans   Translation vector
-*/
-/*
-void Rockable::rotateAndTranslateBlock(vec3r & center, vec3r & axis, double angle, vec3r & vector) {
-
-}
-*/
-
-/**
-   @brief Create sticked contacts between vertices (spheres) of particles
-          that belong to the same cluster (same cluster-ID)
-
-   @param[in]  epsilonDist  A small distance above which the 'glue' is not added
-*/
-/*
-void Rockable::stickVerticesInClusters(double epsilonDist) {
-  for (size_t i = 0; i < Particles.size(); i++) {
-    Particles[i].updateObb();
-  }
-
-  for (size_t i = nDriven; i < Particles.size(); i++) {
-
-    OBB obbi = Particles[i].obb;
-    obbi.enlarge(0.5 * DVerlet);
-
-    for (size_t j = i + 1; j < Particles.size(); j++) {
-
-      if (Particles[i].cluster != Particles[j].cluster) continue;
-
-      OBB obbj = Particles[j].obb;
-      obbj.enlarge(0.5 * DVerlet);
-
-      // Check intersection
-      if (obbi.intersect(obbj)) {
-
-        for (size_t iv = 0; iv < Particles[i].shape->vertex.size(); iv++) {
-          vec3r Vi = Particles[i].GlobVertex(iv);
-          double Ri = Particles[i].MinskowskiRadius();
-          for (size_t jv = 0; jv < Particles[j].shape->vertex.size(); jv++) {
-            vec3r Vj = Particles[j].GlobVertex(jv);
-            double Rj = Particles[j].MinskowskiRadius();
-
-            double distSqr = norm2(Vj - Vi);
-            double dMaxSqr = epsilonDist + (Ri + Rj);
-            dMaxSqr *= dMaxSqr;
-
-            if (distSqr < dMaxSqr) {
-              // It is necessarily two free bodies (spheres at vertices) that interact
-              double meff = (Particles[i].mass * Particles[j].mass) / (Particles[i].mass + Particles[j].mass);
-              double en2 = dataTable.get(idEn2InnerBond, Particles[i].group, Particles[j].group);
-              double kn = dataTable.get(idKnInnerBond, Particles[i].group, Particles[j].group);
-              double Damp = 0.0;
-              if (en2 > 0.0 && en2 < 1.0) {
-                double logen = 0.5 * log(en2);
-                double dampRate = -logen / sqrt(logen * logen + Mth::piSqr);
-                Damp = dampRate * 2.0 * sqrt(kn * meff);
-              } else if (en2 <= 0.0)
-                Damp = 2.0 * sqrt(kn * meff);
-              else
-                Damp = 0.0;
-
-              BreakableInterface BI_toInsert(i, j);
-              BI_toInsert.isInner = 1;
-              BI_toInsert.kn = kn;
-              BI_toInsert.kt = dataTable.get(idKtInnerBond, Particles[i].group, Particles[j].group);
-              BI_toInsert.kr = 0.0;
-              BI_toInsert.fn0 = dataTable.get(idFn0InnerBond, Particles[i].group, Particles[j].group);
-              BI_toInsert.ft0 = dataTable.get(idFt0InnerBond, Particles[i].group, Particles[j].group);
-              BI_toInsert.mom0 = 1e10;
-              BI_toInsert.power = dataTable.get(idPowInnerBond, Particles[i].group, Particles[j].group);
-              std::pair<std::set<BreakableInterface>::iterator, bool> ret;
-              ret = Interfaces[i].insert(BI_toInsert);
-              BreakableInterface* BI = const_cast<BreakableInterface*>(std::addressof(*(ret.first)));
-              Interaction I(i, j, vvType, iv, jv, Damp, BI);
-              Interaction::UpdateDispatcher[vvType](I, Particles[i], Particles[j]);
-              Interaction* Iptr = const_cast<Interaction*>(std::addressof(*((Interactions[i].insert(I)).first)));
-              BI->concernedBonds.push_back(Iptr);
-              activeInteractions.push_back(Iptr);
-            }
-          }
-        }
-
-      }  // if obb intersect
-    }    // j
-  }      // i
-
-  std::sort(activeInteractions.begin(), activeInteractions.end(), std::less<Interaction*>());
-}
-*/
-
-/**
-   @brief Create sticked interface between two sub-elements of two distinct particles
-          that do not belong to the same cluster (different cluster-ID).
-          The idea is to update the neighbor list and then replace the contacts
-          between different clusters by a SINGLE sticked link.
-
-   @param[in]  epsilonDist  A small distance below which the 'glue' is not added.
-*/
-/*
-void Rockable::stickClusters(double epsilonDist) {
-  // In case the neighbor list has not been yet updated
-  UpdateNL();
-
-  // Associate pair(i, j) with vector of interactions
-  std::map<std::pair<size_t, size_t>, std::vector<Interaction*>> ctc_packets;
-
-  // Find Packets of contacts
-  for (size_t k = 0; k < Interactions.size(); ++k) {
-    for (auto it = Interactions[k].begin(); it != Interactions[k].end(); ++it) {
-      size_t i = it->i;
-      size_t j = it->j;
-
-      if (glue_with_walls == false) {
-        if (i < nDriven || j < nDriven) continue;  // no sticked link involving a driven body ('walls')
-      }
-
-      // Stick is only possible in-between different clusters
-      if (Particles[i].cluster == Particles[j].cluster) continue;
-
-      // update the interaction
-      Interaction* I = const_cast<Interaction*>(std::addressof(*it));
-      bool valid = Interaction::UpdateDispatcher[it->type](*I, Particles[i], Particles[j]);
-
-      if (valid && it->dn < epsilonDist) {
-        if (j < i) std::swap(i, j);  // NORMALLY, NOT NECESSARY BECAUSE THE NEIGHBOR LIST IS CONSTRUCTED SO THAT i < j
-        std::pair<size_t, size_t> duo(i, j);
-        auto itf = ctc_packets.find(duo);
-        if (itf == ctc_packets.end()) {  // if not found
-          std::vector<Interaction*> v;
-          auto p = ctc_packets.insert(std::pair<std::pair<size_t, size_t>, std::vector<Interaction*>>(duo, v));
-          itf = p.first;
-        }
-        itf->second.push_back(I);
-      }
-    }
-  }
-
-  if (ctc_packets.empty()) {
-    console->info("@Rockable::stickClusters, No possible glued points, ctc_packets is empty");
-    return;
-  }
-
-  // Replace contact packets by single sticked link:
-  for (auto p : ctc_packets) {
-
-    // -- barycenter of each packet
-    vec3r c;
-    size_t nb = p.second.size();
-    for (size_t ip = 0; ip < nb; ip++) {
-      c += (p.second)[ip]->pos;
-    }
-    c /= nb;  // remark: we know that nb >= 1
-
-    // -- select the contact point that is the closest (for each packet)
-    double d2min = norm2((p.second)[0]->pos - c);
-    size_t imin = 0;
-    for (size_t ip = 1; ip < nb; ip++) {
-      double d2 = norm2((p.second)[ip]->pos - c);
-      if (d2 < d2min) {
-        d2min = d2;
-        imin = ip;
-      }
-    }
-
-    //  -- Create the interface and plug it to the selected interaction (it will then be 'glued')
-    size_t i = (p.second)[imin]->i;
-    size_t j = (p.second)[imin]->j;
-    if (j < i) std::swap(i, j);
-    BreakableInterface BI_toInsert(i, j);
-    BI_toInsert.isInner = 0;
-    BI_toInsert.dn0 = (p.second)[imin]->dn;
-    (p.second)[imin]->mom.reset();
-    (p.second)[imin]->ft.reset();
-    (p.second)[imin]->fn = 0.0;
-    BI_toInsert.kn = dataTable.get(idKnOuterBond, Particles[i].group, Particles[j].group);
-    BI_toInsert.kt = dataTable.get(idKtOuterBond, Particles[i].group, Particles[j].group);
-    BI_toInsert.kr = dataTable.get(idKrOuterBond, Particles[i].group, Particles[j].group);
-    BI_toInsert.fn0 = dataTable.get(idFn0OuterBond, Particles[i].group, Particles[j].group);
-    BI_toInsert.ft0 = dataTable.get(idFt0OuterBond, Particles[i].group, Particles[j].group);
-    BI_toInsert.mom0 = dataTable.get(idMom0OuterBond, Particles[i].group, Particles[j].group);
-    BI_toInsert.power = dataTable.get(idPowOuterBond, Particles[i].group, Particles[j].group);
-
-    std::pair<std::set<BreakableInterface>::iterator, bool> ret;
-    ret = Interfaces[i].insert(BI_toInsert);
-    BreakableInterface* BI = const_cast<BreakableInterface*>(std::addressof(*(ret.first)));
-
-    Interaction* Iptr = const_cast<Interaction*>(std::addressof(*((p.second)[imin])));
-
-    Iptr->stick = BI;
-    BI->concernedBonds.push_back(Iptr);
-  }
-
-  // -- remove 'not-glued' contacts between clusters
-  for (size_t k = 0; k < Interactions.size(); ++k) {
-    for (auto it = Interactions[k].begin(); it != Interactions[k].end();) {
-      size_t i = it->i;
-      size_t j = it->j;
-      if (i < nDriven || j < nDriven) {
-        ++it;
-        continue;
-      }  // contact with walls are not erased
-      if (Particles[i].cluster == Particles[j].cluster) {
-        ++it;
-        continue;
-      }  // inner bonds are not erased
-      if (it->stick != nullptr) {
-        ++it;
-        continue;
-      }  // bonded links are not erased
-
-      // erase the interaction (when not sticked)
-      it = Interactions[k].erase(it);  // 'it' points now to the next iterator
-    }
-  }
-
-  // activeInteractions needs to be re-set because 'saveConf' uses it
-  activeInteractions.clear();
-  for (size_t k = 0; k < Interactions.size(); ++k) {
-    for (auto it = Interactions[k].begin(); it != Interactions[k].end(); ++it) {
-      Interaction* I = const_cast<Interaction*>(std::addressof(*it));
-      if (it->dn < 0.0 || it->stick != nullptr) {
-        activeInteractions.push_back(I);
-      }
-    }
-  }
-}
-*/
 
 /**
    @attention  We suppose that the Damp parameter has already been set

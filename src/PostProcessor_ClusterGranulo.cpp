@@ -38,6 +38,7 @@
 
 #include "PostProcessor_ClusterGranulo.hpp"
 #include "Rockable.hpp"
+#include "processingTool_getBrokenSubClusters.hpp"
 
 static Registrar<PostProcessor, ClusterGranulo> registrar("ClusterGranulo");
 
@@ -72,7 +73,7 @@ void ClusterGranulo::exec() {
   std::ofstream file(fname);
   
   std::vector <clusterParticles> subclusters;
-  box->getBrokenSubClusters(subclusters);
+  getBrokenSubClusters(box,subclusters);
   if (subclusters.empty()) return;
   
   std::vector<double> NumberInClass(SievingSizes.size());

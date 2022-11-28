@@ -117,7 +117,11 @@ DataExtractor_MeanVelocity.cpp \
 BodyForce.cpp \
 BodyForce_PreferredDirection.cpp \
 BodyForce_AttractingPoint.cpp \
-BodyForce_ViscousFluid.cpp
+BodyForce_ViscousFluid.cpp \
+processingTool_probeSolidFraction.cpp \
+processingTool_getInteractionGroups.cpp \
+processingTool_getBrokenSubClusters.cpp \
+processingTool_getMassRange.cpp
 
 IMGUI_SOURCES = $(IMGUI_DIR)/imgui.cpp \
 $(IMGUI_DIR)/imgui_demo.cpp \

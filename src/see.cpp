@@ -114,7 +114,7 @@ void keyboard(unsigned char Key, int x, int y) {
 
     case '@': {
       std::cout << "Probing with " << probe_MCnsteps << " Monte-Carlo steps...\n" << std::flush;
-      double SF = box.probeSolidFraction(probe, probe_MCnsteps);
+      double SF = probeSolidFraction(&box, probe, probe_MCnsteps);
       std::cout << "Solid Fraction in probe: " << SF << '\n';
     } break;
 

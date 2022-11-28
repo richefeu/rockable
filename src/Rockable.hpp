@@ -210,15 +210,15 @@ class Rockable {
   void getCriticalTimeStep(double& dtc);
   void getCurrentCriticalTimeStep(double& dtc);
   void estimateCriticalTimeStep(double& dtc);
-  void getMassRange(double& massMin, double& massMax, size_t first = 0, size_t last = 0);
+  //void getMassRange(double& massMin, double& massMax, size_t first = 0, size_t last = 0);
   void getResultantQuickStats(double& Fmax, double& F_fnmax, double& Fmean, double& Fstddev, size_t first = 0,
                               size_t last = 0);
   void getInteractionQuickStats(double& fnMin, double& fnMax, double& fnMean, double& fnStddev);
   void getKineticEnergy(double& Etrans, double& Erot, size_t first = 0, size_t last = 0);
   void getClusters(std::vector<clusterParticles>& clusters);
-  void getBrokenSubClusters(std::vector<clusterParticles>& subclusters);
-  void getInteractionGroups(std::vector<size_t>& nbInt);
-  double probeSolidFraction(AABB& aabb, size_t MCnstep = 100000);
+  //void getBrokenSubClusters(std::vector<clusterParticles>& subclusters);
+  //void getInteractionGroups(std::vector<size_t>& nbInt);
+  // double probeSolidFraction(AABB& aabb, size_t MCnstep = 100000);
 
   // Pre-processing methods
   //void stickVerticesInClusters(double);  ///< Create bonds between vertices if
