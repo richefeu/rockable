@@ -107,6 +107,8 @@ ForceLaw_StickedLinks.cpp \
 PreproCommand.cpp \
 PreproCommand_stickVerticesInClusters.cpp \
 PreproCommand_stickClusters.cpp \
+PreproCommand_randomlyOrientedVelocities.cpp \
+PreproCommand_randomlyOrientedVelocitiesClusters.cpp \
 DataExtractor.cpp \
 DataExtractor_TrackBody.cpp \
 DataExtractor_TrackRockfall.cpp \
@@ -121,7 +123,8 @@ BodyForce_ViscousFluid.cpp \
 processingTool_probeSolidFraction.cpp \
 processingTool_getInteractionGroups.cpp \
 processingTool_getBrokenSubClusters.cpp \
-processingTool_getMassRange.cpp
+processingTool_getMassRange.cpp \
+processingTool_getClusters.cpp
 
 IMGUI_SOURCES = $(IMGUI_DIR)/imgui.cpp \
 $(IMGUI_DIR)/imgui_demo.cpp \

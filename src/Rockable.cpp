@@ -789,7 +789,7 @@ void Rockable::initParser() {
   //          They are generally put at the end of the input file
   //          so that they apply on a system already set
   
-  std::string commands[] = {"stickVerticesInClusters", "stickClusters"};
+  std::string commands[] = {"stickVerticesInClusters", "stickClusters", "randomlyOrientedVelocities"};
   for(const std::string &command : commands) {
     PreproCommand* PC = Factory<PreproCommand>::Instance()->Create(command);
     if (PC != nullptr) {
@@ -831,17 +831,20 @@ void Rockable::initParser() {
     conf >> paramName >> isInnerStr >> lambda >> m >> timeSeeded;
     setVariableStickParams(paramName, isInnerStr, lambda, m, (bool)timeSeeded);
   };
+  /*
   parser.kwMap["randomlyOrientedVelocities"] = __DO__(conf) {
     double vel;
     conf >> vel;
     randomlyOrientedVelocities(vel);
   };
+  
   parser.kwMap["randomlyOrientedVelocitiesClusters"] = __DO__(conf) {
     double vel;
     int opt;
     conf >> vel >> opt;
     randomlyOrientedVelocitiesClusters(vel, opt);
   };
+  */
   parser.kwMap["setAllVelocities"] = __DO__(conf) {
     vec3r vel;
     conf >> vel;
@@ -3022,6 +3025,7 @@ void Rockable::getInteractionQuickStats(double& fnMin, double& fnMax, double& fn
 
    @param[out]  clusters  A vector of 'clusterParticles' that hold the clusterId and the list of involved particleId
 */
+/*
 void Rockable::getClusters(std::vector<clusterParticles>& clusters) {
   clusters.clear();  // clear clusters if not empty
   std::set<clusterParticles> clusterSet;
@@ -3054,6 +3058,7 @@ void Rockable::getClusters(std::vector<clusterParticles>& clusters) {
   }
 #endif
 }
+*/
 
 /**
     @brief      Get the set of sub-parts (broken clusters).
@@ -3281,6 +3286,7 @@ void Rockable::setVariableStickParams(std::string& paramName, std::string& isInn
    @brief  Set randomly oriented velocity vectors (the magnitudes are all the same).
            The velocities of the driven bodies are not modified
 */
+/*
 void Rockable::randomlyOrientedVelocities(double velocityMagnitude) {
   quat q;
   q.randomize(true);
@@ -3290,6 +3296,7 @@ void Rockable::randomlyOrientedVelocities(double velocityMagnitude) {
     Particles[i].vel = q * u;
   }
 }
+*/
 
 /**
    @brief Set random orientation to the clusters
@@ -3297,6 +3304,7 @@ void Rockable::randomlyOrientedVelocities(double velocityMagnitude) {
    @param[in]  opt                An option. if opt = 1 then all the velocity vectors
                                   will be oriented towards negative y (downward)
 */
+/*
 void Rockable::randomlyOrientedVelocitiesClusters(double velocityMagnitude, int opt) {
   std::vector<clusterParticles> clusters;
   getClusters(clusters);
@@ -3313,6 +3321,7 @@ void Rockable::randomlyOrientedVelocitiesClusters(double velocityMagnitude, int 
     }
   }
 }
+*/
 
 /**
    @brief Set the velocity of ALL free bodies to a given velocity vector

@@ -33,54 +33,42 @@
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
-#include "processingTool_probeSolidFraction.hpp"
+#include "factory.hpp"
+
+#include "Rockable.hpp"
+#include "PreproCommand_randomlyOrientedVelocitiesClusters.hpp"
+#include "processingTool_getClusters.hpp"
+
+static Registrar<PreproCommand, randomlyOrientedVelocitiesClusters> registrar("randomlyOrientedVelocitiesClusters");
+
+randomlyOrientedVelocitiesClusters::randomlyOrientedVelocitiesClusters() { }
+
+void randomlyOrientedVelocitiesClusters::addCommand() {  
+  box->parser.kwMap["randomlyOrientedVelocitiesClusters"] = [this](std::istream& conf) {
+    conf >> this->velocityMagnitude >> this->opt;
+    exec();
+  };
+}
 
 /**
- * @brief xxx
- *
- * @param aabb    The probe as an Axis Aligned Bounding Box
- * @param MCnstep Number of Monte Carlo steps
- * @return double Estimate of the solid fraction inside the probe
- */
-double probeSolidFraction(Rockable *box, AABB& aabb, size_t MCnstep) {
-  if (MCnstep == 0) return -1.0;
+   @brief Set random orientation to the clusters
+   @param[in]  velocityMagnitude  Magnitude of all velocities (only orientations change)
+   @param[in]  opt                An option. if opt = 1 then all the velocity vectors
+                                  will be oriented towards negative y (downward)
+*/
+void randomlyOrientedVelocitiesClusters::exec() {
+  std::vector<clusterParticles> clusters;
+  getClusters(box, clusters);
 
-  // select the concerned particles
-  OBB zone;
-  zone.center = 0.5 * (aabb.min + aabb.max);
-  zone.extent.set(0.5 * (aabb.max.x - aabb.min.x), 0.5 * (aabb.max.y - aabb.min.y), 0.5 * (aabb.max.z - aabb.min.z));
-  std::vector<size_t> pid;
-  for (size_t i = 0; i < box->Particles.size(); ++i) {
-    box->Particles[i].updateObb();
-    if (zone.intersect(box->Particles[i].obb)) {
-      pid.push_back(i);
+  quat q;
+  q.randomize(true);
+  vec3r u(velocityMagnitude, 0.0, 0.0);
+  for (size_t c = 0; c < clusters.size(); c++) {
+    q.randomize();
+    vec3r v = q * u;
+    if (opt == 1) v.y = -fabs(v.y);
+    for (size_t i = 0; i < clusters[c].particleId.size(); i++) {
+      box->Particles[clusters[c].particleId[i]].vel = v;
     }
   }
-
-  vec3r pt3;
-  std::vector<double> vv(3);
-  Mth::sobolSequence(-3, vv);  // Initialize the Sobol sequence
-  size_t count = 0;
-  for (size_t imc = 0; imc < MCnstep; ++imc) {
-    Mth::sobolSequence(3, vv);
-    pt3.set(aabb.min.x + vv[0] * (aabb.max.x - aabb.min.x), aabb.min.y + vv[1] * (aabb.max.y - aabb.min.y),
-            aabb.min.z + vv[2] * (aabb.max.z - aabb.min.z));
-
-    bool inSolid = false;
-    for (size_t ii = 0; ii < pid.size(); ii++) {
-      size_t i = pid[ii];
-      vec3r ptTest = pt3 - box->Particles[i].pos;
-      quat Qinv = box->Particles[i].Q.get_conjugated();
-      ptTest = Qinv * ptTest;
-      ptTest /= box->Particles[i].homothety;
-
-      if (box->Particles[i].shape->inside(ptTest)) {
-        inSolid = true;
-        break;
-      }
-    }
-    if (inSolid) count++;
-  }
-
-  return ((double)count / (double)MCnstep);
 }

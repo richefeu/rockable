@@ -210,12 +210,12 @@ class Rockable {
   void getCriticalTimeStep(double& dtc);
   void getCurrentCriticalTimeStep(double& dtc);
   void estimateCriticalTimeStep(double& dtc);
-  //void getMassRange(double& massMin, double& massMax, size_t first = 0, size_t last = 0);
   void getResultantQuickStats(double& Fmax, double& F_fnmax, double& Fmean, double& Fstddev, size_t first = 0,
                               size_t last = 0);
   void getInteractionQuickStats(double& fnMin, double& fnMax, double& fnMean, double& fnStddev);
   void getKineticEnergy(double& Etrans, double& Erot, size_t first = 0, size_t last = 0);
-  void getClusters(std::vector<clusterParticles>& clusters);
+  
+  //void getClusters(std::vector<clusterParticles>& clusters);
   //void getBrokenSubClusters(std::vector<clusterParticles>& subclusters);
   //void getInteractionGroups(std::vector<size_t>& nbInt);
   // double probeSolidFraction(AABB& aabb, size_t MCnstep = 100000);
@@ -229,11 +229,11 @@ class Rockable {
 
   void setVariableStickParams(std::string& paramName, std::string& isInnerStr, double lambda, double m,
                               bool timeSeeded);
-  void randomlyOrientedVelocities(double velocityMagnitude);  ///< Set a randomly oriented
+  //void randomlyOrientedVelocities(double velocityMagnitude);  ///< Set a randomly oriented
                                                               ///< velocity to all free bodies
 
-  void randomlyOrientedVelocitiesClusters(double velocityMagnitude,
-                                          int opt = 0);  ///< Set a randomly oriented velocity to all free clusters
+  //void randomlyOrientedVelocitiesClusters(double velocityMagnitude,
+  //                                        int opt = 0);  ///< Set a randomly oriented velocity to all free clusters
                                                          ///< (same velocity for the bodies belonging
                                                          ///< to the same cluster)
   void setAllVelocities(vec3r& vel);
