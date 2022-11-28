@@ -789,13 +789,15 @@ void Rockable::initParser() {
   //          They are generally put at the end of the input file
   //          so that they apply on a system already set
   
-  std::string commands[] = {"stickVerticesInClusters"};
+  std::string commands[] = {"stickVerticesInClusters", "stickClusters"};
   for(const std::string &command : commands) {
     PreproCommand* PC = Factory<PreproCommand>::Instance()->Create(command);
     if (PC != nullptr) {
       PC->plug(this);
       PC->addCommand();
-    }  
+    } else {
+      console->warn("The PreproCommand named {} was not added!", command);
+    }
   }
   /*
   parser.kwMap["stickVerticesInClusters"] = __DO__(conf) {
@@ -803,13 +805,14 @@ void Rockable::initParser() {
     conf >> epsilonDist;
     stickVerticesInClusters(epsilonDist);
   };
-  */
+  
   
   parser.kwMap["stickClusters"] = __DO__(conf) {
     double epsilonDist;
     conf >> epsilonDist;
     stickClusters(epsilonDist);
   };
+  */
   parser.kwMap["copyParamsToInterfaces"] = __DO__(conf) {
     std::string isInnerStr;
     conf >> isInnerStr;
@@ -3186,6 +3189,7 @@ void Rockable::rotateAndTranslateBlock(vec3r & center, vec3r & axis, double angl
 
    @param[in]  epsilonDist  A small distance above which the 'glue' is not added
 */
+/*
 void Rockable::stickVerticesInClusters(double epsilonDist) {
   for (size_t i = 0; i < Particles.size(); i++) {
     Particles[i].updateObb();
@@ -3259,6 +3263,7 @@ void Rockable::stickVerticesInClusters(double epsilonDist) {
 
   std::sort(activeInteractions.begin(), activeInteractions.end(), std::less<Interaction*>());
 }
+*/
 
 /**
    @brief Create sticked interface between two sub-elements of two distinct particles
@@ -3268,6 +3273,7 @@ void Rockable::stickVerticesInClusters(double epsilonDist) {
 
    @param[in]  epsilonDist  A small distance below which the 'glue' is not added.
 */
+/*
 void Rockable::stickClusters(double epsilonDist) {
   // In case the neighbor list has not been yet updated
   UpdateNL();
@@ -3395,6 +3401,7 @@ void Rockable::stickClusters(double epsilonDist) {
     }
   }
 }
+*/
 
 /**
    @attention  We suppose that the Damp parameter has already been set

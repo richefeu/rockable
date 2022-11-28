@@ -50,6 +50,12 @@ void StickVerticesInClusters::addCommand() {
   };
 }
 
+/**
+   @brief Create sticked contacts between vertices (spheres) of particles
+          that belong to the same cluster (same cluster-ID)
+
+   @param[in]  epsilonDist  A small distance above which the 'glue' is not added
+*/
 void StickVerticesInClusters::exec() {
   for (size_t i = 0; i < box->Particles.size(); i++) {
     box->Particles[i].updateObb();

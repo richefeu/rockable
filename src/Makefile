@@ -106,6 +106,7 @@ ForceLaw_Avalanche.cpp \
 ForceLaw_StickedLinks.cpp \
 PreproCommand.cpp \
 PreproCommand_stickVerticesInClusters.cpp \
+PreproCommand_stickClusters.cpp \
 DataExtractor.cpp \
 DataExtractor_TrackBody.cpp \
 DataExtractor_TrackRockfall.cpp \

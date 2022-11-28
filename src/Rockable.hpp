@@ -155,7 +155,7 @@ class Rockable {
   std::map<std::string, std::string> optionNames;  ///< All the options refered to as a string and set
                                                    ///< as a string also
   
-  ForceLaw * forceLaw;
+  ForceLaw * forceLaw;      ///< User defined force law
   
   // Ctor
   Rockable();
@@ -203,14 +203,6 @@ class Rockable {
   std::function<void()> UpdateNL;       ///< Pointer funtion to the updateNL
                                         ///< (update the neighbor-list) method
   void setUpdateNL(std::string& Name);  ///< select the Neighbor list updator
-
-  /*
-  bool forceLawDefault(Interaction&);             ///< Most common force law
-  bool forceLawStickedLinks(Interaction&);        ///< Force law for 'glued' bodies
-  bool forceLawAvalanches(Interaction&);          ///< Force law specific for rock avalanches
-  std::function<bool(Interaction&)> forceLawPtr;  ///< Pointer function to the force-law used
-  void setForceLaw(std::string& lawName);         ///< Force law selector
-  */
   
   // Processing methods
   void computeAABB(size_t first = 0, size_t last = 0);  ///< Compute Axis Aligned Bounding
@@ -229,9 +221,9 @@ class Rockable {
   double probeSolidFraction(AABB& aabb, size_t MCnstep = 100000);
 
   // Pre-processing methods
-  void stickVerticesInClusters(double);  ///< Create bonds between vertices if
+  //void stickVerticesInClusters(double);  ///< Create bonds between vertices if
                                          ///< they belong to the same cluster (same cluster ID)
-  void stickClusters(double);            ///< Create bonds in-between different clusters (different cluster IDs)
+  //void stickClusters(double);            ///< Create bonds in-between different clusters (different cluster IDs)
   void copyParamsToInterfaces(std::string& isInnerStr);
   void setStiffnessRatioInterfaces(double ratio);
 
