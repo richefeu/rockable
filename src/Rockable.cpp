@@ -760,7 +760,10 @@ void Rockable::initParser() {
   //          They are generally put at the end of the input file
   //          so that they apply on a system already set
 
-  std::string commands[] = {"stickVerticesInClusters", "stickClusters", "randomlyOrientedVelocities"};
+  std::string commands[] = {"stickVerticesInClusters",    "stickClusters",
+                            "randomlyOrientedVelocities", "randomlyOrientedVelocitiesClusters",
+                            "copyParamsToInterfaces",     "setStiffnessRatioInterfaces",
+                            "setVariableStickParams"};
   for (const std::string& command : commands) {
     PreproCommand* PC = Factory<PreproCommand>::Instance()->Create(command);
     if (PC != nullptr) {
@@ -783,17 +786,19 @@ void Rockable::initParser() {
     conf >> epsilonDist;
     stickClusters(epsilonDist);
   };
-  */
+
   parser.kwMap["copyParamsToInterfaces"] = __DO__(conf) {
     std::string isInnerStr;
     conf >> isInnerStr;
     copyParamsToInterfaces(isInnerStr);
   };
+
   parser.kwMap["setStiffnessRatioInterfaces"] = __DO__(conf) {
     double ratio;
     conf >> ratio;
     setStiffnessRatioInterfaces(ratio);
   };
+
   parser.kwMap["setVariableStickParams"] = __DO__(conf) {
     std::string paramName;
     std::string isInnerStr;
@@ -802,7 +807,7 @@ void Rockable::initParser() {
     conf >> paramName >> isInnerStr >> lambda >> m >> timeSeeded;
     setVariableStickParams(paramName, isInnerStr, lambda, m, (bool)timeSeeded);
   };
-  /*
+
   parser.kwMap["randomlyOrientedVelocities"] = __DO__(conf) {
     double vel;
     conf >> vel;
@@ -1280,7 +1285,6 @@ void Rockable::UpdateNL_bruteForce() {
       std::set<BreakableInterface>::iterator BI_it = (Interfaces[i]).find(BI_to_find);
       if (BI_it != Interfaces[i].end()) continue;  // Continue the loop (next j) if an interface is found
 
-
       OBB obbj = Particles[j].obb;
       obbj.enlarge(0.5 * DVerlet);
 
@@ -1346,7 +1350,6 @@ void Rockable::UpdateNL_linkCells() {
               std::set<BreakableInterface>::iterator BI_it = (Interfaces[i]).find(BI_to_find);
               if (BI_it != Interfaces[i].end()) continue;  // Continue the loop if an interface is found
 
-
               OBB obbj = Particles[j].obb;
               obbj.enlarge(0.5 * DVerlet);
 
@@ -1392,7 +1395,6 @@ void Rockable::UpdateNL_linkCells() {
             BI_to_find.j = j;
             std::set<BreakableInterface>::iterator BI_it = (Interfaces[i]).find(BI_to_find);
             if (BI_it != Interfaces[i].end()) continue;  // Continue the loop if an interface is found
-
 
             OBB obbj = Particles[j].obb;
             obbj.enlarge(0.5 * DVerlet);
@@ -2378,7 +2380,6 @@ void Rockable::accelerations() {
     needUpdate = true;
   }
 
-
   timeInForceComputation += tm.getElapsedTimeSeconds();
 
   if (numericalDampingCoeff > 0.0) numericalDamping();
@@ -2868,6 +2869,7 @@ void Rockable::getInteractionQuickStats(double& fnMin, double& fnMax, double& fn
    @attention  We suppose that the Damp parameter has already been set
                in the corresponding Interactions
 */
+/*
 void Rockable::copyParamsToInterfaces(std::string& isInnerStr) {
   int isInner = 0;
   if (isInnerStr == "inner") isInner = 1;
@@ -2902,11 +2904,13 @@ void Rockable::copyParamsToInterfaces(std::string& isInnerStr) {
   }
   paramsInInterfaces = 1;  // so that they are stored in the conf files (within interfaces)
 }
+*/
 
 /**
    @brief  Set the ratio kt/kn in interfaces
            (only for parameters that are stored in Interfaces)
 */
+/*
 void Rockable::setStiffnessRatioInterfaces(double ratio) {
   for (size_t i = 0; i < Interfaces.size(); i++) {
     for (auto it = Interfaces[i].begin(); it != Interfaces[i].end(); ++it) {
@@ -2918,12 +2922,14 @@ void Rockable::setStiffnessRatioInterfaces(double ratio) {
     }
   }
 }
+*/
 
 /**
    Usage (in an input file):
    variableStickParams paramName inner/outer lambdaValue mValue 0/1
    example: variableStickParams fn0 inner 80 9 1
 */
+/*
 void Rockable::setVariableStickParams(std::string& paramName, std::string& isInnerStr, double lambda, double m,
                                       bool timeSeeded) {
   std::default_random_engine generator;
@@ -2963,6 +2969,7 @@ void Rockable::setVariableStickParams(std::string& paramName, std::string& isInn
 
   paramsInInterfaces = 1;  // so that they are stored in the conf files (within interfaces)
 }
+*/
 
 /**
    @brief Set the velocity of ALL free bodies to a given velocity vector

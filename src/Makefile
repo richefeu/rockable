@@ -109,6 +109,9 @@ PreproCommand_stickVerticesInClusters.cpp \
 PreproCommand_stickClusters.cpp \
 PreproCommand_randomlyOrientedVelocities.cpp \
 PreproCommand_randomlyOrientedVelocitiesClusters.cpp \
+PreproCommand_copyParamsToInterfaces.cpp \
+PreproCommand_setStiffnessRatioInterfaces.cpp \
+PreproCommand_setVariableStickParams.cpp \
 DataExtractor.cpp \
 DataExtractor_TrackBody.cpp \
 DataExtractor_TrackRockfall.cpp \

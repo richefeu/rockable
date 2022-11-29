@@ -142,7 +142,7 @@ class Rockable {
 
   // Other parameters
   int iconf;                ///< Current configuration ID
-  AABB aabb;                ///< Axis Aligned Bounding Box (AABB) of the entire sample
+  AABB aabb;                ///< Axis Aligned Bounding Box (AABB) that surrounds some free bodies.
   std::vector<AABB> paabb;  ///< AABBs of all particles
   vec3r gravity;            ///< Gravity acceleration
   int paramsInInterfaces;   ///< Flag saying if the parameters for sticked blonds
@@ -205,8 +205,7 @@ class Rockable {
   void setUpdateNL(std::string& Name);  ///< select the Neighbor list updator
   
   // Processing methods
-  void computeAABB(size_t first = 0, size_t last = 0);  ///< Compute Axis Aligned Bounding
-                                                        ///< Box of a part of the sample
+  void computeAABB(size_t first = 0, size_t last = 0);  ///< Compute Axis Aligned Bounding Box of a part of the sample
   void getCriticalTimeStep(double& dtc);
   void getCurrentCriticalTimeStep(double& dtc);
   void estimateCriticalTimeStep(double& dtc);
@@ -217,11 +216,11 @@ class Rockable {
 
 
   // Pre-processing methods
-  void copyParamsToInterfaces(std::string& isInnerStr);
-  void setStiffnessRatioInterfaces(double ratio);
+  //void copyParamsToInterfaces(std::string& isInnerStr);
+  //void setStiffnessRatioInterfaces(double ratio);
 
-  void setVariableStickParams(std::string& paramName, std::string& isInnerStr, double lambda, double m,
-                              bool timeSeeded);
+  //void setVariableStickParams(std::string& paramName, std::string& isInnerStr, double lambda, double m,
+  //                            bool timeSeeded);
   void setAllVelocities(vec3r& vel);
   void homothetyRange(size_t idFirst, size_t idLast, double hmin, double hmax, bool timeSeeded);
   void particlesClonage(size_t idFirst, size_t idLast, vec3r& translation);
@@ -245,9 +244,7 @@ class Rockable {
   //void getInteractingGroups(Interaction& I, int& g1, int& g2);
 
   void readLawData(std::istream&, size_t id);             ///< Helper method to read a law in loadConf
-  void writeLawData(std::ostream&, const char* parName);  ///< Helper method to
-                                                          ///< write law in
-                                                          ///< saveConf
+  void writeLawData(std::ostream&, const char* parName);  ///< Helper method to write law in saveConf
 
   bool interactiveMode;  ///< computation (false) or visualization (true) modes
 
