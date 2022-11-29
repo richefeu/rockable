@@ -351,8 +351,10 @@ void Rockable::saveConf(const char* fname) {
 
   writeLawData(conf, "knInnerBond");
   writeLawData(conf, "ktInnerBond");
+  writeLawData(conf, "krInnerBond");
   writeLawData(conf, "fn0InnerBond");
   writeLawData(conf, "ft0InnerBond");
+  writeLawData(conf, "mom0InnerBond");
   writeLawData(conf, "powInnerBond");
   writeLawData(conf, "en2InnerBond");
 
@@ -581,8 +583,10 @@ void Rockable::initParser() {
 
   parser.kwMap["knInnerBond"] = __DO__(conf) { readLawData(conf, idKnInnerBond); };
   parser.kwMap["ktInnerBond"] = __DO__(conf) { readLawData(conf, idKtInnerBond); };
+  parser.kwMap["krInnerBond"] = __DO__(conf) { readLawData(conf, idKrInnerBond); };
   parser.kwMap["fn0InnerBond"] = __DO__(conf) { readLawData(conf, idFn0InnerBond); };
   parser.kwMap["ft0InnerBond"] = __DO__(conf) { readLawData(conf, idFt0InnerBond); };
+  parser.kwMap["mom0InnerBond"] = __DO__(conf) { readLawData(conf, idMom0InnerBond); };
   parser.kwMap["powInnerBond"] = __DO__(conf) { readLawData(conf, idPowInnerBond); };
   parser.kwMap["en2InnerBond"] = __DO__(conf) { readLawData(conf, idEn2InnerBond); };
 
@@ -760,7 +764,7 @@ void Rockable::initParser() {
   //          They are generally put at the end of the input file
   //          so that they apply on a system already set
 
-  std::string commands[] = {"stickVerticesInClusters",    "stickClusters",
+  std::string commands[] = {"stickVerticesInClusters",  "stickVerticesInClustersMoments",  "stickClusters",
                             "randomlyOrientedVelocities", "randomlyOrientedVelocitiesClusters",
                             "copyParamsToInterfaces",     "setStiffnessRatioInterfaces",
                             "setVariableStickParams"};

@@ -106,6 +106,7 @@ ForceLaw_Avalanche.cpp \
 ForceLaw_StickedLinks.cpp \
 PreproCommand.cpp \
 PreproCommand_stickVerticesInClusters.cpp \
+PreproCommand_stickVerticesInClustersMoments.cpp \
 PreproCommand_stickClusters.cpp \
 PreproCommand_randomlyOrientedVelocities.cpp \
 PreproCommand_randomlyOrientedVelocitiesClusters.cpp \

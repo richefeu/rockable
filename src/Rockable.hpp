@@ -262,9 +262,11 @@ class Rockable {
 
   size_t idKnInnerBond;   ///< Identifier of normal stiffness for inner-bonds
   size_t idKtInnerBond;   ///< Identifier of tangential stiffness for inner-bonds
+  size_t idKrInnerBond;   ///< Identifier of angular stiffness for inner-bonds
   size_t idEn2InnerBond;  ///< Identifier of normal energy-restitution for inner-bonds
   size_t idFn0InnerBond;  ///< Identifier of normal threshold force for inner-bonds
   size_t idFt0InnerBond;  ///< Identifier of tangential threshold force for inner-bonds
+  size_t idMom0InnerBond; ///< Identifier of threshold bendind-moment for inner-bonds
   size_t idPowInnerBond;  ///< Identifier of power in yield function for inner-bonds
 
   size_t idKnOuterBond;    ///< Identifier of normal stiffness for outer-bonds

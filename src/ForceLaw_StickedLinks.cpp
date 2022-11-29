@@ -1,24 +1,24 @@
 //  Copyright or © or Copr. Rockable
-//  
+//
 //  vincent.richefeu@3sr-grenoble.fr
-//  
-//  This software is a computer program whose purpose is 
+//
+//  This software is a computer program whose purpose is
 //    (i)  to hold sphero-polyhedral shapes,
-//    (ii) to manage breakable interfaces. 
+//    (ii) to manage breakable interfaces.
 //  It is developed for an ACADEMIC USAGE
-//  
+//
 //  This software is governed by the CeCILL-B license under French law and
-//  abiding by the rules of distribution of free software.  You can  use, 
+//  abiding by the rules of distribution of free software.  You can  use,
 //  modify and/ or redistribute the software under the terms of the CeCILL-B
 //  license as circulated by CEA, CNRS and INRIA at the following URL
-//  "http://www.cecill.info". 
-//  
+//  "http://www.cecill.info".
+//
 //  As a counterpart to the access to the source code and  rights to copy,
 //  modify and redistribute granted by the license, users are provided only
 //  with a limited warranty  and the software's author,  the holder of the
 //  economic rights,  and the successive licensors  have only  limited
-//  liability. 
-//  
+//  liability.
+//
 //  In this respect, the user's attention is drawn to the risks associated
 //  with loading,  using,  modifying and/or developing or reproducing the
 //  software by the user in light of its specific status of free software,
@@ -26,21 +26,21 @@
 //  therefore means  that it is reserved for developers  and  experienced
 //  professionals having in-depth computer knowledge. Users are therefore
 //  encouraged to load and test the software's suitability as regards their
-//  requirements in conditions enabling the security of their systems and/or 
-//  data to be ensured and,  more generally, to use and operate it in the 
-//  same conditions as regards security. 
-//  
+//  requirements in conditions enabling the security of their systems and/or
+//  data to be ensured and,  more generally, to use and operate it in the
+//  same conditions as regards security.
+//
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
 #include "factory.hpp"
 
-#include "Rockable.hpp"
 #include "ForceLaw_StickedLinks.hpp"
+#include "Rockable.hpp"
 
 static Registrar<ForceLaw, StickedLinks> registrar("StickedLinks");
 
-StickedLinks::StickedLinks() { }
+StickedLinks::StickedLinks() {}
 
 void StickedLinks::init() {
   box->idKnContact = box->dataTable.add("knContact");
@@ -49,12 +49,14 @@ void StickedLinks::init() {
   box->idMuContact = box->dataTable.add("muContact");
   box->idKrContact = box->dataTable.add("krContact");
   box->idMurContact = box->dataTable.add("murContact");
-  
+
   box->idKnInnerBond = box->dataTable.add("knInnerBond");
   box->idKtInnerBond = box->dataTable.add("ktInnerBond");
+  box->idKrInnerBond = box->dataTable.add("krInnerBond");
   box->idEn2InnerBond = box->dataTable.add("en2InnerBond");
   box->idFn0InnerBond = box->dataTable.add("fn0InnerBond");
   box->idFt0InnerBond = box->dataTable.add("ft0InnerBond");
+  box->idMom0InnerBond = box->dataTable.add("mom0InnerBond");
   box->idPowInnerBond = box->dataTable.add("powInnerBond");
 
   box->idKnOuterBond = box->dataTable.add("knOuterBond");
@@ -77,11 +79,11 @@ bool StickedLinks::computeInteraction(Interaction& I) {
     double kn = 0.0, kt = 0.0, kr = 0.0;
     double fn0 = 1.0, ft0 = 1.0, mom0 = 1.0, power = 1.0;
     double dn0 = I.stick->dn0;
-    bool isInner = false;
+    //bool isInner = false;
 
     // First we need to get the parameters
     if (box->paramsInInterfaces == 1) {
-      isInner = I.stick->isInner;
+      //isInner = I.stick->isInner;
       kn = I.stick->kn;
       kt = I.stick->kt;
       kr = I.stick->kr;
@@ -94,15 +96,17 @@ bool StickedLinks::computeInteraction(Interaction& I) {
       int g2 = box->Particles[I.j].group;
 
       if (box->Particles[I.i].cluster == box->Particles[I.j].cluster) {  // Inner
-        isInner = true;
+        //isInner = true;
         kn = box->dataTable.get(box->idKnInnerBond, g1, g2);
         kt = box->dataTable.get(box->idKtInnerBond, g1, g2);
+        kr = box->dataTable.get(box->idKrInnerBond, g1, g2);
         fn0 = box->dataTable.get(box->idFn0InnerBond, g1, g2);
         ft0 = box->dataTable.get(box->idFt0InnerBond, g1, g2);
+        mom0 = box->dataTable.get(box->idMom0InnerBond, g1, g2);
         power = box->dataTable.get(box->idPowInnerBond, g1, g2);
         dn0 = 0.0;
       } else {  // Outer
-        isInner = false;
+        //isInner = false;
         kn = box->dataTable.get(box->idKnOuterBond, g1, g2);
         kt = box->dataTable.get(box->idKtOuterBond, g1, g2);
         kr = box->dataTable.get(box->idKrOuterBond, g1, g2);
@@ -139,12 +143,9 @@ bool StickedLinks::computeInteraction(Interaction& I) {
 
     // === Rupture criterion (and resistant moment for outer bonds)
     double f;  // it defines the yield surface
-    if (isInner == true) {
-      f = pow(norm(I.ft) / ft0, power) - I.fn / fn0 - 1.0;
-    } else {
-      I.mom += kr * (box->Particles[I.j].vrot - box->Particles[I.i].vrot) * box->dt;
-      f = pow(norm(I.ft) / ft0, power) + pow(norm(I.mom) / mom0, power) - I.fn / fn0 - 1.0;
-    }
+
+    I.mom += kr * (box->Particles[I.j].vrot - box->Particles[I.i].vrot) * box->dt;
+    f = pow(norm(I.ft) / ft0, power) + pow(norm(I.mom) / mom0, power) - I.fn / fn0 - 1.0;
 
     if (f > 0.0) {
       // All the bonds (Interactions) of the interface are broken.
