@@ -33,55 +33,27 @@
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
-#include <tclap/CmdLine.h>
+#include "factory.hpp"
 
+#include "PreproCommand_setAllVelocities.hpp"
 #include "Rockable.hpp"
-#include "stackTracer.hpp"
+
+static Registrar<PreproCommand, setAllVelocities> registrar("setAllVelocities");
+
+setAllVelocities::setAllVelocities() {}
+
+void setAllVelocities::addCommand() {  
+  box->parser.kwMap["setAllVelocities"] = [this](std::istream& conf) {
+    conf >> this->vel;
+    exec();
+  };
+}
 
 /**
- * @brief This is the command line interface (CLI) for using Rockable
- * 
- */
-int main(int argc, char const* argv[]) {
-  
-  StackTracer::initSignals();
-  
-  std::string confFileName;
-  int nbThreads = 1;
-  int verboseLevel = 0;
-
-  try {
-    TCLAP::CmdLine cmd("This is the command line interface for Rockable", ' ', "0.3");
-    TCLAP::UnlabeledValueArg<std::string> nameArg("input", "Name of the conf-file", true, "conf0", "conf-file");
-    TCLAP::ValueArg<int> nbThreadsArg("j", "nbThreads", "Number of threads to be used", false, 1, "int");
-    TCLAP::ValueArg<int> verboseArg("v", "verbose", "Verbose level", false, 4, "int");
-
-    cmd.add(nameArg);
-    cmd.add(nbThreadsArg);
-    cmd.add(verboseArg);
-
-    cmd.parse(argc, argv);
-
-    confFileName = nameArg.getValue();
-    nbThreads = nbThreadsArg.getValue();
-    verboseLevel = verboseArg.getValue();
-  } catch (TCLAP::ArgException& e) {
-    std::cerr << "error: " << e.error() << " for argument " << e.argId() << std::endl;
+   @brief Set the velocity of ALL free bodies to a given velocity vector
+*/
+void setAllVelocities::exec() {
+  for (size_t i = box->nDriven; i < box->Particles.size(); i++) {
+    box->Particles[i].vel = vel;
   }
-
-  Rockable box;
-  box.initParser();
-  box.setVerboseLevel(verboseLevel);
-  box.showBanner();
-  
-#ifdef _OPENMP
-  omp_set_num_threads(nbThreads);
-  box.console->info("OpenMP acceleration (Number of threads = {})", nbThreads);
-#else
-  box.console->info("No multithreading");
-#endif
-
-  box.console_run(confFileName);
-  
-  return 0;
 }

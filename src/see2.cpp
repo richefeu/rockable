@@ -1311,6 +1311,7 @@ void error(int error, const char* description) {
 // =====================================================================
 
 int main(int argc, char* argv[]) {
+  box.initParser();
   box.setInteractive(true);
 
   std::string confFileName;

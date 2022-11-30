@@ -1628,6 +1628,7 @@ void main_imgui_menu() {
 // =====================================================================
 
 int main(int argc, char* argv[]) {
+  box.initParser();
   box.setInteractive(true);
 
   std::string confFileName;

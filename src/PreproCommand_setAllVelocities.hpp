@@ -33,9 +33,21 @@
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
+#ifndef PREPROCOMMAND_SET_ALL_VELOCITIES_HPP
+#define PREPROCOMMAND_SET_ALL_VELOCITIES_HPP
+
 #include "PreproCommand.hpp"
 
-PreproCommand::PreproCommand() {}
-PreproCommand::~PreproCommand() {}
-void PreproCommand::plug(Rockable* Box) { box = Box; }
+#include "vec3.hpp"
 
+class setAllVelocities : public PreproCommand {
+ public:
+  setAllVelocities();
+  void addCommand() override;
+  void exec() override;
+
+ private:
+  vec3r vel;
+};
+
+#endif /* end of include guard: PREPROCOMMAND_SET_ALL_VELOCITIES_HPP */

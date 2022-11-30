@@ -36,13 +36,6 @@
 #ifndef PREPRO_COMMAND_HPP
 #define PREPRO_COMMAND_HPP
 
-/*
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <vector>
-*/
-
 class Rockable;
 
 class PreproCommand {

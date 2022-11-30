@@ -33,9 +33,22 @@
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
+#ifndef PREPROCOMMAND_HOMOTHETY_RANGE_HPP
+#define PREPROCOMMAND_HOMOTHETY_RANGE_HPP
+
 #include "PreproCommand.hpp"
 
-PreproCommand::PreproCommand() {}
-PreproCommand::~PreproCommand() {}
-void PreproCommand::plug(Rockable* Box) { box = Box; }
+class homothetyRange : public PreproCommand {
+ public:
+  homothetyRange();
+  void addCommand() override;
+  void exec() override;
+
+ private:
+   size_t ifirst, ilast;
+   double hmin, hmax;
+   bool timeSeeded;
+};
+
+#endif /* end of include guard: PREPROCOMMAND_HOMOTHETY_RANGE_HPP */
 

@@ -44,7 +44,6 @@
 # endif
 
 #include "message.hpp"
-//#include "glutTools.hpp"
 #include "glTools.hpp"
 #include "geoTool.hpp"
 #include "fileTool.hpp"

@@ -33,9 +33,55 @@
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
-#include "PreproCommand.hpp"
+#include "factory.hpp"
 
-PreproCommand::PreproCommand() {}
-PreproCommand::~PreproCommand() {}
-void PreproCommand::plug(Rockable* Box) { box = Box; }
+#include "PreproCommand_particlesClonage.hpp"
+#include "Rockable.hpp"
 
+static Registrar<PreproCommand, particlesClonage> registrar("particlesClonage");
+
+particlesClonage::particlesClonage() {}
+
+void particlesClonage::addCommand() {
+  box->parser.kwMap["particlesClonage"] = [this](std::istream& conf) {
+    conf >> this->ifirst >> this->ilast >> this->translation;
+    exec();
+  };
+}
+
+/**
+   Usage in input conf-file:
+   particlesClonage idFirst idLast dX dY dZ
+*/
+void particlesClonage::exec() {
+  if (box->Particles.empty()) return;
+
+  int numClusterMax = box->Particles[0].cluster;
+  for (size_t i = 1; i < box->Particles.size(); i++) {
+    if (box->Particles[i].cluster > numClusterMax) numClusterMax = box->Particles[i].cluster;
+  }
+
+  Particle P;
+  for (size_t i = ifirst; i <= ilast; i++) {
+    P.group = box->Particles[i].group;
+    P.cluster = box->Particles[i].cluster - ifirst + numClusterMax + 1;
+    P.homothety = box->Particles[i].homothety;
+    P.pos = box->Particles[i].pos + translation;
+    P.vel = box->Particles[i].vel;
+    P.acc = box->Particles[i].acc;
+    P.Q = box->Particles[i].Q;
+    P.vrot = box->Particles[i].vrot;
+    P.arot = box->Particles[i].arot;
+    P.shape = box->Particles[i].shape;
+    P.homothety = box->Particles[i].homothety;
+    P.mass = box->Particles[i].mass;
+    P.inertia = box->Particles[i].inertia;
+    P.obb = box->Particles[i].obb;
+    P.force = box->Particles[i].force;
+    P.moment = box->Particles[i].moment;
+    box->Particles.push_back(P);
+  }
+
+  if (box->Interactions.size() != box->Particles.size()) box->Interactions.resize(box->Particles.size());
+  if (box->Interfaces.size() != box->Particles.size()) box->Interfaces.resize(box->Particles.size());
+}

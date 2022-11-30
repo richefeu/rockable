@@ -33,9 +33,47 @@
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
-#include "PreproCommand.hpp"
+#include "factory.hpp"
 
-PreproCommand::PreproCommand() {}
-PreproCommand::~PreproCommand() {}
-void PreproCommand::plug(Rockable* Box) { box = Box; }
+#include "PreproCommand_homothetyRange.hpp"
+#include "Rockable.hpp"
 
+static Registrar<PreproCommand, homothetyRange> registrar("homothetyRange");
+
+homothetyRange::homothetyRange() {}
+
+void homothetyRange::addCommand() {
+  box->parser.kwMap["homothetyRange"] = [this](std::istream& conf) {
+    int timeSeededInt;
+    conf >> this->ifirst >> this->ilast >> this->hmin >> this->hmax >> timeSeededInt;
+    this->timeSeeded = (bool)timeSeededInt;
+    exec();
+  };
+}
+
+/**
+   @brief Set Uniform distribution of homothety of a sub-set of particles
+   @param[in]  idFirst     ID-Number of the first particle
+   @param[in]  idLast      ID-Number of the last particle
+   @param[in]  hmin        Minimum of the homothety range
+   @param[in]  hmax        Maximum of the homothety range
+   @param[in]  timeSeeded  if true, the random generator is seeded with current time
+
+   Usage in input conf-file:
+   homothetyRange idFirst idLast hmin hmax timeSeeded(0/1)
+*/
+void homothetyRange::exec() {
+  std::default_random_engine generator;
+  if (timeSeeded == true) {
+    generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
+  }
+  std::uniform_real_distribution<> distribution(hmin, hmax);
+
+  for (size_t i = ifirst; i <= ilast; i++) {
+    double h = distribution(generator);
+    box->Particles[i].homothety = h;
+    box->Particles[i].mass =
+        (h * h * h * box->Particles[i].shape->volume) * box->properties.get(box->idDensity, box->Particles[i].group);
+    box->Particles[i].inertia = (h * h * box->Particles[i].shape->inertia_mass) * box->Particles[i].mass;
+  }
+}

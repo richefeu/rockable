@@ -221,9 +221,9 @@ class Rockable {
 
   //void setVariableStickParams(std::string& paramName, std::string& isInnerStr, double lambda, double m,
   //                            bool timeSeeded);
-  void setAllVelocities(vec3r& vel);
-  void homothetyRange(size_t idFirst, size_t idLast, double hmin, double hmax, bool timeSeeded);
-  void particlesClonage(size_t idFirst, size_t idLast, vec3r& translation);
+  //void setAllVelocities(vec3r& vel);
+  //void homothetyRange(size_t idFirst, size_t idLast, double hmin, double hmax, bool timeSeeded);
+  //void particlesClonage(size_t idFirst, size_t idLast, vec3r& translation);
 
   // =============================================================================================================
 

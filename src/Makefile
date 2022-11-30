@@ -113,6 +113,9 @@ PreproCommand_randomlyOrientedVelocitiesClusters.cpp \
 PreproCommand_copyParamsToInterfaces.cpp \
 PreproCommand_setStiffnessRatioInterfaces.cpp \
 PreproCommand_setVariableStickParams.cpp \
+PreproCommand_setAllVelocities.cpp \
+PreproCommand_homothetyRange.cpp \
+PreproCommand_particlesClonage.cpp \
 DataExtractor.cpp \
 DataExtractor_TrackBody.cpp \
 DataExtractor_TrackRockfall.cpp \

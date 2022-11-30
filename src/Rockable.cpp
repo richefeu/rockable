@@ -115,7 +115,6 @@ Rockable::Rockable() {
   glue_with_walls = false;
 
   console = spdlog::stdout_color_mt("console");
-  initParser();
 }
 
 /*
@@ -604,10 +603,12 @@ void Rockable::initParser() {
   parser.kwMap["shapeFile"] = __DO__(conf) {
     std::string wantedLib;
     conf >> wantedLib;
-    console->info("wantedLib is {}", wantedLib);
     if (wantedLib != shapeFile) {  // it means that the library is not already loaded
       shapeFile = wantedLib;
       loadShapes(shapeFile.c_str());
+      console->info("wantedLib is {}", wantedLib);
+    } else {
+      console->info("wantedLib is {} (already loaded)", wantedLib);
     }
   };
   parser.kwMap["separator"] = __DO__(conf) {  // TODO: remove it !?
@@ -764,10 +765,18 @@ void Rockable::initParser() {
   //          They are generally put at the end of the input file
   //          so that they apply on a system already set
 
-  std::string commands[] = {"stickVerticesInClusters",  "stickVerticesInClustersMoments",  "stickClusters",
-                            "randomlyOrientedVelocities", "randomlyOrientedVelocitiesClusters",
-                            "copyParamsToInterfaces",     "setStiffnessRatioInterfaces",
-                            "setVariableStickParams"};
+  const std::string commands[] = {"stickVerticesInClusters",
+                                  "stickVerticesInClustersMoments",
+                                  "stickClusters",
+                                  "randomlyOrientedVelocities",
+                                  "randomlyOrientedVelocitiesClusters",
+                                  "copyParamsToInterfaces",
+                                  "setStiffnessRatioInterfaces",
+                                  "setVariableStickParams",
+                                  "setAllVelocities",
+                                  "homothetyRange",
+                                  "particlesClonage"};
+                                  
   for (const std::string& command : commands) {
     PreproCommand* PC = Factory<PreproCommand>::Instance()->Create(command);
     if (PC != nullptr) {
@@ -777,59 +786,14 @@ void Rockable::initParser() {
       console->warn("The PreproCommand named {} was not added!", command);
     }
   }
+
   /*
-  parser.kwMap["stickVerticesInClusters"] = __DO__(conf) {
-    double epsilonDist;
-    conf >> epsilonDist;
-    stickVerticesInClusters(epsilonDist);
-  };
-
-
-  parser.kwMap["stickClusters"] = __DO__(conf) {
-    double epsilonDist;
-    conf >> epsilonDist;
-    stickClusters(epsilonDist);
-  };
-
-  parser.kwMap["copyParamsToInterfaces"] = __DO__(conf) {
-    std::string isInnerStr;
-    conf >> isInnerStr;
-    copyParamsToInterfaces(isInnerStr);
-  };
-
-  parser.kwMap["setStiffnessRatioInterfaces"] = __DO__(conf) {
-    double ratio;
-    conf >> ratio;
-    setStiffnessRatioInterfaces(ratio);
-  };
-
-  parser.kwMap["setVariableStickParams"] = __DO__(conf) {
-    std::string paramName;
-    std::string isInnerStr;
-    double lambda, m;
-    int timeSeeded;
-    conf >> paramName >> isInnerStr >> lambda >> m >> timeSeeded;
-    setVariableStickParams(paramName, isInnerStr, lambda, m, (bool)timeSeeded);
-  };
-
-  parser.kwMap["randomlyOrientedVelocities"] = __DO__(conf) {
-    double vel;
-    conf >> vel;
-    randomlyOrientedVelocities(vel);
-  };
-
-  parser.kwMap["randomlyOrientedVelocitiesClusters"] = __DO__(conf) {
-    double vel;
-    int opt;
-    conf >> vel >> opt;
-    randomlyOrientedVelocitiesClusters(vel, opt);
-  };
-  */
   parser.kwMap["setAllVelocities"] = __DO__(conf) {
     vec3r vel;
     conf >> vel;
     setAllVelocities(vel);
   };
+
   parser.kwMap["homothetyRange"] = __DO__(conf) {
     size_t ifirst, ilast;
     double hmin, hmax;
@@ -837,12 +801,15 @@ void Rockable::initParser() {
     conf >> ifirst >> ilast >> hmin >> hmax >> timeSeeded;
     homothetyRange(ifirst, ilast, hmin, hmax, (bool)timeSeeded);
   };
+ 
+  
   parser.kwMap["particlesClonage"] = __DO__(conf) {
     size_t ifirst, ilast;
     vec3r translation;
     conf >> ifirst >> ilast >> translation;
     particlesClonage(ifirst, ilast, translation);
   };
+   */
 }
 
 /**
@@ -2978,11 +2945,13 @@ void Rockable::setVariableStickParams(std::string& paramName, std::string& isInn
 /**
    @brief Set the velocity of ALL free bodies to a given velocity vector
 */
+/*
 void Rockable::setAllVelocities(vec3r& vel) {
   for (size_t i = nDriven; i < Particles.size(); i++) {
     Particles[i].vel = vel;
   }
 }
+*/
 
 /**
    @brief Set Uniform distribution of homothety of a sub-set of particles
@@ -2995,6 +2964,7 @@ void Rockable::setAllVelocities(vec3r& vel) {
    Usage in input conf-file:
    homothetyRange idFirst idLast hmin hmax timeSeeded(0/1)
 */
+/*
 void Rockable::homothetyRange(size_t idFirst, size_t idLast, double hmin, double hmax, bool timeSeeded) {
   std::default_random_engine generator;
   if (timeSeeded == true) {
@@ -3009,11 +2979,13 @@ void Rockable::homothetyRange(size_t idFirst, size_t idLast, double hmin, double
     Particles[i].inertia = (h * h * Particles[i].shape->inertia_mass) * Particles[i].mass;
   }
 }
+*/
 
 /**
    Usage in input conf-file:
    particlesClonage idFirst idLast dX dY dZ
 */
+/*
 void Rockable::particlesClonage(size_t idFirst, size_t idLast, vec3r& translation) {
   if (Particles.empty()) return;
 
@@ -3046,3 +3018,4 @@ void Rockable::particlesClonage(size_t idFirst, size_t idLast, vec3r& translatio
   if (Interactions.size() != Particles.size()) Interactions.resize(Particles.size());
   if (Interfaces.size() != Particles.size()) Interfaces.resize(Particles.size());
 }
+*/

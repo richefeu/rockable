@@ -35,8 +35,8 @@
 
 #include "factory.hpp"
 
-#include "ForceLaw_StickedLinks.hpp"
 #include "Rockable.hpp"
+#include "ForceLaw_StickedLinks.hpp"
 
 static Registrar<ForceLaw, StickedLinks> registrar("StickedLinks");
 
@@ -79,11 +79,11 @@ bool StickedLinks::computeInteraction(Interaction& I) {
     double kn = 0.0, kt = 0.0, kr = 0.0;
     double fn0 = 1.0, ft0 = 1.0, mom0 = 1.0, power = 1.0;
     double dn0 = I.stick->dn0;
-    //bool isInner = false;
+    bool isInner = (box->Particles[I.i].cluster == box->Particles[I.j].cluster);
 
     // First we need to get the parameters
     if (box->paramsInInterfaces == 1) {
-      //isInner = I.stick->isInner;
+      isInner = I.stick->isInner;
       kn = I.stick->kn;
       kt = I.stick->kt;
       kr = I.stick->kr;
@@ -95,8 +95,7 @@ bool StickedLinks::computeInteraction(Interaction& I) {
       int g1 = box->Particles[I.i].group;
       int g2 = box->Particles[I.j].group;
 
-      if (box->Particles[I.i].cluster == box->Particles[I.j].cluster) {  // Inner
-        //isInner = true;
+      if (isInner == true) {  // Inner
         kn = box->dataTable.get(box->idKnInnerBond, g1, g2);
         kt = box->dataTable.get(box->idKtInnerBond, g1, g2);
         kr = box->dataTable.get(box->idKrInnerBond, g1, g2);
@@ -106,7 +105,6 @@ bool StickedLinks::computeInteraction(Interaction& I) {
         power = box->dataTable.get(box->idPowInnerBond, g1, g2);
         dn0 = 0.0;
       } else {  // Outer
-        //isInner = false;
         kn = box->dataTable.get(box->idKnOuterBond, g1, g2);
         kt = box->dataTable.get(box->idKtOuterBond, g1, g2);
         kr = box->dataTable.get(box->idKrOuterBond, g1, g2);
@@ -143,7 +141,6 @@ bool StickedLinks::computeInteraction(Interaction& I) {
 
     // === Rupture criterion (and resistant moment for outer bonds)
     double f;  // it defines the yield surface
-
     I.mom += kr * (box->Particles[I.j].vrot - box->Particles[I.i].vrot) * box->dt;
     f = pow(norm(I.ft) / ft0, power) + pow(norm(I.mom) / mom0, power) - I.fn / fn0 - 1.0;
 

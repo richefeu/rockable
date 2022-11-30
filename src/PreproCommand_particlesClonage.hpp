@@ -33,9 +33,22 @@
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
+#ifndef PREPROCOMMAND_PARTICLES_CLONAGE_HPP
+#define PREPROCOMMAND_PARTICLES_CLONAGE_HPP
+
 #include "PreproCommand.hpp"
 
-PreproCommand::PreproCommand() {}
-PreproCommand::~PreproCommand() {}
-void PreproCommand::plug(Rockable* Box) { box = Box; }
+#include "vec3.hpp"
 
+class particlesClonage : public PreproCommand {
+ public:
+  particlesClonage();
+  void addCommand() override;
+  void exec() override;
+
+ private:
+   size_t ifirst, ilast;
+   vec3r translation;
+};
+
+#endif /* end of include guard: PREPROCOMMAND_PARTICLES_CLONAGE_HPP */
