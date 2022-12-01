@@ -174,6 +174,11 @@ format:
 run: run.cpp $(HEADERS) $(SOURCES) $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -c $<
 	$(LINK) $(CXXFLAGS) -o $@ $@.o $(OBJECTS)
+
+# The application that converts conf-files into vtk-files
+conftovtk: conftovtk.cpp conftovtk.hpp $(HEADERS) $(SOURCES) $(OBJECTS)
+	$(CXX) $(CXXFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(GLLINK)
 	
 # Scripting with chaiscript (TEST!!!)
 script: script.cpp $(HEADERS) $(SOURCES) $(OBJECTS)

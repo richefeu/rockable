@@ -140,11 +140,11 @@ bool StickedLinks::computeInteraction(Interaction& I) {
     // =============================
 
     // === Rupture criterion (and resistant moment for outer bonds)
-    double f;  // it defines the yield surface
+    double yield;  // it defines the yield surface
     I.mom += kr * (box->Particles[I.j].vrot - box->Particles[I.i].vrot) * box->dt;
-    f = pow(norm(I.ft) / ft0, power) + pow(norm(I.mom) / mom0, power) - I.fn / fn0 - 1.0;
+    yield = pow(norm(I.ft) / ft0, power) + pow(norm(I.mom) / mom0, power) - I.fn / fn0 - 1.0;
 
-    if (f > 0.0) {
+    if (yield > 0.0) {
       // All the bonds (Interactions) of the interface are broken.
       // The Interactions pointer inserted in this std::set
       // will be 'broken' just after all the forces are computed

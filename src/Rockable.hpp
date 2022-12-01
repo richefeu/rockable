@@ -74,15 +74,15 @@
 #include "message.hpp"
 
 // local headers
-#include "PreproCommand.hpp"
-#include "ForceLaw.hpp"
 #include "BodyForce.hpp"
 #include "BreakableInterface.hpp"
 #include "ContactPartnership.hpp"
 #include "DataExtractor.hpp"
 #include "DrivingSystem.hpp"
+#include "ForceLaw.hpp"
 #include "Interaction.hpp"
 #include "Particle.hpp"
+#include "PreproCommand.hpp"
 #include "clusterParticles.hpp"
 
 class Rockable {
@@ -110,10 +110,10 @@ class Rockable {
   std::map<std::string, size_t> shapeId;  ///< Associate a name of shape with its id in the vector 'Shapes'
 
   // Time parameters
-  double t;     ///< Current Time
-  double tmax;  ///< End time
-  double dt;    ///< Time increment
-  int computationStopAsked;
+  double t;                  ///< Current Time
+  double tmax;               ///< End time
+  double dt;                 ///< Time increment
+  int computationStopAsked;  ///< Ask to break the integration loop if positive
 
   // Simulation flow
   double interVerlet;  ///< Time interval between each update of the
@@ -154,9 +154,9 @@ class Rockable {
 
   std::map<std::string, std::string> optionNames;  ///< All the options refered to as a string and set
                                                    ///< as a string also
-  
-  ForceLaw * forceLaw;      ///< User defined force law
-  
+
+  ForceLaw* forceLaw;  ///< User defined force law
+
   // Ctor
   Rockable();
 
@@ -187,8 +187,8 @@ class Rockable {
 
   // Save/Load methods
   kwParser parser;
-  void clearMemory();  ///< Clear the Particles and Interactions
-  void initParser();
+  void clearMemory();            ///< Clear the Particles and Interactions
+  void initParser();             ///< The place where the parsing commands are defined
   void saveConf(int i);          ///< Save the current configuration in a file named confX, where X=i
   void saveConf(const char*);    ///< Save a configuration from a conf-file
   void loadConf(int i);          ///< Load the current configuration in a file named confX, where X=i
@@ -203,7 +203,7 @@ class Rockable {
   std::function<void()> UpdateNL;       ///< Pointer funtion to the updateNL
                                         ///< (update the neighbor-list) method
   void setUpdateNL(std::string& Name);  ///< select the Neighbor list updator
-  
+
   // Processing methods
   void computeAABB(size_t first = 0, size_t last = 0);  ///< Compute Axis Aligned Bounding Box of a part of the sample
   void getCriticalTimeStep(double& dtc);
@@ -214,25 +214,14 @@ class Rockable {
   void getInteractionQuickStats(double& fnMin, double& fnMax, double& fnMean, double& fnStddev);
   void getKineticEnergy(double& Etrans, double& Erot, size_t first = 0, size_t last = 0);
 
-
-  // Pre-processing methods
-  //void copyParamsToInterfaces(std::string& isInnerStr);
-  //void setStiffnessRatioInterfaces(double ratio);
-
-  //void setVariableStickParams(std::string& paramName, std::string& isInnerStr, double lambda, double m,
-  //                            bool timeSeeded);
-  //void setAllVelocities(vec3r& vel);
-  //void homothetyRange(size_t idFirst, size_t idLast, double hmin, double hmax, bool timeSeeded);
-  //void particlesClonage(size_t idFirst, size_t idLast, vec3r& translation);
-
   // =============================================================================================================
 
-  void velocityControlledDrive();
-  void numericalDamping();        ///< The Cundall damping solution
+  void velocityControlledDrive();      ///< Impose the velocities of driven bodies
+  void numericalDamping();             ///< The Cundall damping solution
   void applyVelocityBarrier();         ///< The velocity barrier solution
   void applyAngularVelocityBarrier();  ///< The velocity barrier solution for rotations
-  void dynamicCheckUpdateNL();    ///< Ask for NL reconstruction if the maximum
-                                  ///< displacement of rotation is more than given values
+  void dynamicCheckUpdateNL();         ///< Ask for NL reconstruction if the maximum
+                                       ///< displacement of rotation is more than given values
 
   int AddOrRemoveInteractions_bruteForce(size_t i, size_t j,
                                          double dmax);                   ///< Brute-force approach
@@ -240,8 +229,6 @@ class Rockable {
   std::function<int(size_t, size_t, double)> AddOrRemoveInteractions;    ///< (Pointer function) Add or remove an
                                                                          ///< interaction according to the distance dmax
   void setAddOrRemoveInteractions(std::string& Name);
-
-  //void getInteractingGroups(Interaction& I, int& g1, int& g2);
 
   void readLawData(std::istream&, size_t id);             ///< Helper method to read a law in loadConf
   void writeLawData(std::ostream&, const char* parName);  ///< Helper method to write law in saveConf
@@ -260,14 +247,14 @@ class Rockable {
   size_t idKrContact;   ///< Identifier of angular stiffness for contact
   size_t idMurContact;  ///< Identifier of rolling-friction coefficient for contact
 
-  size_t idKnInnerBond;   ///< Identifier of normal stiffness for inner-bonds
-  size_t idKtInnerBond;   ///< Identifier of tangential stiffness for inner-bonds
-  size_t idKrInnerBond;   ///< Identifier of angular stiffness for inner-bonds
-  size_t idEn2InnerBond;  ///< Identifier of normal energy-restitution for inner-bonds
-  size_t idFn0InnerBond;  ///< Identifier of normal threshold force for inner-bonds
-  size_t idFt0InnerBond;  ///< Identifier of tangential threshold force for inner-bonds
-  size_t idMom0InnerBond; ///< Identifier of threshold bendind-moment for inner-bonds
-  size_t idPowInnerBond;  ///< Identifier of power in yield function for inner-bonds
+  size_t idKnInnerBond;    ///< Identifier of normal stiffness for inner-bonds
+  size_t idKtInnerBond;    ///< Identifier of tangential stiffness for inner-bonds
+  size_t idKrInnerBond;    ///< Identifier of angular stiffness for inner-bonds
+  size_t idEn2InnerBond;   ///< Identifier of normal energy-restitution for inner-bonds
+  size_t idFn0InnerBond;   ///< Identifier of normal threshold force for inner-bonds
+  size_t idFt0InnerBond;   ///< Identifier of tangential threshold force for inner-bonds
+  size_t idMom0InnerBond;  ///< Identifier of threshold bendind-moment for inner-bonds
+  size_t idPowInnerBond;   ///< Identifier of power in yield function for inner-bonds
 
   size_t idKnOuterBond;    ///< Identifier of normal stiffness for outer-bonds
   size_t idKtOuterBond;    ///< Identifier of tangential stiffness for outer-bonds
@@ -279,8 +266,7 @@ class Rockable {
   size_t idPowOuterBond;   ///< Identifier of power in yield function for outer-bonds
 
   // Postponed breakage of BreakableInterfaces
-  std::set<BreakableInterface*> interfacesToBreak;  ///< Pointers to interfaces
-                                                    ///< to be broken
+  std::set<BreakableInterface*> interfacesToBreak;  ///< Pointers to interfaces to be broken
 
   // dynamic update of the Neighbor-List (NL)
   bool needUpdate;              ///< when true, an updateNL will be done at the next time increment
