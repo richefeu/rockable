@@ -96,9 +96,11 @@ Rockable::Rockable() {
 
   idKnInnerBond = dataTable.add("knInnerBond");
   idKtInnerBond = dataTable.add("ktInnerBond");
+  idKrInnerBond = dataTable.add("krInnerBond");
   idEn2InnerBond = dataTable.add("en2InnerBond");
   idFn0InnerBond = dataTable.add("fn0InnerBond");
   idFt0InnerBond = dataTable.add("ft0InnerBond");
+  idMom0InnerBond = dataTable.add("mom0InnerBond");
   idPowInnerBond = dataTable.add("powInnerBond");
 
   idKnOuterBond = dataTable.add("knOuterBond");
@@ -224,22 +226,10 @@ void Rockable::showBanner() {
                "https://richefeu.gitbook.io/cdm/\n\n";
   std::cout << std::endl;
 
-#ifdef QUAT_ACC
-  console->info("Compilation options: QUAT_ACC = YES");
-#else
-  console->info("Compilation options: QUAT_ACC = NO");
-#endif
-
 #ifdef FT_CORR
   console->info("Compilation options: FT_CORR = YES");
 #else
   console->info("Compilation options: FT_CORR = NO");
-#endif
-
-#ifdef ROT_MATRIX
-  console->info("Compilation options: ROT_MATRIX = YES");
-#else
-  console->info("Compilation options: ROT_MATRIX = NO");
 #endif
 }
 
@@ -1574,9 +1564,7 @@ void Rockable::velocityVerletStep() {
     // Rotation: Q(k+1) = Q(k) + dQ(k) * dt + ddQ(k) * dt2/2
     // It reads like this with quaternions
     Particles[i].Q += ((Particles[i].Q.dot(Particles[i].vrot)) *= dt);
-#ifdef QUAT_ACC
     Particles[i].Q += ((Particles[i].Q.ddot(Particles[i].vrot, Particles[i].arot)) *= dt2_2);
-#endif
     Particles[i].Q.normalize();
 
     Particles[i].vrot += dt_2 * Particles[i].arot;
@@ -2181,10 +2169,6 @@ void Rockable::incrementResultants(Interaction& I) {
       3. the axial and angular accelerations of the bodies
 */
 void Rockable::accelerations() {
-#ifdef ROT_MATRIX
-  static mat9r P;
-  static mat9r Pt;
-#endif
 
   // Set resultant forces and moments to zero
 #pragma omp parallel for default(shared)
@@ -2403,18 +2387,6 @@ void Rockable::accelerations() {
   for (size_t i = nDriven; i < Particles.size(); ++i) {
     Particles[i].acc = Particles[i].force / Particles[i].mass;
 
-#ifdef ROT_MATRIX
-    Particles[i].Q.get_rot_matrix(P);
-    Pt = P;
-    Pt.transpose();
-    vec3r omega = Pt * Particles[i].vrot;  // Express omega in the body framework
-    vec3r M = Pt * Particles[i].moment;    // Express torque in the body framework
-    vec3r domega(
-        (M[0] - (Particles[i].inertia[2] - Particles[i].inertia[1]) * omega[1] * omega[2]) / Particles[i].inertia[0],
-        (M[1] - (Particles[i].inertia[0] - Particles[i].inertia[2]) * omega[2] * omega[0]) / Particles[i].inertia[1],
-        (M[2] - (Particles[i].inertia[1] - Particles[i].inertia[0]) * omega[0] * omega[1]) / Particles[i].inertia[2]);
-    Particles[i].arot = P * domega;  // Express arot in the global framework
-#else
     quat Qinv = Particles[i].Q.get_conjugated();
     vec3r omega = Qinv * Particles[i].vrot;  // Express omega in the body framework
     vec3r M = Qinv * Particles[i].moment;    // Express torque in the body framework
@@ -2423,7 +2395,6 @@ void Rockable::accelerations() {
         (M[1] - (Particles[i].inertia[0] - Particles[i].inertia[2]) * omega[2] * omega[0]) / Particles[i].inertia[1],
         (M[2] - (Particles[i].inertia[1] - Particles[i].inertia[0]) * omega[0] * omega[1]) / Particles[i].inertia[2]);
     Particles[i].arot = Particles[i].Q * domega;  // Express arot in the global framework
-#endif
   }
 
   // damping solutions based on the weighting of accelerations

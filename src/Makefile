@@ -35,7 +35,7 @@
 #######################################################################################################################
 
 # An option can be disable by adding 'n' before
-OPTIONS = -DQUAT_ACC -DnFT_CORR -DnROT_MATRIX -DnCOMPONENTWISE_NUM_DAMPING
+OPTIONS = -DnFT_CORR -DnCOMPONENTWISE_NUM_DAMPING
 
 # If you don't want to use libpng in 'see', comment this two lines
 # In this case the screenshots will be TGA (not compressed)
