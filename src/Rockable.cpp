@@ -36,6 +36,33 @@
 #define CONF_VERSION_DATE "21-08-2022"
 #include "Rockable.hpp"
 
+#include "BodyForce_AttractingPoint.hpp"
+#include "BodyForce_PreferredDirection.hpp"
+#include "BodyForce_ViscousFluid.hpp"
+
+#include "DataExtractor_ClusterAABB.hpp"
+#include "DataExtractor_dnStat.hpp"
+#include "DataExtractor_DuoBalance.hpp"
+#include "DataExtractor_MeanVelocity.hpp"
+#include "DataExtractor_TrackBody.hpp"
+#include "DataExtractor_TrackRockfall.hpp"
+
+#include "ForceLaw_Avalanche.hpp"
+#include "ForceLaw_Default.hpp"
+#include "ForceLaw_StickedLinks.hpp"
+
+#include "PreproCommand_copyParamsToInterfaces.hpp"
+#include "PreproCommand_homothetyRange.hpp"
+#include "PreproCommand_particlesClonage.hpp"
+#include "PreproCommand_randomlyOrientedVelocities.hpp"
+#include "PreproCommand_randomlyOrientedVelocitiesClusters.hpp"
+#include "PreproCommand_setAllVelocities.hpp"
+#include "PreproCommand_setStiffnessRatioInterfaces.hpp"
+#include "PreproCommand_setVariableStickParams.hpp"
+#include "PreproCommand_stickClusters.hpp"
+#include "PreproCommand_stickVerticesInClusters.hpp"
+#include "PreproCommand_stickVerticesInClustersMoments.hpp"
+
 // ==============================================================================================================
 //  INITIALIZATIONS
 // ==============================================================================================================
@@ -117,6 +144,60 @@ Rockable::Rockable() {
   glue_with_walls = false;
 
   console = spdlog::stdout_color_mt("console");
+  ExplicitRegistrations();
+}
+
+void Rockable::ExplicitRegistrations() {
+  Factory<BodyForce, std::string>::Instance()->RegisterFactoryFunction(
+      "AttractingPoint", [](void) -> BodyForce* { return new AttractingPoint(); });
+  Factory<BodyForce, std::string>::Instance()->RegisterFactoryFunction(
+      "PreferredDirection", [](void) -> BodyForce* { return new PreferredDirection(); });
+  Factory<BodyForce, std::string>::Instance()->RegisterFactoryFunction(
+      "ViscousFluid", [](void) -> BodyForce* { return new ViscousFluid(); });
+  
+  Factory<DataExtractor, std::string>::Instance()->RegisterFactoryFunction(
+      "ClusterAABB", [](void) -> DataExtractor* { return new ClusterAABB(); });
+  Factory<DataExtractor, std::string>::Instance()->RegisterFactoryFunction(
+      "dnStat", [](void) -> DataExtractor* { return new dnStat(); });
+  Factory<DataExtractor, std::string>::Instance()->RegisterFactoryFunction(
+      "DuoBalance", [](void) -> DataExtractor* { return new DuoBalance(); });
+  Factory<DataExtractor, std::string>::Instance()->RegisterFactoryFunction(
+      "MeanVelocity", [](void) -> DataExtractor* { return new MeanVelocity(); });
+  Factory<DataExtractor, std::string>::Instance()->RegisterFactoryFunction(
+      "TrackBody", [](void) -> DataExtractor* { return new TrackBody(); });
+  Factory<DataExtractor, std::string>::Instance()->RegisterFactoryFunction(
+      "TrackRockfall", [](void) -> DataExtractor* { return new TrackRockfall(); });  
+
+  Factory<ForceLaw, std::string>::Instance()->RegisterFactoryFunction(
+      "Avalanche", [](void) -> ForceLaw* { return new Avalanche(); });
+  Factory<ForceLaw, std::string>::Instance()->RegisterFactoryFunction("Default",
+                                                                      [](void) -> ForceLaw* { return new Default(); });
+  Factory<ForceLaw, std::string>::Instance()->RegisterFactoryFunction(
+      "StickedLinks", [](void) -> ForceLaw* { return new StickedLinks(); });
+
+  Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
+      "copyParamsToInterfaces", [](void) -> PreproCommand* { return new copyParamsToInterfaces(); });
+  Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
+      "homothetyRange", [](void) -> PreproCommand* { return new homothetyRange(); });
+  Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
+      "particlesClonage", [](void) -> PreproCommand* { return new particlesClonage(); });
+  Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
+      "randomlyOrientedVelocities", [](void) -> PreproCommand* { return new randomlyOrientedVelocities(); });
+  Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
+      "randomlyOrientedVelocitiesClusters",
+      [](void) -> PreproCommand* { return new randomlyOrientedVelocitiesClusters(); });
+  Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
+      "setAllVelocities", [](void) -> PreproCommand* { return new setAllVelocities(); });
+  Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
+      "setStiffnessRatioInterfaces", [](void) -> PreproCommand* { return new setStiffnessRatioInterfaces(); });
+  Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
+      "setVariableStickParams", [](void) -> PreproCommand* { return new setVariableStickParams(); });
+  Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
+      "stickClusters", [](void) -> PreproCommand* { return new StickClusters(); });
+  Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
+      "stickVerticesInClusters", [](void) -> PreproCommand* { return new StickVerticesInClusters(); });
+  Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
+      "stickVerticesInClustersMoments", [](void) -> PreproCommand* { return new StickVerticesInClustersMoments(); });
 }
 
 /*
@@ -170,7 +251,7 @@ void Rockable::setVerboseLevel(int v) {
  *
  * @param levelName Name of the verbose level
  */
-void Rockable::setVerboseLevel(std::string& levelName) {
+void Rockable::setVerboseLevel(const std::string& levelName) {
   if (levelName == "off")
     setVerboseLevel(0);
   else if (levelName == "critical")
@@ -766,7 +847,7 @@ void Rockable::initParser() {
                                   "setAllVelocities",
                                   "homothetyRange",
                                   "particlesClonage"};
-                                  
+
   for (const std::string& command : commands) {
     PreproCommand* PC = Factory<PreproCommand>::Instance()->Create(command);
     if (PC != nullptr) {
@@ -898,7 +979,7 @@ void Rockable::loadShapes(const char* fileName) {
   }
 }
 
-void Rockable::console_run(std::string& confFileName) {
+void Rockable::console_run(const std::string& confFileName) {
   loadConf(confFileName.c_str());
   initOutputFiles();
 
@@ -2778,4 +2859,3 @@ void Rockable::getInteractionQuickStats(double& fnMin, double& fnMax, double& fn
     fnStddev = sqrt(fnStddev);
   }
 }
-

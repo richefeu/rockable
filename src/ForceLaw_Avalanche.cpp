@@ -38,7 +38,7 @@
 #include "Rockable.hpp"
 #include "ForceLaw_Avalanche.hpp"
 
-static Registrar<ForceLaw, Avalanche> registrar("Avalanche");
+//static Registrar<ForceLaw, Avalanche> registrar("Avalanche");
 
 Avalanche::Avalanche() { }
 

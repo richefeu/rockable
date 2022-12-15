@@ -40,7 +40,7 @@
 #include "DataExtractor_TrackBody.hpp"
 #include "Rockable.hpp"
 
-static Registrar<DataExtractor, TrackBody> registrar("TrackBody");
+//static Registrar<DataExtractor, TrackBody> registrar("TrackBody");
 
 TrackBody::TrackBody() : ibody(0), ictrl(0) {}
 

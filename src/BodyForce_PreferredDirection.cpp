@@ -38,7 +38,7 @@
 #include "BodyForce_PreferredDirection.hpp"
 #include "Rockable.hpp"
 
-static Registrar<BodyForce, PreferredDirection> registrar("PreferredDirection");
+//static Registrar<BodyForce, PreferredDirection> registrar("PreferredDirection");
 
 PreferredDirection::PreferredDirection() {}
 

@@ -159,10 +159,11 @@ class Rockable {
 
   // Ctor
   Rockable();
+  void ExplicitRegistrations();
 
   // Initialization methods
   void setVerboseLevel(int v);                   ///< Defines verbosity with an integer
-  void setVerboseLevel(std::string& levelName);  ///< Defines verbosity with a string label
+  void setVerboseLevel(const std::string& levelName);  ///< Defines verbosity with a string label
   void initOutputFiles();                        ///< Open the output files
   void setInteractive(bool imode = true);        ///< Set in a computation mode
   bool isInteractive() const;                    ///< Set in a visualization mode
@@ -196,7 +197,7 @@ class Rockable {
   void loadShapes(const char*);  ///< Load a shape library from a shape-file
   void readDataExtractors();     ///< Read the file dataExtractors.txt
 
-  void console_run(std::string& confFileName);
+  void console_run(const std::string& confFileName);
 
   void UpdateNL_bruteForce();           ///< Brute-force approach
   void UpdateNL_linkCells();            ///< Link-cells approach

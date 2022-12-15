@@ -39,7 +39,7 @@
 #include "PreproCommand_randomlyOrientedVelocitiesClusters.hpp"
 #include "processingTool_getClusters.hpp"
 
-static Registrar<PreproCommand, randomlyOrientedVelocitiesClusters> registrar("randomlyOrientedVelocitiesClusters");
+//static Registrar<PreproCommand, randomlyOrientedVelocitiesClusters> registrar("randomlyOrientedVelocitiesClusters");
 
 randomlyOrientedVelocitiesClusters::randomlyOrientedVelocitiesClusters() { }
 

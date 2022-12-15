@@ -38,7 +38,7 @@
 #include "PreproCommand_homothetyRange.hpp"
 #include "Rockable.hpp"
 
-static Registrar<PreproCommand, homothetyRange> registrar("homothetyRange");
+//static Registrar<PreproCommand, homothetyRange> registrar("homothetyRange");
 
 homothetyRange::homothetyRange() {}
 

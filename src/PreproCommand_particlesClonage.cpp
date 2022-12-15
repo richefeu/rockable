@@ -38,7 +38,7 @@
 #include "PreproCommand_particlesClonage.hpp"
 #include "Rockable.hpp"
 
-static Registrar<PreproCommand, particlesClonage> registrar("particlesClonage");
+//static Registrar<PreproCommand, particlesClonage> registrar("particlesClonage");
 
 particlesClonage::particlesClonage() {}
 

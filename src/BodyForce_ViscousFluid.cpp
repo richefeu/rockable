@@ -38,7 +38,7 @@
 #include "BodyForce_ViscousFluid.hpp"
 #include "Rockable.hpp"
 
-static Registrar<BodyForce, ViscousFluid> registrar("ViscousFluid");
+//static Registrar<BodyForce, ViscousFluid> registrar("ViscousFluid");
 
 ViscousFluid::ViscousFluid() {}
 

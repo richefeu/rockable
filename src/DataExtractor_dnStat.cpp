@@ -40,7 +40,7 @@
 #include "DataExtractor_dnStat.hpp"
 #include "Rockable.hpp"
 
-static Registrar<DataExtractor, dnStat> registrar("dnStat");
+//static Registrar<DataExtractor, dnStat> registrar("dnStat");
 
 dnStat::dnStat() {}
 

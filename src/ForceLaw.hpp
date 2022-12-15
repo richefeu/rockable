@@ -45,9 +45,6 @@ class ForceLaw {
 
   virtual ~ForceLaw();
   virtual void plug(Rockable* Box) final;
-  //virtual void read(std::istream& is) = 0;
-  //virtual void write(std::ostream& os) = 0;
-  //virtual void getForceAndMoment(size_t ibody, vec3r& force, vec3r& moment) = 0;
   virtual void init() = 0;
   virtual bool computeInteraction(Interaction& I) = 0;
 

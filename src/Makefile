@@ -182,8 +182,8 @@ conftovtk: conftovtk.cpp conftovtk.hpp $(HEADERS) $(SOURCES) $(OBJECTS)
 	
 # Scripting with chaiscript (TEST!!!)
 script: script.cpp $(HEADERS) $(SOURCES) $(OBJECTS)
-	$(CXX) $(CXXFLAGS) -I $(CHAISCRIPTPATH)  -c $<
-	$(LINK) $(CXXFLAGS) -o $@ $@.o $(OBJECTS)
+	$(CXX) $(CXXFLAGS) -I $(CHAISCRIPTPATH) -DCHAISCRIPT_NO_THREADS -c $<
+	$(LINK) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) -ldl
 	
 # The application that edits and visualize the conf files (it uses FLTK)
 edt: edt.cpp edt.hpp $(HEADERS) $(SOURCES) $(OBJECTS)

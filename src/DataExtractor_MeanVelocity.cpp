@@ -40,7 +40,7 @@
 #include "DataExtractor_MeanVelocity.hpp"
 #include "Rockable.hpp"
 
-static Registrar<DataExtractor, MeanVelocity> registrar("MeanVelocity");
+//static Registrar<DataExtractor, MeanVelocity> registrar("MeanVelocity");
 
 MeanVelocity::MeanVelocity() {}
 
