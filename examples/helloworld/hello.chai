@@ -1,0 +1,21 @@
+// hello
+
+var Simu = Rockable();
+Simu.setVerboseLevel("debug");
+//Simu.setOpenMPThreads(1);
+Simu.initParser();
+Simu.showBanner();
+print("dt = ${Simu.dt}");
+Simu.tmax = 1.0;
+print("tmax = ${Simu.tmax}");
+
+print("gravity = ${Simu.gravity.x} ${Simu.gravity.y} ${Simu.gravity.z}");
+
+//Simu.console_run("input.txt");
+
+
+
+
+
+
+

@@ -314,6 +314,15 @@ void Rockable::showBanner() {
 #endif
 }
 
+void Rockable::setOpenMPThreads(int nbThreads) {
+#ifdef _OPENMP
+  omp_set_num_threads(nbThreads);
+  console->info("OpenMP acceleration (Number of threads = {})", nbThreads);
+#else
+  console->info("No multithreading");
+#endif
+}
+
 // ==================================================================================================================
 //  CHECK METHODS
 // ==================================================================================================================

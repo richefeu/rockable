@@ -170,6 +170,7 @@ class Rockable {
   void setInteractive(bool imode = true);        ///< Set in a computation mode
   bool isInteractive() const;                    ///< Set in a visualization mode
   void showBanner();                             ///< Display a banner about the code
+  void setOpenMPThreads(int nbThreads = 1);
 
   void initialChecks();  ///< Checks before runing a computation
 
