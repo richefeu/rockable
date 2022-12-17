@@ -60,7 +60,7 @@ ifeq ($(UNAME_S),Darwin)
 	
   # The list of flags passed to the compiler
   CXXFLAGS := -fopenmp -O3 -Wall -Wextra -Wno-deprecated-declarations -std=c++17
-  CXXFLAGS += -I $(TOOFUSPATH) -I $(SPDLOGPATH) $(OPTIONS) $(SVNDEV)
+  CXXFLAGS += -I $(TOOFUSPATH) -I $(SPDLOGPATH) $(OPTIONS)
   CXXFLAGS += `pkg-config --cflags tclap`
 	
   # Link flags for OpenGL and glut
@@ -81,7 +81,7 @@ else
 	
   # The list of flags passed to the compiler
   CXXFLAGS := -fopenmp -O3 -std=c++17
-  CXXFLAGS += -I $(TOOFUSPATH) $(OPTIONS) $(SVNDEV)
+  CXXFLAGS += -I $(TOOFUSPATH) $(OPTIONS)
 	
   # CXXFLAGS += `pkg-config --cflags tclap`
   # Link flags for OpenGL and glut
@@ -96,6 +96,7 @@ endif
 SOURCES = Shape.cpp \
 Particle.cpp \
 Interaction.cpp \
+SpringJoint.cpp \
 Rockable.cpp \
 DrivingSystem.cpp \
 BreakableInterface.cpp \

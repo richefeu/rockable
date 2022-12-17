@@ -41,11 +41,11 @@
 #include "BodyForce_ViscousFluid.hpp"
 
 #include "DataExtractor_ClusterAABB.hpp"
-#include "DataExtractor_dnStat.hpp"
 #include "DataExtractor_DuoBalance.hpp"
 #include "DataExtractor_MeanVelocity.hpp"
 #include "DataExtractor_TrackBody.hpp"
 #include "DataExtractor_TrackRockfall.hpp"
+#include "DataExtractor_dnStat.hpp"
 
 #include "ForceLaw_Avalanche.hpp"
 #include "ForceLaw_Default.hpp"
@@ -154,7 +154,7 @@ void Rockable::ExplicitRegistrations() {
       "PreferredDirection", [](void) -> BodyForce* { return new PreferredDirection(); });
   Factory<BodyForce, std::string>::Instance()->RegisterFactoryFunction(
       "ViscousFluid", [](void) -> BodyForce* { return new ViscousFluid(); });
-  
+
   Factory<DataExtractor, std::string>::Instance()->RegisterFactoryFunction(
       "ClusterAABB", [](void) -> DataExtractor* { return new ClusterAABB(); });
   Factory<DataExtractor, std::string>::Instance()->RegisterFactoryFunction(
@@ -166,7 +166,7 @@ void Rockable::ExplicitRegistrations() {
   Factory<DataExtractor, std::string>::Instance()->RegisterFactoryFunction(
       "TrackBody", [](void) -> DataExtractor* { return new TrackBody(); });
   Factory<DataExtractor, std::string>::Instance()->RegisterFactoryFunction(
-      "TrackRockfall", [](void) -> DataExtractor* { return new TrackRockfall(); });  
+      "TrackRockfall", [](void) -> DataExtractor* { return new TrackRockfall(); });
 
   Factory<ForceLaw, std::string>::Instance()->RegisterFactoryFunction(
       "Avalanche", [](void) -> ForceLaw* { return new Avalanche(); });
@@ -611,6 +611,16 @@ void Rockable::initParser() {
       forceLaw->init();
       optionNames["forceLaw"] = "Default";
     }
+  };
+
+  parser.kwMap["initSpringJoint"] = __DO__(conf) {
+    size_t ibody, jbody;
+    vec3r ipos0, jpos0;
+    double stiffness;
+    conf >> ibody >> ipos0 >> jbody >> jpos0 >> stiffness;
+    SpringJoint SJ(ibody, jbody, ipos0, jpos0);
+    SJ.init(Particles, stiffness);
+    joints.push_back(SJ);
   };
 
   parser.kwMap["AddOrRemoveInteractions"] = __DO__(conf) {
@@ -2343,6 +2353,25 @@ void Rockable::accelerations() {
         activeInteractions.push_back(I);
       }
     }
+  }
+
+  // SpringJoints
+  for (size_t sj = 0; sj < joints.size(); ++sj) {
+    vec3r forceOnj;
+    joints[sj].getForceOnj(Particles, forceOnj);
+    vec3r forceOni = - forceOnj;
+    Particle* ip = &(Particles[joints[sj].ibody]);
+    Particle* jp = &(Particles[joints[sj].jbody]);
+    
+    // Forces
+    ip->force += forceOni;
+    jp->force += forceOnj;
+
+    // Moments
+    vec3r Ci = ip->Q * joints[sj].ipos0;
+    vec3r Cj = jp->Q * joints[sj].jpos0;
+    ip->moment += cross(Ci, forceOni);
+    jp->moment += cross(Cj, forceOnj);
   }
 
   // In this loop, all the bonds that are identified to be broken will actually be broken now

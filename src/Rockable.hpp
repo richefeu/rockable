@@ -84,6 +84,7 @@
 #include "Particle.hpp"
 #include "PreproCommand.hpp"
 #include "clusterParticles.hpp"
+#include "SpringJoint.hpp"
 
 class Rockable {
  public:
@@ -91,6 +92,7 @@ class Rockable {
   std::vector<std::set<Interaction> > Interactions;       ///< The interactions (contacts and potential contacts)
   std::vector<std::set<BreakableInterface> > Interfaces;  ///< The interfaces
   std::vector<Interaction*> activeInteractions;  ///< Hold a pointer to the contact interactions that are active
+  std::vector<SpringJoint> joints;
 
   ContactPartnership ctcPartnership;  ///< Model to weight the stiffnesses of contacts
                                       ///< in case of multiple contacts between two particles
