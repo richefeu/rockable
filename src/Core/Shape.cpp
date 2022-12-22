@@ -66,7 +66,7 @@ void Shape::homothety(const double H) {
   radius *= H;
 }
 
-void Shape::read(std::istream& is) {
+void Shape::read(std::istream& inputStream) {
   kwParser parser;
   parser.breakStr = ">";
   parser.kwMap["name"] = __GET__(is, name);
@@ -119,7 +119,7 @@ void Shape::read(std::istream& is) {
     }
   };
 
-  parser.parse(is);
+  parser.parse(inputStream);
 
   // Limit MCnstep value within a reasonnable range
   if (MCnstep > 10000000) MCnstep = 10000000;

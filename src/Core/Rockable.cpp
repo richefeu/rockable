@@ -1063,23 +1063,23 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
   int nbAdd = 0;
 
   // A helper lambda function
-  auto addOrRemoveSingleInteraction = [&](size_t i, size_t j, size_t isub, size_t type, size_t nbj,
+  auto addOrRemoveSingleInteraction = [&](size_t i_, size_t j_, size_t isub, size_t type, size_t nbj,
                                           std::function<bool(Particle&, Particle&, size_t, size_t, double)> func) {
     Interaction to_find;
-    to_find.i = i;
-    to_find.j = j;
+    to_find.i = i_;
+    to_find.j = j_;
     to_find.type = type;
     to_find.isub = isub;
     for (size_t jsub = 0; jsub < nbj; ++jsub) {
       to_find.jsub = jsub;
-      auto exist_it = (Interactions[i]).find(to_find);
-      bool NEW = (exist_it == Interactions[i].end());
-      bool NEAR = func(Particles[i], Particles[j], isub, jsub, dmax);
+      auto exist_it = (Interactions[i_]).find(to_find);
+      bool NEW = (exist_it == Interactions[i_].end());
+      bool NEAR = func(Particles[i_], Particles[j_], isub, jsub, dmax);
       if (NEAR && NEW) {
-        Interactions[i].insert(Interaction(i, j, type, isub, jsub, Damp));
+        Interactions[i_].insert(Interaction(i_, j_, type, isub, jsub, Damp));
         ++nbAdd;
       } else if (!NEAR && !NEW) {
-        Interactions[i].erase(exist_it);
+        Interactions[i_].erase(exist_it);
         --nbAdd;
       }
     }
@@ -1175,21 +1175,21 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
   int nbAdd = 0;
 
   // A helper lambda function
-  auto addOrRemoveSingleInteraction = [&](size_t i, size_t j, size_t isub, size_t type, size_t jsub,
+  auto addOrRemoveSingleInteraction = [&](size_t i_, size_t j_, size_t isub, size_t type, size_t jsub,
                                           std::function<bool(Particle&, Particle&, size_t, size_t, double)> func) {
-    to_find.i = i;
-    to_find.j = j;
+    to_find.i = i_;
+    to_find.j = j_;
     to_find.type = type;
     to_find.isub = isub;
     to_find.jsub = jsub;
-    exist_it = (Interactions[i]).find(to_find);
-    bool NEW = (exist_it == Interactions[i].end());
-    bool NEAR = func(Particles[i], Particles[j], isub, jsub, dmax);
+    exist_it = (Interactions[i_]).find(to_find);
+    bool NEW = (exist_it == Interactions[i_].end());
+    bool NEAR = func(Particles[i_], Particles[j_], isub, jsub, dmax);
     if (NEAR && NEW) {
-      Interactions[i].insert(Interaction(i, j, type, isub, jsub, Damp));
+      Interactions[i_].insert(Interaction(i_, j_, type, isub, jsub, Damp));
       ++nbAdd;
     } else if (!NEAR && !NEW) {
-      Interactions[i].erase(exist_it);
+      Interactions[i_].erase(exist_it);
       --nbAdd;
     }
   };

@@ -54,12 +54,13 @@ CHAISCRIPTPATH = ~/ChaiScript-6.1.0/include
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
+
   # The compiler and linker to be used
   CXX = g++-12
 	LINK = $(CXX)
 	
   # The list of flags passed to the compiler
-  CXXFLAGS := -fopenmp -O3 -Wall -Wextra -Wno-deprecated-declarations -std=c++17
+  CXXFLAGS = -fopenmp -O3 -Wall -Wextra -Wshadow -std=c++17
   CXXFLAGS += -I $(TOOFUSPATH) -I $(SPDLOGPATH) $(OPTIONS)
   CXXFLAGS += `pkg-config --cflags tclap`
 	
@@ -75,12 +76,13 @@ ifeq ($(UNAME_S),Darwin)
   GLFWLINK = -framework OpenGL `pkg-config --libs glfw3`
 
 else
+
   # The compiler and linker to be used
   CXX = g++
   LINK = $(CXX)
 	
   # The list of flags passed to the compiler
-  CXXFLAGS := -fopenmp -O3 -std=c++17
+  CXXFLAGS = -fopenmp -O3 -std=c++17
   CXXFLAGS += -I $(TOOFUSPATH) $(OPTIONS)
 	
   # CXXFLAGS += `pkg-config --cflags tclap`
@@ -89,6 +91,7 @@ else
   
   GLFWFLAGS = `pkg-config --cflags glfw3`
   GLFWLINK = -lGLU -lGL `pkg-config --libs glfw3`
+	
 endif
 
 
@@ -166,7 +169,7 @@ POSTPROHEADERS = $(POSTPROSOURCES:%.cpp=%.hpp)
 all: run see # postpro patatrac
 
 clean:
-	rm -f *~ *.o run see see2 see3 postpro patatrac edt
+	rm -f *~ *.o run see see2 see3 postpro patatrac script
 
 format:
 	clang-format -i $(HEADERS) $(SOURCES) $(POSTPROHEADERS) $(POSTPROSOURCES) run.cpp see.cpp patatrac.cpp postpro.cpp
@@ -185,11 +188,6 @@ conftovtk: conftovtk.cpp conftovtk.hpp $(HEADERS) $(SOURCES) $(OBJECTS)
 script: script.cpp $(HEADERS) $(SOURCES) $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -I $(CHAISCRIPTPATH) -DCHAISCRIPT_NO_THREADS -c $<
 	$(LINK) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) -ldl
-	
-# The application that edits and visualize the conf files (it uses FLTK)
-edt: edt.cpp edt.hpp $(HEADERS) $(SOURCES) $(OBJECTS)
-	$(CXX) $(CXXFLAGS) $(FLTKFLAGS) -c $<
-	$(LINK) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(FLTKLINK) 
 
 # An application for post-processing the conf-files
 postpro: postpro.cpp $(HEADERS) $(SOURCES) $(OBJECTS) $(POSTPROHEADERS) $(POSTPROSOURCES) $(POSTPROOBJECTS)
