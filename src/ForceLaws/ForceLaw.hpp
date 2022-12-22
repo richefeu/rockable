@@ -36,7 +36,7 @@
 #define FORCE_LAW_HPP
 
 class Rockable;
-#include "Interaction.hpp"
+#include "Core/Interaction.hpp"
 
 //
 class ForceLaw {

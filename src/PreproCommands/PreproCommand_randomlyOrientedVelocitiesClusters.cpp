@@ -35,11 +35,9 @@
 
 #include "factory.hpp"
 
-#include "Rockable.hpp"
+#include "Core/Rockable.hpp"
 #include "PreproCommand_randomlyOrientedVelocitiesClusters.hpp"
-#include "processingTool_getClusters.hpp"
-
-//static Registrar<PreproCommand, randomlyOrientedVelocitiesClusters> registrar("randomlyOrientedVelocitiesClusters");
+#include "ProcessingTools/processingTool_getClusters.hpp"
 
 randomlyOrientedVelocitiesClusters::randomlyOrientedVelocitiesClusters() { }
 

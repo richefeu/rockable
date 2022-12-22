@@ -38,9 +38,7 @@
 #include "factory.hpp"
 
 #include "DataExtractor_TrackBody.hpp"
-#include "Rockable.hpp"
-
-//static Registrar<DataExtractor, TrackBody> registrar("TrackBody");
+#include "Core/Rockable.hpp"
 
 TrackBody::TrackBody() : ibody(0), ictrl(0) {}
 

@@ -36,7 +36,7 @@
 #ifndef GET_BROKEN_SUBCLUSTERS_HPP
 #define GET_BROKEN_SUBCLUSTERS_HPP
 
-#include "Rockable.hpp"
+#include "Core/Rockable.hpp"
 
 void getBrokenSubClusters(Rockable *box, std::vector<clusterParticles>& subParts);
 

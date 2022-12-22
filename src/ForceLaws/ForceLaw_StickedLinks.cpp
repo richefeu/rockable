@@ -35,10 +35,8 @@
 
 #include "factory.hpp"
 
-#include "Rockable.hpp"
+#include "Core/Rockable.hpp"
 #include "ForceLaw_StickedLinks.hpp"
-
-//static Registrar<ForceLaw, StickedLinks> registrar("StickedLinks");
 
 StickedLinks::StickedLinks() {}
 

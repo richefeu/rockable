@@ -36,7 +36,7 @@
 #ifndef PROCESSINGTOOL_GET_CLUSTERS_HPP
 #define PROCESSINGTOOL_GET_CLUSTERS_HPP
 
-#include "Rockable.hpp"
+#include "Core/Rockable.hpp"
 
 void getClusters(Rockable *box, std::vector<clusterParticles>& clusters);
 

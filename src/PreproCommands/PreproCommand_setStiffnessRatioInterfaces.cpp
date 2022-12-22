@@ -36,9 +36,7 @@
 #include "factory.hpp"
 
 #include "PreproCommand_setStiffnessRatioInterfaces.hpp"
-#include "Rockable.hpp"
-
-//static Registrar<PreproCommand, setStiffnessRatioInterfaces> registrar("setStiffnessRatioInterfaces");
+#include "Core/Rockable.hpp"
 
 setStiffnessRatioInterfaces::setStiffnessRatioInterfaces() { }
 

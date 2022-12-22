@@ -35,10 +35,8 @@
 
 #include "factory.hpp"
 
-#include "Rockable.hpp"
+#include "Core/Rockable.hpp"
 #include "PreproCommand_copyParamsToInterfaces.hpp"
-
-//static Registrar<PreproCommand, copyParamsToInterfaces> registrar("copyParamsToInterfaces");
 
 copyParamsToInterfaces::copyParamsToInterfaces() { }
 

@@ -36,9 +36,7 @@
 #include "factory.hpp"
 
 #include "PreproCommand_particlesClonage.hpp"
-#include "Rockable.hpp"
-
-//static Registrar<PreproCommand, particlesClonage> registrar("particlesClonage");
+#include "Core/Rockable.hpp"
 
 particlesClonage::particlesClonage() {}
 

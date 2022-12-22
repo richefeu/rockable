@@ -36,9 +36,7 @@
 #include "factory.hpp"
 
 #include "PreproCommand_setVariableStickParams.hpp"
-#include "Rockable.hpp"
-
-//static Registrar<PreproCommand, setVariableStickParams> registrar("setVariableStickParams");
+#include "Core/Rockable.hpp"
 
 setVariableStickParams::setVariableStickParams() { }
 

@@ -35,10 +35,8 @@
 
 #include "factory.hpp"
 
-#include "Rockable.hpp"
+#include "Core/Rockable.hpp"
 #include "ForceLaw_Default.hpp"
-
-//static Registrar<ForceLaw, Default> registrar("Default");
 
 Default::Default() { }
 

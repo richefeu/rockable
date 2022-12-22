@@ -38,9 +38,7 @@
 #include "factory.hpp"
 
 #include "DataExtractor_dnStat.hpp"
-#include "Rockable.hpp"
-
-//static Registrar<DataExtractor, dnStat> registrar("dnStat");
+#include "Core/Rockable.hpp"
 
 dnStat::dnStat() {}
 

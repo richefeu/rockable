@@ -36,9 +36,7 @@
 #include "factory.hpp"
 
 #include "PreproCommand_stickVerticesInClusters.hpp"
-#include "Rockable.hpp"
-
-//static Registrar<PreproCommand, StickVerticesInClusters> registrar("stickVerticesInClusters");
+#include "Core/Rockable.hpp"
 
 StickVerticesInClusters::StickVerticesInClusters() {}
 

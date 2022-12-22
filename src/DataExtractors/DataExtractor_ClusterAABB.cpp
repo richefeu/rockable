@@ -39,9 +39,7 @@
 #include "factory.hpp"
 
 #include "DataExtractor_ClusterAABB.hpp"
-#include "Rockable.hpp"
-
-//static Registrar<DataExtractor, ClusterAABB> registrar("ClusterAABB");
+#include "Core/Rockable.hpp"
 
 ClusterAABB::ClusterAABB() : icluster(0) {}
 

@@ -74,17 +74,17 @@
 #include "message.hpp"
 
 // local headers
-#include "BodyForce.hpp"
+#include "BodyForces/BodyForce.hpp"
 #include "BreakableInterface.hpp"
 #include "ContactPartnership.hpp"
-#include "DataExtractor.hpp"
+#include "DataExtractors/DataExtractor.hpp"
 #include "DrivingSystem.hpp"
-#include "ForceLaw.hpp"
+#include "ForceLaws/ForceLaw.hpp"
 #include "Interaction.hpp"
 #include "Particle.hpp"
-#include "PreproCommand.hpp"
-#include "clusterParticles.hpp"
+#include "PreproCommands/PreproCommand.hpp"
 #include "SpringJoint.hpp"
+#include "clusterParticles.hpp"
 
 class Rockable {
  public:
@@ -164,12 +164,12 @@ class Rockable {
   void ExplicitRegistrations();
 
   // Initialization methods
-  void setVerboseLevel(int v);                   ///< Defines verbosity with an integer
+  void setVerboseLevel(int v);                         ///< Defines verbosity with an integer
   void setVerboseLevel(const std::string& levelName);  ///< Defines verbosity with a string label
-  void initOutputFiles();                        ///< Open the output files
-  void setInteractive(bool imode = true);        ///< Set in a computation mode
-  bool isInteractive() const;                    ///< Set in a visualization mode
-  void showBanner();                             ///< Display a banner about the code
+  void initOutputFiles();                              ///< Open the output files
+  void setInteractive(bool imode = true);              ///< Set in a computation mode
+  bool isInteractive() const;                          ///< Set in a visualization mode
+  void showBanner();                                   ///< Display a banner about the code
   void setOpenMPThreads(int nbThreads = 1);
 
   void initialChecks();  ///< Checks before runing a computation

@@ -38,9 +38,7 @@
 #include "factory.hpp"
 
 #include "DataExtractor_TrackRockfall.hpp"
-#include "Rockable.hpp"
-
-//static Registrar<DataExtractor, TrackRockfall> registrar("TrackRockfall");
+#include "Core/Rockable.hpp"
 
 TrackRockfall::TrackRockfall() : ibody(0), ictrl(0) {}
 

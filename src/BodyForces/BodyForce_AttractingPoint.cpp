@@ -35,10 +35,8 @@
 
 #include "factory.hpp"
 
-#include "Rockable.hpp"
+#include "Core/Rockable.hpp"
 #include "BodyForce_AttractingPoint.hpp"
-
-//static Registrar<BodyForce, AttractingPoint> registrar("AttractingPoint");
 
 AttractingPoint::AttractingPoint() { }
 

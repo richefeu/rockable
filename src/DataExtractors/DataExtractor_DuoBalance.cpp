@@ -38,9 +38,7 @@
 #include "factory.hpp"
 
 #include "DataExtractor_DuoBalance.hpp"
-#include "Rockable.hpp"
-
-//static Registrar<DataExtractor, DuoBalance> registrar("DuoBalance");
+#include "Core/Rockable.hpp"
 
 DuoBalance::DuoBalance() {}
 

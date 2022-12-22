@@ -36,9 +36,7 @@
 #include "factory.hpp"
 
 #include "BodyForce_ViscousFluid.hpp"
-#include "Rockable.hpp"
-
-//static Registrar<BodyForce, ViscousFluid> registrar("ViscousFluid");
+#include "Core/Rockable.hpp"
 
 ViscousFluid::ViscousFluid() {}
 

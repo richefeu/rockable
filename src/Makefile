@@ -51,6 +51,7 @@ TOOFUSPATH = ~/toofus
 IMGUI_DIR = ./imgui
 SPDLOGPATH = /usr/local/include
 CHAISCRIPTPATH = ~/ChaiScript-6.1.0/include
+LIB = libRockable
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
@@ -61,7 +62,7 @@ ifeq ($(UNAME_S),Darwin)
 	
   # The list of flags passed to the compiler
   CXXFLAGS = -fopenmp -O3 -Wall -Wextra -Wshadow -std=c++17
-  CXXFLAGS += -I $(TOOFUSPATH) -I $(SPDLOGPATH) $(OPTIONS)
+  CXXFLAGS += -I $(TOOFUSPATH) -I $(SPDLOGPATH) -I . $(OPTIONS)
   CXXFLAGS += `pkg-config --cflags tclap`
 	
   # Link flags for OpenGL and glut
@@ -94,48 +95,14 @@ else
 	
 endif
 
-
 # The list of source files needed by Rockable (the library)
-SOURCES = Shape.cpp \
-Particle.cpp \
-Interaction.cpp \
-SpringJoint.cpp \
-Rockable.cpp \
-DrivingSystem.cpp \
-BreakableInterface.cpp \
-ContactPartnership.cpp \
-ForceLaw.cpp \
-ForceLaw_Default.cpp \
-ForceLaw_Avalanche.cpp \
-ForceLaw_StickedLinks.cpp \
-PreproCommand.cpp \
-PreproCommand_stickVerticesInClusters.cpp \
-PreproCommand_stickVerticesInClustersMoments.cpp \
-PreproCommand_stickClusters.cpp \
-PreproCommand_randomlyOrientedVelocities.cpp \
-PreproCommand_randomlyOrientedVelocitiesClusters.cpp \
-PreproCommand_copyParamsToInterfaces.cpp \
-PreproCommand_setStiffnessRatioInterfaces.cpp \
-PreproCommand_setVariableStickParams.cpp \
-PreproCommand_setAllVelocities.cpp \
-PreproCommand_homothetyRange.cpp \
-PreproCommand_particlesClonage.cpp \
-DataExtractor.cpp \
-DataExtractor_TrackBody.cpp \
-DataExtractor_TrackRockfall.cpp \
-DataExtractor_ClusterAABB.cpp \
-DataExtractor_dnStat.cpp \
-DataExtractor_DuoBalance.cpp \
-DataExtractor_MeanVelocity.cpp \
-BodyForce.cpp \
-BodyForce_PreferredDirection.cpp \
-BodyForce_AttractingPoint.cpp \
-BodyForce_ViscousFluid.cpp \
-processingTool_probeSolidFraction.cpp \
-processingTool_getInteractionGroups.cpp \
-processingTool_getBrokenSubClusters.cpp \
-processingTool_getMassRange.cpp \
-processingTool_getClusters.cpp
+SOURCES = \
+$(wildcard Core/*.cpp) \
+$(wildcard BodyForces/*.cpp) \
+$(wildcard DataExtractors/*.cpp) \
+$(wildcard ForceLaws/*.cpp) \
+$(wildcard PreproCommands/*.cpp) \
+$(wildcard ProcessingTools/*.cpp)
 
 IMGUI_SOURCES = $(IMGUI_DIR)/imgui.cpp \
 $(IMGUI_DIR)/imgui_demo.cpp \
@@ -146,33 +113,39 @@ $(IMGUI_DIR)/backends/imgui_impl_glfw.cpp \
 $(IMGUI_DIR)/backends/imgui_impl_opengl2.cpp
 
 # The list of source files for post-processing (excepted postpro.cpp)
-POSTPROSOURCES = PostProcessor.cpp \
-PostProcessor_ClusterGranulo.cpp \
-PostProcessor_ParticleStress.cpp
+POSTPROSOURCES = $(wildcard PostProcessors/*.cpp) 
 
 # Each cpp file listed below corresponds to an object file
-OBJECTS = $(SOURCES:%.cpp=%.o)
-POSTPROOBJECTS = $(POSTPROSOURCES:%.cpp=%.o)
+OBJECTS = $(SOURCES:.cpp=.o)
+POSTPROOBJECTS = $(POSTPROSOURCES:.cpp=.o)
 IMGUI_OBJECTS = $(addsuffix .o, $(basename $(notdir $(IMGUI_SOURCES))))
 
 # Each cpp file listed below corresponds to a header file
-HEADERS = $(SOURCES:%.cpp=%.hpp)
-POSTPROHEADERS = $(POSTPROSOURCES:%.cpp=%.hpp)
+HEADERS = $(SOURCES:.cpp=.hpp)
+POSTPROHEADERS = $(POSTPROSOURCES:.cpp=.hpp)
 
 # All source files (listed in SOURCES or POSTPROSOURCES) will be compiled into an object file
 # with the following command
 %.o:%.cpp
-	$(CXX) $(CXXFLAGS) -c $<
+	@echo "\033[0;32m-> COMPILING" $@ "\033[0m"
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 .PHONY: all clean format
 
-all: run see # postpro patatrac
+all: lib
 
 clean:
-	rm -f *~ *.o run see see2 see3 postpro patatrac script
+	rm -f $(OBJECTS)
 
 format:
 	clang-format -i $(HEADERS) $(SOURCES) $(POSTPROHEADERS) $(POSTPROSOURCES) run.cpp see.cpp patatrac.cpp postpro.cpp
+
+lib: lib/$(LIB).a
+	
+lib/$(LIB).a: $(OBJECTS)
+	@echo "\033[0;32m-> BUILDING" $@ "\033[0m"
+	@mkdir -p lib
+	ar rs $@ $^
 
 # The application that runs a simulation
 run: run.cpp $(HEADERS) $(SOURCES) $(OBJECTS)

@@ -35,10 +35,8 @@
 
 #include "factory.hpp"
 
-#include "Rockable.hpp"
+#include "Core/Rockable.hpp"
 #include "PreproCommand_randomlyOrientedVelocities.hpp"
-
-//static Registrar<PreproCommand, randomlyOrientedVelocities> registrar("randomlyOrientedVelocities");
 
 randomlyOrientedVelocities::randomlyOrientedVelocities() { }
 

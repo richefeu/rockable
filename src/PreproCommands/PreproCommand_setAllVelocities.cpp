@@ -36,9 +36,7 @@
 #include "factory.hpp"
 
 #include "PreproCommand_setAllVelocities.hpp"
-#include "Rockable.hpp"
-
-//static Registrar<PreproCommand, setAllVelocities> registrar("setAllVelocities");
+#include "Core/Rockable.hpp"
 
 setAllVelocities::setAllVelocities() {}
 
