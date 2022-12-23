@@ -36,7 +36,7 @@
 #ifndef CONFTOVTK_HPP
 #define CONFTOVTK_HPP
 
-#include "Rockable.hpp"
+#include "Core/Rockable.hpp"
 #include "message.hpp"
 
 #include <cstring>

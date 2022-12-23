@@ -49,9 +49,9 @@
 #include "fileTool.hpp"
 #include "ColorTable.hpp"
 
-#include "Rockable.hpp"
+#include "Core/Rockable.hpp"
 #include "BlockRelease.hpp"
-#include "processingTool_probeSolidFraction.hpp"
+#include "ProcessingTools/processingTool_probeSolidFraction.hpp"
 
 Rockable box;
 int confNum = 0;

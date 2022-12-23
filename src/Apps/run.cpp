@@ -35,7 +35,7 @@
 
 #include <tclap/CmdLine.h>
 
-#include "Rockable.hpp"
+#include "Core/Rockable.hpp"
 #include "stackTracer.hpp"
 
 /**

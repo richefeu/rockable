@@ -1259,7 +1259,7 @@ void Input_LawData(const char* parName) {
 }
 
 void ForceLaw_Combo() {
-  std::vector<std::string> lawNames = {"Default", "Avalanches", "StickedLinks"};
+  std::vector<std::string> lawNames = {"Default", "Avalanche", "StickedLinks"};
   std::string lawName = box.optionNames["forceLaw"];
   size_t index = 0;
   for (size_t i = 0; i < lawNames.size(); i++) {
@@ -1274,7 +1274,10 @@ void ForceLaw_Combo() {
       const bool is_selected = (index == n);
       if (ImGui::Selectable(lawNames[n].c_str(), is_selected)) {
         index = n;
-        box.setForceLaw(lawNames[n]);
+        //box.setForceLaw(lawNames[n]);
+        std::stringstream ss;
+        ss << "forceLaw " << lawNames[n];
+        box.parser.parseString(ss.str().c_str());     
       }
       if (is_selected) {
         ImGui::SetItemDefaultFocus();
@@ -1420,10 +1423,10 @@ void window_conf_data() {
 
   if (ImGui::CollapsingHeader("Numerical damping (0 = disabled)")) {
     ImGui::InputDouble("Cundall numerical Damping Coeff.", &(box.numericalDampingCoeff));
-    ImGui::InputDouble("Velocity Barrier", &(box.VelocityBarrier));
-    ImGui::InputDouble("Angular Velocity Barrier", &(box.AngularVelocityBarrier));
-    ImGui::InputDouble("Velocity Barrier Exponent", &(box.VelocityBarrierExponent));
-    ImGui::InputDouble("Angular Velocity Barrier Exponent", &(box.AngularVelocityBarrierExponent));
+    ImGui::InputDouble("Velocity Barrier", &(box.velocityBarrier));
+    ImGui::InputDouble("Angular Velocity Barrier", &(box.angularVelocityBarrier));
+    ImGui::InputDouble("Velocity Barrier Exponent", &(box.velocityBarrierExponent));
+    ImGui::InputDouble("Angular Velocity Barrier Exponent", &(box.angularVelocityBarrierExponent));
   }
 
   if (ImGui::CollapsingHeader("Properties")) {

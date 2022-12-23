@@ -65,6 +65,8 @@ ifeq ($(UNAME_S),Darwin)
   CXXFLAGS += -I $(TOOFUSPATH) -I $(SPDLOGPATH) -I . $(OPTIONS)
   CXXFLAGS += `pkg-config --cflags tclap`
 	
+	OPENMP_LIB = -l gomp
+	
   # Link flags for OpenGL and glut
   GLUTFLAGS = `pkg-config --cflags glut`
   GLUTLINK = `pkg-config --libs glut` -framework OpenGL
@@ -95,6 +97,8 @@ else
 	
 endif
 
+#######################################################################################################################
+
 # The list of source files needed by Rockable (the library)
 SOURCES = \
 $(wildcard Core/*.cpp) \
@@ -124,21 +128,17 @@ IMGUI_OBJECTS = $(addsuffix .o, $(basename $(notdir $(IMGUI_SOURCES))))
 HEADERS = $(SOURCES:.cpp=.hpp)
 POSTPROHEADERS = $(POSTPROSOURCES:.cpp=.hpp)
 
+#######################################################################################################################
+
 # All source files (listed in SOURCES or POSTPROSOURCES) will be compiled into an object file
 # with the following command
 %.o:%.cpp
 	@echo "\033[0;32m-> COMPILING" $@ "\033[0m"
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-.PHONY: all clean format
+.PHONY: all clean clean+
 
-all: lib
-
-clean:
-	rm -f $(OBJECTS)
-
-format:
-	clang-format -i $(HEADERS) $(SOURCES) $(POSTPROHEADERS) $(POSTPROSOURCES) run.cpp see.cpp patatrac.cpp postpro.cpp
+all: lib rockable see
 
 lib: lib/$(LIB).a
 	
@@ -148,34 +148,49 @@ lib/$(LIB).a: $(OBJECTS)
 	ar rs $@ $^
 
 # The application that runs a simulation
-run: run.cpp $(HEADERS) $(SOURCES) $(OBJECTS)
-	$(CXX) $(CXXFLAGS) -c $<
-	$(LINK) $(CXXFLAGS) -o $@ $@.o $(OBJECTS)
+rockable: bin/rockable
+bin/rockable: Apps/run.cpp $(OBJECTS)
+	@echo "\033[0;32m-> BUILDING" $@ "\033[0m"
+	@mkdir -p bin
+	$(CXX) $(CXXFLAGS) -c $< -o $(patsubst %.cpp, %.o, $<)
+	$(LINK) $(OPENMP_LIB) -o $@ Apps/run.o lib/$(LIB).a
 
 # The application that converts conf-files into vtk-files
-conftovtk: conftovtk.cpp conftovtk.hpp $(HEADERS) $(SOURCES) $(OBJECTS)
-	$(CXX) $(CXXFLAGS) -c $<
-	$(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(GLLINK)
+conftovtk: bin/conftovtk
+bin/conftovtk: Apps/conftovtk.cpp $(OBJECTS)
+	@echo "\033[0;32m-> BUILDING" $@ "\033[0m"
+	@mkdir -p bin
+	$(CXX) $(CXXFLAGS) -c $< -o $(patsubst %.cpp, %.o, $<)
+	$(CXX) $(OPENMP_LIB) -o $@ Apps/conftovtk.o lib/$(LIB).a
 	
-# Scripting with chaiscript (TEST!!!)
-script: script.cpp $(HEADERS) $(SOURCES) $(OBJECTS)
-	$(CXX) $(CXXFLAGS) -I $(CHAISCRIPTPATH) -DCHAISCRIPT_NO_THREADS -c $<
-	$(LINK) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) -ldl
+# Scripting with chaiscript
+script: bin/script
+bin/script: Apps/script.cpp $(OBJECTS)
+	@echo "\033[0;32m-> BUILDING" $@ "\033[0m"
+	@mkdir -p bin
+	$(CXX) $(CXXFLAGS) -I $(CHAISCRIPTPATH) -DCHAISCRIPT_NO_THREADS -c $< -o $(patsubst %.cpp, %.o, $<)
+	$(LINK) $(OPENMP_LIB) -o $@ Apps/script.o lib/$(LIB).a -ldl
 
 # An application for post-processing the conf-files
-postpro: postpro.cpp $(HEADERS) $(SOURCES) $(OBJECTS) $(POSTPROHEADERS) $(POSTPROSOURCES) $(POSTPROOBJECTS)
-	$(CXX) $(CXXFLAGS) -c $<
-	$(LINK) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(POSTPROOBJECTS)
+postpro: bin/postpro
+bin/postpro: Apps/postpro.cpp $(OBJECTS) $(POSTPROOBJECTS)
+	@echo "\033[0;32m-> BUILDING" $@ "\033[0m"
+	@mkdir -p bin
+	$(CXX) $(CXXFLAGS) -c $< -o $(patsubst %.cpp, %.o, $<)
+	$(LINK) $(OPENMP_LIB) -o $@ Apps/postpro.o $(OBJECTS) $(POSTPROOBJECTS)
 
 # An application to use Rockable as a "trajectography-analysis" tool
-patatrac: patatrac.cpp patatrac.hpp $(HEADERS) $(SOURCES) $(OBJECTS)
+patatrac: patatrac.cpp $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -c $<
 	$(LINK) $(CXXFLAGS) -o $@ $@.o $(OBJECTS)
 
 # The application that visualizes the conf files (it uses GLUT)
-see: see.cpp see.hpp $(HEADERS) $(SOURCES) $(OBJECTS)
-	$(CXX) $(CXXFLAGS) $(GLUTFLAGS) $(PNGFLAGS) -c $<
-	$(LINK) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(GLUTLINK) $(PNGLINK)
+see: bin/see
+bin/see: Apps/see.cpp $(OBJECTS)
+	@echo "\033[0;32m-> BUILDING" $@ "\033[0m"
+	@mkdir -p bin
+	$(CXX) $(CXXFLAGS) $(GLUTFLAGS) $(PNGFLAGS) -c $< -o $(patsubst %.cpp, %.o, $<)
+	$(LINK) $(OPENMP_LIB) $(GLUTLINK) $(PNGLINK) -o $@ Apps/see.o lib/$(LIB).a
 	
 # The application that visualizes the conf files (it uses GLFW)
 see2: see2.cpp see2.hpp $(HEADERS) $(SOURCES) $(OBJECTS)
@@ -183,11 +198,20 @@ see2: see2.cpp see2.hpp $(HEADERS) $(SOURCES) $(OBJECTS)
 	$(LINK) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(GLFWLINK) $(PNGLINK)
 	
 # The application that visualizes the conf files (it uses GLFW and Dear ImGui)
-$(IMGUI_OBJECTS): $(IMGUI_SOURCES)
-	$(CXX) $(CXXFLAGS) -I $(IMGUI_DIR) -I $(IMGUI_DIR)/backends -Wno-unused-function $(GLFWFLAGS) -c $(IMGUI_SOURCES)
-	
-see3: see3.cpp see3.hpp $(HEADERS) $(OBJECTS) $(IMGUI_OBJECTS)
-	$(CXX) $(CXXFLAGS) -I $(IMGUI_DIR) -I $(IMGUI_DIR)/backends $(GLFWFLAGS) $(PNGFLAGS) -c $<
-	$(LINK) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(IMGUI_OBJECTS) $(GLFWLINK) $(PNGLINK)
+imguiObjs: $(IMGUI_SOURCES)
+	@echo "\033[0;32m-> BUILDING" $@ "\033[0m"
+	$(CXX) $(CXXFLAGS) -I $(IMGUI_DIR) -I $(IMGUI_DIR)/backends -Wno-unused-function $(GLFWFLAGS) -c $(IMGUI_SOURCES) 
+see3: bin/see3
+bin/see3: Apps/see3.cpp $(OBJECTS) imguiObjs
+	@echo "\033[0;32m-> BUILDING" $@ "\033[0m"
+	$(CXX) $(CXXFLAGS) -I $(IMGUI_DIR) -I $(IMGUI_DIR)/backends $(GLFWFLAGS) $(PNGFLAGS) -c $< -o $(patsubst %.cpp, %.o, $<)
+	$(LINK) $(CXXFLAGS) -o $@ Apps/see3.o lib/$(LIB).a $(IMGUI_OBJECTS) $(GLFWLINK) $(PNGLINK)
 
+clean:
+	rm -f $(OBJECTS)
+
+clean+: clean
+	rm -rf lib
+	rm -rf bin
+	
 #######################################################################################################################

@@ -37,6 +37,7 @@
 #define SEE3_HPP
 #include <tclap/CmdLine.h>
 #include <unistd.h>
+#include <sstream>
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -59,7 +60,7 @@
 #include "message.hpp"
 
 #include "BlockRelease.hpp"
-#include "Rockable.hpp"
+#include "Core/Rockable.hpp"
 
 Rockable box;
 int confNum = 0;

@@ -37,7 +37,7 @@
 #include "kwParser.hpp"
 
 #include "PostProcessor_ParticleStress.hpp"
-#include "Rockable.hpp"
+#include "Core/Rockable.hpp"
 
 static Registrar<PostProcessor, ParticleStress> registrar("ParticleStress");
 

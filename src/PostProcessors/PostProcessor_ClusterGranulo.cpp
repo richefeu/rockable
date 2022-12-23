@@ -37,8 +37,8 @@
 #include "kwParser.hpp"
 
 #include "PostProcessor_ClusterGranulo.hpp"
-#include "Rockable.hpp"
-#include "processingTool_getBrokenSubClusters.hpp"
+#include "Core/Rockable.hpp"
+#include "ProcessingTools/processingTool_getBrokenSubClusters.hpp"
 
 static Registrar<PostProcessor, ClusterGranulo> registrar("ClusterGranulo");
 
