@@ -31,7 +31,7 @@ void printHelp() {
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[e]      print extents of the current shape");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[h]      Show this help");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[K][k]   Tune the level of displayed OBB-tree");
-  //glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[L][l]   Tune OBB-tree level of the current shape");
+  // glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[L][l]   Tune OBB-tree level of the current shape");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[N][n]   Tune number of Monte-Carlo steps");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[p]      Export as particles (Rockable sample)");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[q]      Quit");
@@ -44,7 +44,7 @@ void printHelp() {
   switch2D::back();
 }
 
-void keyboard(unsigned char Key, int x, int y) {
+void keyboard(unsigned char Key, int /*x*/, int /*y*/) {
   switch (Key) {
 
     case 'A':
@@ -140,23 +140,23 @@ void keyboard(unsigned char Key, int x, int y) {
       break;
 
     case 't': {
-      //maxOBBLevel = Shapes[ishape].OBBtreeLevel;
-      //Shapes[ishape].buildOBBtree();
+      // maxOBBLevel = Shapes[ishape].OBBtreeLevel;
+      // Shapes[ishape].buildOBBtree();
       maxOBBLevel = 0;
       Shapes[ishape].buildOBBtree();
     } break;
-    
+
     case 'w': {
       vec3r axis = center - eye;
       axis.normalize();
-      
+
       up = rotatePoint(up, eye, axis, -0.005 * M_PI);
       up.normalize();
     } break;
     case 'W': {
       vec3r axis = center - eye;
       axis.normalize();
-      
+
       up = rotatePoint(up, eye, axis, 0.005 * M_PI);
       up.normalize();
     } break;
@@ -173,7 +173,7 @@ void keyboard(unsigned char Key, int x, int y) {
       if (Shapes[ishape].preCompDone == 'n') Shapes[ishape].fitObb();
       fit_view();
     } break;
-    
+
     case '*': {
       if (Shapes[ishape].preCompDone == 'y') Shapes[ishape].preCompDone = 'n';
     } break;
@@ -203,11 +203,11 @@ void mouse(int button, int state, int x, int y) {
   }
 }
 
-vec3r rotatePoint(vec3r const& p, vec3r const& center, vec3r const& axis, double theta) {
+vec3r rotatePoint(vec3r const& p, vec3r const& center_, vec3r const& axis, double theta) {
   double const c = cos(theta), s = sin(theta);
   double const C = 1.0 - c;
-  vec3r tmp = p - center;
-  return center + vec3r(tmp[0] * (axis[0] * axis[0] * C + c) + tmp[1] * (axis[0] * axis[1] * C - axis[2] * s) +
+  vec3r tmp = p - center_;
+  return center_ + vec3r(tmp[0] * (axis[0] * axis[0] * C + c) + tmp[1] * (axis[0] * axis[1] * C - axis[2] * s) +
                             tmp[2] * (axis[0] * axis[2] * C + axis[1] * s),
                         tmp[0] * (axis[1] * axis[0] * C + axis[2] * s) + tmp[1] * (axis[1] * axis[1] * C + c) +
                             tmp[2] * (axis[1] * axis[2] * C - axis[0] * s),
@@ -261,8 +261,7 @@ void drawInfo() {
 
   glText::print(GLUT_BITMAP_9_BY_15, 10, 10, "Shape %lu/%lu, named %s", ishape + 1, Shapes.size(),
                 Shapes[ishape].name.c_str());
-  glText::print(GLUT_BITMAP_9_BY_15, 10, 25, "Radius = %g, OBBtreeLevel = %d",
-                Shapes[ishape].radius, maxOBBLevel);
+  glText::print(GLUT_BITMAP_9_BY_15, 10, 25, "Radius = %g, OBBtreeLevel = %d", Shapes[ishape].radius, maxOBBLevel);
   glText::print(GLUT_BITMAP_9_BY_15, 10, 40, "nb vertex = %lu, nb edge = %lu, nb face = %lu",
                 Shapes[ishape].vertex.size(), Shapes[ishape].edge.size(), Shapes[ishape].face.size());
   glText::print(GLUT_BITMAP_9_BY_15, 10, 55, "preCompDone %c", Shapes[ishape].preCompDone);
@@ -316,10 +315,10 @@ void adjust_clipping_plans() {
   OBB& obb = Shapes[ishape].obb;
   vec3r mx = 2 * (obb.extent[0] * obb.e[0] + obb.extent[1] * obb.e[1] + obb.extent[2] * obb.e[2]);
   max_length = (GLfloat)(2 * norm(mx));
-  double znear = zf - 0.5 * max_length;
+  znear = zf - 0.5 * max_length;
   double close_dst = 0.1 * zf;
   if (znear < close_dst) znear = close_dst;
-  double zfar = zf + max_length;
+  zfar = zf + max_length;
   gluPerspective(view_angle, wh_ratio, znear, zfar);
   glMatrixMode(GL_MODELVIEW);
 }
@@ -343,14 +342,13 @@ void reshape(int w, int h) {
   glutPostRedisplay();
 }
 
-void recursiveDrawOBB(OBBnode<subBox> * node, int wantedLevel, int level) {
+void recursiveDrawOBB(OBBnode<subBox>* node, int wantedLevel, int level) {
   if (node == nullptr) {
     return;
   }
-  
-  if (level == wantedLevel)
-  glutShape::drawObb(node->boundary);
-  
+
+  if (level == wantedLevel) glutShape::drawObb(node->boundary);
+
   if (node->first != nullptr) {
     recursiveDrawOBB(node->first, wantedLevel, level + 1);
   }
@@ -524,9 +522,9 @@ void buildMenu() {
 // =====================================================================
 
 int main(int argc, char* argv[]) {
-  
+
   StackTracer::initSignals();
-  
+
   if (argc == 1) {
     if (readShapeLib("shapes") == 0) return 0;
   } else if (argc == 2) {

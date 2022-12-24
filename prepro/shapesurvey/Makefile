@@ -1,5 +1,5 @@
 # Paths
-COMMONPATH = /usr/local/include/toofus
+TOOFUSPATH = ~/toofus
 ROCKABLEPATH = ../../src
 
 UNAME_S := $(shell uname -s)
@@ -15,7 +15,7 @@ else
 endif
 
 # The list of flags passed to the compiler
-CXXFLAGS = -O3 -Wall -std=c++11 -I $(COMMONPATH) -I $(ROCKABLEPATH)
+CXXFLAGS = -O3 -Wall -Wextra -Wshadow -pedantic -std=c++11 -I $(TOOFUSPATH) -I $(ROCKABLEPATH)/Core
 
 # All source files (listed in SOURCES) will be compiled into an object file
 # with the following command
@@ -29,7 +29,7 @@ all: shapeSurvey
 clean:
 	rm -f *.o shapeSurvey
 
-Shape.o: $(ROCKABLEPATH)/Shape.cpp $(ROCKABLEPATH)/Shape.hpp
+Shape.o: $(ROCKABLEPATH)/Core/Shape.cpp $(ROCKABLEPATH)/Core/Shape.hpp
 	$(CXX) $(CXXFLAGS) -c $<
 
 # The application that visualize the conf files

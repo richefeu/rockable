@@ -635,7 +635,7 @@ void doc_selection_cb(Fl_Widget*, void* v) {
 void deg_to_rad_cb(Fl_Widget*, void* v) {
   const char* deg = fl_input("Value in degree: ", "0");
   char radtxt[100];
-  sprintf(radtxt, "%f", atof(deg) * M_PI / 180.0);
+  snprintf(radtxt, 100, "%f", atof(deg) * M_PI / 180.0);
 
   EditorWindow* e = (EditorWindow*)v;
   Fl_Text_Buffer* buf = e->editor->buffer();
@@ -655,7 +655,7 @@ void quat_axis_angle_cb(Fl_Widget*, void* v) {
   vy = sin(half_angle) * axis_y / len;
   vz = sin(half_angle) * axis_z / len;
   char txt[100];
-  sprintf(txt, "%f  %f %f %f", s, vx, vy, vz);
+  snprintf(txt, 100, "%f  %f %f %f", s, vx, vy, vz);
 
   EditorWindow* e = (EditorWindow*)v;
   Fl_Text_Buffer* buf = e->editor->buffer();

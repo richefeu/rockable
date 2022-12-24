@@ -1,6 +1,6 @@
 CXX      = $(shell fltk-config --cxx)
 LINK     = $(CXX)
-CXXFLAGS = $(shell fltk-config --cxxflags ) -std=c++17 -I ~/toofus -I ../genesis/cpptools
+CXXFLAGS = $(shell fltk-config --cxxflags ) -Wall -std=c++17 -I ~/toofus -I ../genesis/cpptools
 LDFLAGS  = $(shell fltk-config --ldflags )
 LDSTATIC = $(shell fltk-config --ldstaticflags )
  

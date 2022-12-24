@@ -37,7 +37,7 @@
 #define PATATRAC_HPP
 
 #include "BlockRelease.hpp"
-#include "Rockable.hpp"
+#include "Core/Rockable.hpp"
 #include "freeFlight.hpp"
 
 class Patatrac {

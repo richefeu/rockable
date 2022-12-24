@@ -51,7 +51,7 @@
 #include "fileTool.hpp"
 #include "ColorTable.hpp"
 
-#include "Rockable.hpp"
+#include "Core/Rockable.hpp"
 #include "BlockRelease.hpp"
 
 Rockable box;

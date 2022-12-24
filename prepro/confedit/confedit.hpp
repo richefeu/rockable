@@ -144,7 +144,7 @@ class addParticleDialog : public Fl_Window {
     vz = sin(half_angle) * axis_z / len;
 
     char txt[512];
-    sprintf(txt, "_shapeName_ _group_ _cluster_ _homothety_  %s  0 0 0  0 0 0  %f %f %f %f  0 0 0  0 0 0\n",
+    snprintf(txt, 512, "_shapeName_ _group_ _cluster_ _homothety_  %s  0 0 0  0 0 0  %f %f %f %f  0 0 0  0 0 0\n",
             w->position->value(), s, vx, vy, vz);
     w->editor->buffer()->insert(w->editor->insert_position(), txt);
     w->hide();
