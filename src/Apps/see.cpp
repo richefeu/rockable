@@ -35,6 +35,38 @@
 
 #include "see.hpp"
 
+void local_to_json() {
+  params["window"]["width"] = width;
+  params["window"]["height"] = height;
+  params["camera"]["view_angle"] = view_angle;
+  params["camera"]["znear"] = znear;
+  params["camera"]["zfar"] = zfar;
+  params["camera"]["eye"] = {eye.x, eye.y, eye.z};
+  params["camera"]["center"] = {center.x, center.y, center.z};
+  params["camera"]["up"] = {up.x, up.y, up.z};
+}
+
+void json_to_local() {
+  width = params["window"]["width"].get<int>();
+  height = params["window"]["height"].get<int>();
+
+  view_angle = params["camera"]["view_angle"].get<float>();
+  znear = params["camera"]["znear"].get<float>();
+  zfar = params["camera"]["zfar"].get<float>();
+  eye.x = params["camera"]["eye"][0].get<double>();
+  eye.y = params["camera"]["eye"][1].get<double>();
+  eye.z = params["camera"]["eye"][2].get<double>();
+  center.x = params["camera"]["center"][0].get<double>();
+  center.y = params["camera"]["center"][1].get<double>();
+  center.z = params["camera"]["center"][2].get<double>();
+  up.x = params["camera"]["up"][0].get<double>();
+  up.y = params["camera"]["up"][1].get<double>();
+  up.z = params["camera"]["up"][2].get<double>();
+
+  adjustClippingPlans();
+  glutReshapeWindow(width, height);
+}
+
 void showKeybinds() {
   switch2D::go(width, height);
 
@@ -201,8 +233,10 @@ void keyboard(unsigned char Key, int x, int y) {
         std::ifstream file("see.json");
         nlohmann::json patch = nlohmann::json::parse(file);
         params.merge_patch(patch);
+        json_to_local();
         textZone.addLine("Configuration file see.json has been loaded");
       } else {
+        local_to_json();
         std::ofstream file("see.json");
         file << std::setw(4) << params;
         textZone.addLine("Configuration file see.json has been saved");
@@ -210,6 +244,7 @@ void keyboard(unsigned char Key, int x, int y) {
     } break;
 
     case 'J': {
+      local_to_json();
       std::ofstream file("see.json");
       file << std::setw(4) << params;
       textZone.addLine("Configuration file see.json has been saved");
@@ -254,22 +289,15 @@ void keyboard(unsigned char Key, int x, int y) {
       break;
 
     case 'r': {
-      rescaleColorRange = 1 - rescaleColorRange;
-      if (rescaleColorRange == 0) {
+      params["rescaleColorRange"] = 1 - params["rescaleColorRange"].get<int>();
+      if (params["rescaleColorRange"].get<int>() == 0) {
         std::cout << "rescaleColorRange = 0\n";
-        std::cout << "colorRangeMin = " << colorRangeMin << '\n';
-        std::cout << "colorRangeMax = " << colorRangeMax << '\n';
-      } else if (rescaleColorRange == 1) {
+        std::cout << "colorRangeMin = " << params["colorRangeMin"].get<double>() << '\n';
+        std::cout << "colorRangeMax = " << params["colorRangeMax"].get<double>() << '\n';
+      } else if (params["rescaleColorRange"].get<int>() == 1) {
         std::cout << "rescaleColorRange = 1\n";
       }
     } break;
-
-    case 't':
-      if (forceTubeFactor > 0.2) forceTubeFactor -= 0.05;
-      break;
-    case 'T':
-      if (forceTubeFactor <= 0.9) forceTubeFactor += 0.05;
-      break;
 
     case 'v':
       params["show_velocities"] = 1 - params["show_velocities"].get<int>();
@@ -345,12 +373,12 @@ void keyboard(unsigned char Key, int x, int y) {
     } break;
 
     case '0': {
-      colorMode = 0;
+      params["colorMode"] = 0;
       pcolors.clear();
     } break;
 
     case '1': {
-      colorMode = 1;
+      params["colorMode"] = 1;
       pcolors.clear();
       colorRGBA col;
       for (size_t i = 0; i < box.Particles.size(); ++i) {
@@ -360,8 +388,8 @@ void keyboard(unsigned char Key, int x, int y) {
     } break;
 
     case '2': {
-      colorMode = 2;
-      resetColors(colorMode, 1);
+      params["colorMode"] = 2;
+      resetColors(params["colorMode"].get<int>(), 1);
     } break;
   };
 
@@ -372,17 +400,20 @@ void resetColors(int mode, int rescale) {
   switch (mode) {
     case 2: {  // velocity magnitude
       if (rescale == 1) {
-        colorRangeMin = colorRangeMax = 0.0;
+        double colorRangeMin = 0.0;
+        double colorRangeMax = 0.0;
         for (size_t i = box.nDriven; i < box.Particles.size(); ++i) {
           double v = norm(box.Particles[i].vel);
           if (v > colorRangeMax) colorRangeMax = v;
         }
+        params["colorRangeMin"] = colorRangeMin;
+        params["colorRangeMax"] = colorRangeMax;
         std::cout << "colorRangeMin = " << colorRangeMin << '\n';
         std::cout << "colorRangeMax = " << colorRangeMax << '\n';
       }
 
       CT.setTableID(MATLAB_HOT);
-      CT.setMinMax(colorRangeMin, colorRangeMax);
+      CT.setMinMax(params["colorRangeMin"].get<float>(), params["colorRangeMax"].get<float>());
       CT.Rebuild();
       pcolors.clear();
       colorRGBA col;
@@ -1295,7 +1326,7 @@ bool tryToReadConf(int num) {
     std::cout << "Read " << file_name << std::endl;
     box.clearMemory();
     box.loadConf(file_name);
-    resetColors(colorMode, rescaleColorRange);
+    resetColors(params["colorMode"].get<int>(), params["rescaleColorRange"].get<int>());
     complexityNumber = 0;
     for (size_t i = 0; i < box.Particles.size(); ++i) {
       complexityNumber += box.Particles[i].shape->vertex.size();
@@ -1388,7 +1419,7 @@ int main(int argc, char* argv[]) {
 
   box.setVerboseLevel(verboseLevel);
   box.clearMemory();
-  box.loadConf(confFileName.c_str()); 
+  box.loadConf(confFileName.c_str());
   textZone.addLine("conf-file: %s (time = %f)", confFileName.c_str(), box.t);
   box.computeAABB();
 
@@ -1400,15 +1431,6 @@ int main(int argc, char* argv[]) {
     std::ifstream f("probe.txt");
     f >> probe.min >> probe.max >> probe_MCnsteps;
     std::cout << "Probe: min = " << probe.min << "\n       max = " << probe.max << "\n";
-  }
-
-  if (fileTool::fileExists("see.json")) {
-    std::ifstream file("see.json");
-    nlohmann::json patch = nlohmann::json::parse(file);
-    params.merge_patch(patch);
-  } else {
-    std::ofstream file("see.json");
-    file << std::setw(4) << params;
   }
 
   complexityNumber = 0;
@@ -1434,7 +1456,7 @@ int main(int argc, char* argv[]) {
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DOUBLE | GLUT_ALPHA | GLUT_DEPTH | GLUT_MULTISAMPLE);
   glutInitWindowPosition(50, 50);
   glutInitWindowSize(width, height);
-  main_window = glutCreateWindow("Rockable VISUALIZER");
+  main_window = glutCreateWindow("Rockable visualiser");
 
   // ==== Register callbacks
   glutDisplayFunc(display);
@@ -1448,7 +1470,20 @@ int main(int argc, char* argv[]) {
   buildMenu();
   glutAttachMenu(GLUT_RIGHT_BUTTON);
 
+  json_to_local();  // so that default values are used
+  if (fileTool::fileExists("see.json")) {
+    std::ifstream file("see.json");
+    nlohmann::json patch = nlohmann::json::parse(file);
+    params.merge_patch(patch);
+    json_to_local();
+  } else {  // the file is automatically created if not present
+    local_to_json();
+    std::ofstream file("see.json");
+    file << std::setw(4) << params;
+  }
+
   // ==== Init the visualizer
+  /*
   center.set(0.0, 0.0, 0.0);  // where we look at
   eye.set(0.0, 0.0, 1.0);     // from where we look
   up.set(0.0, 1.0, 0.0);      // direction (normalized)
@@ -1457,6 +1492,7 @@ int main(int argc, char* argv[]) {
   view_angle = 45.0f;
   znear = 0.01f;
   zfar = 10.0f;
+  */
 
   glText::init();
 
@@ -1500,7 +1536,7 @@ int main(int argc, char* argv[]) {
 
   // ==== Enter GLUT event processing cycle
   adjustClippingPlans();
-  fitView();
+  if (eye.x == 0.0 && eye.y == 0.0 && eye.z == 1.0) fitView();
   glutMainLoop();
   return 0;
 }

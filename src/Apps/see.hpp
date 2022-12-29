@@ -62,7 +62,11 @@ std::vector<BlockRelease> releases;
 
 int main_window;
 
-nlohmann::json params = {{"show_background", 1},
+nlohmann::json params = {{"colorMode", 0},
+                         {"rescaleColorRange", 1},
+                         {"colorRangeMin", 0.0},
+                         {"colorRangeMax", 1.0},
+                         {"show_background", 1},
                          {"show_particles", 1},
                          {"show_driven", 1},
                          {"show_velocities", 0},
@@ -74,53 +78,36 @@ nlohmann::json params = {{"show_background", 1},
                          {"show_keybinds", 0},
                          {"show_traj", 0},
                          {"show_probe", 0},
-                         {"ParticleColor", {191, 178, 120}},
+                         {"ParticleColor", {207, 174, 85}},
                          {"alpha_particles", 1.0f},
-                         {"alpha_fixparticles", 0.2f}};
+                         {"alpha_fixparticles", 0.2f},
+                         {"window", {{"width", 700}, {"height", 700}}},
+                         {"camera",
+                          {{"view_angle", 45.0f},
+                           {"znear", 0.01f},
+                           {"zfar", 10.0f},
+                           {"eye", {0.0, 0.0, 1.0}},
+                           {"center", {0.0, 0.0, 0.0}},
+                           {"up", {0.0, 1.0, 0.0}}}}};
 
-// flags with default values
-// int show_background  = 1;
-// int show_particles   = 1;
-// int show_driven = 1;
-// int show_velocities = 0;
-// int show_forces = 0;
-// int show_obb = 0;
-// int enlarged_obb = 0;
-// int link_obb = 1;
-// int show_interFrames = 0;
-// int show_interTypes = 0;
-// int show_keybinds = 0;
-// int show_traj = 0;
-// int show_probe = 0;
+// brick color rgb is: 178, 34, 34
 
 AABB probe;
 size_t probe_MCnsteps = 10000;
 
 ColorTable CT;
 std::vector<colorRGBA> pcolors;
-int colorMode = 0;
-int rescaleColorRange = 1;
-double colorRangeMin = 0.0;
-double colorRangeMax = 1.0;
-
-// colorRGBA ParticleColor;
 
 int complexMode = 0;
 size_t complexityNumber = 0;  // it says how the sample will be long to display
 
-//GLfloat alpha_particles = 1.0f;
-//GLfloat alpha_fixparticles = 0.1f;
-
 int selectedParticle = -1;
 
-double arrowSize = 0.0005;
-double arrowAngle = 0.7;
-
-double forceTubeFactor = 1.0;
-
-double radiusMin;
-double radiusMax;
-double radiusMean;
+// double arrowSize = 0.0005;
+// double arrowAngle = 0.7;
+// double radiusMin;
+// double radiusMax;
+// double radiusMean;
 
 int width = 700;
 int height = 700;
@@ -162,6 +149,8 @@ void reshape(int x, int y);
 void menu(int num);
 
 // Helper functions
+void local_to_json();
+void json_to_local();
 void buildMenu();
 vec3r rotatePoint(vec3r const& p, vec3r const& center, vec3r const& axis, double theta);
 void computePerspective();
