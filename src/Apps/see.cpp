@@ -104,8 +104,8 @@ void keyboard(unsigned char Key, int x, int y) {
       break;
 
     case '!': {
-      show_probe = 1 - show_probe;
-      if (show_probe == 1 && fileTool::fileExists("probe.txt")) {
+      params["show_probe"] = 1 - params["show_probe"].get<int>();
+      if (params["show_probe"].get<int>() == 1 && fileTool::fileExists("probe.txt")) {
         std::ifstream f("probe.txt");
         f >> probe.min >> probe.max >> probe_MCnsteps;
         std::cout << "Probe: min = " << probe.min << "\n       max = " << probe.max << "\n";
@@ -127,14 +127,16 @@ void keyboard(unsigned char Key, int x, int y) {
       break;
 
     case 'a':
-      if (alpha_fixparticles > 0.1) alpha_fixparticles -= 0.05;
+      if (params["alpha_fixparticles"].get<GLfloat>() > 0.1f)
+        params["alpha_fixparticles"] = params["alpha_fixparticles"].get<GLfloat>() - 0.05f;
       break;
     case 'A':
-      if (alpha_fixparticles <= 0.95) alpha_fixparticles += 0.05;
+      if (params["alpha_fixparticles"].get<GLfloat>() <= 0.95f)
+        params["alpha_fixparticles"] = params["alpha_fixparticles"].get<GLfloat>() + 0.05f;
       break;
 
     case 'b':
-      show_background = 1 - show_background;
+      params["show_background"] = 1 - params["show_background"].get<int>();
       break;
 
     case 'c': {  // compute a few steps (for debugging)
@@ -144,18 +146,20 @@ void keyboard(unsigned char Key, int x, int y) {
     } break;
 
     case 'd':
-      show_driven = 1 - show_driven;
+      params["show_driven"] = 1 - params["show_driven"].get<int>();
       break;
 
     case 'e':
-      if (alpha_particles > 0.1) alpha_particles -= 0.05;
+      if (params["alpha_particles"].get<GLfloat>() > 0.1f)
+        params["alpha_particles"] = params["alpha_particles"].get<GLfloat>() - 0.05f;
       break;
     case 'E':
-      if (alpha_particles <= 0.95) alpha_particles += 0.05;
+      if (params["alpha_particles"].get<GLfloat>() <= 0.95f)
+        params["alpha_particles"] = params["alpha_particles"].get<GLfloat>() + 0.05f;
       break;
 
     case 'f':
-      show_forces = 1 - show_forces;
+      params["show_forces"] = 1 - params["show_forces"].get<int>();
       break;
 
     case 'h': {
@@ -192,34 +196,53 @@ void keyboard(unsigned char Key, int x, int y) {
       }
     } break;
 
+    case 'j': {
+      if (fileTool::fileExists("see.json")) {
+        std::ifstream file("see.json");
+        nlohmann::json patch = nlohmann::json::parse(file);
+        params.merge_patch(patch);
+        textZone.addLine("Configuration file see.json has been loaded");
+      } else {
+        std::ofstream file("see.json");
+        file << std::setw(4) << params;
+        textZone.addLine("Configuration file see.json has been saved");
+      }
+    } break;
+
+    case 'J': {
+      std::ofstream file("see.json");
+      file << std::setw(4) << params;
+      textZone.addLine("Configuration file see.json has been saved");
+    } break;
+
     case 'k':
-      show_keybinds = 1 - show_keybinds;
+      params["show_keybinds"] = 1 - params["show_keybinds"].get<int>();
       break;
 
     case 'g': {
-      std::cout << ">>>>>>>>>> CONF NUMBER: ";
+      std::cout << ">>>>>>>>>> CONF NUMBER (negative number to escape): ";
       int Num;
       std::cin >> Num;
       tryToReadConf(Num);
     } break;
 
     case 'l':
-      show_interFrames = 1 - show_interFrames;
+      params["show_interFrames"] = 1 - params["show_interFrames"].get<int>();
       break;
 
     case 'm':
-      show_interTypes = 1 - show_interTypes;
+      params["show_interTypes"] = 1 - params["show_interTypes"].get<int>();
       break;
 
     case 'n':
-      show_particles = 1 - show_particles;
+      params["show_particles"] = 1 - params["show_particles"].get<int>();
       break;
 
     case 'o':
-      show_obb = 1 - show_obb;
+      params["show_obb"] = 1 - params["show_obb"].get<int>();
       break;
     case 'O':
-      enlarged_obb = 1 - enlarged_obb;
+      params["enlarged_obb"] = 1 - params["enlarged_obb"].get<int>();
       break;
 
     case 'p': {
@@ -241,10 +264,6 @@ void keyboard(unsigned char Key, int x, int y) {
       }
     } break;
 
-    case 's':
-      show_slice = 1 - show_slice;
-      break;
-
     case 't':
       if (forceTubeFactor > 0.2) forceTubeFactor -= 0.05;
       break;
@@ -253,7 +272,7 @@ void keyboard(unsigned char Key, int x, int y) {
       break;
 
     case 'v':
-      show_velocities = 1 - show_velocities;
+      params["show_velocities"] = 1 - params["show_velocities"].get<int>();
       break;
 
     case 'w': {
@@ -303,9 +322,9 @@ void keyboard(unsigned char Key, int x, int y) {
       while (tryToReadConf(confNum + 1)) {
         char name[256];
 #ifdef PNG_H
-        sprintf(name, "shot%d.png", confNum);
+        snprintf(name, 256, "shot%d.png", confNum);
 #else
-        sprintf(name, "shot%d.tga", confNum);
+        snprintf(name, 256, "shot%d.tga", confNum);
 #endif
         display();
         screenshot(name);
@@ -405,10 +424,10 @@ void selection(int x, int y) {
   glInitNames();
   glPushName(0);
 
-  if (show_particles) {
+  if (params["show_particles"].get<int>()) {
     glColor3f(0.5f, 0.5f, 0.5f);
     size_t i0 = 0;
-    if (show_driven == 0) i0 = box.nDriven;
+    if (params["show_driven"].get<int>() == 0) i0 = box.nDriven;
     for (size_t i = i0; i < box.Particles.size(); ++i) {
       glLoadName(i);
       vec3r pos = box.Particles[i].pos;
@@ -461,10 +480,10 @@ void mouse(int button, int state, int x, int y) {
     mouse_mode = NOTHING;
     display();
   } else if (state == GLUT_DOWN) {
-    
+
     mouse_start[0] = x;
     mouse_start[1] = y;
-    
+
     switch (button) {
       case GLUT_LEFT_BUTTON: {
         if (glutGetModifiers() == GLUT_ACTIVE_SHIFT)
@@ -475,16 +494,14 @@ void mouse(int button, int state, int x, int y) {
           mouse_mode = ZOOM;
         else
           mouse_mode = ROTATION;
-      }
-      break;
-      
+      } break;
+
       case GLUT_MIDDLE_BUTTON: {
         if (glutGetModifiers() == GLUT_ACTIVE_SHIFT)
           selection(x, y);
         else
           mouse_mode = ZOOM;
-      }
-      break;
+      } break;
     }
   }
 }
@@ -531,7 +548,7 @@ void motion(int x, int y) {
 
 void display() {
   sleep(0);  // it is supposed to accelerate the display
-  glTools::clearBackground(show_background);
+  glTools::clearBackground(params["show_background"].get<int>());
   adjustClippingPlans();
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
@@ -541,16 +558,16 @@ void display() {
   glShadeModel(GL_SMOOTH);
   glEnable(GL_DEPTH_TEST);
 
-  // if (show_velocities) drawVelocities();
-  if (show_traj) drawTrajectories();
-  if (show_forces) drawForces();
-  if (show_interFrames) drawInteractionFrames();
-  if (show_interTypes) drawInteractionTypes();
-  if (show_obb) drawOBBs();
-  if (show_particles) drawParticles();
-  if (show_probe) drawProbe();
+  // if (params["show_velocities"].get<int>() == 1) drawVelocities();
+  if (params["show_traj"].get<int>() == 1) drawTrajectories();
+  if (params["show_forces"].get<int>() == 1) drawForces();
+  if (params["show_interFrames"].get<int>() == 1) drawInteractionFrames();
+  if (params["show_interTypes"].get<int>() == 1) drawInteractionTypes();
+  if (params["show_obb"].get<int>() == 1) drawOBBs();
+  if (params["show_particles"].get<int>() == 1) drawParticles();
+  if (params["show_probe"].get<int>() == 1) drawProbe();
 
-  if (show_keybinds) showKeybinds();
+  if (params["show_keybinds"].get<int>() == 1) showKeybinds();
   textZone.draw();
   glFlush();
   glutSwapBuffers();
@@ -664,13 +681,15 @@ void drawParticles() {
   glEnable(GL_LIGHTING);
   glEnable(GL_DEPTH_TEST);
   for (size_t i = box.nDriven; i < box.Particles.size(); ++i) {
+    int alpha = (int)floor(params["alpha_particles"].get<GLfloat>() * 255);
     if (selectedParticle >= 0 && i == (size_t)selectedParticle) {
-      glColor4ub(234, 255, 0, (int)floor(alpha_particles * 255));  // yellow
+      glColor4ub(234, 255, 0, alpha);  // yellow
     } else {
       if (i >= pcolors.size()) {
-        glColor4ub(178, 34, 34, (int)floor(alpha_particles * 255));  // brick color
+        glColor4ub(params["ParticleColor"][0].get<int>(), params["ParticleColor"][1].get<int>(),
+                   params["ParticleColor"][2].get<int>(), alpha);
       } else {
-        glColor4ub(pcolors[i].r, pcolors[i].g, pcolors[i].b, (int)floor(alpha_particles * 255));
+        glColor4ub(pcolors[i].r, pcolors[i].g, pcolors[i].b, alpha);
       }
     }
 
@@ -684,12 +703,13 @@ void drawParticles() {
     glPopMatrix();
   }
 
-  if (show_driven == 1) {
+  if (params["show_driven"].get<int>() == 1) {
     for (size_t i = 0; i < box.nDriven; ++i) {
+      int alpha = (int)floor(params["alpha_fixparticles"].get<GLfloat>() * 255);
       if (selectedParticle >= 0 && i == (size_t)selectedParticle) {
-        glColor4ub(234, 255, 0, (int)floor(alpha_fixparticles * 255));
+        glColor4ub(234, 255, 0, alpha);
       } else
-        glColor4ub(128, 128, 128, (int)floor(alpha_fixparticles * 255));
+        glColor4ub(128, 128, 128, alpha);
 
       vec3r pos = box.Particles[i].pos;
 
@@ -755,7 +775,7 @@ void drawOBBs() {
     obbi.extent *= box.Particles[i].homothety;
     obbi.center *= box.Particles[i].homothety;
     obbi.center += box.Particles[i].pos;
-    if (enlarged_obb) obbi.enlarge(0.5 * box.DVerlet);
+    if (params["enlarged_obb"].get<int>() == 1) obbi.enlarge(0.5 * box.DVerlet);
 
     glColor4ub(255, 0, 0, 255);  // RED
     vec3r corner;
@@ -1270,7 +1290,7 @@ int screenshot(const char* filename) {
 
 bool tryToReadConf(int num) {
   char file_name[256];
-  sprintf(file_name, "conf%d", num);
+  snprintf(file_name, 256, "conf%d", num);
   if (fileTool::fileExists(file_name)) {
     std::cout << "Read " << file_name << std::endl;
     box.clearMemory();
@@ -1293,7 +1313,7 @@ bool tryToReadConf(int num) {
 
 void readTraj(const char* name) {
   if (!fileTool::fileExists(name)) {
-    return;  // return silently (most of time it is not required)
+    return;  // return silently (most of time it is not required to make noise)
   }
   std::cout << "Read trajectory file: " << name << std::endl;
 
@@ -1316,51 +1336,22 @@ void readTraj(const char* name) {
     releases[r].Q = releases[r].freeFlights[0].Q;
     releases[r].vrot = releases[r].freeFlights[0].vrot;
   }
-  show_traj = 1;
+  params["show_traj"] = 1;
 }
 
 void menu(int num) {
   switch (num) {
-
     case 0:
       exit(0);
       break;
-
-    case 100:
-      // colorParticle = colorParticleNone;
-      break;
-    case 101: {
-      // colorParticle = colorParticleVelocityMagnitude;
-      // ParticleColorTable.setMinMax(0.0, box.VelMax);
-      // ParticleColorTable.Rebuild();
-    } break;
   };
 
   glutPostRedisplay();
 }
 
 void buildMenu() {
-  // int popupmenu, submenu1, submenu2, submenu3;
-
-  /*
-  submenu1 = glutCreateMenu(menu); // Particle Colors
-  glutAddMenuEntry("None", 100);
-  glutAddMenuEntry("Velocity Magnitude", 101);
-  glutAddMenuEntry("Sum of Normal Contact Forces", 102);
-
-  submenu2 = glutCreateMenu(menu); // Force Colors
-  glutAddMenuEntry("None", 200);
-  glutAddMenuEntry("Magnitude", 201);
-
-  submenu3 = glutCreateMenu(menu); // Velocity Colors
-  glutAddMenuEntry("None", 300);
-  glutAddMenuEntry("Magnitude", 301);
-*/
-  // popupmenu =
+  // popupm
   glutCreateMenu(menu);  // Main menu
-  // glutAddSubMenu("Particle Colors", submenu1);
-  // glutAddSubMenu("Force Colors", submenu2);
-  // glutAddSubMenu("Velocity Colors", submenu2);
   glutAddMenuEntry("Quit", 0);
 }
 
@@ -1374,25 +1365,30 @@ int main(int argc, char* argv[]) {
 
   std::string confFileName;
   std::string trajFileName;
+  int verboseLevel = 0;
 
   try {
-    TCLAP::CmdLine cmd("Visualization of Rockable simulations", ' ', "0.3");
+    TCLAP::CmdLine cmd("Visualisation of Rockable simulations", ' ', "0.3");
     TCLAP::UnlabeledValueArg<std::string> nameArg("input", "Name of the conf-file", false, "conf0", "conf-file");
     TCLAP::ValueArg<std::string> trajFileNameArg("t", "traj", "Name of a trajectory file", false, "traj.txt", "string");
+    TCLAP::ValueArg<int> verboseArg("v", "verbose", "Verbose level", false, 2, "int");
 
     cmd.add(nameArg);
     cmd.add(trajFileNameArg);
+    cmd.add(verboseArg);
 
     cmd.parse(argc, argv);
 
     confFileName = nameArg.getValue();
     trajFileName = trajFileNameArg.getValue();
+    verboseLevel = verboseArg.getValue();
   } catch (TCLAP::ArgException& e) {
     std::cerr << "error: " << e.error() << " for argument " << e.argId() << std::endl;
   }
 
+  box.setVerboseLevel(verboseLevel);
   box.clearMemory();
-  box.loadConf(confFileName.c_str());
+  box.loadConf(confFileName.c_str()); 
   textZone.addLine("conf-file: %s (time = %f)", confFileName.c_str(), box.t);
   box.computeAABB();
 
@@ -1404,6 +1400,15 @@ int main(int argc, char* argv[]) {
     std::ifstream f("probe.txt");
     f >> probe.min >> probe.max >> probe_MCnsteps;
     std::cout << "Probe: min = " << probe.min << "\n       max = " << probe.max << "\n";
+  }
+
+  if (fileTool::fileExists("see.json")) {
+    std::ifstream file("see.json");
+    nlohmann::json patch = nlohmann::json::parse(file);
+    params.merge_patch(patch);
+  } else {
+    std::ofstream file("see.json");
+    file << std::setw(4) << params;
   }
 
   complexityNumber = 0;
@@ -1418,6 +1423,10 @@ int main(int argc, char* argv[]) {
     std::cerr << "No particles! Goodbye." << std::endl;
     return 1;
   }
+
+  // ==== Default parameters
+  // ParticleColor.set(178, 34, 34); // brick color
+  // ParticleColor.set(191, 178, 120);  // light brown
 
   // ==== Init GLUT and create window
   glutInit(&argc, argv);
@@ -1445,9 +1454,9 @@ int main(int argc, char* argv[]) {
   up.set(0.0, 1.0, 0.0);      // direction (normalized)
 
   mouse_mode = NOTHING;
-  view_angle = 45.0;
-  znear = 0.01;
-  zfar = 10.0;
+  view_angle = 45.0f;
+  znear = 0.01f;
+  zfar = 10.0f;
 
   glText::init();
 

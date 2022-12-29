@@ -376,7 +376,7 @@ void Rockable::clearMemory() {
 */
 void Rockable::saveConf(int i) {
   char fname[256];
-  sprintf(fname, "conf%d", i);
+  snprintf(fname, 256, "conf%d", i);
   saveConf(fname);
 }
 
@@ -883,7 +883,7 @@ void Rockable::initParser() {
 */
 void Rockable::loadConf(int i) {
   char fname[256];
-  sprintf(fname, "conf%d", i);
+  snprintf(fname, 256, "conf%d", i);
   loadConf(fname);
 }
 
@@ -2368,10 +2368,10 @@ void Rockable::accelerations() {
   for (size_t sj = 0; sj < joints.size(); ++sj) {
     vec3r forceOnj;
     joints[sj].getForceOnj(Particles, forceOnj);
-    vec3r forceOni = - forceOnj;
+    vec3r forceOni = -forceOnj;
     Particle* ip = &(Particles[joints[sj].ibody]);
     Particle* jp = &(Particles[joints[sj].jbody]);
-    
+
     // Forces
     ip->force += forceOni;
     jp->force += forceOnj;

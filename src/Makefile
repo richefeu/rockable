@@ -58,21 +58,23 @@ ifeq ($(UNAME_S),Darwin)
 
   # The compiler and linker to be used
   CXX = g++-12
-	LINK = $(CXX)
+  LINK = $(CXX)
 	
   # The list of flags passed to the compiler
   CXXFLAGS = -fopenmp -O3 -Wall -Wextra -Wshadow -pedantic -std=c++17
   CXXFLAGS += -I $(TOOFUSPATH) -I $(SPDLOGPATH) -I . $(OPTIONS)
   CXXFLAGS += `pkg-config --cflags tclap`
+
+  JSONFLAGS = `pkg-config --cflags nlohmann_json`
 	
-	OPENMP_LIB = -l gomp
+  OPENMP_LIB = -l gomp
 	
   # Link flags for OpenGL and glut
   GLUTFLAGS = `pkg-config --cflags glut`
   GLUTLINK = `pkg-config --libs glut` -framework OpenGL
 	
-	FLTKFLAGS = `fltk-config --use-gl --cxxflags`
-	FLTKLINK = `fltk-config --use-gl --ldstaticflags`
+  FLTKFLAGS = `fltk-config --use-gl --cxxflags`
+  FLTKLINK = `fltk-config --use-gl --ldstaticflags`
 	
   # need to install glfw3 with brew: 'brew install glfw3'
   GLFWFLAGS = `pkg-config --cflags glfw3`
@@ -205,7 +207,7 @@ see: bin/see
 bin/see: Apps/see.cpp $(OBJECTS)
 	@echo "\033[0;32m-> BUILDING" $@ "\033[0m"
 	@mkdir -p bin
-	$(CXX) $(CXXFLAGS) $(GLUTFLAGS) $(PNGFLAGS) -c $< -o $(patsubst %.cpp, %.o, $<)
+	$(CXX) $(CXXFLAGS) $(GLUTFLAGS) $(PNGFLAGS) $(JSONFLAGS) -c $< -o $(patsubst %.cpp, %.o, $<)
 	$(LINK) $(OPENMP_LIB) $(GLUTLINK) $(PNGLINK) -o $@ Apps/see.o lib/$(LIB).a
 clean_see:
 	rm -rf Apps/see.o bin/see

@@ -37,7 +37,7 @@
 
 bool tryToReadConf(int num) {
   char file_name[256];
-  sprintf(file_name, "conf%d", num);
+  snprintf(file_name, 256, "conf%d", num);
   if (fileTool::fileExists(file_name)) {
     std::cout << "Read " << file_name << std::endl;
     box.clearMemory();
@@ -96,7 +96,7 @@ void writeVTKSPHER(int num) {
 
   unsigned int nbgrains = (unsigned int)Sphers.size();
 
-  sprintf(vtk_file, "Shepres%.4i.vtk", num);
+  snprintf(vtk_file, 200, "Shepres%.4i.vtk", num);
   sortie_vtk = fopen(vtk_file, "w");
 
   fprintf(sortie_vtk, "# vtk DataFile Version 3.0\n");
@@ -159,7 +159,7 @@ void writeVTKPOLYR(int num) {
     }
   }
 
-  sprintf(vtk_file, "Polyr%.4i.vtk", num);
+  snprintf(vtk_file, 200, "Polyr%.4i.vtk", num);
 
   sortie_vtk = fopen(vtk_file, "w");
 
@@ -252,7 +252,7 @@ void writeVTKPOLYRVertex(int num) {
   FILE* sortie_vtk;
   FILE* sortie_vtk2;
 
-  sprintf(vtk_file, "Polyr%.4i.vtk", num);
+  snprintf(vtk_file, 200, "Polyr%.4i.vtk", num);
   sortie_vtk = fopen(vtk_file, "w");
   fprintf(sortie_vtk, "# vtk DataFile Version 3.0\n");
   fprintf(sortie_vtk, "RIGID      1\n");
@@ -260,7 +260,7 @@ void writeVTKPOLYRVertex(int num) {
   fprintf(sortie_vtk, "DATASET POLYDATA\n");
   fprintf(sortie_vtk, "POINTS %i float\n", nb_points);
 
-  sprintf(vtk_file2, "PolyrSpheres%.4i.vtk", num);
+  snprintf(vtk_file2, 200, "PolyrSpheres%.4i.vtk", num);
   sortie_vtk2 = fopen(vtk_file2, "w");
   fprintf(sortie_vtk2, "# vtk DataFile Version 3.0\n");
   fprintf(sortie_vtk2, "Sortie Particles\n");
@@ -358,7 +358,7 @@ void writeVTKContactsSpheres(int num) {
   char vtk_file[200];
   FILE* sortie_vtk;
 
-  sprintf(vtk_file, "Forces%.4i.vtk", num);
+  snprintf(vtk_file, 200, "Forces%.4i.vtk", num);
   sortie_vtk = fopen(vtk_file, "w");
 
   long nbContacts = 0;
@@ -477,7 +477,7 @@ void writeVTKContactsLines(int num) {
   char vtk_file[200];
   FILE* sortie_vtk;
 
-  sprintf(vtk_file, "ForceLines%.4i.vtk", num);
+  snprintf(vtk_file, 200, "ForceLines%.4i.vtk", num);
   sortie_vtk = fopen(vtk_file, "w");
 
   size_t nbContacts = 0;
@@ -596,7 +596,7 @@ void writeVTKOBB(int num) {
   char vtk_file[200];
   FILE* sortie_vtk;
 
-  sprintf(vtk_file, "OBB%.4i.vtk", num);
+  snprintf(vtk_file, 200, "OBB%.4i.vtk", num);
   sortie_vtk = fopen(vtk_file, "w");
 
   size_t nbSommets = 8 * box.Particles.size();

@@ -121,7 +121,7 @@ void keyboard(GLFWwindow* window, int key, int /*scancode*/, int action, int mod
         std::cout << "Solid Fraction in probe: " << SF << '\n';
       } break;
       */
-        
+
       case GLFW_KEY_SPACE:
         textZone.reset();
         break;
@@ -132,15 +132,15 @@ void keyboard(GLFWwindow* window, int key, int /*scancode*/, int action, int mod
         selection((int)floor(x), (int)floor(y));
       } break;
 
-      /*
-      case GLFW_KEY_A: {
-        if (mods == GLFW_MOD_SHIFT && alpha_fixparticles <= 0.95)
-          alpha_fixparticles += 0.05;
-        else if (alpha_fixparticles > 0.1)
-          alpha_fixparticles -= 0.05;
-      } break;
-      */
-      
+        /*
+        case GLFW_KEY_A: {
+          if (mods == GLFW_MOD_SHIFT && alpha_fixparticles <= 0.95)
+            alpha_fixparticles += 0.05;
+          else if (alpha_fixparticles > 0.1)
+            alpha_fixparticles -= 0.05;
+        } break;
+        */
+
       case GLFW_KEY_B:
         show_background = 1 - show_background;
         break;
@@ -312,9 +312,9 @@ void keyboard(GLFWwindow* window, int key, int /*scancode*/, int action, int mod
           while (tryToReadConf(confNum + 1)) {
             char name[256];
 #ifdef PNG_H
-            sprintf(name, "shot%d.png", confNum);
+            snprintf(name, 256, "shot%d.png", confNum);
 #else
-            sprintf(name, "shot%d.tga", confNum);
+            snprintf(name, 256, "shot%d.tga", confNum);
 #endif
             display();
             screenshot(name);
@@ -1253,7 +1253,7 @@ int screenshot(const char* filename) {
 
 bool tryToReadConf(int num) {
   char file_name[256];
-  sprintf(file_name, "conf%d", num);
+  snprintf(file_name, 256, "conf%d", num);
   if (fileTool::fileExists(file_name)) {
     std::cout << "Read " << file_name << std::endl;
     box.clearMemory();
@@ -1318,7 +1318,7 @@ int main(int argc, char* argv[]) {
   std::string trajFileName;
 
   try {
-    TCLAP::CmdLine cmd("Visualization of Rockable simulations", ' ', "0.3");
+    TCLAP::CmdLine cmd("Visualisation of Rockable simulations", ' ', "0.3");
     TCLAP::UnlabeledValueArg<std::string> nameArg("input", "Name of the conf-file", false, "conf0", "conf-file");
     TCLAP::ValueArg<std::string> trajFileNameArg("t", "traj", "Name of a trajectory file", false, "traj.txt", "string");
 
@@ -1366,14 +1366,14 @@ int main(int argc, char* argv[]) {
 
   glfwWindowHint(GLFW_SAMPLES, 4);
 
-  GLFWwindow* window = glfwCreateWindow(width, height, "Rockable VISUALIZER (GLFW)", NULL, NULL);
+  GLFWwindow* window = glfwCreateWindow(width, height, "Rockable visualiser (GLFW)", NULL, NULL);
   if (!window) {
     glfwTerminate();
     return -1;
   }
 
   glfwSetKeyCallback(window, keyboard);
-  //glfwSetKeyCallback(window, keyboard);
+  // glfwSetKeyCallback(window, keyboard);
   glfwSetMouseButtonCallback(window, mouse);
   glfwSetCursorPosCallback(window, motion);
   glfwSetFramebufferSizeCallback(window, reshape);
@@ -1391,7 +1391,7 @@ int main(int argc, char* argv[]) {
   view_angle = 45.0;
   znear = 0.01;
   zfar = 10.0;
-  
+
   glText::init();
 
   glDisable(GL_CULL_FACE);

@@ -206,9 +206,9 @@ void keyboard(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int
           while (tryToReadConf(confNum + 1)) {
             char name[256];
 #ifdef PNG_H
-            sprintf(name, "shot%d.png", confNum);
+            snprintf(name, 256, "shot%d.png", confNum);
 #else
-            sprintf(name, "shot%d.tga", confNum);
+            snprintf(name, 256, "shot%d.tga", confNum);
 #endif
             display();
             screenshot(name);
@@ -1117,7 +1117,7 @@ int screenshot(const char* filename) {
 
 bool tryToReadConf(int num) {
   char file_name[256];
-  sprintf(file_name, "conf%d", num);
+  snprintf(file_name, 256, "conf%d", num);
   if (fileTool::fileExists(file_name)) {
     std::cout << "Read " << file_name << std::endl;
     box.clearMemory();
@@ -1239,7 +1239,7 @@ void Input_Properties(const char* propertyName) {
   for (size_t grp = 0; grp < box.properties.ngroup; grp++) {
     size_t idDensity = box.properties.get_id(propertyName);
     char label[256];
-    sprintf(label, "density (%ld)", grp);
+    snprintf(label, 256, "density (%ld)", grp);
     ImGui::InputDouble(label, &(box.properties.prop[idDensity][grp]));
   }
 }
@@ -1251,7 +1251,7 @@ void Input_LawData(const char* parName) {
     for (size_t g2 = g1; g2 < box.dataTable.ngroup; ++g2) {
       if (1 /*box.dataTable.isDefined(id, g1, g2)*/) {
         char label[256];
-        sprintf(label, "%s (%ld - %ld)", parNameStr.c_str(), g1, g2);
+        snprintf(label, 256, "%s (%ld - %ld)", parNameStr.c_str(), g1, g2);
         ImGui::InputDouble(label, &(box.dataTable.tables[id][g1][g2]));
       }
     }
@@ -1274,10 +1274,10 @@ void ForceLaw_Combo() {
       const bool is_selected = (index == n);
       if (ImGui::Selectable(lawNames[n].c_str(), is_selected)) {
         index = n;
-        //box.setForceLaw(lawNames[n]);
+        // box.setForceLaw(lawNames[n]);
         std::stringstream ss;
         ss << "forceLaw " << lawNames[n];
-        box.parser.parseString(ss.str().c_str());     
+        box.parser.parseString(ss.str().c_str());
       }
       if (is_selected) {
         ImGui::SetItemDefaultFocus();
@@ -1689,7 +1689,7 @@ int main(int argc, char* argv[]) {
 
   glfwWindowHint(GLFW_SAMPLES, 4);
 
-  GLFWwindow* window = glfwCreateWindow(width, height, "Rockable VISUALIZER (GLFW)", NULL, NULL);
+  GLFWwindow* window = glfwCreateWindow(width, height, "Rockable visualiser (GLFW + Dear ImGui)", NULL, NULL);
   if (!window) {
     glfwTerminate();
     return -1;
