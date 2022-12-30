@@ -72,6 +72,7 @@
 #include "kwParser.hpp"
 #include "linkCells.hpp"
 #include "message.hpp"
+#include "profiler.hpp"
 
 // local headers
 #include "BodyForces/BodyForce.hpp"
@@ -85,12 +86,14 @@
 #include "PreproCommands/PreproCommand.hpp"
 #include "SpringJoint.hpp"
 #include "clusterParticles.hpp"
+#include "PeriodicCell.hpp"
 
 class Rockable {
  public:
   std::vector<Particle> Particles;                        ///< The particles
   std::vector<std::set<Interaction> > Interactions;       ///< The interactions (contacts and potential contacts)
   std::vector<std::set<BreakableInterface> > Interfaces;  ///< The interfaces
+  std::vector<std::vector<Interaction*> > m_vecInteractions;
   std::vector<Interaction*> activeInteractions;  ///< Hold a pointer to the contact interactions that are active
   std::vector<SpringJoint> joints;
 
@@ -110,6 +113,9 @@ class Rockable {
   std::string shapeFile;                  ///< Name of the file that contain the library of shapes
   std::vector<Shape> Shapes;              ///< Loaded library of shapes
   std::map<std::string, size_t> shapeId;  ///< Associate a name of shape with its id in the vector 'Shapes'
+
+  int usePeriodicCell;
+  PeriodicCell Cell;
 
   // Time parameters
   double t;                  ///< Current Time
@@ -183,6 +189,9 @@ class Rockable {
   void integrate();                        ///< Simulation flow (make time increments and check for updates or saving)
   void accelerations();                    ///< Compute accelerations
   void incrementResultants(Interaction&);  ///< Project force and moment on the interacting particles
+  void incrementPeriodicCellTensorialMoment(Interaction&);
+  void realToReducedWorld();
+  void reducedToRealWorld();
   std::function<void()> integrationStep;   ///< Pointer function for  tion
   void setIntegrator(std::string& Name);   ///< Select the time-integration scheme
 
@@ -202,6 +211,7 @@ class Rockable {
 
   void console_run(const std::string& confFileName);
 
+  void Interactions_from_set_to_vec();
   void UpdateNL_bruteForce();           ///< Brute-force approach
   void UpdateNL_linkCells();            ///< Link-cells approach
   std::function<void()> UpdateNL;       ///< Pointer funtion to the updateNL

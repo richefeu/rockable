@@ -37,6 +37,7 @@
 #include <chaiscript/chaiscript.hpp>
 
 int main(int argc, char const* argv[]) {
+	INIT_TIMERS();
 
   chaiscript::ModulePtr const vec3r_module = chaiscript::ModulePtr(new chaiscript::Module);
   chaiscript::utility::add_class<vec3r>(

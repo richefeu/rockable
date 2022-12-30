@@ -35,7 +35,7 @@
 #######################################################################################################################
 
 # An option can be disable by adding 'n' before
-OPTIONS = -DnFT_CORR -DnCOMPONENTWISE_NUM_DAMPING
+OPTIONS = -DnFT_CORR -DnCOMPONENTWISE_NUM_DAMPING -DENABLE_PROFILING
 
 # If you don't want to use libpng in 'see', comment this two lines
 # In this case the screenshots will be TGA (not compressed)
@@ -65,6 +65,7 @@ ifeq ($(UNAME_S),Darwin)
   CXXFLAGS += -I $(TOOFUSPATH) -I $(SPDLOGPATH) -I . $(OPTIONS)
   CXXFLAGS += `pkg-config --cflags tclap`
 
+  # need to install nlohmann/json: 'brew install nlohmann-json'
   JSONFLAGS = `pkg-config --cflags nlohmann_json`
 	
   OPENMP_LIB = -l gomp
@@ -76,7 +77,7 @@ ifeq ($(UNAME_S),Darwin)
   FLTKFLAGS = `fltk-config --use-gl --cxxflags`
   FLTKLINK = `fltk-config --use-gl --ldstaticflags`
 	
-  # need to install glfw3 with brew: 'brew install glfw3'
+  # need to install glfw3 with brew: 'brew install glfw3' or 'brew install glfw' (it depends...)
   GLFWFLAGS = `pkg-config --cflags glfw3`
   GLFWLINK = -framework OpenGL `pkg-config --libs glfw3`
 
@@ -124,7 +125,6 @@ POSTPROSOURCES = $(wildcard PostProcessors/*.cpp)
 # Each cpp file listed below corresponds to an object file
 OBJECTS = $(SOURCES:.cpp=.o)
 POSTPROOBJECTS = $(POSTPROSOURCES:.cpp=.o)
-#IMGUI_OBJECTS = $(addsuffix .o, $(basename $(notdir $(IMGUI_SOURCES))))
 IMGUI_OBJECTS = $(addsuffix .o, $(basename $(IMGUI_SOURCES)))
 
 # Each cpp file listed below corresponds to a header file

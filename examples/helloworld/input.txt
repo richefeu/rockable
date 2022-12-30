@@ -22,7 +22,7 @@ density 1 2700
 #AngularVelocityBarrierExponent 5
 
 #### interaction model ################
-forceLaw Avalanche
+forceLaw Default
 
 
 #### interaction parameters ###########

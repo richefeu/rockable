@@ -42,6 +42,7 @@
 #include <vector>
 
 #include "vec3.hpp"
+#include "mat9.hpp"
 
 class Rockable;
 
@@ -73,6 +74,12 @@ struct Control {
   vec3r vec_value; // in case we impose a velocity or force vector
 };
 
+struct PeriodicCellControl {
+  mat9b Drive; ///< Driving mode. Can be ForceDriven or VelocityDriven
+  mat9r Sig;   ///< Imposed external stress
+  mat9r v;     ///< Imposed velocities
+};
+
 /// @brief This class hold the controls (force or velocity on the 'nContr' first
 /// bodies)
 class DrivingSystem {
@@ -81,6 +88,7 @@ class DrivingSystem {
                                                      ///< used for 'smart' driving conditions
 
   std::vector<Control> controls;
+  PeriodicCellControl cellControl;
 
   DrivingSystem();  // Ctor
 

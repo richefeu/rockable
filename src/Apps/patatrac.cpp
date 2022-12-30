@@ -39,7 +39,7 @@
 #include "profiler.hpp"
 
 // Ctor
-Patatrac::Patatrac() : epsilon_dn(1e-6) {}
+Patatrac::Patatrac() : epsilon_dn(1e-6) { box.initParser(); }
 
 // Read data from a file
 void Patatrac::loadDropConfigsFromFile(const char* name) {

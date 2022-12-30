@@ -78,7 +78,8 @@ class Interaction {
   
   vec3r pos;  ///< Contact position
   vec3r vel;  ///< Relative velocity (j relative to i)
-
+  vec3r branchPerioCorr;
+  
   double fn;  ///< Normal force (scalar value)
   vec3r ft;   ///< Tangential force (vector)
   vec3r mom;  ///< Moment at the contact point
@@ -97,6 +98,7 @@ class Interaction {
   // binded functions in UpdateDispatcher. This change provided a gain (redution
   // of CPU time) of about 12% for the tested example.
   static std::function<bool(Interaction&, Particle&, Particle&)> UpdateDispatcher[4];
+  static std::function<bool(Interaction&, Particle&, Particle&)> UpdateDispatcherPeriodic[4];
 };
 
 // This is used to sort the Interactions having the same i-particle (in

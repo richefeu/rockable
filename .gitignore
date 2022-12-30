@@ -9,6 +9,8 @@ src/bin/see3
 src/bin/run
 src/bin/patatrac
 src/bin/postpro
+src/bin
+src/lib
 common/*
 *pack
 *seePack
@@ -29,3 +31,5 @@ sphinxdoc/build/*
 .vscode
 src/imgui/examples
 *imgui.ini
+*see.json
+examples/**/*.txt

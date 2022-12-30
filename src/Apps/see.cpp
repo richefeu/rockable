@@ -1391,6 +1391,8 @@ void buildMenu() {
 // =====================================================================
 
 int main(int argc, char* argv[]) {
+	INIT_TIMERS();
+	
   box.initParser();
   box.setInteractive(true);
 

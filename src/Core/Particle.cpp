@@ -56,20 +56,20 @@ Particle::Particle()
       obb() {}
 
 /** @brief Given a vector expressed in the shape framework,
- *        this method returns its expression in the global framework
- * 
+ *         this method returns its expression in the global framework
+ *
  */
 vec3r Particle::Glob(vec3r& Vertex) const { return (pos + Q * (homothety * Vertex)); }
 
 /** @brief Given the vertex number v of the shape,
- *        this method returns the vector expression in the global framework
- * 
+ *         this method returns the vector expression in the global framework
+ *
  */
 vec3r Particle::GlobVertex(size_t v) const { return (pos + Q * (homothety * shape->vertex[v])); }
 
 /** @brief Given the vertex index v of the face f in the shape,
- *        this method returns the vector expression in the global framework
- * 
+ *         this method returns the vector expression in the global framework
+ *
  */
 vec3r Particle::GlobFaceVertex(size_t f, size_t v) const {
   return (pos + Q * (homothety * shape->vertex[shape->face[f][v]]));
@@ -77,13 +77,14 @@ vec3r Particle::GlobFaceVertex(size_t f, size_t v) const {
 
 /**
  *  @brief Get the scaled Minskowski radius
- * 
- */ 
+ *
+ */
 double Particle::MinskowskiRadius() const { return homothety * shape->radius; }
 
 /**
- * @brief Update the placement of the Oriented Bounding Box
- * 
+ * @brief Update the placement of the Oriented Bounding Box according to the current position and orientation of the
+ *        particle
+ *
  */
 void Particle::updateObb() {
   obb = shape->obb;
@@ -93,15 +94,17 @@ void Particle::updateObb() {
   obb.center += pos;
 }
 
-bool Particle::VertexIsNearVertex(Particle& Pi, Particle& Pj, size_t isub, size_t jsub, double dmax) {
+bool Particle::VertexIsNearVertex(Particle& Pi, Particle& Pj, size_t isub, size_t jsub, double dmax,
+                                  const vec3r& branchPerioCorr) {
   vec3r pos_iv = Pi.GlobVertex(isub);
-  vec3r pos_jv = Pj.GlobVertex(jsub);
+  vec3r pos_jv = Pj.GlobVertex(jsub) + branchPerioCorr;
   double sum = Pi.MinskowskiRadius() + Pj.MinskowskiRadius() + dmax;
   return (norm2(pos_jv - pos_iv) <= sum * sum);
 }
 
-bool Particle::VertexIsNearEdge(Particle& Pi, Particle& Pj, size_t isub, size_t jsub, double dmax) {
-  vec3r pos_iv = Pi.GlobVertex(isub);
+bool Particle::VertexIsNearEdge(Particle& Pi, Particle& Pj, size_t isub, size_t jsub, double dmax,
+                                const vec3r& branchPerioCorr) {
+  vec3r pos_iv = Pi.GlobVertex(isub) - branchPerioCorr;
   size_t v1 = Pj.shape->edge[jsub].first;
   size_t v2 = Pj.shape->edge[jsub].second;
   vec3r pos0_jv = Pj.GlobVertex(v1);
@@ -119,13 +122,14 @@ bool Particle::VertexIsNearEdge(Particle& Pi, Particle& Pj, size_t isub, size_t 
   return (norm2(pos_iv - (pos0_jv + r * E)) <= sum * sum);
 }
 
-bool Particle::VertexIsNearFace(Particle& Pi, Particle& Pj, size_t isub, size_t jsub, double dmax) {
+bool Particle::VertexIsNearFace(Particle& Pi, Particle& Pj, size_t isub, size_t jsub, double dmax,
+                                const vec3r& branchPerioCorr) {
   // First, we project the node position onto the face plane.
   size_t nb_vertices = Pj.shape->face[jsub].size();
   vec3r posNodeA_jv = Pj.GlobFaceVertex(jsub, 0);
   vec3r posNodeB_jv = Pj.GlobFaceVertex(jsub, 1);
   vec3r posNodeC_jv = Pj.GlobFaceVertex(jsub, nb_vertices - 1);
-  vec3r pos_iv = Pi.GlobVertex(isub);
+  vec3r pos_iv = Pi.GlobVertex(isub) - branchPerioCorr;
   vec3r v = pos_iv - posNodeA_jv;
   vec3r v1 = posNodeB_jv - posNodeA_jv;
   v1.normalize();
@@ -172,7 +176,8 @@ bool Particle::VertexIsNearFace(Particle& Pi, Particle& Pj, size_t isub, size_t 
   return false;
 }
 
-bool Particle::EdgeIsNearEdge(Particle& Pi, Particle& Pj, size_t isub, size_t jsub, double dmax) {
+bool Particle::EdgeIsNearEdge(Particle& Pi, Particle& Pj, size_t isub, size_t jsub, double dmax,
+                              const vec3r& branchPerioCorr) {
 // Be carreful about this small value because, if it is not sufficiently small,
 // some edges (tubes) couldn't see them each other.
 #define _EPSILON_VALUE_ 1.0e-12
@@ -187,7 +192,7 @@ bool Particle::EdgeIsNearEdge(Particle& Pi, Particle& Pj, size_t isub, size_t js
 
   vec3r Ei = pos1_iv - pos0_iv;
   vec3r Ej = pos1_jv - pos0_jv;
-  vec3r v = pos0_iv - pos0_jv;
+  vec3r v = pos0_iv - pos0_jv - branchPerioCorr;
 
   double c = Ei * Ei;
   double d = Ej * Ej;

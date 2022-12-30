@@ -66,7 +66,33 @@ void DrivingSystem::read(bool allow_warn) {
   while (is) {
     if (token[0] == '/' || token[0] == '#' || token[0] == '!')
       getline(is, token);
-    else if (token == "Control") {
+	
+    else if (token == "PeriodicLoading") {
+
+      std::string LoadingName;
+      is >> LoadingName;
+      if (LoadingName == "IsotropicCompression") {
+        double pressure;
+        is >> pressure;
+        cellControl.Drive.xx = cellControl.Drive.yy = cellControl.Drive.zz = ForceDriven;
+        cellControl.Drive.xy = cellControl.Drive.yx = VelocityDriven;
+        cellControl.Drive.xz = cellControl.Drive.zx = VelocityDriven;
+        cellControl.Drive.yz = cellControl.Drive.zy = VelocityDriven;
+
+        cellControl.Sig.xx = cellControl.Sig.yy = cellControl.Sig.zz = pressure;
+        cellControl.Sig.xy = cellControl.Sig.yx = 0.0;
+        cellControl.Sig.xz = cellControl.Sig.yz = 0.0;
+        cellControl.Sig.yz = cellControl.Sig.zy = 0.0;
+
+        cellControl.v.xx = cellControl.v.yy = cellControl.v.zz = 0.0;  // free in fact
+        cellControl.v.xy = cellControl.v.yx = 0.0;
+        cellControl.v.xz = cellControl.v.zx = 0.0;
+        cellControl.v.yz = cellControl.v.zy = 0.0;
+
+        ServoFunction = nullptr;
+      }
+
+    } else if (token == "Control") {
       std::string typeStr;
       Control C;
       is >> typeStr >> C.i;

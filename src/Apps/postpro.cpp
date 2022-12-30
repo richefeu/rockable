@@ -65,6 +65,8 @@ PostProcessor* readPostproCommands(const char* fname) {
 }
 
 int main(int argc, char const* argv[]) {
+	INIT_TIMERS();
+	
   PostProcessor* processor;
 
   // Read postprocessing commands from input file
@@ -80,6 +82,7 @@ int main(int argc, char const* argv[]) {
   }
 
   Rockable box;
+	box.initParser();
   box.setInteractive(true);
   processor->plug(&box);
 
