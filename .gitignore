@@ -33,3 +33,4 @@ src/imgui/examples
 *imgui.ini
 *see.json
 examples/**/*.txt
+!examples/**/input.txt

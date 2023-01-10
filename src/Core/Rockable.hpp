@@ -187,13 +187,27 @@ class Rockable {
   void RungeKutta4Step();                  ///< Make a time increment with the Runge-Kutta scheme (4th order)
   void initIntegrator();                   ///< Set additionally stored data required by some integrator
   void integrate();                        ///< Simulation flow (make time increments and check for updates or saving)
-  void accelerations();                    ///< Compute accelerations
+  
+	void accelerations();                    ///< Compute accelerations
   void incrementResultants(Interaction&);  ///< Project force and moment on the interacting particles
   void incrementPeriodicCellTensorialMoment(Interaction&);
-  void realToReducedWorld();
-  void reducedToRealWorld();
+  void realToReducedKinematics();
+  void reducedToRealKinematics();
   std::function<void()> integrationStep;   ///< Pointer function for  tion
   void setIntegrator(std::string& Name);   ///< Select the time-integration scheme
+	
+private:
+	// These methods are subparts of the method accelerations() 
+	void initialise_particle_forces_and_moments();
+	void update_interactions();
+	void build_activeInteractions();
+	void compute_forces_and_moments();
+	void compute_resultants();
+	void compute_SpringJoints();
+	void breakage_of_interfaces();
+	void compute_accelerations_from_resultants();
+
+public:
 
   // Core CD method (TODO)
   // ...

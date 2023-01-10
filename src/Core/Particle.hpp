@@ -104,10 +104,10 @@ class Particle {
 
   void updateObb();
 
-  static bool VertexIsNearVertex(Particle& Pi, Particle& Pj, size_t isub, size_t jsub, double dmax, const vec3r& branchPerioCorr);
-  static bool VertexIsNearEdge(Particle& Pi, Particle& Pj, size_t isub, size_t jsub, double dmax, const vec3r& branchPerioCorr);
-  static bool VertexIsNearFace(Particle& Pi, Particle& Pj, size_t isub, size_t jsub, double dmax, const vec3r& branchPerioCorr);
-  static bool EdgeIsNearEdge(Particle& Pi, Particle& Pj, size_t isub, size_t jsub, double dmax, const vec3r& branchPerioCorr);
+  static bool VertexIsNearVertex(Particle& Pi, Particle& Pj, size_t isub, size_t jsub, double dmax, const vec3r& jPeriodicShift);
+  static bool VertexIsNearEdge(Particle& Pi, Particle& Pj, size_t isub, size_t jsub, double dmax, const vec3r& jPeriodicShift);
+  static bool VertexIsNearFace(Particle& Pi, Particle& Pj, size_t isub, size_t jsub, double dmax, const vec3r& jPeriodicShift);
+  static bool EdgeIsNearEdge(Particle& Pi, Particle& Pj, size_t isub, size_t jsub, double dmax, const vec3r& jPeriodicShift);
 };
 
 #endif /* end of include guard: PARTICLE_HPP */

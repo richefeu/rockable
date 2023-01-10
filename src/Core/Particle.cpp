@@ -95,16 +95,16 @@ void Particle::updateObb() {
 }
 
 bool Particle::VertexIsNearVertex(Particle& Pi, Particle& Pj, size_t isub, size_t jsub, double dmax,
-                                  const vec3r& branchPerioCorr) {
+                                  const vec3r& jPeriodicShift) {
   vec3r pos_iv = Pi.GlobVertex(isub);
-  vec3r pos_jv = Pj.GlobVertex(jsub) + branchPerioCorr;
+  vec3r pos_jv = Pj.GlobVertex(jsub) + jPeriodicShift;
   double sum = Pi.MinskowskiRadius() + Pj.MinskowskiRadius() + dmax;
   return (norm2(pos_jv - pos_iv) <= sum * sum);
 }
 
 bool Particle::VertexIsNearEdge(Particle& Pi, Particle& Pj, size_t isub, size_t jsub, double dmax,
-                                const vec3r& branchPerioCorr) {
-  vec3r pos_iv = Pi.GlobVertex(isub) - branchPerioCorr;
+                                const vec3r& jPeriodicShift) {
+  vec3r pos_iv = Pi.GlobVertex(isub) - jPeriodicShift;
   size_t v1 = Pj.shape->edge[jsub].first;
   size_t v2 = Pj.shape->edge[jsub].second;
   vec3r pos0_jv = Pj.GlobVertex(v1);
@@ -123,13 +123,13 @@ bool Particle::VertexIsNearEdge(Particle& Pi, Particle& Pj, size_t isub, size_t 
 }
 
 bool Particle::VertexIsNearFace(Particle& Pi, Particle& Pj, size_t isub, size_t jsub, double dmax,
-                                const vec3r& branchPerioCorr) {
+                                const vec3r& jPeriodicShift) {
   // First, we project the node position onto the face plane.
   size_t nb_vertices = Pj.shape->face[jsub].size();
   vec3r posNodeA_jv = Pj.GlobFaceVertex(jsub, 0);
   vec3r posNodeB_jv = Pj.GlobFaceVertex(jsub, 1);
   vec3r posNodeC_jv = Pj.GlobFaceVertex(jsub, nb_vertices - 1);
-  vec3r pos_iv = Pi.GlobVertex(isub) - branchPerioCorr;
+  vec3r pos_iv = Pi.GlobVertex(isub) - jPeriodicShift;
   vec3r v = pos_iv - posNodeA_jv;
   vec3r v1 = posNodeB_jv - posNodeA_jv;
   v1.normalize();
@@ -177,7 +177,7 @@ bool Particle::VertexIsNearFace(Particle& Pi, Particle& Pj, size_t isub, size_t 
 }
 
 bool Particle::EdgeIsNearEdge(Particle& Pi, Particle& Pj, size_t isub, size_t jsub, double dmax,
-                              const vec3r& branchPerioCorr) {
+                              const vec3r& jPeriodicShift) {
 // Be carreful about this small value because, if it is not sufficiently small,
 // some edges (tubes) couldn't see them each other.
 #define _EPSILON_VALUE_ 1.0e-12
@@ -192,7 +192,7 @@ bool Particle::EdgeIsNearEdge(Particle& Pi, Particle& Pj, size_t isub, size_t js
 
   vec3r Ei = pos1_iv - pos0_iv;
   vec3r Ej = pos1_jv - pos0_jv;
-  vec3r v = pos0_iv - pos0_jv - branchPerioCorr;
+  vec3r v = pos0_iv - pos0_jv - jPeriodicShift;
 
   double c = Ei * Ei;
   double d = Ej * Ej;

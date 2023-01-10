@@ -48,11 +48,12 @@ Interaction::Interaction()
       prev_dn(0.0),
       pos(),
       vel(),
+			jPeriodicShift(),
       fn(0.0),
       ft(),
       mom(),
       damp(0.0),
-      stick(nullptr) {}
+      stick(nullptr){}
 
 Interaction::Interaction(const Interaction& I)
     : i(I.i),
@@ -66,6 +67,7 @@ Interaction::Interaction(const Interaction& I)
       prev_dn(I.prev_dn),
       pos(I.pos),
       vel(I.vel),
+			jPeriodicShift(I.jPeriodicShift),
       fn(I.fn),
       ft(I.ft),
       mom(I.mom),
@@ -84,6 +86,7 @@ Interaction::Interaction(size_t I, size_t J, int Type, size_t Isub, size_t Jsub,
       prev_dn(0.0),
       pos(),
       vel(),
+			jPeriodicShift(),
       fn(0.0),
       ft(),
       mom(),
@@ -103,6 +106,7 @@ Interaction& Interaction::operator=(const Interaction& other) {
     prev_dn = other.prev_dn;
     pos = other.pos;
     vel = other.vel;
+		jPeriodicShift = other.jPeriodicShift;
     fn = other.fn;
     ft = other.ft;
     mom = other.mom;
@@ -313,7 +317,7 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
     // ------ UpdateVertexVertex (Periodic)
     [](Interaction& I, Particle& Pi, Particle& Pj) -> bool {
       vec3r posi = Pi.GlobVertex(I.isub);
-      vec3r posj = Pj.GlobVertex(I.jsub) + I.branchPerioCorr;
+      vec3r posj = Pj.GlobVertex(I.jsub) + I.jPeriodicShift;
       double Ri = Pi.MinskowskiRadius();
       double Rj = Pj.MinskowskiRadius();
 
@@ -325,7 +329,7 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
       I.pos = posi - I.n * (Ri + 0.5 * I.dn);
       // v(Qj) - v(Qi)
       I.vel =
-          (Pj.vel - cross(I.pos - (Pj.pos + I.branchPerioCorr), Pj.vrot)) - (Pi.vel - cross(I.pos - Pi.pos, Pi.vrot));
+          (Pj.vel - cross(I.pos - (Pj.pos + I.jPeriodicShift), Pj.vrot)) - (Pi.vel - cross(I.pos - Pi.pos, Pi.vrot));
 
       return true;
     },
@@ -335,7 +339,7 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
       size_t v2 = Pj.shape->edge[I.jsub].second;
       vec3r posj1 = Pj.GlobVertex(v1);
       vec3r posj2 = Pj.GlobVertex(v2);
-      vec3r posi = Pi.GlobVertex(I.isub) - I.branchPerioCorr;
+      vec3r posi = Pi.GlobVertex(I.isub) - I.jPeriodicShift;
 
       vec3r E = posj2 - posj1;
       vec3r v = posi - posj1;
@@ -356,7 +360,7 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
       I.pos = posi - I.n * (Ri + 0.5 * I.dn);
       // v(Qj) - v(Qi)
       I.vel =
-          (Pj.vel - cross(I.pos - Pj.pos, Pj.vrot)) - (Pi.vel - cross(I.pos - (Pi.pos - I.branchPerioCorr), Pi.vrot));
+          (Pj.vel - cross(I.pos - Pj.pos, Pj.vrot)) - (Pi.vel - cross(I.pos - (Pi.pos - I.jPeriodicShift), Pi.vrot));
 
       return true;
     },
@@ -368,7 +372,7 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
       vec3r posNodeA_jv = Pj.GlobFaceVertex(I.jsub, 0);
       vec3r posNodeB_jv = Pj.GlobFaceVertex(I.jsub, 1);
       vec3r posNodeC_jv = Pj.GlobFaceVertex(I.jsub, nb_vertices - 1);
-      vec3r pos_iv = Pi.GlobVertex(I.isub) - I.branchPerioCorr;
+      vec3r pos_iv = Pi.GlobVertex(I.isub) - I.jPeriodicShift;
       vec3r v = pos_iv - posNodeA_jv;
       vec3r v1 = posNodeB_jv - posNodeA_jv;
       v1.normalize();
@@ -423,7 +427,7 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
         I.pos = pos_iv - I.n * (Ri + 0.5 * I.dn);
         // v(Qj) - v(Qi)
         I.vel =
-            (Pj.vel - cross(I.pos - Pj.pos, Pj.vrot)) - (Pi.vel - cross(I.pos - (Pi.pos - I.branchPerioCorr), Pi.vrot));
+            (Pj.vel - cross(I.pos - Pj.pos, Pj.vrot)) - (Pi.vel - cross(I.pos - (Pi.pos - I.jPeriodicShift), Pi.vrot));
 
         return true;
       }
@@ -437,8 +441,8 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
       // Be carreful about this small value because, if it is not
       // sufficiently small, some edges (tubes) may not see them each other.
 
-      vec3r posi1 = Pi.GlobVertex(Pi.shape->edge[I.isub].first) - I.branchPerioCorr;
-      vec3r posi2 = Pi.GlobVertex(Pi.shape->edge[I.isub].second) - I.branchPerioCorr;
+      vec3r posi1 = Pi.GlobVertex(Pi.shape->edge[I.isub].first) - I.jPeriodicShift;
+      vec3r posi2 = Pi.GlobVertex(Pi.shape->edge[I.isub].second) - I.jPeriodicShift;
       vec3r posj1 = Pj.GlobVertex(Pj.shape->edge[I.jsub].first);
       vec3r posj2 = Pj.GlobVertex(Pj.shape->edge[I.jsub].second);
 
@@ -480,7 +484,7 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
       I.pos = posi1 + s * Ei - I.n * (Ri + 0.5 * I.dn);
       // v(Qj) - v(Qi)
       I.vel =
-          (Pj.vel - cross(I.pos - Pj.pos, Pj.vrot)) - (Pi.vel - cross(I.pos - (Pi.pos - I.branchPerioCorr), Pi.vrot));
+          (Pj.vel - cross(I.pos - Pj.pos, Pj.vrot)) - (Pi.vel - cross(I.pos - (Pi.pos - I.jPeriodicShift), Pi.vrot));
       return true;
 #undef _EPSILON_VALUE_
     }};  // End of dispatching array of lambdas

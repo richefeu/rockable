@@ -78,7 +78,7 @@ class Interaction {
   
   vec3r pos;  ///< Contact position
   vec3r vel;  ///< Relative velocity (j relative to i)
-  vec3r branchPerioCorr;
+  vec3r jPeriodicShift;
   
   double fn;  ///< Normal force (scalar value)
   vec3r ft;   ///< Tangential force (vector)

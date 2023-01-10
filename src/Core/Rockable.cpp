@@ -150,6 +150,8 @@ Rockable::Rockable() {
 }
 
 void Rockable::ExplicitRegistrations() {
+	
+	// BodyForces
   Factory<BodyForce, std::string>::Instance()->RegisterFactoryFunction(
       "AttractingPoint", [](void) -> BodyForce* { return new AttractingPoint(); });
   Factory<BodyForce, std::string>::Instance()->RegisterFactoryFunction(
@@ -157,6 +159,7 @@ void Rockable::ExplicitRegistrations() {
   Factory<BodyForce, std::string>::Instance()->RegisterFactoryFunction(
       "ViscousFluid", [](void) -> BodyForce* { return new ViscousFluid(); });
 
+	// DataExtractors
   Factory<DataExtractor, std::string>::Instance()->RegisterFactoryFunction(
       "ClusterAABB", [](void) -> DataExtractor* { return new ClusterAABB(); });
   Factory<DataExtractor, std::string>::Instance()->RegisterFactoryFunction(
@@ -170,6 +173,8 @@ void Rockable::ExplicitRegistrations() {
   Factory<DataExtractor, std::string>::Instance()->RegisterFactoryFunction(
       "TrackRockfall", [](void) -> DataExtractor* { return new TrackRockfall(); });
 
+
+  // ForceLaws
   Factory<ForceLaw, std::string>::Instance()->RegisterFactoryFunction(
       "Avalanche", [](void) -> ForceLaw* { return new Avalanche(); });
   Factory<ForceLaw, std::string>::Instance()->RegisterFactoryFunction("Default",
@@ -177,6 +182,7 @@ void Rockable::ExplicitRegistrations() {
   Factory<ForceLaw, std::string>::Instance()->RegisterFactoryFunction(
       "StickedLinks", [](void) -> ForceLaw* { return new StickedLinks(); });
 
+  // PreproCommands
   Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
       "copyParamsToInterfaces", [](void) -> PreproCommand* { return new copyParamsToInterfaces(); });
   Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
@@ -302,17 +308,29 @@ bool Rockable::isInteractive() const { return interactiveMode; }
 */
 void Rockable::showBanner() {
   std::cout << "\n\n";
-  std::cout << "Rockable  Copyright (C) 2016-2022  <vincent.richefeu@3sr-grenoble.fr>\n";
-  std::cout << "This program comes with ABSOLUTELY NO WARRANTY.\n";
-  std::cout << "This is academic software\n";
-  std::cout << "Documentation: "
-               "https://richefeu.gitbook.io/cdm/\n\n";
+  std::cout << "   Rockable  Copyright (C) 2016-2023  <vincent.richefeu@3sr-grenoble.fr>\n";
+  std::cout << "   This program comes with ABSOLUTELY NO WARRANTY.\n";
+  std::cout << "   This is academic software\n";
+  std::cout << "   Documentation: "
+               "      https://richefeu.gitbook.io/cdm/\n\n";
   std::cout << std::endl;
 
 #ifdef FT_CORR
-  console->info("Compilation options: FT_CORR = YES");
+  console->info("Compilation option: FT_CORR = YES");
 #else
-  console->info("Compilation options: FT_CORR = NO");
+  console->info("Compilation option: FT_CORR = NO");
+#endif
+	
+#ifdef COMPONENTWISE_NUM_DAMPING
+  console->info("Compilation option: COMPONENTWISE_NUM_DAMPING = YES");
+#else
+  console->info("Compilation option: COMPONENTWISE_NUM_DAMPING = NO");
+#endif
+	
+#ifdef ENABLE_PROFILING
+  console->info("Compilation option: ENABLE_PROFILING = YES");
+#else
+  console->info("Compilation option: ENABLE_PROFILING = NO");
 #endif
 }
 
@@ -389,7 +407,7 @@ void Rockable::saveConf(int i) {
 void Rockable::saveConf(const char* fname) {
   START_TIMER("saveConf");
 
-  if (usePeriodicCell == 1) reducedToRealWorld();
+  if (usePeriodicCell == 1) reducedToRealKinematics();
   std::ofstream conf(fname);
 
   conf << "Rockable " << CONF_VERSION_DATE << '\n';  // format: progName version-date(dd-mm-yyyy)
@@ -520,7 +538,7 @@ void Rockable::saveConf(const char* fname) {
   }
 
   conf << std::flush;
-  if (usePeriodicCell == 1) realToReducedWorld();
+  if (usePeriodicCell == 1) realToReducedKinematics();
 }
 
 void Rockable::readLawData(std::istream& is, size_t id) {
@@ -937,34 +955,20 @@ void Rockable::loadConf(const char* name) {
   // This single line actually parses the file
   parser.parse(conf);
 
-  Interactions_from_set_to_vec();
-  /*
-{
-// START_TIMER("buildVectorInteractions");
-m_vecInteractions.resize(Interactions.size());
+  if (usePeriodicCell == 1) {
+    Cell.precomputeInverse();
+  }
 
-//int compt = 0;
-#pragma omp parallel for schedule(static)
-for (size_t i = 0; i < Interactions.size(); ++i) {
-//auto& oneInteraction = Interactions[i];
-//auto& oneVecIteration = m_vecInteractions[i];
-//compt += Interactions[i].size();
-m_vecInteractions[i].clear();
-for (auto& it : Interactions[i]) m_vecInteractions[i].push_back((Interaction*)&it);
-}
-}
-  */
+  Interactions_from_set_to_vec();
 
   // This is a kind of fake time-step (the time is not incremented)
   // mainly used to compute resultant forces and moments on the particles.
   // It will also populate the vector 'activeInteractions'.
   if (interactiveMode == false) {
-    accelerations();
-  }
-
-  if (usePeriodicCell == 1) {
-    Cell.precomputeInverse();
-    realToReducedWorld();
+      accelerations();
+		  if (usePeriodicCell == 1) {
+		    realToReducedKinematics();
+		  }
   }
 }
 
@@ -1115,7 +1119,7 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
 
   // A helper lambda function
   auto addOrRemoveSingleInteraction =
-      [&](size_t i_, size_t j_, size_t isub, size_t type, size_t nbj, const vec3r& branchPerioCorr,
+      [&](size_t i_, size_t j_, size_t isub, size_t type, size_t nbj, const vec3r& jPeriodicShift,
           std::function<bool(Particle&, Particle&, size_t, size_t, double, const vec3r&)> func) {
         Interaction to_find;
         to_find.i = i_;
@@ -1126,9 +1130,11 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
           to_find.jsub = jsub;
           auto exist_it = (Interactions[i_]).find(to_find);
           bool NEW = (exist_it == Interactions[i_].end());
-          bool NEAR = func(Particles[i_], Particles[j_], isub, jsub, dmax, branchPerioCorr);
+          bool NEAR = func(Particles[i_], Particles[j_], isub, jsub, dmax, jPeriodicShift);
           if (NEAR && NEW) {
-            Interactions[i_].insert(Interaction(i_, j_, type, isub, jsub, Damp));
+						Interaction I = Interaction(i_, j_, type, isub, jsub, Damp);
+						I.jPeriodicShift = jPeriodicShift;
+            Interactions[i_].insert(I);
             ++nbAdd;
           } else if (!NEAR && !NEW) {
             Interactions[i_].erase(exist_it);
@@ -1137,8 +1143,8 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
         }
       };
 
-  vec3r branchPerioCorr;
-  if (usePeriodicCell == 1) branchPerioCorr = Cell.getBranchCorrection(Particles[i].pos, Particles[j].pos);
+  vec3r jPeriodicShift;
+  if (usePeriodicCell == 1) jPeriodicShift = Cell.getBranchCorrection(Particles[i].pos, Particles[j].pos);
 
   size_t nvi = Particles[i].shape->vertex.size();
   size_t nvj = Particles[j].shape->vertex.size();
@@ -1177,42 +1183,43 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
     subObbi.center = Particles[i].GlobVertex(isub);
     subObbi.enlarge(Particles[i].MinskowskiRadius() + dmax);
     OBB obbj = Particles[j].obb;
-    obbj.translate(branchPerioCorr);
+    obbj.translate(jPeriodicShift);
     obbj.enlarge(dmax);
     if (!(obbj.intersect(subObbi))) continue;
 
     // vertex-vertex (i, vertex isub)->(j, all vertices)
-    addOrRemoveSingleInteraction(i, j, isub, vvType, nvj, branchPerioCorr, Particle::VertexIsNearVertex);
+    addOrRemoveSingleInteraction(i, j, isub, vvType, nvj, jPeriodicShift, Particle::VertexIsNearVertex);
 
     // vertex-edge (i, vertex isub)->(j, all edges)
-    addOrRemoveSingleInteraction(i, j, isub, veType, nej, branchPerioCorr, Particle::VertexIsNearEdge);
+    addOrRemoveSingleInteraction(i, j, isub, veType, nej, jPeriodicShift, Particle::VertexIsNearEdge);
 
     // vertex-face (i, vertex isub)->(j, all faces)
-    addOrRemoveSingleInteraction(i, j, isub, vfType, nfj, branchPerioCorr, Particle::VertexIsNearFace);
+    addOrRemoveSingleInteraction(i, j, isub, vfType, nfj, jPeriodicShift, Particle::VertexIsNearFace);
 
   }  // end for isub (i->j)
 
   for (size_t jsub = 0; jsub < nvj; ++jsub) {
 
     OBB subObbj;
-    subObbj.center = Particles[j].GlobVertex(jsub) + branchPerioCorr;
+    subObbj.center = Particles[j].GlobVertex(jsub) + jPeriodicShift;
     subObbj.enlarge(Particles[j].MinskowskiRadius() + dmax);
     OBB obbi = Particles[i].obb;
+		obbi.translate(-jPeriodicShift);
     obbi.enlarge(dmax);
     if (!(obbi.intersect(subObbj))) continue;
 
     // vertex-edge (j, vertex jsub)->(i, all edges)
-    addOrRemoveSingleInteraction(j, i, jsub, veType, nei, -branchPerioCorr, Particle::VertexIsNearEdge);
+    addOrRemoveSingleInteraction(j, i, jsub, veType, nei, -jPeriodicShift, Particle::VertexIsNearEdge);
 
     // vertex-face (j, vertex jsub)->(i, all faces)
-    addOrRemoveSingleInteraction(j, i, jsub, vfType, nfi, -branchPerioCorr, Particle::VertexIsNearFace);
+    addOrRemoveSingleInteraction(j, i, jsub, vfType, nfi, -jPeriodicShift, Particle::VertexIsNearFace);
 
   }  // end for jsub (j->i)
 
   // edge-edge i->j
   for (size_t isub = 0; isub < nei; ++isub) {
     // edge-edge (i, edge isub)->(j, all edges)
-    addOrRemoveSingleInteraction(i, j, isub, eeType, nej, branchPerioCorr, Particle::EdgeIsNearEdge);
+    addOrRemoveSingleInteraction(i, j, isub, eeType, nej, jPeriodicShift, Particle::EdgeIsNearEdge);
   }
 
   return nbAdd;
@@ -1235,7 +1242,7 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
 
   // A helper lambda function
   auto addOrRemoveSingleInteraction =
-      [&](size_t i_, size_t j_, size_t isub, size_t type, size_t jsub, const vec3r& branchPerioCorr,
+      [&](size_t i_, size_t j_, size_t isub, size_t type, size_t jsub, const vec3r& jPeriodicShift,
           std::function<bool(Particle&, Particle&, size_t, size_t, double, const vec3r&)> func) {
         to_find.i = i_;
         to_find.j = j_;
@@ -1244,9 +1251,11 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
         to_find.jsub = jsub;
         exist_it = (Interactions[i_]).find(to_find);
         bool NEW = (exist_it == Interactions[i_].end());
-        bool NEAR = func(Particles[i_], Particles[j_], isub, jsub, dmax, branchPerioCorr);
+        bool NEAR = func(Particles[i_], Particles[j_], isub, jsub, dmax, jPeriodicShift);
         if (NEAR && NEW) {
-          Interactions[i_].insert(Interaction(i_, j_, type, isub, jsub, Damp));
+					Interaction I = Interaction(i_, j_, type, isub, jsub, Damp);
+					I.jPeriodicShift = jPeriodicShift;
+          Interactions[i_].insert(I);
           ++nbAdd;
         } else if (!NEAR && !NEW) {
           Interactions[i_].erase(exist_it);
@@ -1254,8 +1263,8 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
         }
       };
 
-  vec3r branchPerioCorr;
-  if (usePeriodicCell) branchPerioCorr = Cell.getBranchCorrection(Particles[i].pos, Particles[j].pos);
+  vec3r jPeriodicShift;
+  if (usePeriodicCell) jPeriodicShift = Cell.getBranchCorrection(Particles[i].pos, Particles[j].pos);
 
   // Precompute the viscous damping parameter
   double en2 = dataTable.get(idEn2Contact, Particles[i].group, Particles[j].group);
@@ -1295,21 +1304,21 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
 
     if (i_nbPoints == 1) {
       if (j_nbPoints == 1) {  // vertex (i, isub) -> vertex (j, jsub)
-        addOrRemoveSingleInteraction(i, j, isub, vvType, jsub, branchPerioCorr, Particle::VertexIsNearVertex);
+        addOrRemoveSingleInteraction(i, j, isub, vvType, jsub, jPeriodicShift, Particle::VertexIsNearVertex);
       } else if (j_nbPoints == 2) {  // vertex (i, isub) -> edge (j, jsub)
-        addOrRemoveSingleInteraction(i, j, isub, veType, jsub, branchPerioCorr, Particle::VertexIsNearEdge);
+        addOrRemoveSingleInteraction(i, j, isub, veType, jsub, jPeriodicShift, Particle::VertexIsNearEdge);
       } else if (j_nbPoints >= 3) {  // vertex (i, isub) -> face (j, jsub)
-        addOrRemoveSingleInteraction(i, j, isub, vfType, jsub, branchPerioCorr, Particle::VertexIsNearFace);
+        addOrRemoveSingleInteraction(i, j, isub, vfType, jsub, jPeriodicShift, Particle::VertexIsNearFace);
       }
     } else if (i_nbPoints == 2) {
       if (j_nbPoints == 1) {  // vertex (j, jsub) -> edge (i, isub)
-        addOrRemoveSingleInteraction(j, i, jsub, veType, isub, -branchPerioCorr, Particle::VertexIsNearEdge);
+        addOrRemoveSingleInteraction(j, i, jsub, veType, isub, -jPeriodicShift, Particle::VertexIsNearEdge);
       } else if (j_nbPoints == 2) {  // vertex (i, isub) -> edge (j, jsub)
-        addOrRemoveSingleInteraction(i, j, isub, eeType, jsub, branchPerioCorr, Particle::EdgeIsNearEdge);
+        addOrRemoveSingleInteraction(i, j, isub, eeType, jsub, jPeriodicShift, Particle::EdgeIsNearEdge);
       }
     } else if (i_nbPoints >= 3) {
       if (j_nbPoints == 1) {  // vertex (j, jsub) -> face (i, isub)
-        addOrRemoveSingleInteraction(j, i, jsub, vfType, isub, -branchPerioCorr, Particle::VertexIsNearFace);
+        addOrRemoveSingleInteraction(j, i, jsub, vfType, isub, -jPeriodicShift, Particle::VertexIsNearFace);
       }
     }
 
@@ -1416,21 +1425,7 @@ void Rockable::UpdateNL_bruteForce() {
     }
   }
 
-	/*
-  {
-    // START_TIMER("Transfert Interaction to m_vecInteractions");
-    m_vecInteractions.resize(Interactions.size());  // Normally, this is not useful when the number of particle doesn't
-                                                    // change
-#pragma omp parallel for schedule(static)
-    for (size_t i = 0; i < Interactions.size(); ++i) {
-      // auto& oneInteraction = Interactions[i];
-      // auto& oneVecIteration = m_vecInteractions[i];
-      m_vecInteractions[i].clear();
-      for (auto& it : Interactions[i]) m_vecInteractions[i].push_back((Interaction*)&it);
-    }
-  }
-	*/
-	Interactions_from_set_to_vec();
+  Interactions_from_set_to_vec();
 }
 
 /**
@@ -1552,8 +1547,8 @@ void Rockable::UpdateNL_linkCells() {
       }  // iz
     }    // iy
   }      // ix
-	
-	Interactions_from_set_to_vec();
+
+  Interactions_from_set_to_vec();
 }
 
 // ==============================================================================================================
@@ -1699,7 +1694,7 @@ void Rockable::EulerStep() {
     Particles[i].pos += dt * Particles[i].vel;
     Particles[i].vel += dt * Particles[i].acc;
 
-    // Rotation: Q <- Q + (dQ/dt)*dt
+    // Rotation: Q <- Q + (dQ / dt) * dt
     // It reads like this with quaternions
     Particles[i].Q += ((Particles[i].Q.dot(Particles[i].vrot)) *= dt);
     Particles[i].Q.normalize();
@@ -1773,7 +1768,8 @@ void Rockable::velocityVerletStep() {
     Particles[i].pos += dt * Particles[i].vel + dt2_2 * Particles[i].acc;
     Particles[i].vel += dt_2 * Particles[i].acc;
 
-    if (usePeriodicCell == 1) Cell.forceToStayInside(Particles[i].pos);
+    //if (usePeriodicCell == 1) Cell.forceToStayInside(Particles[i].pos);
+		// This function is problematic because of n_prev should be 'wrong' in involved interactions
 
     // Rotation: Q(k+1) = Q(k) + dQ(k) * dt + ddQ(k) * dt2/2
     // It reads like this with quaternions
@@ -1784,7 +1780,6 @@ void Rockable::velocityVerletStep() {
     Particles[i].vrot += dt_2 * Particles[i].arot;
   }
 
-  // accelerations();
   if (usePeriodicCell == 1) {
     for (size_t c = 0; c < 9; c++) {  // loop over components
       if (System.cellControl.Drive[c] == ForceDriven) {
@@ -1798,9 +1793,9 @@ void Rockable::velocityVerletStep() {
     }
     Cell.precomputeInverse();  // because Cell.h has just been updated
 
-    reducedToRealWorld();
+    reducedToRealKinematics();
     accelerations();
-    realToReducedWorld();
+    realToReducedKinematics();
 
   } else {
     accelerations();
@@ -1843,14 +1838,6 @@ void Rockable::velocityVerletStep() {
   }
 
   // Free bodies
-#if 0
-#pragma omp parallel for default(shared)
-  for (size_t i = nDriven; i < Particles.size(); ++i) {
-    Particles[i].vel += dt_2 * Particles[i].acc;
-    Particles[i].vrot += dt_2 * Particles[i].arot;
-  }
-#endif
-
   if (usePeriodicCell == 1) {
     vec3r vmean;
     for (size_t i = nDriven; i < Particles.size(); i++) {
@@ -2403,11 +2390,10 @@ void Rockable::integrate() {
     if (needUpdate || interVerletC >= interVerlet - dt_2) {
       PerfTimer tm;
 
-      // UpdateNL();
       if (usePeriodicCell == 1) {
-        reducedToRealWorld();
+        reducedToRealKinematics();
         UpdateNL();
-        realToReducedWorld();
+        realToReducedKinematics();
       } else {
         UpdateNL();
       }
@@ -2465,8 +2451,8 @@ void Rockable::incrementResultants(Interaction& I) {
  */
 void Rockable::incrementPeriodicCellTensorialMoment(Interaction& I) {
   START_TIMER("incrementPeriodicCellTensorialMoment");
-  vec3r branch = (Particles[I.j].pos + I.branchPerioCorr) - Particles[I.i].pos;
-  // branch = Cell.hinv * branch;
+  vec3r branch = (Particles[I.j].pos + I.jPeriodicShift) - Particles[I.i].pos;
+  
   vec3r f = I.fn * I.n + I.ft;
   Cell.Sig.xx += f.x * branch.x;
   Cell.Sig.xy += f.x * branch.y;
@@ -2483,46 +2469,40 @@ void Rockable::incrementPeriodicCellTensorialMoment(Interaction& I) {
 
 // s = hinv . r
 // dots = hinv . (dotr - doth . s)
-// ddots = hinv . (ddotr - ddoth . s - 2 doth . dots) .. approx .. hinv . ddotr
-void Rockable::realToReducedWorld() {
-  START_TIMER("realToReducedWorld");
+void Rockable::realToReducedKinematics() {
+  START_TIMER("realToReducedKinematics");
+	
 #pragma omp parallel for default(shared)
   for (size_t i = 0; i < Particles.size(); ++i) {
+    // this is supposed to be real coordinates
     vec3r r = Particles[i].pos;
     vec3r dr = Particles[i].vel;
-    vec3r ddr = Particles[i].acc;
+
+    // now express in reduced coordinates
     Particles[i].pos = Cell.hinv * r;
-    Particles[i].vel = Cell.hinv * (dr /* - Cell.vh * Particles[i].pos */);
-    Particles[i].acc = Cell.hinv * ddr;  // approx
+    Particles[i].vel = Cell.hinv * (dr - Cell.vh * Particles[i].pos);
   }
 }
 
 // r = h . s
 // dotr = doth . s + h . dots
-// ddotr = ddoth . s + doth . dots + doth . dots + h . ddots
-void Rockable::reducedToRealWorld() {
-  START_TIMER("reducedToRealWorld");
+void Rockable::reducedToRealKinematics() {
+  START_TIMER("reducedToRealKinematics");
+	
 #pragma omp parallel for default(shared)
   for (size_t i = 0; i < Particles.size(); ++i) {
+    // this is supposed to be reduced coordinates
     vec3r s = Particles[i].pos;
     vec3r ds = Particles[i].vel;
-    vec3r dds = Particles[i].acc;
+
+    // now express in real coordinates
     Particles[i].pos = Cell.h * s;
     Particles[i].vel = Cell.vh * s + Cell.h * ds;
-    Particles[i].acc = Cell.ah * s + Cell.vh * ds + Cell.vh * ds + Cell.h * dds;
   }
 }
 
-/**
-    @brief  Compute the particle accelerations (translations and rotations)
-
-    The method computes actually 3 things:\n
-      1. the interaction forces and moments with the force laws,\n
-      2. the resultant forces and moments at the body centers,\n
-      3. the axial and angular accelerations of the bodies
-*/
-void Rockable::accelerations() {
-  START_TIMER("Accelerations");
+void Rockable::initialise_particle_forces_and_moments() {
+  START_TIMER("initialise_particle_forces_and_moments");
 
   // Set resultant forces and moments to zero
 #pragma omp parallel for default(shared)
@@ -2573,40 +2553,26 @@ void Rockable::accelerations() {
         break;
     }
   }
+}
 
-  // Update the interactions (n, dn, pos and vel)
-  // and apply the force law
-  PerfTimer tm;
-  activeInteractions.clear();
-  interfacesToBreak.clear();
-
-  // In the following loop, ALL interactions are updated,
-  // including the interactions that are sticked or with positive dn
-#if 0
-#pragma omp parallel for default(shared)
-  for (size_t k = 0; k < Interactions.size(); ++k) {
-    for (auto it = Interactions[k].begin(); it != Interactions[k].end(); ++it) {
-      Interaction* I = const_cast<Interaction*>(std::addressof(*it));
-      Interaction::UpdateDispatcher[it->type](*I, Particles[it->i], Particles[it->j]);
-    }
-  }
-#endif
+void Rockable::update_interactions() {
+  START_TIMER("update_interactions");
 
   if (usePeriodicCell == 1) {
-		
+
     // In the following loop, ALL interactions are updated,
     // including the interactions that are sticked or with positive dn
 #pragma omp parallel for default(shared)
     for (size_t k = 0; k < m_vecInteractions.size(); ++k) {
       std::vector<Interaction*>& InterLoc = m_vecInteractions[k];
       for (auto it = InterLoc.begin(); it != InterLoc.end(); ++it) {
-        (*it)->branchPerioCorr = Cell.getBranchCorrection(Particles[(*it)->i].pos, Particles[(*it)->j].pos);
+        (*it)->jPeriodicShift = Cell.getBranchCorrection(Particles[(*it)->i].pos, Particles[(*it)->j].pos);
         Interaction::UpdateDispatcherPeriodic[(*it)->type](**it, Particles[(*it)->i], Particles[(*it)->j]);
       }
     }
-		
+
   } else {
-		
+
     // In the following loop, ALL interactions are updated,
     // including the interactions that are sticked or with positive dn
 #pragma omp parallel for default(shared)
@@ -2616,84 +2582,79 @@ void Rockable::accelerations() {
         Interaction::UpdateDispatcher[(*it)->type](**it, Particles[(*it)->i], Particles[(*it)->j]);
       }
     }
-		
+  }
+}
+
+void Rockable::build_activeInteractions() {
+  START_TIMER("build_activeInteractions");
+
+  size_t part_size = 0;
+  std::vector<size_t> offsets(m_vecInteractions.size(), 0);
+  for (size_t k = 0; k < m_vecInteractions.size(); ++k) {
+    offsets[k] = part_size;
+    part_size += m_vecInteractions[k].size();
   }
 
-  // Some weighting relations can be established for the stiffnesses
-  // of the cantacts that share the same body pair
-  if (ctcPartnership.update != nullptr) ctcPartnership.update(*this);
-
-  {
-    // START_TIMER("Build_activeInteractions");
-    size_t part_size = 0;
-    // size_t offsets[m_vecInteractions.size()];
-    std::vector<size_t> offsets(m_vecInteractions.size(), 0);
-    for (size_t k = 0; k < m_vecInteractions.size(); ++k) {
-      offsets[k] = part_size;
-      part_size += m_vecInteractions[k].size();
-    }
-
-    activeInteractions.resize(part_size, nullptr);
+  activeInteractions.resize(part_size, nullptr);
 
 #pragma omp for schedule(static, 1)
-    for (size_t k = 0; k < m_vecInteractions.size(); ++k) {
-      size_t index = 0;
-      std::vector<Interaction*>& InterLoc = m_vecInteractions[k];
-      for (auto it = InterLoc.begin(); it != InterLoc.end(); ++it, ++index) {
-        if ((*it)->dn < 0.0 || (*it)->stick != nullptr) {
-          activeInteractions[offsets[k] + index] = *it;
-        }
+  for (size_t k = 0; k < m_vecInteractions.size(); ++k) {
+    size_t index = 0;
+    std::vector<Interaction*>& InterLoc = m_vecInteractions[k];
+    for (auto it = InterLoc.begin(); it != InterLoc.end(); ++it, ++index) {
+      if ((*it)->dn < 0.0 || (*it)->stick != nullptr) {
+        activeInteractions[offsets[k] + index] = *it;
       }
     }
-    activeInteractions.erase(std::remove(activeInteractions.begin(), activeInteractions.end(), nullptr),
-                             activeInteractions.end());
+  }
+  activeInteractions.erase(std::remove(activeInteractions.begin(), activeInteractions.end(), nullptr),
+                           activeInteractions.end());
+}
 
-  }  // END_TIMER("Build_activeInteractions")
+void Rockable::compute_forces_and_moments() {
+  START_TIMER("compute_forces_and_moments");
 
-  // Now the forces and moments are computed
-  {
-    // START_TIMER("forceLaw");
-    //  Now the forces and moments are computed
+  //  Now the forces and moments are computed
 #pragma omp parallel for default(shared)
+  for (size_t i = 0; i < activeInteractions.size(); ++i) {
+    Interaction& I = *activeInteractions[i];
+    // forceLawPtr(I);
+    if (I.dn < 0.0 || I.stick != nullptr) {
+      forceLaw->computeInteraction(I);
+    }
+  }
+}
+
+void Rockable::compute_resultants() {
+  START_TIMER("compute_resultants");
+
+  //  The increment of resultants (forces and moments) on the bodies
+  //  cannot be parallelised (because of possible conflicts).
+  //  Pointer to interactions are stored in the vector 'activeInteractions'
+  if (usePeriodicCell == 1) {
+
     for (size_t i = 0; i < activeInteractions.size(); ++i) {
       Interaction& I = *activeInteractions[i];
-      // forceLawPtr(I);
       if (I.dn < 0.0 || I.stick != nullptr) {
-        forceLaw->computeInteraction(I);
+        incrementResultants(I);
+        incrementPeriodicCellTensorialMoment(I);
       }
     }
 
-  }  // END_TIMER("forceLaw")
+  } else {
 
-  // The increment of resultants (forces and moments) on the bodies
-  // cannot be parallelised (because of possible conflicts).
-  // Pointer to interactions are stored in the vector 'activeInteractions'
-  {
-    // START_TIMER("Resultants");
-    //  The increment of resultants (forces and moments) on the bodies
-    //  cannot be parallelised (because of possible conflicts).
-    //  Pointer to interactions are stored in the vector 'activeInteractions'
-    if (usePeriodicCell == 1) {
-
-      for (size_t i = 0; i < activeInteractions.size(); ++i) {
-        Interaction& I = *activeInteractions[i];
-        if (I.dn < 0.0 || I.stick != nullptr) {
-          incrementResultants(I);
-          incrementPeriodicCellTensorialMoment(I);
-        }
-      }
-
-    } else {
-
-      for (size_t i = 0; i < activeInteractions.size(); ++i) {
-        Interaction& I = *activeInteractions[i];
-        if (I.dn < 0.0 || I.stick != nullptr) {
-          incrementResultants(I);
-        }
+    for (size_t i = 0; i < activeInteractions.size(); ++i) {
+      Interaction& I = *activeInteractions[i];
+      if (I.dn < 0.0 || I.stick != nullptr) {
+        incrementResultants(I);
       }
     }
-  }  // END_TIMER("Resultants")
+  }
+}
 
+void Rockable::compute_SpringJoints() {
+  START_TIMER("compute_SpringJoints");
+	
   // SpringJoints
   for (size_t sj = 0; sj < joints.size(); ++sj) {
     vec3r forceOnj;
@@ -2712,7 +2673,11 @@ void Rockable::accelerations() {
     ip->moment += cross(Ci, forceOni);
     jp->moment += cross(Cj, forceOnj);
   }
+}
 
+void Rockable::breakage_of_interfaces() {
+  START_TIMER("breakage_of_interfaces");
+	
   // In this loop, all the bonds that are identified to be broken will actually be broken now
   for (std::set<BreakableInterface*>::iterator BI = interfacesToBreak.begin(); BI != interfacesToBreak.end(); ++BI) {
     std::string whichBond;
@@ -2759,10 +2724,10 @@ void Rockable::accelerations() {
 
     needUpdate = true;
   }
+}
 
-  timeInForceComputation += tm.getElapsedTimeSeconds();
-
-  if (numericalDampingCoeff > 0.0) numericalDamping();
+void Rockable::compute_accelerations_from_resultants() {
+	START_TIMER("compute_accelerations_from_resultants");
 
   if (usePeriodicCell == 1) {
 
@@ -2859,6 +2824,7 @@ void Rockable::accelerations() {
 #pragma omp parallel for default(shared)
   for (size_t i = nDriven; i < Particles.size(); ++i) {
     Particles[i].acc = Particles[i].force / Particles[i].mass;
+		if (usePeriodicCell == 1) Particles[i].acc = Cell.hinv * Particles[i].acc;
 
     quat Qinv = Particles[i].Q.get_conjugated();
     vec3r omega = Qinv * Particles[i].vrot;  // Express omega in the body framework
@@ -2869,6 +2835,48 @@ void Rockable::accelerations() {
         (M[2] - (Particles[i].inertia[1] - Particles[i].inertia[0]) * omega[0] * omega[1]) / Particles[i].inertia[2]);
     Particles[i].arot = Particles[i].Q * domega;  // Express arot in the global framework
   }
+}
+
+/**
+    @brief  Compute the particle accelerations (translations and rotations)
+
+    The method computes actually 3 things:\n
+      1. the interaction forces and moments with the force laws,\n
+      2. the resultant forces and moments at the body centers,\n
+      3. the axial and angular accelerations of the bodies
+*/
+void Rockable::accelerations() {
+  START_TIMER("Accelerations");
+
+  initialise_particle_forces_and_moments();
+
+  // Update the interactions (n, dn, pos and vel)
+  // and apply the force law
+  PerfTimer tm;
+  activeInteractions.clear();
+  interfacesToBreak.clear();
+
+  update_interactions();
+
+  // Some weighting relations can be established for the stiffnesses
+  // of the cantacts that share the same body pair
+  if (ctcPartnership.update != nullptr) ctcPartnership.update(*this);
+
+  build_activeInteractions();
+
+  compute_forces_and_moments();
+
+  compute_resultants();
+
+  compute_SpringJoints();
+
+  breakage_of_interfaces();
+
+  timeInForceComputation += tm.getElapsedTimeSeconds();
+
+  if (numericalDampingCoeff > 0.0) numericalDamping();
+
+  compute_accelerations_from_resultants();
 
   // damping solutions based on the weighting of accelerations
   if (velocityBarrier > 0.0) applyVelocityBarrier();
