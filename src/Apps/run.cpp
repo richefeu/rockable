@@ -56,7 +56,7 @@ int main(int argc, char const* argv[]) {
     TCLAP::UnlabeledValueArg<std::string> nameArg("input", "Name of the conf-file", true, "conf0", "conf-file");
     TCLAP::ValueArg<int> nbThreadsArg("j", "nbThreads", "Number of threads to be used", false, 1, "int");
     TCLAP::ValueArg<int> verboseArg(
-        "v", "verbose", "Verbose level (0 to 6 for resp. 'off', 'critical', 'err', 'warn', 'info', 'debug', 'trace')",
+        "v", "verbose", "Verbose level (0='off', 1='critical', 2='err', 3='warn', 4='info', 5='debug', 6='trace')",
         false, 4, "int");
 
     cmd.add(nameArg);

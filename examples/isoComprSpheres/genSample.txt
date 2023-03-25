@@ -1,0 +1,8 @@
+generatePacking:wallBox  0  0.05 0.05 0.05 0.001
+generatePacking:grid Sphere 
+0.0 0.0 0.0
+0.05 0.05 0.05
+5 5 5
+1
+0.004
+0

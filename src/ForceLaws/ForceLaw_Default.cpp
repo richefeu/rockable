@@ -78,10 +78,15 @@ bool Default::computeInteraction(Interaction& I) {
     kr *= w;
     damp *= sqrt(w);
   }
-
+  
   // === Normal force (elatic contact + viscous damping)
   double vn = I.vel * I.n;
   double fne = -kn * I.dn;
+  /*
+  if (box->preventCrossingLength > 0.0) {
+    fne *= box->preventCrossingLength / (box->preventCrossingLength + I.dn);
+  }
+  */
   double fnv = damp * vn;
   I.fn = fne + fnv;
   if (I.fn < 0.0) I.fn = 0.0;  // Because viscous damping can make the normal force negative

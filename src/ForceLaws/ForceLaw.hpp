@@ -38,7 +38,9 @@
 class Rockable;
 #include "Core/Interaction.hpp"
 
-//
+/**
+  @brief This is a base class for a force law
+*/
 class ForceLaw {
  public:
   Rockable* box;

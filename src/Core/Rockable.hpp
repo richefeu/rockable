@@ -83,10 +83,10 @@
 #include "ForceLaws/ForceLaw.hpp"
 #include "Interaction.hpp"
 #include "Particle.hpp"
+#include "PeriodicCell.hpp"
 #include "PreproCommands/PreproCommand.hpp"
 #include "SpringJoint.hpp"
 #include "clusterParticles.hpp"
-#include "PeriodicCell.hpp"
 
 class Rockable {
  public:
@@ -142,11 +142,11 @@ class Rockable {
   double angleUpdateNL;  ///< The moving rotation-angle that trigger an update of the neighbor list
 
   // Numerical Damping
-  double numericalDampingCoeff;   ///< Coefficient of the so-called Cundall damping (0 = disabled)
-  double velocityBarrier;         ///< Velocity Barrier by weighting the particle accelerations (0 = disabled)
-  double angularVelocityBarrier;  ///< Angular velocity Barrier by weighting the particle accelerations (0 = disabled)
-  double velocityBarrierExponent;
-  double angularVelocityBarrierExponent;
+  double numericalDampingCoeff;    ///< Coefficient of the so-called Cundall damping (0 = disabled)
+  double velocityBarrier;          ///< Velocity Barrier by weighting the particle accelerations (0 = disabled)
+  double angularVelocityBarrier;   ///< Angular velocity Barrier by weighting the particle accelerations (0 = disabled)
+  double velocityBarrierExponent;  ///< The exponent to be used with velocityBarrier
+  double angularVelocityBarrierExponent;  ///< The exponent to be used with angularVelocityBarrier
 
   // Other parameters
   int iconf;                ///< Current configuration ID
@@ -164,6 +164,8 @@ class Rockable {
                                                    ///< as a string also
 
   ForceLaw* forceLaw;  ///< User defined force law
+  
+  double preventCrossingLength;
 
   // Ctor
   Rockable();
@@ -181,34 +183,33 @@ class Rockable {
   void initialChecks();  ///< Checks before runing a computation
 
   // Core DEM methods
-  void velocityVerletStep();               ///< Make a time increment with the velocity-Verlet scheme
-  void EulerStep();                        ///< Make a time increment with the explicit-Euler scheme
-  void BeemanStep();                       ///< Make a time increment with the Beeman scheme
-  void RungeKutta4Step();                  ///< Make a time increment with the Runge-Kutta scheme (4th order)
-  void initIntegrator();                   ///< Set additionally stored data required by some integrator
-  void integrate();                        ///< Simulation flow (make time increments and check for updates or saving)
-  
-	void accelerations();                    ///< Compute accelerations
-  void incrementResultants(Interaction&);  ///< Project force and moment on the interacting particles
-  void incrementPeriodicCellTensorialMoment(Interaction&);
+  void velocityVerletStep();  ///< Make a time increment with the velocity-Verlet scheme
+  void EulerStep();           ///< Make a time increment with the explicit-Euler scheme
+  void BeemanStep();          ///< Make a time increment with the Beeman scheme
+  void RungeKutta4Step();     ///< Make a time increment with the Runge-Kutta scheme (4th order)
+  void initIntegrator();      ///< Set additionally stored data required by some integrator
+  void integrate();           ///< Simulation flow (make time increments and check for updates or saving)
+
+  void accelerations();                                     ///< Compute accelerations
+  void incrementResultants(Interaction&);                   ///< Project force and moment on the interacting particles
+  void incrementPeriodicCellTensorialMoment(Interaction&);  ///< Update the tensorial moment of interacting particles
   void realToReducedKinematics();
   void reducedToRealKinematics();
-  std::function<void()> integrationStep;   ///< Pointer function for  tion
-  void setIntegrator(std::string& Name);   ///< Select the time-integration scheme
-	
-private:
-	// These methods are subparts of the method accelerations() 
-	void initialise_particle_forces_and_moments();
-	void update_interactions();
-	void build_activeInteractions();
-	void compute_forces_and_moments();
-	void compute_resultants();
-	void compute_SpringJoints();
-	void breakage_of_interfaces();
-	void compute_accelerations_from_resultants();
+  std::function<void()> integrationStep;  ///< Pointer function for  tion
+  void setIntegrator(std::string& Name);  ///< Select the time-integration scheme
 
-public:
+ private:
+  // These methods are subparts of the method accelerations()
+  void initialise_particle_forces_and_moments();
+  void update_interactions();
+  void build_activeInteractions();
+  void compute_forces_and_moments();
+  void compute_resultants();
+  void compute_SpringJoints();
+  void breakage_of_interfaces();
+  void compute_accelerations_from_resultants();
 
+ public:
   // Core CD method (TODO)
   // ...
 

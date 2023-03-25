@@ -78,7 +78,7 @@ class Interaction {
   
   vec3r pos;  ///< Contact position
   vec3r vel;  ///< Relative velocity (j relative to i)
-  vec3r jPeriodicShift;
+  vec3r jPeriodicShift;  ///< In case of periodic cell, this the shifting of particle j
   
   double fn;  ///< Normal force (scalar value)
   vec3r ft;   ///< Tangential force (vector)
@@ -113,30 +113,14 @@ struct less<Interaction> {
 
     // from here lhs.i == rhs.i
     if (lhs.j < rhs.j) return true;
+
+    // FIXME: from here lhs.i == rhs.i AND lhs.j == rhs.j if we add if (lhs.j > rhs.j) return false;
     if (lhs.j == rhs.j && lhs.type < rhs.type) return true;
     if (lhs.j == rhs.j && lhs.type == rhs.type && lhs.isub < rhs.isub) return true;
     if (lhs.j == rhs.j && lhs.type == rhs.type && lhs.isub == rhs.isub) return (lhs.jsub < rhs.jsub);
     return false;
   }
 };
-
-/*
-// Another (maybe faster) solution
-if (lhs.i < rhs.i) return true;
-if (lhs.i > rhs.i) return false;
-if (lhs.j < rhs.j) return true;
-if (lhs.j > rhs.j) return false;
-if (lhs.type < rhs.type) return true;
-if (lhs.type > rhs.type) return false;
-if (lhs.isub < rhs.isub) return true;
-if (lhs.isub > rhs.isub) return false;
-if (lhs.jsub < rhs.jsub) return true;
-if (lhs.jsub > rhs.jsub) return false;
-return false;
-
-// on pourrait ajouter des fonctions de comparaison qui ne testent pas i (sous entendu lhs.i == rhs.i) ????
-// Mais il n'est pas certain que le gain soit genial
-*/
 
 template <>
 struct less<Interaction*> {

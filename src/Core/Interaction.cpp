@@ -125,9 +125,9 @@ void Interaction::deactivate() {
 
 // Dispatching (array of lambdas)
 // ===============================================================================
-//  Be careful not to change I.type, I.j and I.jsub in the following lambdas,
-//  because they are stored in an ordered std::set.
-//  They will be called that way:
+//  ! Be careful not to change I.type, I.j and I.jsub in the following lambdas,
+//  ! because they are stored in an ordered std::set.
+//  ! They will be called that way:
 //  Interaction::UpdateDispatcher[IT->type](const_cast<Interaction&>(*IT), Pi, Pj);
 //  where IT is set<Interaction>::iterator, and thus *IT is a const Interaction.
 //  This is imposed to avoid the breakage of the order in std::set.

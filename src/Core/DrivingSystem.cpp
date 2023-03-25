@@ -136,6 +136,7 @@ void DrivingSystem::read(bool allow_warn) {
         C.type = _z_For_;
         controls.push_back(C);  // icontr + 5
 
+        /*
         // rotation blocked on the 8 walls
 #define _FIXED_ROT(W)    \
   C.i = W;               \
@@ -146,13 +147,14 @@ void DrivingSystem::read(bool allow_warn) {
   C.type = _zrot_Vel_;   \
   controls.push_back(C)
 
-        _FIXED_ROT(idXmin);
-        _FIXED_ROT(idXmax);
-        _FIXED_ROT(idYmin);
-        _FIXED_ROT(idYmax);
-        _FIXED_ROT(idZmin);
-        _FIXED_ROT(idZmax);
+        //_FIXED_ROT(idXmin);
+        //_FIXED_ROT(idXmax);
+        //_FIXED_ROT(idYmin);
+        //_FIXED_ROT(idYmax);
+        //_FIXED_ROT(idZmin);
+        //_FIXED_ROT(idZmax);
 #undef _FIXED_ROT
+    */
 
         if (servoName == "tritriIsostaticCompression") {
           // This is an isostatic compression.
@@ -161,6 +163,7 @@ void DrivingSystem::read(bool allow_warn) {
           // The walls with the minimum positions are fixed (velocity imposed at zero)
           double pressure;
           is >> pressure;
+           
           ServoFunction = [icontr, idXmin, idXmax, idYmin, idYmax, idZmin, idZmax, pressure](Rockable& box) -> void {
             const double Xmin = box.Particles[idXmin].pos.x + box.Particles[idXmin].MinskowskiRadius();
             const double Xmax = box.Particles[idXmax].pos.x - box.Particles[idXmax].MinskowskiRadius();
@@ -178,6 +181,7 @@ void DrivingSystem::read(bool allow_warn) {
             box.System.controls[icontr + 1].value = -pressure * surfX;
             box.System.controls[icontr + 3].value = -pressure * surfY;
             box.System.controls[icontr + 5].value = -pressure * surfZ;
+
           };
         } else if (servoName == "tritriBiaxialCompression") {
           // This is a biaxial compression along the y-axis

@@ -85,7 +85,7 @@ class Particle {
   std::shared_ptr<BeemanMoreData> beemanData;
   std::shared_ptr<RK4MoreData> RK4Data;
 
-  Shape* shape;      ///< The particle shape
+  Shape* shape;      ///< The particle shape (sphero-polyhedron)
   double homothety;  ///< Homothety applied to the shape
   vec3r inertia;     ///< Inertia values (same value in the diagonal)
   double mass;       ///< The particle mass

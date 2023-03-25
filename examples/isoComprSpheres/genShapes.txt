@@ -1,0 +1,2 @@
+generateShape:sphere Sphere 1.0
+generateShape:xyz_walls 0.05 0.05 0.05 0.001
