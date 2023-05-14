@@ -1,0 +1,13 @@
+var Simu = Rockable();
+Simu.setVerboseLevel("debug");
+Simu.setOpenMPThreads(1);
+Simu.initParser();
+Simu.showBanner();
+Simu.console_run("input.txt");
+
+
+
+
+
+
+
