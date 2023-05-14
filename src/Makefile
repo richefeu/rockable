@@ -57,7 +57,7 @@ UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
 
   # The compiler and linker to be used
-  CXX = g++-12
+  CXX = g++-13
   LINK = $(CXX)
 	
   # The list of flags passed to the compiler
@@ -172,7 +172,7 @@ bin/conftovtk: Apps/conftovtk.cpp $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -c $< -o $(patsubst %.cpp, %.o, $<)
 	$(CXX) $(OPENMP_LIB) -o $@ Apps/conftovtk.o lib/$(LIB).a
 	
-# Scripting with chaiscript
+# Scripting with ChaiScript
 script: bin/script
 bin/script: Apps/script.cpp $(OBJECTS)
 	@echo "\033[0;32m-> BUILDING" $@ "\033[0m"

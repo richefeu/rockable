@@ -73,7 +73,6 @@ int main(int argc, char const* argv[]) {
   }
 
   Rockable box;
-  box.initParser();
   box.setVerboseLevel(verboseLevel);
   box.showBanner();
 
@@ -81,7 +80,7 @@ int main(int argc, char const* argv[]) {
   omp_set_num_threads(nbThreads);
   box.console->info("OpenMP acceleration (Number of threads = {})", nbThreads);
 #else
-  box.console->info("No multithreading");
+  box.console->info("No multithreading (compiled without OpenMP)");
 #endif
 
   box.console_run(confFileName);

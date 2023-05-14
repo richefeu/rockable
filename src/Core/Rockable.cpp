@@ -149,9 +149,12 @@ Rockable::Rockable() {
 
   console = spdlog::stdout_color_mt("console");
   ExplicitRegistrations();
+  initParser();
 }
 
 void Rockable::ExplicitRegistrations() {
+  // We need to make this explicit registration of various features to be able to build a static library.
+  // With the automatic registration, this is not possible (merging the *.o into a single *.a breaks everything)
 
   // BodyForces
   Factory<BodyForce, std::string>::Instance()->RegisterFactoryFunction(
@@ -209,15 +212,11 @@ void Rockable::ExplicitRegistrations() {
       "stickVerticesInClustersMoments", [](void) -> PreproCommand* { return new StickVerticesInClustersMoments(); });
 }
 
-/*
-    trace    =  6
-    debug    =  5
-    info     =  4
-    warn     =  3
-    err      =  2
-    critical =  1
-    off      =  0
-*/
+/**
+ * @brief The version of setVerboseLevel that takes a integer number as argument
+ *
+ * @param v The verbose level (trace = 6, debug = 5, info = 4, warn = 3, err = 2, critical = 1, off = 0)
+ */
 void Rockable::setVerboseLevel(int v) {
   std::string levelNames[] = {"off", "critical", "err", "warn", "info", "debug", "trace"};
 
@@ -309,11 +308,15 @@ bool Rockable::isInteractive() const { return interactiveMode; }
 */
 void Rockable::showBanner() {
   std::cout << "\n\n";
-  std::cout << "   Rockable  Copyright (C) 2016-2023  <vincent.richefeu@3sr-grenoble.fr>\n";
+  std::cout << msg::bold() << "   Rockable" << msg::normal()
+            << "  Copyright (C) 2016-2023  <vincent.richefeu@univ-grenoble-alpes.fr>\n";
   std::cout << "   This program comes with ABSOLUTELY NO WARRANTY.\n";
-  std::cout << "   This is academic software\n";
-  std::cout << "   Documentation: "
-               "      https://richefeu.gitbook.io/cdm/\n\n";
+  std::cout << "   " << msg::fg_blue() << "This is academic software" << msg::fg_default() << "\n\n";
+  std::cout << "   Documentation:       install sphinx-doc\n";
+  std::cout << "   e.g., for mac OS X   brew install sphinx-doc\n";
+  std::cout << "                        brew link sphinx-doc --force\n";
+  std::cout << "                        make html\n";
+  std::cout << "                        open build/html/index.html\n\n";
   std::cout << std::endl;
 
 #ifdef FT_CORR
@@ -862,7 +865,7 @@ void Rockable::initParser() {
   };
   parser.kwMap["DataExtractor"] = __DO__(conf) {  // Kept for compatibility (use file dataExtractors.txt instead)
 
-    if (interactiveMode == true) return;  // The dataExtractors are not read in interactive mode
+    if (interactiveMode == true) return;          // The dataExtractors are not read in interactive mode
 
     std::string ExtractorName;
     conf >> ExtractorName;
@@ -1231,10 +1234,10 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
 }
 
 /**
-    This version should be best adapted when the particles have a lot of sub-elements
+    This version should be best suited when the particles have a lot of sub-elements
     (a terrain for example). When the number of sub-elements is relatively small,
     it seems not to dramatically slow down the computation.
-    Remark: obbi and obbj need to be already placed BEFORE calling this method
+    REMARK: obbi and obbj need to be already placed BEFORE calling this method
 */
 int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
   START_TIMER("AddOrRemoveInteractions (OBB-tree)");
@@ -1308,7 +1311,7 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
     int j_nbPoints = intersections[c].second.nbPoints;
 
     if (i_nbPoints == 1) {
-      if (j_nbPoints == 1) {  // vertex (i, isub) -> vertex (j, jsub)
+      if (j_nbPoints == 1) {         // vertex (i, isub) -> vertex (j, jsub)
         addOrRemoveSingleInteraction(i, j, isub, vvType, jsub, jPeriodicShift, Particle::VertexIsNearVertex);
       } else if (j_nbPoints == 2) {  // vertex (i, isub) -> edge (j, jsub)
         addOrRemoveSingleInteraction(i, j, isub, veType, jsub, jPeriodicShift, Particle::VertexIsNearEdge);
@@ -1316,7 +1319,7 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
         addOrRemoveSingleInteraction(i, j, isub, vfType, jsub, jPeriodicShift, Particle::VertexIsNearFace);
       }
     } else if (i_nbPoints == 2) {
-      if (j_nbPoints == 1) {  // vertex (j, jsub) -> edge (i, isub)
+      if (j_nbPoints == 1) {         // vertex (j, jsub) -> edge (i, isub)
         addOrRemoveSingleInteraction(j, i, jsub, veType, isub, -jPeriodicShift, Particle::VertexIsNearEdge);
       } else if (j_nbPoints == 2) {  // vertex (i, isub) -> edge (j, jsub)
         addOrRemoveSingleInteraction(i, j, isub, eeType, jsub, jPeriodicShift, Particle::EdgeIsNearEdge);
@@ -1425,6 +1428,7 @@ void Rockable::UpdateNL_bruteForce() {
 
       // Check intersection
       if (obbi.intersect(obbj)) {
+        // this is thread-safe for an access of vector Interaction in particle i 
         AddOrRemoveInteractions(i, j, dVerlet);
       }
     }
@@ -1503,11 +1507,11 @@ void Rockable::UpdateNL_linkCells() {
             }  // jcv
           }    // icc
 
-        }  // c (neighbor cells)
+        }      // c (neighbor cells)
 
-      }  // iz
-    }    // iy
-  }      // ix
+      }        // iz
+    }          // iy
+  }            // ix
 
   // Now we test if a too large bodies can collide another body in the
   Cc = &(LinkCells.oversized_bodies);
@@ -1549,9 +1553,9 @@ void Rockable::UpdateNL_linkCells() {
           }  // jcv
         }    // icc
 
-      }  // iz
-    }    // iy
-  }      // ix
+      }      // iz
+    }        // iy
+  }          // ix
 
   Interactions_from_set_to_vec();
 }

@@ -6,7 +6,7 @@ you will also need to clone toofus into your home directory:
 
 git clone https://www.github.com/richefeu/toofus.git
 
-For compilations, gcc (version >=10 is possible) and make are required
+For compilations, gcc (version >=10 if possible) and make are required
 
 Some dependencies need to be installed:
 

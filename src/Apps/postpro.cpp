@@ -82,7 +82,6 @@ int main(int argc, char const* argv[]) {
   }
 
   Rockable box;
-	box.initParser();
   box.setInteractive(true);
   processor->plug(&box);
 

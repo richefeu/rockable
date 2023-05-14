@@ -5,7 +5,7 @@ Force laws
 
 We provide here the interaction models existing in ``Rockable``.
 The equations are explained with the associated parameters.
-The parameters ``[PARAMETER]`` are to be defined in the input file in the following way: 
+The parameters ``[PARAMETER]`` are to be defined in the input conf-file in the following way: 
 
 - ``[PARAMETER]`` (*int*) **firstGroupNumber** (*int*) **secondGroupNumber** (*double*) **value**
 
@@ -45,17 +45,20 @@ and :math:`\alpha_n \in [0, 1[` is the rate of normal viscuous damping. There ar
 2. The keyword ``en2ContactFromViscRate`` that will  
 
 .. math:: 
-   e_n^2 = e^{-\frac{\alpha_n \pi}{  \sqrt{1.0 - \alpha_n^2}}}
+   e_n^2 = \exp \left(-\frac{\alpha_n \pi}{\sqrt{1 - \alpha_n^2}}\right)
 
 Because of the viscuous part of the normal force, the total normal force :math:`f_n = f_n^{el} + f_n^{visc}` can be negative. 
 Although the physical meaning of this negative value is arguable, 
-the normal force is restricted to remain positive or zero
+the normal force is by default restricted to remain positive or zero.
+
+.. note:: After discussion with Farhang, an option will be added to let force not to be restricted 
+          (let it be negative if it wants)
 
 
 Tangential component
 """"""""""""""""""""
 
-TODO
+.. TODO
 
 .. math::
    \Delta f_t^{el} = -k_t (v_t \delta t)
@@ -64,22 +67,23 @@ TODO
 Moment  component
 """""""""""""""""
 
-TODO
+.. TODO
 
 
 Law for rock avalanches (keywork ``Avalanche``)
 -----------------------------------------------
 
-This is historically the first law that has been implemented in Rockable.
+This is historically the first law that has been implemented in Rockable (actually in DEMbox, its ancestor).
 
-TODO
+.. TODO
 
 
 Breakable elastic solid bonds (keywork ``StickedLinks``)
 --------------------------------------------------------
 
 This law has been introduced since the PhD work of Marta Stasiak.
-TODO
+
+.. TODO
 
 
 

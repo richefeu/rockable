@@ -145,8 +145,8 @@ There are several dissipation strategies that can be used (see :ref:`Dissipation
 Loading
 -------
 
-- ``nDriven`` (*int*) **value**
-  **value** is the number of bodies, at the beginning of the list, that are not free to move. 
+- ``nDriven`` (*int*) **Value**
+  where **value** is the number of bodies, at the beginning of the list, that are not free to move. 
   By default, the **nDriven** first bodies are fixed (all velocities imposed to zero), 
   but if we want to set a velocity or a force/moment, some commands have to be added 
   in a file named ``drivingSystem.txt``.
@@ -158,8 +158,8 @@ File drivingSystem.txt
   where **mode** is either ``_x_Vel_``, ``_y_Vel_``, ``_z_Vel_``, ``_xrot_Vel_``, ``_yrot_Vel_``, 
   ``_zrot_Vel_``, ``_x_For_``, ``_y_For_``, ``_z_For_``, ``_xrot_Mom_``, ``_yrot_Mom_``, or ``_zrot_Mom_``  
   
-  .. note:: There are 2 more mode keywords for which the single **value** has to be replaced by 3 values
-            (a vector of 3 components):  ``_xyzrot_Vel_`` and ``_xyzrot_Mom_``
+  .. warning:: There are 2 more mode keywords for which the single **value** has to be replaced by 3 values
+               (a vector of 3 components):  ``_xyzrot_Vel_`` and ``_xyzrot_Mom_``
   
 - ``Servo`` (*string*) **servoName** <*PARAMETERS*>
   where the parameter list depends on the selected servo (see :ref:`Servo-controllers`) 

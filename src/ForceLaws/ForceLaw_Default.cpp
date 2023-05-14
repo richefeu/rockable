@@ -102,7 +102,12 @@ bool Default::computeInteraction(Interaction& I) {
   I.ft += kt * (vt * box->dt);
 #endif
 
-  double threshold = fabs(mu * fne);
+#ifdef ALLOW_NEGATIVE_THRESHOLDS
+  double threshold = fabs(mu * I.fn);
+#else
+	double threshold = fabs(mu * fne);
+#endif
+	
   double ft_square = I.ft * I.ft;
   if (ft_square > 0.0 && ft_square >= threshold * threshold) I.ft *= threshold / sqrt(ft_square);
   // Remark: in fact, the test (ft_square > 0.0) means that ft_square is not

@@ -1,5 +1,6 @@
 # Minimal makefile for Sphinx documentation
-#
+# documentation for reStructuredText: 
+#    https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html
 
 # You can set these variables from the command line, and also
 # from the environment for the first two.

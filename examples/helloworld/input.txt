@@ -2,7 +2,7 @@ Rockable 21-08-2022
 
 #### time #############################
 t 0
-tmax 2.0
+tmax 0.2
 dt 1e-6
 interVerlet 0.01
 interConf 0.05
@@ -16,14 +16,12 @@ density 0 2700
 density 1 2700
 #BodyForce ViscousFluid 3000
 
-
 #VelocityBarrier 0.1
 #AngularVelocityBarrier 1.1
 #AngularVelocityBarrierExponent 5
 
 #### interaction model ################
 forceLaw Default
-
 
 #### interaction parameters ###########
 knContact 0 1 1e6

@@ -37,22 +37,28 @@
 #include <chaiscript/chaiscript.hpp>
 
 int main(int argc, char const* argv[]) {
-	INIT_TIMERS();
+  INIT_TIMERS();
 
+  // clang-format off
   chaiscript::ModulePtr const vec3r_module = chaiscript::ModulePtr(new chaiscript::Module);
   chaiscript::utility::add_class<vec3r>(
       *vec3r_module, "vec3r", {chaiscript::constructor<vec3r()>()},
-      {{chaiscript::fun(&vec3r::x), "x"}, {chaiscript::fun(&vec3r::y), "y"}, {chaiscript::fun(&vec3r::z), "z"}
+      {
+				
+				{chaiscript::fun(&vec3r::x), "x"}, 
+				{chaiscript::fun(&vec3r::y), "y"}, 
+				{chaiscript::fun(&vec3r::z), "z"}
 
-      });
+      }
+	);
 
   chaiscript::ModulePtr const Rockable_module = chaiscript::ModulePtr(new chaiscript::Module);
   chaiscript::utility::add_class<Rockable>(
-      *Rockable_module, "Rockable", {chaiscript::constructor<Rockable()>()},
+      *Rockable_module, "Rockable", { chaiscript::constructor<Rockable()>() },
       {
 
           {chaiscript::fun(&Rockable::showBanner), "showBanner"},
-          {chaiscript::fun(&Rockable::initParser), "initParser"},
+          //{chaiscript::fun(&Rockable::initParser), "initParser"},
           {chaiscript::fun(&Rockable::setOpenMPThreads), "setOpenMPThreads"},
           {chaiscript::fun(static_cast<void (Rockable::*)(int)>(&Rockable::setVerboseLevel)), "setVerboseLevel"},
           {chaiscript::fun(static_cast<void (Rockable::*)(const std::string&)>(&Rockable::setVerboseLevel)),
@@ -80,7 +86,10 @@ int main(int argc, char const* argv[]) {
 
           {chaiscript::fun(&Rockable::gravity), "gravity"}
 
-      });
+      }
+	);
+
+  // clang-format on
 
   chaiscript::ChaiScript chai;
   chai.add(vec3r_module);
@@ -97,5 +106,6 @@ int main(int argc, char const* argv[]) {
     std::cerr << "usage = " << argv[0] << " <script_file>\n";
   }
 
+  PRINT_TIMERS("rockable_chai");
   return 0;
 }
