@@ -61,7 +61,7 @@ std::vector<size_t> PolyrsId;
 
 int confNum = 0;
 std::vector<int> tabConf;
-size_t complexityNumber = 0;  // it says how the sample will be long to display
+size_t totalNumberOfVertices = 0;  // it says how the sample will be long to display
 bool tryToReadConf(int num);
 void SeparateParticlesByType();
 void nbConfToVtk();           // nombre de configurations

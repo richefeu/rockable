@@ -63,8 +63,10 @@
 #include "PreproCommands/PreproCommand_stickVerticesInClusters.hpp"
 #include "PreproCommands/PreproCommand_stickVerticesInClustersMoments.hpp"
 
+// #include UNSHARED_FOLDER "/includes.hpp"
+
 // ==============================================================================================================
-//  INITIALIZATIONS
+//  INITIALISATIONS
 // ==============================================================================================================
 
 Rockable::Rockable() {
@@ -87,6 +89,8 @@ Rockable::Rockable() {
   bodyForce = nullptr;
 
   usePeriodicCell = 0;
+  useSoftParticles = 0;
+  Cinv.set(1e10, 0.0);
 
   dynamicUpdateNL = 0;
   dispUpdateNL = 1.0;
@@ -148,6 +152,8 @@ Rockable::Rockable() {
   preventCrossingLength = 0.0;
 
   console = spdlog::stdout_color_mt("console");
+  console->set_pattern("[%^%l%$] %v");
+
   ExplicitRegistrations();
   initParser();
 }
@@ -210,6 +216,8 @@ void Rockable::ExplicitRegistrations() {
       "stickVerticesInClusters", [](void) -> PreproCommand* { return new StickVerticesInClusters(); });
   Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
       "stickVerticesInClustersMoments", [](void) -> PreproCommand* { return new StickVerticesInClustersMoments(); });
+
+  //registerUnsharedModules();
 }
 
 /**
@@ -503,7 +511,12 @@ void Rockable::saveConf(const char* fname) {
   for (size_t i = 0; i < Particles.size(); i++) {
     conf << Particles[i].shape->name << ' ' << Particles[i].group << ' ' << Particles[i].cluster << ' '
          << Particles[i].homothety << ' ' << Particles[i].pos << ' ' << Particles[i].vel << ' ' << Particles[i].acc
-         << ' ' << Particles[i].Q << ' ' << Particles[i].vrot << ' ' << Particles[i].arot << '\n';
+         << ' ' << Particles[i].Q << ' ' << Particles[i].vrot << ' ' << Particles[i].arot;
+    if (useSoftParticles == 1) {
+      conf << ' ' << Particles[i].uniformTransformation << '\n';
+    } else {
+			conf << '\n';
+    }
   }
 
   conf << "Interactions " << activeInteractions.size() << '\n';
@@ -603,6 +616,13 @@ void Rockable::initParser() {
   parser.kwMap["vh"] = __GET__(conf, Cell.vh);
   parser.kwMap["ah"] = __GET__(conf, Cell.ah);
   parser.kwMap["mh"] = __GET__(conf, Cell.mass);
+
+  parser.kwMap["useSoftParticles"] = __DO__(conf) {
+    useSoftParticles = 1;
+    double Y, P;
+    conf >> Y >> P;
+    Cinv.set(Y, P);
+  };
 
   parser.kwMap["numericalDampingCoeff"] = __GET__(conf, numericalDampingCoeff);
   parser.kwMap["VelocityBarrier"] = __GET__(conf, velocityBarrier);
@@ -790,7 +810,12 @@ void Rockable::initParser() {
         continue;
       }
       conf >> P.group >> P.cluster >> P.homothety >> P.pos >> P.vel >> P.acc >> P.Q >> P.vrot >> P.arot;
-
+      if (useSoftParticles == 1) {
+        conf >> P.uniformTransformation;
+      } else {
+      	P.uniformTransformation = mat9r::unit();
+      }
+			
       P.shape = &(Shapes[shapeId[shpName]]);  // Plug to the shape
       double h = P.homothety;
       P.mass = (h * h * h * P.shape->volume) * properties.get(idDensity, P.group);
@@ -865,7 +890,7 @@ void Rockable::initParser() {
   };
   parser.kwMap["DataExtractor"] = __DO__(conf) {  // Kept for compatibility (use file dataExtractors.txt instead)
 
-    if (interactiveMode == true) return;          // The dataExtractors are not read in interactive mode
+    if (interactiveMode == true) return;  // The dataExtractors are not read in interactive mode
 
     std::string ExtractorName;
     conf >> ExtractorName;
@@ -1311,7 +1336,7 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
     int j_nbPoints = intersections[c].second.nbPoints;
 
     if (i_nbPoints == 1) {
-      if (j_nbPoints == 1) {         // vertex (i, isub) -> vertex (j, jsub)
+      if (j_nbPoints == 1) {  // vertex (i, isub) -> vertex (j, jsub)
         addOrRemoveSingleInteraction(i, j, isub, vvType, jsub, jPeriodicShift, Particle::VertexIsNearVertex);
       } else if (j_nbPoints == 2) {  // vertex (i, isub) -> edge (j, jsub)
         addOrRemoveSingleInteraction(i, j, isub, veType, jsub, jPeriodicShift, Particle::VertexIsNearEdge);
@@ -1319,7 +1344,7 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
         addOrRemoveSingleInteraction(i, j, isub, vfType, jsub, jPeriodicShift, Particle::VertexIsNearFace);
       }
     } else if (i_nbPoints == 2) {
-      if (j_nbPoints == 1) {         // vertex (j, jsub) -> edge (i, isub)
+      if (j_nbPoints == 1) {  // vertex (j, jsub) -> edge (i, isub)
         addOrRemoveSingleInteraction(j, i, jsub, veType, isub, -jPeriodicShift, Particle::VertexIsNearEdge);
       } else if (j_nbPoints == 2) {  // vertex (i, isub) -> edge (j, jsub)
         addOrRemoveSingleInteraction(i, j, isub, eeType, jsub, jPeriodicShift, Particle::EdgeIsNearEdge);
@@ -1428,7 +1453,7 @@ void Rockable::UpdateNL_bruteForce() {
 
       // Check intersection
       if (obbi.intersect(obbj)) {
-        // this is thread-safe for an access of vector Interaction in particle i 
+        // this is thread-safe for an access of vector Interaction in particle i
         AddOrRemoveInteractions(i, j, dVerlet);
       }
     }
@@ -1507,11 +1532,11 @@ void Rockable::UpdateNL_linkCells() {
             }  // jcv
           }    // icc
 
-        }      // c (neighbor cells)
+        }  // c (neighbor cells)
 
-      }        // iz
-    }          // iy
-  }            // ix
+      }  // iz
+    }    // iy
+  }      // ix
 
   // Now we test if a too large bodies can collide another body in the
   Cc = &(LinkCells.oversized_bodies);
@@ -1553,9 +1578,9 @@ void Rockable::UpdateNL_linkCells() {
           }  // jcv
         }    // icc
 
-      }      // iz
-    }        // iy
-  }          // ix
+      }  // iz
+    }    // iy
+  }      // ix
 
   Interactions_from_set_to_vec();
 }
@@ -2451,6 +2476,28 @@ void Rockable::incrementResultants(Interaction& I) {
   vec3r Cj = (I.pos - Particles[I.j].pos);
   Particles[I.i].moment += cross(Ci, f) + I.mom;
   Particles[I.j].moment += cross(Cj, -f) - I.mom;
+
+  if (useSoftParticles == 1) {
+    Particles[I.i].stress.xx += f.x * Ci.x;
+    Particles[I.i].stress.xy += f.x * Ci.y;
+    Particles[I.i].stress.xz += f.x * Ci.z;
+    Particles[I.i].stress.yx += f.y * Ci.x;
+    Particles[I.i].stress.yy += f.y * Ci.y;
+    Particles[I.i].stress.yz += f.y * Ci.z;
+    Particles[I.i].stress.zx += f.z * Ci.x;
+    Particles[I.i].stress.zy += f.z * Ci.y;
+    Particles[I.i].stress.zz += f.z * Ci.z;
+
+    Particles[I.j].stress.xx -= f.x * Cj.x;
+    Particles[I.j].stress.xy -= f.x * Cj.y;
+    Particles[I.j].stress.xz -= f.x * Cj.z;
+    Particles[I.j].stress.yx -= f.y * Cj.x;
+    Particles[I.j].stress.yy -= f.y * Cj.y;
+    Particles[I.j].stress.yz -= f.y * Cj.z;
+    Particles[I.j].stress.zx -= f.z * Cj.x;
+    Particles[I.j].stress.zy -= f.z * Cj.y;
+    Particles[I.j].stress.zz -= f.z * Cj.z;
+  }
 }
 
 /**
@@ -2520,6 +2567,7 @@ void Rockable::initialise_particle_forces_and_moments() {
     Particles[i].acc.reset();
     Particles[i].moment.reset();
     Particles[i].arot.reset();
+    Particles[i].stress.reset();
   }
   if (usePeriodicCell == 1) Cell.Sig.reset();
 
@@ -2877,6 +2925,25 @@ void Rockable::accelerations() {
   compute_resultants();
 
   compute_SpringJoints();
+	
+	
+  // compute_SoftParticles_transformation();
+  if (useSoftParticles == 1) {
+    // pour le moment on code en dure la loi. ***** DEVEL
+
+    for (size_t i = 0; i < Particles.size(); i++) {
+      double volume = /* Particles[i].uniformTransformation * */ (Particles[i].homothety * Particles[i].homothety *
+                                                                  Particles[i].homothety * Particles[i].shape->volume);
+      Particles[i].stress /= volume;
+      Particles[i].stress.symmetrize();
+      //mat9r strain = Cinv.getStrain(Particles[i].stress);
+      Particles[i].uniformTransformation = mat9r::unit(); // + strain;
+      //__SHOW(volume);
+      //__SHOW(Particles[i].stress);
+      //__SHOW(strain);
+      //__SHOW(Particles[i].uniformTransformation);
+    }
+  }
 
   breakage_of_interfaces();
 

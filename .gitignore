@@ -32,4 +32,6 @@ sphinxdoc/build/*
 src/imgui/examples
 *imgui.ini
 *see.json
+perflog*
+conf*
 !examples/**/input.txt

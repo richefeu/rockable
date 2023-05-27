@@ -87,8 +87,8 @@ int rescaleColorRange = 1;
 double colorRangeMin = 0.0;
 double colorRangeMax = 1.0;
 
-int complexMode = 0;
-size_t complexityNumber = 0; // it says how the sample will be long to display
+int shapeWithoutThickness = 0;
+size_t totalNumberOfVertices = 0; // it says how the sample will be long to display
 
 GLfloat alpha_particles = 1.0f;
 GLfloat alpha_fixparticles = 0.1f;

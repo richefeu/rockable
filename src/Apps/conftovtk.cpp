@@ -42,9 +42,9 @@ bool tryToReadConf(int num) {
     std::cout << "Read " << file_name << std::endl;
     box.clearMemory();
     box.loadConf(file_name);
-    complexityNumber = 0;
+    totalNumberOfVertices = 0;
     for (size_t i = 0; i < box.Particles.size(); ++i) {
-      complexityNumber += box.Particles[i].shape->vertex.size();
+      totalNumberOfVertices += box.Particles[i].shape->vertex.size();
     }
     confNum = box.iconf;
     box.computeAABB();

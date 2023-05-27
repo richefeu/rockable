@@ -41,6 +41,7 @@
 
 #include "quat.hpp"
 #include "vec3.hpp"
+#include "mat9.hpp"
 
 #include "Shape.hpp"
 
@@ -89,6 +90,8 @@ class Particle {
   double homothety;  ///< Homothety applied to the shape
   vec3r inertia;     ///< Inertia values (same value in the diagonal)
   double mass;       ///< The particle mass
+	mat9r uniformTransformation;
+	mat9r stress; 
 
   vec3r force;   ///< Resultant force acting on the particle
   vec3r moment;  ///< Resultant moment acting on the particle

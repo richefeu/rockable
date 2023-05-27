@@ -334,7 +334,7 @@ void keyboard(unsigned char Key, int x, int y) {
     } break;
 
     case 'y':
-      complexMode = 1 - complexMode;
+      shapeWithoutThickness = 1 - shapeWithoutThickness;
       break;
 
     case 'z': {
@@ -645,64 +645,81 @@ void reshape(int w, int h) {
 }
 
 // Draw the shape of the sphero-polyhedron in its own framework
-void drawShape(Shape* s, double homothety) {
+void drawShape(Shape* s, double homothety, const mat9r & T) {
   double R = homothety * s->radius;
   int nbLevelSphere = 2;
-  if (complexityNumber > 10000) {
+  if (totalNumberOfVertices > 10000) {
     nbLevelSphere = 1;
   }
 
-  if (complexMode == 0) {
+  if (shapeWithoutThickness == 0 || s->face.empty()) {
     // vertixes (spheres)
+		vec3r vert;
     for (size_t v = 0; v < s->vertex.size(); ++v) {
       glPushMatrix();
-      glTranslatef(homothety * s->vertex[v].x, homothety * s->vertex[v].y, homothety * s->vertex[v].z);
+			vert = T * (homothety * s->vertex[v]);
+      glTranslatef(vert.x, vert.y, vert.z);
       facetSphere::draw(nbLevelSphere, R);
       glPopMatrix();
     }
 
     // edges (tubes)
     for (size_t e = 0; e < s->edge.size(); ++e) {
-      vec3r orig = homothety * s->vertex[s->edge[e].first];
-      vec3r arrow = homothety * s->vertex[s->edge[e].second];
+      vec3r orig =T* homothety * s->vertex[s->edge[e].first];
+      vec3r arrow = T*homothety * s->vertex[s->edge[e].second];
       arrow -= orig;
       glShape::tube(orig, arrow, 2.0 * R);
     }
-  }
 
-  // faces (3D polygones)
-  for (size_t f = 0; f < s->face.size(); ++f) {
-    if (s->face[f].size() < 3) continue;  // At least 3 pts!
-    vec3r N =
-        cross(s->vertex[s->face[f][1]] - s->vertex[s->face[f][0]], s->vertex[s->face[f][2]] - s->vertex[s->face[f][0]]);
-    N.normalize();
+    // faces (3D polygones)
+    for (size_t f = 0; f < s->face.size(); ++f) {
+      if (s->face[f].size() < 3) continue;  // At least 3 pts!
+      vec3r N = cross(s->vertex[s->face[f][1]] - s->vertex[s->face[f][0]],
+                      s->vertex[s->face[f][2]] - s->vertex[s->face[f][0]]);
+      N.normalize();
 
-    glBegin(GL_TRIANGLE_FAN);
-    glNormal3f(N.x, N.y, N.z);
-    for (size_t v = 0; v < s->face[f].size(); ++v) {
-      glVertex3f(homothety * s->vertex[s->face[f][v]].x + N.x * R, homothety * s->vertex[s->face[f][v]].y + N.y * R,
-                 homothety * s->vertex[s->face[f][v]].z + N.z * R);
+      glBegin(GL_TRIANGLE_FAN);
+      glNormal3f(N.x, N.y, N.z);
+      for (size_t v = 0; v < s->face[f].size(); ++v) {
+        glVertex3f(homothety * s->vertex[s->face[f][v]].x + N.x * R, homothety * s->vertex[s->face[f][v]].y + N.y * R,
+                   homothety * s->vertex[s->face[f][v]].z + N.z * R);
+      }
+      glEnd();
+
+      glBegin(GL_TRIANGLE_FAN);
+      glNormal3f(-N.x, -N.y, -N.z);
+      for (size_t v = 0; v < s->face[f].size(); ++v) {
+        glVertex3f(homothety * s->vertex[s->face[f][v]].x - N.x * R, homothety * s->vertex[s->face[f][v]].y - N.y * R,
+                   homothety * s->vertex[s->face[f][v]].z - N.z * R);
+      }
+      glEnd();
     }
-    glEnd();
+  } else {
+    for (size_t f = 0; f < s->face.size(); ++f) {
+      if (s->face[f].size() < 3) continue;  // At least 3 pts!
+      vec3r N = cross(s->vertex[s->face[f][1]] - s->vertex[s->face[f][0]],
+                      s->vertex[s->face[f][2]] - s->vertex[s->face[f][0]]);
+      N.normalize();
 
-    glBegin(GL_TRIANGLE_FAN);
-    glNormal3f(-N.x, -N.y, -N.z);
-    for (size_t v = 0; v < s->face[f].size(); ++v) {
-      glVertex3f(homothety * s->vertex[s->face[f][v]].x - N.x * R, homothety * s->vertex[s->face[f][v]].y - N.y * R,
-                 homothety * s->vertex[s->face[f][v]].z - N.z * R);
+      glBegin(GL_TRIANGLE_FAN);
+      glNormal3f(N.x, N.y, N.z);
+      for (size_t v = 0; v < s->face[f].size(); ++v) {
+        glVertex3f(homothety * s->vertex[s->face[f][v]].x, homothety * s->vertex[s->face[f][v]].y,
+                   homothety * s->vertex[s->face[f][v]].z);
+      }
+      glEnd();
     }
-    glEnd();
   }
 }
 
 void drawParticles() {
   if (mouse_mode != NOTHING) {
-    if (complexityNumber > 500) {
+    if (totalNumberOfVertices > 500) {
       drawGlobalAABB();
       drawGlobalFrame();
       return;
     }
-    if (complexityNumber > 100) {
+    if (totalNumberOfVertices > 100) {
       drawOBBs();
       drawGlobalFrame();
       return;
@@ -714,7 +731,7 @@ void drawParticles() {
   for (size_t i = box.nDriven; i < box.Particles.size(); ++i) {
     int alpha = (int)floor(params["alpha_particles"].get<GLfloat>() * 255);
     if (selectedParticle >= 0 && i == (size_t)selectedParticle) {
-      glColor4ub(234, 255, 0, alpha);  // yellow
+      glColor4ub(234, 255, 0, alpha);  // shiny yellow
     } else {
       if (i >= pcolors.size()) {
         glColor4ub(params["ParticleColor"][0].get<int>(), params["ParticleColor"][1].get<int>(),
@@ -730,7 +747,7 @@ void drawParticles() {
     glTranslatef(pos.x, pos.y, pos.z);
     quat2GLMatrix<GLfloat>(box.Particles[i].Q, Rot_Matrix);
     glMultMatrixf(Rot_Matrix);
-    drawShape(box.Particles[i].shape, box.Particles[i].homothety);
+    drawShape(box.Particles[i].shape, box.Particles[i].homothety, box.Particles[i].uniformTransformation);
     glPopMatrix();
   }
 
@@ -748,7 +765,7 @@ void drawParticles() {
       glTranslatef(pos.x, pos.y, pos.z);
       quat2GLMatrix<GLfloat>(box.Particles[i].Q, Rot_Matrix);
       glMultMatrixf(Rot_Matrix);
-      drawShape(box.Particles[i].shape, box.Particles[i].homothety);
+      drawShape(box.Particles[i].shape, box.Particles[i].homothety, box.Particles[i].uniformTransformation);
       glPopMatrix();
     }
   }
@@ -1327,11 +1344,11 @@ bool tryToReadConf(int num) {
     box.clearMemory();
     box.loadConf(file_name);
     resetColors(params["colorMode"].get<int>(), params["rescaleColorRange"].get<int>());
-    complexityNumber = 0;
+    totalNumberOfVertices = 0;
     for (size_t i = 0; i < box.Particles.size(); ++i) {
-      complexityNumber += box.Particles[i].shape->vertex.size();
+      totalNumberOfVertices += box.Particles[i].shape->vertex.size();
     }
-    textZone.addLine("conf-file: %s (time = %f, complexityNumber = %ld)", file_name, box.t, complexityNumber);
+    textZone.addLine("conf-file: %s (time = %f, totalNumberOfVertices = %ld)", file_name, box.t, totalNumberOfVertices);
     confNum = box.iconf;
     box.computeAABB();
     adjustClippingPlans();
@@ -1391,8 +1408,8 @@ void buildMenu() {
 // =====================================================================
 
 int main(int argc, char* argv[]) {
-	INIT_TIMERS();
-	
+  INIT_TIMERS();
+
   box.setInteractive(true);
 
   std::string confFileName;
@@ -1434,9 +1451,9 @@ int main(int argc, char* argv[]) {
     std::cout << "Probe: min = " << probe.min << "\n       max = " << probe.max << "\n";
   }
 
-  complexityNumber = 0;
+  totalNumberOfVertices = 0;
   for (size_t i = 0; i < box.Particles.size(); ++i) {
-    complexityNumber += box.Particles[i].shape->vertex.size();
+    totalNumberOfVertices += box.Particles[i].shape->vertex.size();
   }
 
   box.System.read();

@@ -10,7 +10,7 @@ A shape-file is a library of shapes, which is in fact a file with a number of sh
 To run a simulation, we need that all required shapes are defined in a single shape-file. The keywords are given here after:
 
 - ``name`` (*string*) **shapeName**
-  The name of the shape. When the particles are listed in a conf-file, its shape is referred to as this defined keyword
+  The name of the shape (without space). When the particles are listed in a conf-file, its shape is referred to as this defined keyword
   
 - ``radius`` (*double*) **MinskowskiRadius**
   The radius of the rounded edges (so-called Minskowski radius) of the shape (there is only one radius per sphero-polyhedron)
@@ -20,7 +20,7 @@ To run a simulation, we need that all required shapes are defined in a single sh
   in Rockable or in the program shapeSurvey
   
 - ``OBBtreeLevel`` (*int*) **number**
-  set the number of levels for building an OBB-tree
+  (deprecated) set the number of levels for building an OBB-tree
   
 - ``nv`` (*int*) **numberOfVertices**
 

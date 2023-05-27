@@ -302,7 +302,7 @@ void keyboard(GLFWwindow* window, int key, int /*scancode*/, int action, int mod
       } break;
 
       case GLFW_KEY_Y:
-        complexMode = 1 - complexMode;
+        shapeWithoutThickness = 1 - shapeWithoutThickness;
         break;
 
       case GLFW_KEY_Z: {
@@ -608,11 +608,11 @@ void reshape(GLFWwindow* /*window*/, int w, int h) {
 void drawShape(Shape* s, double homothety) {
   double R = homothety * s->radius;
   int nbLevelSphere = 2;
-  if (complexityNumber > 10000) {
+  if (totalNumberOfVertices > 10000) {
     nbLevelSphere = 1;
   }
 
-  if (complexMode == 0) {
+  if (shapeWithoutThickness == 0) {
     // vertixes (spheres)
     for (size_t v = 0; v < s->vertex.size(); ++v) {
       glPushMatrix();
@@ -656,7 +656,7 @@ void drawShape(Shape* s, double homothety) {
 }
 
 void drawParticles() {
-  if (mouse_mode != NOTHING && complexityNumber > 100) {
+  if (mouse_mode != NOTHING && totalNumberOfVertices > 100) {
     drawOBBs();
     return;
   }
@@ -1259,9 +1259,9 @@ bool tryToReadConf(int num) {
     box.clearMemory();
     box.loadConf(file_name);
     resetColors(colorMode, rescaleColorRange);
-    complexityNumber = 0;
+    totalNumberOfVertices = 0;
     for (size_t i = 0; i < box.Particles.size(); ++i) {
-      complexityNumber += box.Particles[i].shape->vertex.size();
+      totalNumberOfVertices += box.Particles[i].shape->vertex.size();
     }
     textZone.addLine("conf-file: %s (time = %f)", file_name, box.t);
     confNum = box.iconf;
@@ -1349,9 +1349,9 @@ int main(int argc, char* argv[]) {
     std::cout << "Probe: min = " << probe.min << "\n       max = " << probe.max << "\n";
   }
 
-  complexityNumber = 0;
+  totalNumberOfVertices = 0;
   for (size_t i = 0; i < box.Particles.size(); ++i) {
-    complexityNumber += box.Particles[i].shape->vertex.size();
+    totalNumberOfVertices += box.Particles[i].shape->vertex.size();
   }
 
   box.System.read();

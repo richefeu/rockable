@@ -40,8 +40,8 @@
 #include <sstream>
 
 #include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl2.h"
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl2.h"
 
 #ifdef __APPLE__
 #define GL_SILENCE_DEPRECATION
@@ -112,8 +112,8 @@ int rescaleColorRange = 1;
 double colorRangeMin = 0.0;
 double colorRangeMax = 1.0;
 
-int complexMode = 0;
-size_t complexityNumber = 0;  // it says how the sample will be long to display
+int shapeWithoutThickness = 0;
+size_t totalNumberOfVertices = 0;  // it says how the sample will be long to display
 
 GLfloat alpha_particles = 1.0f;
 GLfloat alpha_fixparticles = 0.1f;

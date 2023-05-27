@@ -98,8 +98,8 @@ size_t probe_MCnsteps = 10000;
 ColorTable CT;
 std::vector<colorRGBA> pcolors;
 
-int complexMode = 0;
-size_t complexityNumber = 0;  // it says how the sample will be long to display
+int shapeWithoutThickness = 0;
+size_t totalNumberOfVertices = 0;  // it says how the sample will be long to display
 
 int selectedParticle = -1;
 
@@ -128,7 +128,7 @@ vec3r eye;
 vec3r center;
 vec3r up;
 
-void drawShape(Shape* s, double homothety = 1.0);
+void drawShape(Shape* s, double homothety = 1.0, const mat9r & T = mat9r::unit());
 void drawForces();
 void drawVelocities();
 void drawParticles();

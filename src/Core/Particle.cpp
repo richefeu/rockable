@@ -51,28 +51,34 @@ Particle::Particle()
       homothety(1.0),
       inertia(),
       mass(0.0),
+      uniformTransformation(),
+      stress(),
       force(),
       moment(),
-      obb() {}
+      obb() {
+  uniformTransformation = mat9r::unit();
+}
 
 /** @brief Given a vector expressed in the shape framework,
  *         this method returns its expression in the global framework
  *
  */
-vec3r Particle::Glob(vec3r& Vertex) const { return (pos + Q * (homothety * Vertex)); }
+vec3r Particle::Glob(vec3r& Vertex) const { return pos + Q * (uniformTransformation * (homothety * Vertex)); }
 
 /** @brief Given the vertex number v of the shape,
  *         this method returns the vector expression in the global framework
  *
  */
-vec3r Particle::GlobVertex(size_t v) const { return (pos + Q * (homothety * shape->vertex[v])); }
+vec3r Particle::GlobVertex(size_t v) const {
+  return pos + Q * (uniformTransformation * (homothety * shape->vertex[v]));
+}
 
 /** @brief Given the vertex index v of the face f in the shape,
  *         this method returns the vector expression in the global framework
  *
  */
 vec3r Particle::GlobFaceVertex(size_t f, size_t v) const {
-  return (pos + Q * (homothety * shape->vertex[shape->face[f][v]]));
+  return pos + Q * (uniformTransformation * (homothety * shape->vertex[shape->face[f][v]]));
 }
 
 /**
@@ -89,8 +95,10 @@ double Particle::MinskowskiRadius() const { return homothety * shape->radius; }
 void Particle::updateObb() {
   obb = shape->obb;
   obb.rotate(Q);
-  obb.extent *= homothety;
-  obb.center *= homothety;
+  // obb.extent *= homothety;
+  obb.extent = uniformTransformation * (homothety * obb.extent);
+  // obb.center *= homothety;
+  obb.center = uniformTransformation * (homothety * obb.center);
   obb.center += pos;
 }
 

@@ -20,7 +20,7 @@ and the driven bodies with velocity imposed (translation or rotation) are update
 Euler scheme (keyword ``Euler``)
 --------------------------------
 
-This is the most simple scheme:
+This is the most simple scheme. It is written that way:
 
 .. math::
    \begin{cases}
@@ -29,7 +29,7 @@ This is the most simple scheme:
    \vec{a}(t+\delta t) &\leftarrow \ldots
    \end{cases}
    
-And the same for rotations
+And for rotations, the same idea applies:
 
 .. math::
    \begin{cases}
@@ -40,6 +40,9 @@ And the same for rotations
 
 Velocity-Verlet scheme (keyword ``velocityVerlet``, Default)
 ------------------------------------------------------------
+
+Because this scheme is the default one, most new features may be implemented here and maybe not in other schemes.
+Check the code to be sure. It is written is the following form:
 
 .. math::
    \begin{cases}
@@ -61,9 +64,9 @@ Velocity-Verlet scheme (keyword ``velocityVerlet``, Default)
 Beeman scheme (keyword ``Beeman``)
 ----------------------------------
 
-
+.. TODO
 
 Runge-Kutta-Nyström 4th-order scheme (keyword ``RungeKutta4``)
 --------------------------------------------------------------
 
-
+.. TODO

@@ -73,6 +73,7 @@
 #include "linkCells.hpp"
 #include "message.hpp"
 #include "profiler.hpp"
+#include "Compliance.hpp"
 
 // local headers
 #include "BodyForces/BodyForce.hpp"
@@ -116,6 +117,9 @@ class Rockable {
 
   int usePeriodicCell;
   PeriodicCell Cell;
+	
+	int useSoftParticles;
+	Compliance Cinv;
 
   // Time parameters
   double t;                  ///< Current Time

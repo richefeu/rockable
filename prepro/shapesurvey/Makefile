@@ -6,7 +6,7 @@ UNAME_S := $(shell uname -s)
 
 # The compiler to be used
 ifeq ($(UNAME_S),Darwin)
-  CXX = clang++
+  CXX = g++-13
   GLUTFLAGS = `pkg-config --cflags glut`
   GLLINK = `pkg-config --libs glut` -framework OpenGL
 else
@@ -15,7 +15,7 @@ else
 endif
 
 # The list of flags passed to the compiler
-CXXFLAGS = -O3 -Wall -Wextra -Wshadow -pedantic -std=c++11 -I $(TOOFUSPATH) -I $(ROCKABLEPATH)/Core
+CXXFLAGS = -O3 -Wall -Wextra -Wshadow -pedantic -std=c++17 -I $(TOOFUSPATH) -I $(ROCKABLEPATH)/Core
 
 # All source files (listed in SOURCES) will be compiled into an object file
 # with the following command

@@ -510,11 +510,11 @@ void reshape(GLFWwindow* /*window*/, int w, int h) {
 void drawShape(Shape* s, double homothety) {
   double R = homothety * s->radius;
   int nbLevelSphere = 2;
-  if (complexityNumber > 10000) {
+  if (totalNumberOfVertices > 10000) {
     nbLevelSphere = 1;
   }
 
-  if (complexMode == 0) {
+  if (shapeWithoutThickness == 0) {
     // vertixes (spheres)
     for (size_t v = 0; v < s->vertex.size(); ++v) {
       glPushMatrix();
@@ -558,7 +558,7 @@ void drawShape(Shape* s, double homothety) {
 }
 
 void drawParticles() {
-  if (mouse_mode != NOTHING && complexityNumber > 100) {
+  if (mouse_mode != NOTHING && totalNumberOfVertices > 100) {
     drawOBBs();
     return;
   }
@@ -1123,9 +1123,9 @@ bool tryToReadConf(int num) {
     box.clearMemory();
     box.loadConf(file_name);
     resetColors(colorMode, rescaleColorRange);
-    complexityNumber = 0;
+    totalNumberOfVertices = 0;
     for (size_t i = 0; i < box.Particles.size(); ++i) {
-      complexityNumber += box.Particles[i].shape->vertex.size();
+      totalNumberOfVertices += box.Particles[i].shape->vertex.size();
     }
     textZone.addLine("conf-file: %s (time = %f)", file_name, box.t);
     confNum = box.iconf;
@@ -1546,7 +1546,7 @@ void main_imgui_menu() {
     ImGui::CheckboxFlags("Scene frame", &show_globalFrame, 1);
     ImGui::CheckboxFlags("All particles", &show_particles, 1);
     ImGui::CheckboxFlags("Also driven particles", &show_driven, 1);
-    ImGui::CheckboxFlags("Only faces (faster display)", &complexMode, 1);
+    ImGui::CheckboxFlags("Only faces (faster display)", &shapeWithoutThickness, 1);
     ImGui::CheckboxFlags("OBB", &show_obb, 1);
     ImGui::CheckboxFlags("OBB + Verlet distance", &enlarged_obb, 1);
   }
@@ -1671,9 +1671,9 @@ int main(int argc, char* argv[]) {
     std::cout << "Probe: min = " << probe.min << "\n       max = " << probe.max << "\n";
   }
 
-  complexityNumber = 0;
+  totalNumberOfVertices = 0;
   for (size_t i = 0; i < box.Particles.size(); ++i) {
-    complexityNumber += box.Particles[i].shape->vertex.size();
+    totalNumberOfVertices += box.Particles[i].shape->vertex.size();
   }
 
   box.System.read();

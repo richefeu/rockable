@@ -4,70 +4,12 @@ Quick-start guid
 What is Rockable?
 -----------------
 
-``Rockable`` is a DEM code written in C++11. The two main specificities of the code are (i) to hold sphero-polyhedral shapes, 
-(ii) to manage breakable interfaces. This technique has been developed in another code named ``DEMbox`` which was designed to 
-do more things, with a higher degree of abstraction. Also, it is developed for an academic usage.
+``Rockable`` is a DEM code written in C++11/C++17. The two main specificities of the code are (i) to hold sphero-polyhedral shapes, (ii) to manage breakable interfaces. This technique has been developed in another code named ``DEMbox`` which was designed to do more things, with a higher degree of abstraction. Also, it is developed for an academic usage.
 
 Compilation
 -----------
 
-The compilation is managed by a makefile that should be similar to that one:
-
-.. code-block:: makefile
-   :caption: Makefile
-   
-   # An option can be disable by adding n before it
-   OPTIONS = -DQUAT_ACC -DnFT_CORR -DnROT_MATRIX
-   
-   UNAME_S := $(shell uname -s)
-   ifeq ($(UNAME_S),Darwin)
-   # The compiler to be used
-   CXX = clang++
-   # The list of flags passed to the compiler
-   CXXFLAGS = -O3 -Wall -std=c++11 -I ../../common $(OPTIONS)
-   # Link flags for OpenGL and glut
-   GLLINK = -framework OpenGL -framework GLUT
-   else
-   # The compiler to be used
-   CXX = g++
-   # The list of flags passed to the compiler
-   CXXFLAGS = -O3 -Wall -std=c++11 -I ../../common $(OPTIONS)
-   # Link flags for OpenGL and glut
-   GLLINK = -lGLU -lGL -L/usr/X11R6/lib -lglut -lXmu -lXext -lX11 -lXi
-   endif
-   
-   # The list of source files
-   SOURCES = Shape.cpp Particle.cpp Interaction.cpp Rockable.cpp DrivingSystem.cpp
-   
-   # Each cpp file listed below corresponds to an object file
-   OBJECTS = $(SOURCES:%.cpp=%.o)
-   
-   # Each cpp file listed below corresponds to a header file
-   HEADERS = $(SOURCES:%.cpp=%.hpp)
-   
-   # All source files (listed in SOURCES) will be compiled into an object file
-   # with the following command
-   %.o:%.cpp
-     $(CXX) $(CXXFLAGS) -c $<
-   
-   .PHONY: all clean
-   
-   all: run see
-   
-   clean:
-     rm -f *.o run see
-   
-   # The application that runs a simulation
-   run: run.cpp $(HEADERS) $(OBJECTS)
-     $(CXX) $(CXXFLAGS) -c $<
-     $(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS)
-   
-   # The application that visualize the conf files
-   see: see.cpp see.hpp $(HEADERS) $(OBJECTS)
-     $(CXX) $(CXXFLAGS) -c $< -Wno-deprecated
-     $(CXX) $(CXXFLAGS) -o $@ $@.o $(OBJECTS) $(GLLINK)
-
-As we can see, some options can be set at compile time: QUAT_ACC, FT_CORR, ROT_MATRIX, BREAK_ONCE, COMPONENTWISE_NUM_DAMPING, and BIND_METHODS. To disable an option it is advised to rename it by adding a letter 'n' at the beginning.
+The compilation is managed with a simple makefile. Some options can be set at compile time: QUAT_ACC, FT_CORR, ROT_MATRIX, BREAK_ONCE, COMPONENTWISE_NUM_DAMPING, and BIND_METHODS. To disable an option it is advised to rename it by adding a letter 'n' at the beginning.
 
 - QUAT_ACC: with this option, the angular position (given by a quaternion) 
   is updated by accounting as prescribed by the chose intergator. 

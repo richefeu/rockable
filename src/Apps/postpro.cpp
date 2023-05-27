@@ -40,8 +40,6 @@ int firstConf = 0;
 int lastConf = 0;
 int stepConf = 1;
 
-PostProcessor* processor;
-
 PostProcessor* readPostproCommands(const char* fname) {
   std::ifstream file(fname);
   if (!file) {
@@ -50,16 +48,17 @@ PostProcessor* readPostproCommands(const char* fname) {
   PostProcessor* processor;
 
   kwParser parser;
-  parser.kwMap["firstConf"] = __GET__(file, firstConf);
-  parser.kwMap["lastConf"] = __GET__(file, lastConf);
-  parser.kwMap["stepConf"] = __GET__(file, stepConf);
-  parser.kwMap["PostProcessor"] = [&](std::istream& file) {
+  parser.kwMap["firstConf"] = __GET__(istr, firstConf);
+  parser.kwMap["lastConf"] = __GET__(istr, lastConf);
+  parser.kwMap["stepConf"] = __GET__(istr, stepConf);
+  parser.kwMap["PostProcessor"] = [&](std::istream& istr) {
     std::string postproName;
-    file >> postproName;
+    istr >> postproName;
     std::cout << "PostProcessor: " << postproName << std::endl;
     processor = Factory<PostProcessor>::Instance()->Create(postproName);
-    processor->read(file);
+    processor->read(istr);
   };
+	
   parser.parse(file);
   return processor;
 }

@@ -46,16 +46,17 @@ ClusterGranulo::ClusterGranulo() { }
 
 void ClusterGranulo::read(std::istream& is) {
   kwParser parser;
-  parser.kwMap["SievingSizes"] = __DO__(is) {
+  parser.kwMap["SievingSizes"] = __DO__(istr) {
     size_t nb;
-    is >> nb;
+    istr >> nb;
     SievingSizes.resize(nb);
     for (size_t i = 0 ; i < nb ; i++) {
       double v;
-      is >> v;
+      istr >> v;
       SievingSizes[i] = v;
     }
   };
+	
   parser.parse(is);
 }
 

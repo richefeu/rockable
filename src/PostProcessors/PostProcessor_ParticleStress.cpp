@@ -45,17 +45,18 @@ ParticleStress::ParticleStress() { }
 
 void ParticleStress::read(std::istream& is) {
   kwParser parser;
-  parser.kwMap["Volume"] = __GET__(is, Volume);
-  parser.kwMap["ConfVolumes"] = __DO__(is) {
+  parser.kwMap["Volume"] = __GET__(istr, Volume);
+  parser.kwMap["ConfVolumes"] = __DO__(istr) {
     size_t nb;
-    is >> nb;
+    istr >> nb;
     for (size_t i = 0 ; i < nb ; i++) {
       int iconf;
       double v;
-      is >> iconf >> v;
+      istr >> iconf >> v;
       ConfVolumes[iconf] = v;
     }
   };
+	
   parser.parse(is);
   
   // example:

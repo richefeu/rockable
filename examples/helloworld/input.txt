@@ -2,7 +2,7 @@ Rockable 21-08-2022
 
 #### time #############################
 t 0
-tmax 0.2
+tmax 1.0
 dt 1e-6
 interVerlet 0.01
 interConf 0.05
@@ -14,24 +14,28 @@ dVerlet 0.02
 #### properties for particles #########
 density 0 2700
 density 1 2700
+
 #BodyForce ViscousFluid 3000
 
 #VelocityBarrier 0.1
 #AngularVelocityBarrier 1.1
 #AngularVelocityBarrierExponent 5
 
+#useSoftParticles 1e6 0.0
+
+
 #### interaction model ################
 forceLaw Default
 
 #### interaction parameters ###########
-knContact 0 1 1e6
+knContact 0 1 1e7
 en2Contact 0 1 0.2
 ktContact 0 1 1e7
 muContact 0 1 0.9
 krContact 0 1 1e7
 murContact 0 1 0.0
 
-knContact 1 1 1e6
+knContact 1 1 1e7
 en2Contact 1 1 0.2
 ktContact 1 1 1e7
 muContact 1 1 0.9
@@ -48,6 +52,6 @@ Rice 1 0 1.0   -0.5 0.5 0   0 0 0   0 0 0   0.707 0 0.707 0   0 0 -10   0 0 0
 Sphere 1 0 1.0   0.3 0.5 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
 Sphere 1 0 1.0   0.3 0.66 0   0.5 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
 
-initSpringJoint  2 0 0.08 0   3 0 -0.08 0  1e6
+#initSpringJoint  2 0 0.08 0   3 0 -0.08 0  1e7
 
 
