@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.26)
+cmake_minimum_required(VERSION 3.20)
 
 message(STATUS "CMAKE_HOST_SYSTEM_NAME = " ${CMAKE_HOST_SYSTEM_NAME})
  
@@ -14,6 +14,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 option(ROCKABLE_USE_FT_CORR "add objectivity correction to tangent forces" OFF)
 option(ROCKABLE_ENABLE_PROFILING "enable the time profiling" OFF)
+option(ROCKABLE_DISABLE_SEE "disable see" OFF)
 
 set(CMAKE_CXX_FLAGS "-O3 -Wno-deprecated-declarations -Wall -Wextra -lpthread")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
@@ -177,14 +178,16 @@ target_link_libraries(rockable PUBLIC Rockable_core)
 
 ######################################################################
 ##### visualiser see
-add_executable(see Apps/see.cpp)
-target_include_directories(see PUBLIC 
-	${OPENGL_INCLUDE_DIR} 
-	${GLUT_INCLUDE_DIRS}
-	${nlohmann-json_SOURCE_DIR}/include
-)
+if(NOT ROCKABLE_DISABLE_SEE) 
+	add_executable(see Apps/see.cpp)
+	target_include_directories(see PUBLIC 
+		${OPENGL_INCLUDE_DIR} 
+		${GLUT_INCLUDE_DIRS}
+		${nlohmann-json_SOURCE_DIR}/include
+	)
 target_link_directories(see PUBLIC ${GLUT_LIBRARY_DIRS})
 target_link_libraries (see PUBLIC OpenGL::GL ${GLUT_LIBRARIES} Rockable_core)
+endif()
 
 ######################################################################
 ##### interactive preprocessing (TODO see3 -> will be renamed)
