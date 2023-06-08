@@ -37,7 +37,7 @@
 #include <chaiscript/chaiscript.hpp>
 
 int main(int argc, char const* argv[]) {
-  INIT_TIMERS();
+	RockableProfiler::ProfilerManager prof;
 
   // clang-format off
   chaiscript::ModulePtr const vec3r_module = chaiscript::ModulePtr(new chaiscript::Module);
@@ -105,7 +105,5 @@ int main(int argc, char const* argv[]) {
   } else {
     std::cerr << "usage = " << argv[0] << " <script_file>\n";
   }
-
-  PRINT_TIMERS("rockable_chai");
   return 0;
 }
