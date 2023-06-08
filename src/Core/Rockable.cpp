@@ -159,18 +159,30 @@ Rockable::Rockable() {
 }
 
 void Rockable::ExplicitRegistrations() {
-  // We need to make this explicit registration of various features to be able to build a static library.
+  // We need to make these explicit registrations of various features to be able to build a static library.
   // With the automatic registration, this is not possible (merging the *.o into a single *.a breaks everything)
 
   // BodyForces
+  REGISTRER_BASE_DERIVED(BodyForce, AttractingPoint);
+  REGISTRER_BASE_DERIVED(BodyForce, PreferredDirection);
+  REGISTRER_BASE_DERIVED(BodyForce, ViscousFluid);
+  /*
   Factory<BodyForce, std::string>::Instance()->RegisterFactoryFunction(
       "AttractingPoint", [](void) -> BodyForce* { return new AttractingPoint(); });
   Factory<BodyForce, std::string>::Instance()->RegisterFactoryFunction(
       "PreferredDirection", [](void) -> BodyForce* { return new PreferredDirection(); });
   Factory<BodyForce, std::string>::Instance()->RegisterFactoryFunction(
       "ViscousFluid", [](void) -> BodyForce* { return new ViscousFluid(); });
+  */
 
   // DataExtractors
+  REGISTRER_BASE_DERIVED(DataExtractor, ClusterAABB);
+  REGISTRER_BASE_DERIVED(DataExtractor, dnStat);
+  REGISTRER_BASE_DERIVED(DataExtractor, DuoBalance);
+  REGISTRER_BASE_DERIVED(DataExtractor, MeanVelocity);
+  REGISTRER_BASE_DERIVED(DataExtractor, TrackBody);
+  REGISTRER_BASE_DERIVED(DataExtractor, TrackRockfall);
+  /*
   Factory<DataExtractor, std::string>::Instance()->RegisterFactoryFunction(
       "ClusterAABB", [](void) -> DataExtractor* { return new ClusterAABB(); });
   Factory<DataExtractor, std::string>::Instance()->RegisterFactoryFunction(
@@ -183,16 +195,35 @@ void Rockable::ExplicitRegistrations() {
       "TrackBody", [](void) -> DataExtractor* { return new TrackBody(); });
   Factory<DataExtractor, std::string>::Instance()->RegisterFactoryFunction(
       "TrackRockfall", [](void) -> DataExtractor* { return new TrackRockfall(); });
+  */
 
   // ForceLaws
+  REGISTRER_BASE_DERIVED(ForceLaw, Default);
+  REGISTRER_BASE_DERIVED(ForceLaw, Avalanche);
+  REGISTRER_BASE_DERIVED(ForceLaw, StickedLinks);
+  /*
   Factory<ForceLaw, std::string>::Instance()->RegisterFactoryFunction(
       "Avalanche", [](void) -> ForceLaw* { return new Avalanche(); });
   Factory<ForceLaw, std::string>::Instance()->RegisterFactoryFunction("Default",
                                                                       [](void) -> ForceLaw* { return new Default(); });
   Factory<ForceLaw, std::string>::Instance()->RegisterFactoryFunction(
       "StickedLinks", [](void) -> ForceLaw* { return new StickedLinks(); });
+  */
 
   // PreproCommands
+  REGISTRER_BASE_DERIVED(PreproCommand, copyParamsToInterfaces);
+  REGISTRER_BASE_DERIVED(PreproCommand, homothetyRange);
+  REGISTRER_BASE_DERIVED(PreproCommand, particlesClonage);
+  REGISTRER_BASE_DERIVED(PreproCommand, randomlyOrientedVelocities);
+  REGISTRER_BASE_DERIVED(PreproCommand, randomlyOrientedVelocitiesClusters);
+  REGISTRER_BASE_DERIVED(PreproCommand, setAllVelocities);
+  REGISTRER_BASE_DERIVED(PreproCommand, setStiffnessRatioInterfaces);
+  REGISTRER_BASE_DERIVED(PreproCommand, setVariableStickParams);
+  REGISTRER_BASE_DERIVED(PreproCommand, StickClusters);
+  REGISTRER_BASE_DERIVED(PreproCommand, StickVerticesInClusters);
+  REGISTRER_BASE_DERIVED(PreproCommand, StickVerticesInClustersMoments);
+
+  /*
   Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
       "copyParamsToInterfaces", [](void) -> PreproCommand* { return new copyParamsToInterfaces(); });
   Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
@@ -216,8 +247,9 @@ void Rockable::ExplicitRegistrations() {
       "stickVerticesInClusters", [](void) -> PreproCommand* { return new StickVerticesInClusters(); });
   Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
       "stickVerticesInClustersMoments", [](void) -> PreproCommand* { return new StickVerticesInClustersMoments(); });
+*/
 
-  //registerUnsharedModules();
+  // registerUnsharedModules();
 }
 
 /**
@@ -227,38 +259,16 @@ void Rockable::ExplicitRegistrations() {
  */
 void Rockable::setVerboseLevel(int v) {
   std::string levelNames[] = {"off", "critical", "err", "warn", "info", "debug", "trace"};
+  std::unordered_map<int, spdlog::level::level_enum> levelMap = {
+      {0, spdlog::level::off},  {1, spdlog::level::critical}, {2, spdlog::level::err},  {3, spdlog::level::warn},
+      {4, spdlog::level::info}, {5, spdlog::level::debug},    {6, spdlog::level::trace}};
 
-  switch (v) {
-    case 6:
-      console->set_level(spdlog::level::trace);
-      break;
-    case 5:
-      console->set_level(spdlog::level::debug);
-      break;
-    case 4:
-      console->set_level(spdlog::level::info);
-      break;
-    case 3:
-      console->set_level(spdlog::level::warn);
-      break;
-    case 2:
-      console->set_level(spdlog::level::err);
-      break;
-    case 1:
-      console->set_level(spdlog::level::critical);
-      break;
-    case 0:
-      console->set_level(spdlog::level::off);
-      break;
-    default:
-      console->set_level(spdlog::level::info);
-      break;
-  }
-
-  if (v >= 0 && v <= 6) {
+  if (levelMap.count(v) > 0) {
+    console->set_level(levelMap[v]);
     fmt::print("Verbosity level has been set to '{}'\n", levelNames[v]);
   } else {
-    fmt::print("The asked-level of verbosity should be in the range 0 to 6. It has been set to {}\n", levelNames[4]);
+    console->set_level(spdlog::level::info);
+    fmt::print("The asked-level of verbosity should be in the range 0 to 6. It has been set to '{}'\n", levelNames[4]);
   }
 }
 
@@ -268,21 +278,12 @@ void Rockable::setVerboseLevel(int v) {
  * @param levelName Name of the verbose level
  */
 void Rockable::setVerboseLevel(const std::string& levelName) {
-  if (levelName == "off")
-    setVerboseLevel(0);
-  else if (levelName == "critical")
-    setVerboseLevel(1);
-  else if (levelName == "err")
-    setVerboseLevel(2);
-  else if (levelName == "warn")
-    setVerboseLevel(3);
-  else if (levelName == "info")
-    setVerboseLevel(4);
-  else if (levelName == "debug")
-    setVerboseLevel(5);
-  else if (levelName == "trace")
-    setVerboseLevel(6);
-  else {
+  std::unordered_map<std::string, int> levelMap = {{"off", 0},  {"critical", 1}, {"err", 2},  {"warn", 3},
+                                                   {"info", 4}, {"debug", 5},    {"trace", 6}};
+
+  if (levelMap.count(levelName) > 0) {
+    setVerboseLevel(levelMap[levelName]);
+  } else {
     fmt::print("Unknown verbosity level: '{}'\n", levelName);
   }
 }
@@ -515,7 +516,7 @@ void Rockable::saveConf(const char* fname) {
     if (useSoftParticles == 1) {
       conf << ' ' << Particles[i].uniformTransformation << '\n';
     } else {
-			conf << '\n';
+      conf << '\n';
     }
   }
 
@@ -813,9 +814,9 @@ void Rockable::initParser() {
       if (useSoftParticles == 1) {
         conf >> P.uniformTransformation;
       } else {
-      	P.uniformTransformation = mat9r::unit();
+        P.uniformTransformation = mat9r::unit();
       }
-			
+
       P.shape = &(Shapes[shapeId[shpName]]);  // Plug to the shape
       double h = P.homothety;
       P.mass = (h * h * h * P.shape->volume) * properties.get(idDensity, P.group);
@@ -1815,6 +1816,7 @@ void Rockable::velocityVerletStep() {
   }
 
   if (usePeriodicCell == 1) {
+    
     for (size_t c = 0; c < 9; c++) {  // loop over components
       if (System.cellControl.Drive[c] == ForceDriven) {
         Cell.h[c] += dt * Cell.vh[c] + dt2_2 * Cell.ah[c];
@@ -2639,6 +2641,7 @@ void Rockable::update_interactions() {
         Interaction::UpdateDispatcher[(*it)->type](**it, Particles[(*it)->i], Particles[(*it)->j]);
       }
     }
+
   }
 }
 
@@ -2666,6 +2669,7 @@ void Rockable::build_activeInteractions() {
   }
   activeInteractions.erase(std::remove(activeInteractions.begin(), activeInteractions.end(), nullptr),
                            activeInteractions.end());
+
 }
 
 void Rockable::compute_forces_and_moments() {
@@ -2705,6 +2709,7 @@ void Rockable::compute_resultants() {
         incrementResultants(I);
       }
     }
+
   }
 }
 
@@ -2807,6 +2812,7 @@ void Rockable::compute_accelerations_from_resultants() {
         }
       }
     }
+
   }
 
   // Acceleration of controlled bodies
@@ -2925,8 +2931,7 @@ void Rockable::accelerations() {
   compute_resultants();
 
   compute_SpringJoints();
-	
-	
+
   // compute_SoftParticles_transformation();
   if (useSoftParticles == 1) {
     // pour le moment on code en dure la loi. ***** DEVEL
@@ -2936,8 +2941,8 @@ void Rockable::accelerations() {
                                                                   Particles[i].homothety * Particles[i].shape->volume);
       Particles[i].stress /= volume;
       Particles[i].stress.symmetrize();
-      //mat9r strain = Cinv.getStrain(Particles[i].stress);
-      Particles[i].uniformTransformation = mat9r::unit(); // + strain;
+      // mat9r strain = Cinv.getStrain(Particles[i].stress);
+      Particles[i].uniformTransformation = mat9r::unit();  // + strain;
       //__SHOW(volume);
       //__SHOW(Particles[i].stress);
       //__SHOW(strain);

@@ -127,7 +127,7 @@ void Interaction::deactivate() {
 // Dispatching (array of lambdas)
 // ===============================================================================
 //  ! Be careful not to change I.type, I.j and I.jsub in the following lambdas,
-//  ! because they are stored in an ordered std::set.
+//  ! because Interactions are stored in an ordered std::set (for each Particle).
 //  ! They will be called that way:
 //  Interaction::UpdateDispatcher[IT->type](const_cast<Interaction&>(*IT), Pi, Pj);
 //  where IT is set<Interaction>::iterator, and thus *IT is a const Interaction.
@@ -138,6 +138,8 @@ void Interaction::deactivate() {
 // ===============================================================================
 
 std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispatcher[4]{
+
+    // -----------------------------------------------------------
     // ------ UpdateVertexVertex
     [](Interaction& I, Particle& Pi, Particle& Pj) -> bool {
       START_TIMER("UpdateVertexVertex");
@@ -158,6 +160,8 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
 
       return true;
     },
+
+    // -----------------------------------------------------------
     // ------ UpdateVertexEdge
     [](Interaction& I, Particle& Pi, Particle& Pj) -> bool {
 			START_TIMER("UpdateVertexEdge");
@@ -189,6 +193,8 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
 
       return true;
     },
+
+    // -----------------------------------------------------------
     // ------ UpdateVertexFace
     [](Interaction& I, Particle& Pi, Particle& Pj) -> bool {
 			START_TIMER("UpdateVertexFace");
@@ -260,6 +266,8 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
       I.deactivate();
       return false;
     },
+
+    // -----------------------------------------------------------
     // ------ UpdateEdgeEdge
     [](Interaction& I, Particle& Pi, Particle& Pj) -> bool {
 			START_TIMER("UpdateEdgeEdge");
@@ -314,7 +322,12 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
 #undef _EPSILON_VALUE_
     }};  // End of dispatching array of lambdas
 
+// ================================================
+// PERIODIC VERSIONS OF THE LAMBDAS
+// ================================================
 std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispatcherPeriodic[4]{
+
+    // -----------------------------------------------------------
     // ------ UpdateVertexVertex (Periodic)
     [](Interaction& I, Particle& Pi, Particle& Pj) -> bool {
       vec3r posi = Pi.GlobVertex(I.isub);
@@ -334,6 +347,8 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
 
       return true;
     },
+
+    // -----------------------------------------------------------
     // ------ UpdateVertexEdge (Periodic)
     [](Interaction& I, Particle& Pi, Particle& Pj) -> bool {
       size_t v1 = Pj.shape->edge[I.jsub].first;
@@ -365,6 +380,8 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
 
       return true;
     },
+
+    // -----------------------------------------------------------
     // ------ UpdateVertexFace (Periodic)
     [](Interaction& I, Particle& Pi, Particle& Pj) -> bool {
       // First, we project the node position onto the face plane.
@@ -436,6 +453,8 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
       I.deactivate();
       return false;
     },
+
+    // -----------------------------------------------------------
     // ------ UpdateEdgeEdge (Periodic)
     [](Interaction& I, Particle& Pi, Particle& Pj) -> bool {
 #define _EPSILON_VALUE_ 1.0e-12

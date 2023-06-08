@@ -1,36 +1,52 @@
-cmake_minimum_required(VERSION 3.20)
-
-message(STATUS "CMAKE_HOST_SYSTEM_NAME = " ${CMAKE_HOST_SYSTEM_NAME})
+cmake_minimum_required(VERSION 3.24)
  
 if (${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
-  set(CMAKE_CXX_COMPILER "g++-13") # do not use AppleClang
-  message(STATUS "CMAKE_CXX_COMPILER = " ${CMAKE_CXX_COMPILER})
+  set(CMAKE_OSX_COMPILER_ID "GNU")
+	set(CMAKE_CXX_COMPILER "g++-13")
+	message("On apple computers, you need to install the last g++ compiler (g++-13)")
 endif()
 
-project(Rockable LANGUAGES CXX VERSION 0.9)
+project(Rockable LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+######################################################################
+# OPTIONS
 option(ROCKABLE_USE_FT_CORR "add objectivity correction to tangent forces" OFF)
 option(ROCKABLE_ENABLE_PROFILING "enable the time profiling" OFF)
+<<<<<<< HEAD
 option(ROCKABLE_DISABLE_SEE "disable see" OFF)
+=======
+option(COMPILE_SEE "Compile the application to visualize the conf-files" ON)
+>>>>>>> master
 
-set(CMAKE_CXX_FLAGS "-O3 -Wno-deprecated-declarations -Wall -Wextra -lpthread")
+######################################################################
+# compilation flags
+set(CMAKE_CXX_FLAGS "-O3 -Wall")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 
 if(ROCKABLE_USE_FT_CORR)
-	add_compile_options(-DFT_CORR)
+	add_definitions(-DFT_CORR)
 endif()
 
 if(ROCKABLE_ENABLE_PROFILING)
 	add_compile_options(-DENABLE_PROFILING)
 	add_compile_options(-DROCKABLE_ENABLE_PROFILING)
+	add_definitions(-DENABLE_PROFILING)
 endif()
 
+# get the git tag of Rockable
+execute_process(
+    COMMAND git describe --abbrev=0 --tags
+    OUTPUT_VARIABLE ROCKABLE_GIT_TAG
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+add_definitions(-DROCKABLE_GIT_TAG="${GIT_TAG}")
+
+include(FetchContent)
 ######################################################################
 ##### Fetching TOOFUS
-include(FetchContent)
 FetchContent_Declare (
 	toofus
   GIT_REPOSITORY https://github.com/richefeu/toofus.git
@@ -39,10 +55,20 @@ FetchContent_Declare (
 
 FetchContent_GetProperties(toofus)
 if(NOT toofus_POPULATED)
-  message(STATUS "Fetching toofus")
+  message("Fetching toofus")
   FetchContent_Populate(toofus)
 	#add_subdirectory(${toofus_SOURCE_DIR})
 endif()
+
+######################################################################
+##### Fetching MATools
+#include(ExternalProject)
+#ExternalProject_Add(
+#  MATools
+#  GIT_REPOSITORY https://github.com/rprat-pro/MATools.git
+#  GIT_TAG main
+#  CMAKE_ARGS -DMATOOLS_MPI=OFF -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/MATools -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+#)
 
 ######################################################################
 ##### Fetching spdlog
@@ -54,7 +80,7 @@ FetchContent_Declare (
 
 FetchContent_GetProperties(spdlog)
 if(NOT spdlog_POPULATED)
-  message(STATUS "Fetching spdlog")
+  message("Fetching spdlog")
   FetchContent_Populate(spdlog)
 	#add_subdirectory(${spdlog_SOURCE_DIR})
 endif()
@@ -88,7 +114,7 @@ FetchContent_Declare (
 
 FetchContent_GetProperties(tclap)
 if(NOT tclap_POPULATED)
-  message(STATUS "Fetching tclap")
+  message("Fetching tclap")
   FetchContent_Populate(tclap)
 	#add_subdirectory(${tclap_SOURCE_DIR})
 endif()
@@ -103,7 +129,7 @@ FetchContent_Declare (
 
 FetchContent_GetProperties(nlohmann-json)
 if(NOT nlohmann-json_POPULATED)
-  message(STATUS "Fetching nlohmann-json")
+  message("Fetching nlohmann-json")
   FetchContent_Populate(nlohmann-json)
 	#add_subdirectory(${nlohmann-json_SOURCE_DIR})
 endif()
@@ -118,10 +144,28 @@ FetchContent_Declare (
 
 FetchContent_GetProperties(imgui)
 if(NOT imgui_POPULATED)
-  message(STATUS "Fetching imgui")
+  message("Fetching imgui")
   FetchContent_Populate(imgui)
 	#add_subdirectory(${imgui_SOURCE_DIR})
 endif()
+
+######################################################################
+##### Chaiscript
+#FetchContent_Declare (
+#	ChaiScript
+#  GIT_REPOSITORY https://github.com/ChaiScript/ChaiScript.git
+#  GIT_TAG        v6.1.0
+#)
+#FetchContent_GetProperties(ChaiScript)
+#if(NOT chaiscript_POPULATED)
+#  message("Fetching ChaiScript")
+#  FetchContent_Populate(ChaiScript)
+#	add_subdirectory(${chaiscript_SOURCE_DIR})
+#endif()
+
+######################################################################
+##### Making available all fetched things
+#FetchContent_MakeAvailable(MATools)
 
 ######################################################################
 ##### OpenMP
@@ -135,30 +179,30 @@ endif()
 ##### OpenGL
 find_package(OpenGL REQUIRED)
 if(OPENGL_FOUND)
-  message(STATUS "OPENGL_INCLUDE_DIR = " ${OPENGL_INCLUDE_DIR})
-  message(STATUS "OPENGL_LIBRARIES = " ${OPENGL_LIBRARIES})
+  message("OPENGL_INCLUDE_DIR = " ${OPENGL_INCLUDE_DIR})
+  message("OPENGL_LIBRARIES = " ${OPENGL_LIBRARIES})
 endif()
 
 ######################################################################
 #### glut
 if (${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
+	
   # here, we do not uses find_package(glut) so that the version installed by apple is NOT used
   find_package(PkgConfig REQUIRED)
   pkg_check_modules(GLUT REQUIRED glut>=3.4.0)
   if(GLUT_FOUND)
-    message(STATUS "GLUT as been found with PkgConfig")
-		
-		message(STATUS "GLUT_LIBRARY_DIRS = " ${GLUT_LIBRARY_DIRS})
-	  message(STATUS "GLUT_INCLUDE_DIRS = " ${GLUT_INCLUDE_DIRS})
-		message(STATUS "GLUT_LIBRARIES = " ${GLUT_LIBRARIES})
+    message("GLUT as been found with PkgConfig")		
+		message("GLUT_LIBRARY_DIRS = " ${GLUT_LIBRARY_DIRS})
+	  message("GLUT_INCLUDE_DIRS = " ${GLUT_INCLUDE_DIRS})
+		message("GLUT_LIBRARIES = " ${GLUT_LIBRARIES})
   endif() 
 
 else()
 
   find_package(GLUT REQUIRED)
   if(GLUT_FOUND)
-    message(STATUS "GLUT_INCLUDE_DIRS = " ${GLUT_INCLUDE_DIRS})
-	  message(STATUS "GLUT_LIBRARIES = " ${GLUT_LIBRARIES})
+    message("GLUT_INCLUDE_DIRS = " ${GLUT_INCLUDE_DIRS})
+	  message("GLUT_LIBRARIES = " ${GLUT_LIBRARIES})
   endif()
 	
 endif()
@@ -167,9 +211,10 @@ endif()
 #### glfw
 #find_package(GLFW3 3.3 REQUIRED)
 #if(GLFW3_FOUND)
-#  message(STATUS "GLFW3_INCLUDE_DIRS = " ${GLFW_INCLUDE_DIR})
-#  message(STATUS "GLFW3_LIBRARIES = " ${GLFW3_LIBRARIES})
+#  message("GLFW3_INCLUDE_DIRS = " ${GLFW_INCLUDE_DIR})
+#  message("GLFW3_LIBRARIES = " ${GLFW3_LIBRARIES})
 #endif()
+
 
 ######################################################################
 ##### libRockable_core
@@ -201,13 +246,13 @@ target_link_libraries(rockable PUBLIC Rockable_core)
 
 ######################################################################
 ##### visualiser see
-if(NOT ROCKABLE_DISABLE_SEE) 
-	add_executable(see Apps/see.cpp)
-	target_include_directories(see PUBLIC 
-		${OPENGL_INCLUDE_DIR} 
-		${GLUT_INCLUDE_DIRS}
-		${nlohmann-json_SOURCE_DIR}/include
-	)
+if(COMPILE_SEE)
+add_executable(see Apps/see.cpp)
+target_include_directories(see PUBLIC 
+	${OPENGL_INCLUDE_DIR} 
+	${GLUT_INCLUDE_DIRS}
+	${nlohmann-json_SOURCE_DIR}/include
+)
 target_link_directories(see PUBLIC ${GLUT_LIBRARY_DIRS})
 target_link_libraries (see PUBLIC OpenGL::GL ${GLUT_LIBRARIES} Rockable_core)
 endif()
