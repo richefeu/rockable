@@ -88,6 +88,7 @@
 #include "PreproCommands/PreproCommand.hpp"
 #include "SpringJoint.hpp"
 #include "clusterParticles.hpp"
+#include "ProfilingTools.hpp"
 
 class Rockable {
  public:

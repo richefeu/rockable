@@ -44,9 +44,9 @@
  *
  */
 int main(int argc, char const* argv[]) {
-  INIT_TIMERS();
-
+	RockableProfiler::ProfilerManager prof;
   StackTracer::initSignals();
+
 
   std::string confFileName;
   int nbThreads = 1;
@@ -85,7 +85,5 @@ int main(int argc, char const* argv[]) {
 #endif
 
   box.console_run(confFileName);
-
-  PRINT_TIMERS("rockable");
   return 0;
 }
