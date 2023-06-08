@@ -1631,7 +1631,7 @@ void main_imgui_menu() {
 // =====================================================================
 
 int main(int argc, char* argv[]) {
-	INIT_TIMERS();
+	RockableProfiler::ProfilerManager prof;
 	
   box.setInteractive(true);
 
