@@ -25,6 +25,7 @@ endif()
 
 if(ROCKABLE_ENABLE_PROFILING)
 	add_compile_options(-DENABLE_PROFILING)
+	add_compile_options(-DROCKABLE_ENABLE_PROFILING)
 endif()
 
 ######################################################################
