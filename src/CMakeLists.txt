@@ -59,6 +59,24 @@ if(NOT spdlog_POPULATED)
 endif()
 
 ######################################################################
+##### MATools
+if(ROCKABLE_ENABLE_PROFILING)
+	FetchContent_Declare (
+		matools
+  	GIT_REPOSITORY https://github.com/rprat-pro/MATools
+  	GIT_TAG        v1.0
+	)
+
+	FetchContent_GetProperties(matools)
+	if(NOT matools_POPULATED)
+  	message(STATUS "Fetching MATools")
+		add_subdirectory(build/_deps/matools-src)
+  	FetchContent_Populate(matools)
+	#	find_package(MATools REQUIRED)
+	endif()
+endif()
+
+######################################################################
 ##### tclap
 FetchContent_Declare (
 	tclap
@@ -173,6 +191,9 @@ file(GLOB core_object_files ${CMAKE_CURRENT_SOURCE_DIR}
 ######################################################################
 ##### rockable executable (to run simulations from the console)
 add_library(Rockable_core STATIC ${core_object_files})
+if(ROCKABLE_ENABLE_PROFILING)
+	target_link_libraries(Rockable_core MATools)
+endif()
 add_executable(rockable Apps/run.cpp)
 target_link_libraries(rockable PUBLIC Rockable_core)
 
