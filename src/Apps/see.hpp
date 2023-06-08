@@ -78,6 +78,7 @@ nlohmann::json params = {{"colorMode", 0},
                          {"show_keybinds", 0},
                          {"show_traj", 0},
                          {"show_probe", 0},
+                         {"show_periodicBox", 1},
                          {"ParticleColor", {207, 174, 85}},
                          {"alpha_particles", 1.0f},
                          {"alpha_fixparticles", 0.2f},
@@ -139,6 +140,7 @@ void drawGlobalFrame();
 void drawGlobalAABB();
 void drawOBBs();
 void drawProbe();
+void drawPeriodicCell();
 
 // Callback functions
 void keyboard(unsigned char Key, int x, int y);

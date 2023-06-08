@@ -1,24 +1,24 @@
 //  Copyright or © or Copr. Rockable
-//  
+//
 //  vincent.richefeu@3sr-grenoble.fr
-//  
-//  This software is a computer program whose purpose is 
+//
+//  This software is a computer program whose purpose is
 //    (i)  to hold sphero-polyhedral shapes,
-//    (ii) to manage breakable interfaces. 
+//    (ii) to manage breakable interfaces.
 //  It is developed for an ACADEMIC USAGE
-//  
+//
 //  This software is governed by the CeCILL-B license under French law and
-//  abiding by the rules of distribution of free software.  You can  use, 
+//  abiding by the rules of distribution of free software.  You can  use,
 //  modify and/ or redistribute the software under the terms of the CeCILL-B
 //  license as circulated by CEA, CNRS and INRIA at the following URL
-//  "http://www.cecill.info". 
-//  
+//  "http://www.cecill.info".
+//
 //  As a counterpart to the access to the source code and  rights to copy,
 //  modify and redistribute granted by the license, users are provided only
 //  with a limited warranty  and the software's author,  the holder of the
 //  economic rights,  and the successive licensors  have only  limited
-//  liability. 
-//  
+//  liability.
+//
 //  In this respect, the user's attention is drawn to the risks associated
 //  with loading,  using,  modifying and/or developing or reproducing the
 //  software by the user in light of its specific status of free software,
@@ -26,10 +26,10 @@
 //  therefore means  that it is reserved for developers  and  experienced
 //  professionals having in-depth computer knowledge. Users are therefore
 //  encouraged to load and test the software's suitability as regards their
-//  requirements in conditions enabling the security of their systems and/or 
-//  data to be ensured and,  more generally, to use and operate it in the 
-//  same conditions as regards security. 
-//  
+//  requirements in conditions enabling the security of their systems and/or
+//  data to be ensured and,  more generally, to use and operate it in the
+//  same conditions as regards security.
+//
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
@@ -48,12 +48,7 @@ const int veType = 1;  // vertex       edge
 const int vfType = 2;  // vertex       face
 const int eeType = 3;  // edge         edge
 //=========================================================
-const std::string InteractionTypeName[] = {
-  "vertex-vertex",
-  "vertex-edge",
-  "vertex-face",
-  "edge-edge"
-};
+const std::string InteractionTypeName[] = {"vertex-vertex", "vertex-edge", "vertex-face", "edge-edge"};
 //=========================================================
 
 class BreakableInterface;
@@ -61,9 +56,9 @@ class BreakableInterface;
 /// Data of Interaction
 class Interaction {
  public:
-  size_t i;  ///< ID-number of the first particle
-  size_t j;  ///< ID-number of the second particle
-             // !! BE CAREFUL: there's no explicit assertion that i < j
+  size_t i;     ///< ID-number of the first particle
+  size_t j;     ///< ID-number of the second particle
+                // !! BE CAREFUL: there's no explicit assertion that i < j
   int type;     ///< The type of contact
   size_t isub;  ///< id of sub-body (that can be vertex, edge or face depending
                 ///< on type) in sphero-polyhedron i
@@ -75,11 +70,11 @@ class Interaction {
 
   double dn;       ///< Normal distance (overlap = negative distance)
   double prev_dn;  ///< Backup of dn at the previous time step
-  
-  vec3r pos;  ///< Contact position
-  vec3r vel;  ///< Relative velocity (j relative to i)
+
+  vec3r pos;             ///< Contact position
+  vec3r vel;             ///< Relative velocity (j relative to i)
   vec3r jPeriodicShift;  ///< In case of periodic cell, this the shifting of particle j
-  
+
   double fn;  ///< Normal force (scalar value)
   vec3r ft;   ///< Tangential force (vector)
   vec3r mom;  ///< Moment at the contact point
@@ -108,6 +103,8 @@ namespace std {
 template <>
 struct less<Interaction> {
   bool operator()(const Interaction& lhs, const Interaction& rhs) const {
+#if 0
+
     if (lhs.i < rhs.i) return true;
     if (lhs.i > rhs.i) return false;
 
@@ -119,12 +116,24 @@ struct less<Interaction> {
     if (lhs.j == rhs.j && lhs.type == rhs.type && lhs.isub < rhs.isub) return true;
     if (lhs.j == rhs.j && lhs.type == rhs.type && lhs.isub == rhs.isub) return (lhs.jsub < rhs.jsub);
     return false;
+
+#else
+
+    if (lhs.i != rhs.i) return lhs.i < rhs.i;
+    if (lhs.j != rhs.j) return lhs.j < rhs.j;
+    if (lhs.type != rhs.type) return lhs.type < rhs.type;
+    if (lhs.isub != rhs.isub) return lhs.isub < rhs.isub;
+    return lhs.jsub < rhs.jsub;
+
+#endif
   }
 };
 
 template <>
 struct less<Interaction*> {
   bool operator()(const Interaction* lhs, const Interaction* rhs) const {
+#if 0
+
     if (lhs->i < rhs->i) return true;
     if (lhs->i > rhs->i) return false;
 
@@ -134,6 +143,16 @@ struct less<Interaction*> {
     if (lhs->j == rhs->j && lhs->type == rhs->type && lhs->isub < rhs->isub) return true;
     if (lhs->j == rhs->j && lhs->type == rhs->type && lhs->isub == rhs->isub) return (lhs->jsub < rhs->jsub);
     return false;
+
+#else
+
+    if (lhs->i != rhs->i) return lhs->i < rhs->i;
+    if (lhs->j != rhs->j) return lhs->j < rhs->j;
+    if (lhs->type != rhs->type) return lhs->type < rhs->type;
+    if (lhs->isub != rhs->isub) return lhs->isub < rhs->isub;
+    return lhs->jsub < rhs->jsub;
+
+#endif
   }
 };
 }  // namespace std

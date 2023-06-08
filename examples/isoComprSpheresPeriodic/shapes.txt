@@ -1,0 +1,88 @@
+<
+name Sphere
+radius 1
+preCompDone y
+nv 1
+0 0 0
+ne 0
+nf 0
+obb.extent 1 1 1
+obb.e1 1 0 0
+obb.e2 0 1 0
+obb.e3 0 0 1
+obb.center 0 0 0
+volume 4.18879
+I/m 0.4 0.4 0.4
+>
+<
+name x-wall
+radius 0.001
+preCompDone y
+nv 4
+0 0.026 0.026
+0 0.026 -0.026
+0 -0.026 -0.026
+0 -0.026 0.026
+ne 4
+0 1
+1 2
+2 3
+3 0
+nf 1
+4 0 1 2 3
+obb.extent 0.001 0.027 0.027
+obb.e1 1 0 0
+obb.e2 0 1 0
+obb.e3 0 0 1
+obb.center 0 0 0
+volume 0.000104
+I/m 1.0 1.0 1.0
+>
+<
+name y-wall
+radius 0.001
+preCompDone y
+nv 4
+0.026 0 0.026
+0.026 0 -0.026
+-0.026 0 -0.026
+-0.026 0 0.026
+ne 4
+0 1
+1 2
+2 3
+3 0
+nf 1
+4 0 1 2 3
+obb.extent 0.027 0.001 0.027
+obb.e1 1 0 0
+obb.e2 0 1 0
+obb.e3 0 0 1
+obb.center 0 0 0
+volume 0.000104
+I/m 1.0 1.0 1.0
+>
+<
+name z-wall
+radius 0.001
+preCompDone y
+nv 4
+0.026 0.026 0
+0.026 -0.026 0
+-0.026 -0.026 0
+-0.026 0.026 0
+ne 4
+0 1
+1 2
+2 3
+3 0
+nf 1
+4 0 1 2 3
+obb.extent 0.027 0.027 0.001
+obb.e1 1 0 0
+obb.e2 0 1 0
+obb.e3 0 0 1
+obb.center 0 0 0
+volume 0.000104
+I/m 1.0 1.0 1.0
+>

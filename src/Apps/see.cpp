@@ -284,6 +284,10 @@ void keyboard(unsigned char Key, int x, int y) {
       editSelection();
     } break;
 
+    case 'P': {
+      params["show_periodicBox"] = 1 - params["show_periodicBox"].get<int>();
+    } break;
+
     case 'q':
       exit(0);
       break;
@@ -597,6 +601,7 @@ void display() {
   if (params["show_obb"].get<int>() == 1) drawOBBs();
   if (params["show_particles"].get<int>() == 1) drawParticles();
   if (params["show_probe"].get<int>() == 1) drawProbe();
+  if (params["show_periodicBox"].get<int>() == 1) drawPeriodicCell();
 
   if (params["show_keybinds"].get<int>() == 1) showKeybinds();
   textZone.draw();
@@ -645,7 +650,7 @@ void reshape(int w, int h) {
 }
 
 // Draw the shape of the sphero-polyhedron in its own framework
-void drawShape(Shape* s, double homothety, const mat9r & T) {
+void drawShape(Shape* s, double homothety, const mat9r& T) {
   double R = homothety * s->radius;
   int nbLevelSphere = 2;
   if (totalNumberOfVertices > 10000) {
@@ -654,10 +659,10 @@ void drawShape(Shape* s, double homothety, const mat9r & T) {
 
   if (shapeWithoutThickness == 0 || s->face.empty()) {
     // vertixes (spheres)
-		vec3r vert;
+    vec3r vert;
     for (size_t v = 0; v < s->vertex.size(); ++v) {
       glPushMatrix();
-			vert = T * (homothety * s->vertex[v]);
+      vert = T * (homothety * s->vertex[v]);
       glTranslatef(vert.x, vert.y, vert.z);
       facetSphere::draw(nbLevelSphere, R);
       glPopMatrix();
@@ -665,8 +670,8 @@ void drawShape(Shape* s, double homothety, const mat9r & T) {
 
     // edges (tubes)
     for (size_t e = 0; e < s->edge.size(); ++e) {
-      vec3r orig =T* homothety * s->vertex[s->edge[e].first];
-      vec3r arrow = T*homothety * s->vertex[s->edge[e].second];
+      vec3r orig = T * homothety * s->vertex[s->edge[e].first];
+      vec3r arrow = T * homothety * s->vertex[s->edge[e].second];
       arrow -= orig;
       glShape::tube(orig, arrow, 2.0 * R);
     }
@@ -791,6 +796,63 @@ void drawTrajectories() {
       glEnd();
     }
   }
+}
+
+// This function draw the periodic cell
+// ====================================
+//      Z
+//      4______7
+//     /|     /|
+//   5/_|___6/ |
+//   |  0___|__3 Y
+//   | /    | /
+//   1/_____2/
+//   X
+// ====================================
+void drawPeriodicCell() {
+  glDisable(GL_LIGHTING);
+
+  glLineWidth(3.0f);
+  glColor3f(1.0f, 0.25f, 0.1f);
+
+  vec3r p0;
+  vec3r p1 = box.Cell.h.get_xcol();
+  vec3r p3 = box.Cell.h.get_ycol();
+  vec3r p2 = p1 + p3;
+  vec3r p4 = p0 + box.Cell.h.get_zcol();
+  vec3r p5 = p1 + box.Cell.h.get_zcol();
+  vec3r p6 = p2 + box.Cell.h.get_zcol();
+  vec3r p7 = p3 + box.Cell.h.get_zcol();
+
+  glBegin(GL_LINE_LOOP);
+  glVertex3d(p0.x, p0.y, p0.z);
+  glVertex3d(p1.x, p1.y, p1.z);
+  glVertex3d(p2.x, p2.y, p2.z);
+  glVertex3d(p3.x, p3.y, p3.z);
+  glVertex3d(p0.x, p0.y, p0.z);
+  glEnd();
+
+  glBegin(GL_LINE_LOOP);
+  glVertex3d(p4.x, p4.y, p4.z);
+  glVertex3d(p5.x, p5.y, p5.z);
+  glVertex3d(p6.x, p6.y, p6.z);
+  glVertex3d(p7.x, p7.y, p7.z);
+  glVertex3d(p4.x, p4.y, p4.z);
+  glEnd();
+
+  glBegin(GL_LINES);
+  glVertex3d(p0.x, p0.y, p0.z);
+  glVertex3d(p4.x, p4.y, p4.z);
+
+  glVertex3d(p1.x, p1.y, p1.z);
+  glVertex3d(p5.x, p5.y, p5.z);
+
+  glVertex3d(p2.x, p2.y, p2.z);
+  glVertex3d(p6.x, p6.y, p6.z);
+
+  glVertex3d(p3.x, p3.y, p3.z);
+  glVertex3d(p7.x, p7.y, p7.z);
+  glEnd();
 }
 
 void drawGlobalFrame() {
