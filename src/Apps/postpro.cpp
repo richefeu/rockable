@@ -64,7 +64,7 @@ PostProcessor* readPostproCommands(const char* fname) {
 }
 
 int main(int argc, char const* argv[]) {
-	INIT_TIMERS();
+	RockableProfiler::ProfilerManager prof;
 	
   PostProcessor* processor;
 

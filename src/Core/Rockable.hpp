@@ -73,8 +73,9 @@
 #include "kwParser.hpp"
 #include "linkCells.hpp"
 #include "message.hpp"
-#include "profiler.hpp"
+//#include "profiler.hpp"
 #include "Compliance.hpp"
+#include "ProfilingTools.hpp"
 
 // local headers
 #include "BodyForces/BodyForce.hpp"

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.26)
+cmake_minimum_required(VERSION 3.24)
  
 if (${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
   set(CMAKE_OSX_COMPILER_ID "GNU")
@@ -15,7 +15,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # OPTIONS
 option(ROCKABLE_USE_FT_CORR "add objectivity correction to tangent forces" OFF)
 option(ROCKABLE_ENABLE_PROFILING "enable the time profiling" OFF)
+#<<<<<<< HEAD
+option(ROCKABLE_DISABLE_SEE "disable see" OFF) ## pas utiliser en fait 
+#=======
 option(COMPILE_SEE "Compile the application to visualize the conf-files" ON)
+#>>>>>>> master
 
 ######################################################################
 # compilation flags
@@ -27,6 +31,8 @@ if(ROCKABLE_USE_FT_CORR)
 endif()
 
 if(ROCKABLE_ENABLE_PROFILING)
+	add_compile_options(-DENABLE_PROFILING)
+	add_compile_options(-DROCKABLE_ENABLE_PROFILING)
 	add_definitions(-DENABLE_PROFILING)
 endif()
 
@@ -77,6 +83,25 @@ if(NOT spdlog_POPULATED)
   message("Fetching spdlog")
   FetchContent_Populate(spdlog)
 	#add_subdirectory(${spdlog_SOURCE_DIR})
+endif()
+
+######################################################################
+##### MATools
+if(ROCKABLE_ENABLE_PROFILING)
+	FetchContent_Declare (
+		matools
+  	GIT_REPOSITORY https://github.com/rprat-pro/MATools
+  	GIT_TAG        v1.0
+	)
+
+	FetchContent_GetProperties(matools)
+	if(NOT matools_POPULATED)
+  	message(STATUS "Fetching MATools")
+  	FetchContent_Populate(matools)
+		SET(MATOOLS_MPI OFF CACHE BOOL "Use some expat option")
+		add_subdirectory(${CMAKE_BINARY_DIR}/_deps/matools-src)
+	#	find_package(MATools REQUIRED)
+	endif()
 endif()
 
 ######################################################################
@@ -213,6 +238,9 @@ file(GLOB core_object_files ${CMAKE_CURRENT_SOURCE_DIR}
 ######################################################################
 ##### rockable executable (to run simulations from the console)
 add_library(Rockable_core STATIC ${core_object_files})
+if(ROCKABLE_ENABLE_PROFILING)
+	target_link_libraries(Rockable_core MATools)
+endif()
 add_executable(rockable Apps/run.cpp)
 target_link_libraries(rockable PUBLIC Rockable_core)
 

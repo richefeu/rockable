@@ -412,7 +412,7 @@ void Patatrac::saveTrajectories(const char* name) {
 }
 
 int main(int argc, char const* argv[]) {
-  INIT_TIMERS();
+	RockableProfiler::ProfilerManager prof;
 
   if (argc != 3) {
     std::cout << std::endl;
@@ -428,8 +428,6 @@ int main(int argc, char const* argv[]) {
 
   Ptt.dropAll();
   Ptt.saveTrajectories("traj.txt");
-
-  PRINT_TIMERS("prof");
 
   return 0;
 }
