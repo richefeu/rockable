@@ -1470,7 +1470,7 @@ void buildMenu() {
 // =====================================================================
 
 int main(int argc, char* argv[]) {
-  INIT_TIMERS();
+  //INIT_TIMERS();
 
   box.setInteractive(true);
 

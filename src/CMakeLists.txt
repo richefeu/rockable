@@ -15,11 +15,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # OPTIONS
 option(ROCKABLE_USE_FT_CORR "add objectivity correction to tangent forces" OFF)
 option(ROCKABLE_ENABLE_PROFILING "enable the time profiling" OFF)
-<<<<<<< HEAD
-option(ROCKABLE_DISABLE_SEE "disable see" OFF)
-=======
+#<<<<<<< HEAD
+option(ROCKABLE_DISABLE_SEE "disable see" OFF) ## pas utiliser en fait 
+#=======
 option(COMPILE_SEE "Compile the application to visualize the conf-files" ON)
->>>>>>> master
+#>>>>>>> master
 
 ######################################################################
 # compilation flags
