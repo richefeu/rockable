@@ -161,19 +161,13 @@ Rockable::Rockable() {
 void Rockable::ExplicitRegistrations() {
   // We need to make these explicit registrations of various features to be able to build a static library.
   // With the automatic registration, this is not possible (merging the *.o into a single *.a breaks everything)
+  //
+  // Because of that, the compilation is now longer
 
   // BodyForces
   REGISTRER_BASE_DERIVED(BodyForce, AttractingPoint);
   REGISTRER_BASE_DERIVED(BodyForce, PreferredDirection);
   REGISTRER_BASE_DERIVED(BodyForce, ViscousFluid);
-  /*
-  Factory<BodyForce, std::string>::Instance()->RegisterFactoryFunction(
-      "AttractingPoint", [](void) -> BodyForce* { return new AttractingPoint(); });
-  Factory<BodyForce, std::string>::Instance()->RegisterFactoryFunction(
-      "PreferredDirection", [](void) -> BodyForce* { return new PreferredDirection(); });
-  Factory<BodyForce, std::string>::Instance()->RegisterFactoryFunction(
-      "ViscousFluid", [](void) -> BodyForce* { return new ViscousFluid(); });
-  */
 
   // DataExtractors
   REGISTRER_BASE_DERIVED(DataExtractor, ClusterAABB);
@@ -182,33 +176,11 @@ void Rockable::ExplicitRegistrations() {
   REGISTRER_BASE_DERIVED(DataExtractor, MeanVelocity);
   REGISTRER_BASE_DERIVED(DataExtractor, TrackBody);
   REGISTRER_BASE_DERIVED(DataExtractor, TrackRockfall);
-  /*
-  Factory<DataExtractor, std::string>::Instance()->RegisterFactoryFunction(
-      "ClusterAABB", [](void) -> DataExtractor* { return new ClusterAABB(); });
-  Factory<DataExtractor, std::string>::Instance()->RegisterFactoryFunction(
-      "dnStat", [](void) -> DataExtractor* { return new dnStat(); });
-  Factory<DataExtractor, std::string>::Instance()->RegisterFactoryFunction(
-      "DuoBalance", [](void) -> DataExtractor* { return new DuoBalance(); });
-  Factory<DataExtractor, std::string>::Instance()->RegisterFactoryFunction(
-      "MeanVelocity", [](void) -> DataExtractor* { return new MeanVelocity(); });
-  Factory<DataExtractor, std::string>::Instance()->RegisterFactoryFunction(
-      "TrackBody", [](void) -> DataExtractor* { return new TrackBody(); });
-  Factory<DataExtractor, std::string>::Instance()->RegisterFactoryFunction(
-      "TrackRockfall", [](void) -> DataExtractor* { return new TrackRockfall(); });
-  */
 
   // ForceLaws
   REGISTRER_BASE_DERIVED(ForceLaw, Default);
   REGISTRER_BASE_DERIVED(ForceLaw, Avalanche);
   REGISTRER_BASE_DERIVED(ForceLaw, StickedLinks);
-  /*
-  Factory<ForceLaw, std::string>::Instance()->RegisterFactoryFunction(
-      "Avalanche", [](void) -> ForceLaw* { return new Avalanche(); });
-  Factory<ForceLaw, std::string>::Instance()->RegisterFactoryFunction("Default",
-                                                                      [](void) -> ForceLaw* { return new Default(); });
-  Factory<ForceLaw, std::string>::Instance()->RegisterFactoryFunction(
-      "StickedLinks", [](void) -> ForceLaw* { return new StickedLinks(); });
-  */
 
   // PreproCommands
   REGISTRER_BASE_DERIVED(PreproCommand, copyParamsToInterfaces);
@@ -219,35 +191,9 @@ void Rockable::ExplicitRegistrations() {
   REGISTRER_BASE_DERIVED(PreproCommand, setAllVelocities);
   REGISTRER_BASE_DERIVED(PreproCommand, setStiffnessRatioInterfaces);
   REGISTRER_BASE_DERIVED(PreproCommand, setVariableStickParams);
-  REGISTRER_BASE_DERIVED(PreproCommand, StickClusters);
-  REGISTRER_BASE_DERIVED(PreproCommand, StickVerticesInClusters);
-  REGISTRER_BASE_DERIVED(PreproCommand, StickVerticesInClustersMoments);
-
-  /*
-  Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
-      "copyParamsToInterfaces", [](void) -> PreproCommand* { return new copyParamsToInterfaces(); });
-  Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
-      "homothetyRange", [](void) -> PreproCommand* { return new homothetyRange(); });
-  Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
-      "particlesClonage", [](void) -> PreproCommand* { return new particlesClonage(); });
-  Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
-      "randomlyOrientedVelocities", [](void) -> PreproCommand* { return new randomlyOrientedVelocities(); });
-  Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
-      "randomlyOrientedVelocitiesClusters",
-      [](void) -> PreproCommand* { return new randomlyOrientedVelocitiesClusters(); });
-  Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
-      "setAllVelocities", [](void) -> PreproCommand* { return new setAllVelocities(); });
-  Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
-      "setStiffnessRatioInterfaces", [](void) -> PreproCommand* { return new setStiffnessRatioInterfaces(); });
-  Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
-      "setVariableStickParams", [](void) -> PreproCommand* { return new setVariableStickParams(); });
-  Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
-      "stickClusters", [](void) -> PreproCommand* { return new StickClusters(); });
-  Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
-      "stickVerticesInClusters", [](void) -> PreproCommand* { return new StickVerticesInClusters(); });
-  Factory<PreproCommand, std::string>::Instance()->RegisterFactoryFunction(
-      "stickVerticesInClustersMoments", [](void) -> PreproCommand* { return new StickVerticesInClustersMoments(); });
-*/
+  REGISTRER_BASE_DERIVED(PreproCommand, stickClusters);
+  REGISTRER_BASE_DERIVED(PreproCommand, stickVerticesInClusters);
+  REGISTRER_BASE_DERIVED(PreproCommand, stickVerticesInClustersMoments);
 
   // registerUnsharedModules();
 }
@@ -1107,7 +1053,13 @@ void Rockable::console_run(const std::string& confFileName) {
   std::cout << std::endl << std::endl;
 
   console->info("INITIAL UPDATE OF NEIGHBOR LIST");
-  UpdateNL();
+  if (usePeriodicCell == 1) {
+    reducedToRealKinematics();
+    UpdateNL();
+    realToReducedKinematics();
+  } else {
+    UpdateNL();
+  }
 
   console->info("COMPUTATION STARTS");
   integrate();
@@ -1238,7 +1190,6 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
     subObbj.center = Particles[j].GlobVertex(jsub) + jPeriodicShift;
     subObbj.enlarge(Particles[j].MinskowskiRadius() + dmax);
     OBB obbi = Particles[i].obb;
-    obbi.translate(-jPeriodicShift);
     obbi.enlarge(dmax);
     if (!(obbi.intersect(subObbj))) continue;
 
@@ -1803,8 +1754,8 @@ void Rockable::velocityVerletStep() {
     Particles[i].pos += dt * Particles[i].vel + dt2_2 * Particles[i].acc;
     Particles[i].vel += dt_2 * Particles[i].acc;
 
-    // if (usePeriodicCell == 1) Cell.forceToStayInside(Particles[i].pos);
-    //  This function is problematic because of n_prev should be 'wrong' in involved interactions
+    // remember here that we use reduced coordinates here, in case of periodic cell
+    if (usePeriodicCell == 1) Cell.forceToStayInside(Particles[i].pos);
 
     // Rotation: Q(k+1) = Q(k) + dQ(k) * dt + ddQ(k) * dt2/2
     // It reads like this with quaternions
@@ -1816,11 +1767,12 @@ void Rockable::velocityVerletStep() {
   }
 
   if (usePeriodicCell == 1) {
-    
+
     for (size_t c = 0; c < 9; c++) {  // loop over components
       if (System.cellControl.Drive[c] == ForceDriven) {
         Cell.h[c] += dt * Cell.vh[c] + dt2_2 * Cell.ah[c];
         Cell.vh[c] += dt_2 * Cell.ah[c];
+        // Cell.vh[c] = 0.0; // UN TEST ############
       } else {
         Cell.h[c] += dt * System.cellControl.v[c];
         Cell.vh[c] = System.cellControl.v[c];
@@ -2641,7 +2593,6 @@ void Rockable::update_interactions() {
         Interaction::UpdateDispatcher[(*it)->type](**it, Particles[(*it)->i], Particles[(*it)->j]);
       }
     }
-
   }
 }
 
@@ -2669,7 +2620,6 @@ void Rockable::build_activeInteractions() {
   }
   activeInteractions.erase(std::remove(activeInteractions.begin(), activeInteractions.end(), nullptr),
                            activeInteractions.end());
-
 }
 
 void Rockable::compute_forces_and_moments() {
@@ -2709,7 +2659,6 @@ void Rockable::compute_resultants() {
         incrementResultants(I);
       }
     }
-
   }
 }
 
@@ -2812,7 +2761,6 @@ void Rockable::compute_accelerations_from_resultants() {
         }
       }
     }
-
   }
 
   // Acceleration of controlled bodies
@@ -2956,11 +2904,15 @@ void Rockable::accelerations() {
 
   if (numericalDampingCoeff > 0.0) numericalDamping();
 
-  compute_accelerations_from_resultants();
-
   // damping solutions based on the weighting of accelerations
   if (velocityBarrier > 0.0) applyVelocityBarrier();
   if (angularVelocityBarrier > 0.0) applyAngularVelocityBarrier();
+
+  //if (usePeriodicCell == 1) {
+  //  realToReducedKinematics();
+  //}
+
+  compute_accelerations_from_resultants();
 }
 
 /**

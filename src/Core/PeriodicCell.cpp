@@ -23,14 +23,11 @@ vec3r PeriodicCell::getBranchCorrection(const vec3r& ipos, const vec3r& jpos) {
   vec3r rij = jpos - ipos;  // the branch vector from i to j
   vec3r sij = hinv * rij;   // same vector in reduced coordinates
   
-	// round it
-  sij.x -= floor(sij.x + 0.5);
-  sij.y -= floor(sij.y + 0.5);
-  sij.z -= floor(sij.z + 0.5);
+  sij.x = std::round(sij.x);
+  sij.y = std::round(sij.y);
+  sij.z = std::round(sij.z);
   
-	// the returned value in the vector from (ipos + rij) to (ipos + h.sij)
-	// So in real coordinates
-  return (h * sij - rij);
+  return (h * sij); // back to real coordinates
 }
 
 /**

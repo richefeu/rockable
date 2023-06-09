@@ -38,9 +38,9 @@
 #include "PreproCommand_stickClusters.hpp"
 #include "Core/Rockable.hpp"
 
-StickClusters::StickClusters() { }
+stickClusters::stickClusters() { }
 
-void StickClusters::addCommand() {  
+void stickClusters::addCommand() {  
   box->parser.kwMap["stickClusters"] = [this](std::istream& conf) {
     conf >> this->epsilonDist;
     exec();
@@ -55,7 +55,7 @@ void StickClusters::addCommand() {
 
    @param[in]  epsilonDist  A small distance below which the 'glue' is not added.
 */
-void StickClusters::exec() {
+void stickClusters::exec() {
   // In case the neighbor list has not been yet updated
   box->UpdateNL();
 

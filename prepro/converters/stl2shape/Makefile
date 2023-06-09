@@ -1,5 +1,5 @@
 # Paths
-COMMONPATH = /usr/local/include/toofus
+COMMONPATH = ~/toofus
 
 UNAME_S := $(shell uname -s)
 

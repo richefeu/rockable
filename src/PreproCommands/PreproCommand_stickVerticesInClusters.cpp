@@ -38,9 +38,9 @@
 #include "PreproCommand_stickVerticesInClusters.hpp"
 #include "Core/Rockable.hpp"
 
-StickVerticesInClusters::StickVerticesInClusters() {}
+stickVerticesInClusters::stickVerticesInClusters() {}
 
-void StickVerticesInClusters::addCommand() {
+void stickVerticesInClusters::addCommand() {
   box->parser.kwMap["stickVerticesInClusters"] = [this](std::istream& conf) {
     conf >> this->epsilonDist;
     exec();
@@ -53,7 +53,7 @@ void StickVerticesInClusters::addCommand() {
 
    @param[in]  epsilonDist  A small distance above which the 'glue' is not added
 */
-void StickVerticesInClusters::exec() {
+void stickVerticesInClusters::exec() {
   for (size_t i = 0; i < box->Particles.size(); i++) {
     box->Particles[i].updateObb();
   }

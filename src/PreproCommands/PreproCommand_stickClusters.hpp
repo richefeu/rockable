@@ -38,9 +38,9 @@
 
 #include "PreproCommand.hpp"
 
-class StickClusters : public PreproCommand {
+class stickClusters : public PreproCommand {
  public:
-  StickClusters();
+  stickClusters();
   void addCommand() override;
 
   void exec() override;
