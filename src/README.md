@@ -9,7 +9,7 @@ cmake ..
 #### Disable see
 
 ```
-cmake .. -DROCKABLE_DISABLE_SEE=ON
+cmake .. -DROCKABLE_COMPILE_SEE=OFF
 ```
 
 #### How to install with profiling tools

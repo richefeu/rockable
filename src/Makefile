@@ -109,8 +109,9 @@ $(wildcard BodyForces/*.cpp) \
 $(wildcard DataExtractors/*.cpp) \
 $(wildcard ForceLaws/*.cpp) \
 $(wildcard PreproCommands/*.cpp) \
-$(wildcard ProcessingTools/*.cpp) \
-$(wildcard Boundaries/*.cpp)
+$(wildcard ProcessingTools/*.cpp) 
+
+#$(wildcard Boundaries/*.cpp)
 
 IMGUI_SOURCES = $(IMGUI_DIR)/imgui.cpp \
 $(IMGUI_DIR)/imgui_demo.cpp \
