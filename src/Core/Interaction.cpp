@@ -34,7 +34,6 @@
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
 #include "Interaction.hpp"
-//#include "profiler.hpp"
 #include "ProfilingTools.hpp"
 
 Interaction::Interaction()

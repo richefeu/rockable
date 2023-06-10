@@ -162,7 +162,7 @@ void Rockable::ExplicitRegistrations() {
   // We need to make these explicit registrations of various features to be able to build a static library.
   // With the automatic registration, this is not possible (merging the *.o into a single *.a breaks everything)
   //
-  // Because of that, the compilation is now longer
+  // Because of that, the compilation is now a bit slower
 
   // BodyForces
   REGISTRER_BASE_DERIVED(BodyForce, AttractingPoint);
@@ -266,7 +266,7 @@ void Rockable::showBanner() {
   std::cout << msg::bold() << "   Rockable" << msg::normal()
             << "  Copyright (C) 2016-2023  <vincent.richefeu@univ-grenoble-alpes.fr>\n";
   std::cout << "   This program comes with ABSOLUTELY NO WARRANTY.\n";
-  std::cout << "   " << msg::fg_blue() << "This is academic software" << msg::fg_default() << "\n\n";
+  std::cout << "   " << msg::bold() << "This is academic software" << msg::normal() << "\n\n";
   std::cout << "   Documentation:       install sphinx-doc\n";
   std::cout << "   e.g., for mac OS X   brew install sphinx-doc\n";
   std::cout << "                        brew link sphinx-doc --force\n";
@@ -286,10 +286,10 @@ void Rockable::showBanner() {
   console->info("Compilation option: COMPONENTWISE_NUM_DAMPING = NO");
 #endif
 
-#ifdef ENABLE_PROFILING
-  console->info("Compilation option: ENABLE_PROFILING = YES");
+#ifdef ROCKABLE_ENABLE_PROFILING
+  console->info("Compilation option: ROCKABLE_ENABLE_PROFILING = YES");
 #else
-  console->info("Compilation option: ENABLE_PROFILING = NO");
+  console->info("Compilation option: ROCKABLE_ENABLE_PROFILING = NO");
 #endif
 }
 
@@ -337,8 +337,8 @@ void Rockable::initialChecks() {
 // ==================================================================================================================
 
 /**
-    @bried Clear the memory (exepted the shape library)
-*/
+ *   @bried Clear the memory (exepted the shape library)
+ */
 void Rockable::clearMemory() {
   Particles.clear();
   Interactions.clear();
@@ -351,8 +351,8 @@ void Rockable::clearMemory() {
 }
 
 /**
-    @brief Save a configuration-file named 'conf<i>'
-*/
+ *   @brief Save a configuration-file named 'conf<i>'
+ */
 void Rockable::saveConf(int i) {
   char fname[256];
   snprintf(fname, 256, "conf%d", i);
@@ -360,9 +360,9 @@ void Rockable::saveConf(int i) {
 }
 
 /**
-    @brief Save a configuration-file
-    @param[in]  name  The name of the conf-file
-*/
+ *   @brief Save a configuration-file
+ *   @param[in]  name  The name of the conf-file
+ */
 void Rockable::saveConf(const char* fname) {
   START_TIMER("saveConf");
 
@@ -447,7 +447,6 @@ void Rockable::saveConf(const char* fname) {
   conf << "iconf " << iconf << '\n';
   conf << "nDriven " << nDriven << '\n';
   conf << "shapeFile " << shapeFile << '\n';
-  // if (CommBox().sep != ' ') conf << "separator " << CommBox().keywordFromSep() << '\n';
   conf << "precision " << CommBox().precision << '\n';
   conf << std::scientific << std::setprecision(CommBox().precision);
   conf << "Particles " << Particles.size() << '\n';
@@ -900,8 +899,8 @@ void Rockable::initParser() {
 }
 
 /**
-    @brief Load a configuration-file named 'conf<i>'
-*/
+ *   @brief Load a configuration-file named 'conf<i>'
+ */
 void Rockable::loadConf(int i) {
   char fname[256];
   snprintf(fname, 256, "conf%d", i);
@@ -909,9 +908,9 @@ void Rockable::loadConf(int i) {
 }
 
 /**
-    @brief Load a configuration file named name
-    @param[in]  name  The name of the conf-file
-*/
+ *   @brief Load a configuration file named name
+ *   @param[in]  name  The name of the conf-file
+ */
 void Rockable::loadConf(const char* name) {
   std::ifstream conf(name);
   if (!conf.is_open()) {
@@ -953,10 +952,10 @@ void Rockable::loadConf(const char* name) {
 }
 
 /**
-    Read the DataExtractor commands in a file named 'dataExractors.txt'.
-    If the file is not found, or if the interactiveMode is true, it simply
-    exit without making anything.
-*/
+ *   Read the DataExtractor commands in a file named 'dataExractors.txt'.
+ *   If the file is not found, or if the interactiveMode is true, it simply
+ *   exit without making anything.
+ */
 void Rockable::readDataExtractors() {
   if (interactiveMode == true) return;  // The dataExtractors are not read in interactive mode
 
@@ -986,10 +985,10 @@ void Rockable::readDataExtractors() {
 }
 
 /**
-    @brief Load all shapes defined in the file 'fileName'.
-           If the library has already been loaded (ie. the file name is the same as
-           the one in the previously read conf-file), then it is not re-read.
-*/
+ *   @brief Load all shapes defined in the file 'fileName'.
+ *          If the library has already been loaded (ie. the file name is the same as
+ *          the one in the previously read conf-file), then it is not re-read.
+ */
 void Rockable::loadShapes(const char* fileName) {
   // If a library file is in the running folder, so it is preferably used
   std::string ModFileName(fileName);
@@ -1093,10 +1092,10 @@ void Rockable::setAddOrRemoveInteractions(std::string& Name) {
 }
 
 /**
-    @brief This is the brute-force O(n^2) version of the algorithm.
-           It means that the proximity of all sub-elements of i is tested with all
-           sub-elements of j
-*/
+ *   @brief This is the brute-force O(N^2) version of the algorithm.
+ *          It means that the proximity of all sub-elements of i is tested with all
+ *          sub-elements of j
+ */
 int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax) {
   START_TIMER("AddOrRemoveInteractions (brute force)");
 
@@ -1211,11 +1210,11 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
 }
 
 /**
-    This version should be best suited when the particles have a lot of sub-elements
-    (a terrain for example). When the number of sub-elements is relatively small,
-    it seems not to dramatically slow down the computation.
-    REMARK: obbi and obbj need to be already placed BEFORE calling this method
-*/
+ *   This version should be best suited when the particles have a lot of sub-elements
+ *   (a terrain for example). When the number of sub-elements is relatively small,
+ *   it seems not to dramatically slow down the computation.
+ *   REMARK: obbi and obbj need to be already placed BEFORE calling this method
+ */
 int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
   START_TIMER("AddOrRemoveInteractions (OBB-tree)");
 
@@ -1367,9 +1366,9 @@ void Rockable::Interactions_from_set_to_vec() {
 }
 
 /**
-    @brief  The most basic algorithm for building a neighbor list.
-            That is the O(N^2) complexity
-*/
+ *   @brief  The most basic algorithm for building a neighbor list.
+ *           That is the O(N^2) complexity
+ */
 void Rockable::UpdateNL_bruteForce() {
   START_TIMER("UpdateNL (bruteForce)");
 
@@ -1415,8 +1414,8 @@ void Rockable::UpdateNL_bruteForce() {
 }
 
 /**
-    @brief  A broad-phase collision detection that should have a complexity of nearly O(N).
-*/
+ *   @brief  A broad-phase collision detection that should have a complexity of nearly O(N).
+ */
 void Rockable::UpdateNL_linkCells() {
   START_TIMER("UpdateNL (linkCells)");
 
@@ -1618,8 +1617,8 @@ void Rockable::velocityControlledDrive() {
 }
 
 /**
-    @brief Makes a single step with the Euler scheme.
-*/
+ *   @brief Makes a single step with the Euler scheme.
+ */
 void Rockable::EulerStep() {
   START_TIMER("Step (Euler)");
 
@@ -1772,7 +1771,6 @@ void Rockable::velocityVerletStep() {
       if (System.cellControl.Drive[c] == ForceDriven) {
         Cell.h[c] += dt * Cell.vh[c] + dt2_2 * Cell.ah[c];
         Cell.vh[c] += dt_2 * Cell.ah[c];
-        // Cell.vh[c] = 0.0; // UN TEST ############
       } else {
         Cell.h[c] += dt * System.cellControl.v[c];
         Cell.vh[c] = System.cellControl.v[c];
@@ -2227,7 +2225,7 @@ void Rockable::RungeKutta4Step() {
 void Rockable::integrate() {
   START_TIMER("Integrate");
 
-  if (interactiveMode == true) [[unlikely]] {
+  if (interactiveMode == true) {
     console->warn("It is not possible to invoke Rockable::integrate if interactiveMode is true");
     return;
   }
@@ -2279,11 +2277,11 @@ void Rockable::integrate() {
     // It will use the selected integration scheme
     integrationStep();
 
-    if (computationStopAsked > 0) [[unlikely]] {
+    if (computationStopAsked > 0) {
       break;
     }
 
-    if (interConfC >= interConf - dt_2) [[unlikely]] {
+    if (interConfC >= interConf - dt_2) {
       iconf++;
 
       double elapsedTime = ptimer.getIntermediateElapsedTimeSeconds();
@@ -2427,7 +2425,7 @@ void Rockable::incrementResultants(Interaction& I) {
 
   // Moments
   vec3r Ci = (I.pos - Particles[I.i].pos);
-  vec3r Cj = (I.pos - Particles[I.j].pos);
+  vec3r Cj = (I.pos - (Particles[I.j].pos + I.jPeriodicShift));
   Particles[I.i].moment += cross(Ci, f) + I.mom;
   Particles[I.j].moment += cross(Cj, -f) - I.mom;
 
@@ -2487,10 +2485,12 @@ void Rockable::realToReducedKinematics() {
     // this is supposed to be real coordinates
     vec3r r = Particles[i].pos;
     vec3r dr = Particles[i].vel;
+    // vec3r ddr = Particles[i].acc;
 
-    // now express in reduced coordinates
+    // now expressed in reduced coordinates
     Particles[i].pos = Cell.hinv * r;
     Particles[i].vel = Cell.hinv * (dr - Cell.vh * Particles[i].pos);
+    // Particles[i].acc = Cell.hinv * ddr;
   }
 }
 
@@ -2504,10 +2504,12 @@ void Rockable::reducedToRealKinematics() {
     // this is supposed to be reduced coordinates
     vec3r s = Particles[i].pos;
     vec3r ds = Particles[i].vel;
+    // vec3r dds = Particles[i].acc;
 
-    // now express in real coordinates
+    // now expressed in real coordinates
     Particles[i].pos = Cell.h * s;
     Particles[i].vel = Cell.vh * s + Cell.h * ds;
+    // Particles[i].acc = Cell.h * dds;
   }
 }
 
@@ -2834,6 +2836,8 @@ void Rockable::compute_accelerations_from_resultants() {
 #pragma omp parallel for default(shared)
   for (size_t i = nDriven; i < Particles.size(); ++i) {
     Particles[i].acc = Particles[i].force / Particles[i].mass;
+		
+		// If there's a periodic cell, the accelerations are rescaled toward reduced coordinates
     if (usePeriodicCell == 1) Particles[i].acc = Cell.hinv * Particles[i].acc;
 
     quat Qinv = Particles[i].Q.get_conjugated();
@@ -2848,13 +2852,13 @@ void Rockable::compute_accelerations_from_resultants() {
 }
 
 /**
-    @brief  Compute the particle accelerations (translations and rotations)
-
-    The method computes actually 3 things:\n
-      1. the interaction forces and moments with the force laws,\n
-      2. the resultant forces and moments at the body centers,\n
-      3. the axial and angular accelerations of the bodies
-*/
+ *   @brief  Compute the particle accelerations (translations and rotations)
+ *
+ *   The method computes actually 3 things:\n
+ *     1. the interaction forces and moments with the force laws,\n
+ *     2. the resultant forces and moments at the body centers,\n
+ *     3. the axial and angular accelerations of the bodies
+ */
 void Rockable::accelerations() {
   START_TIMER("Accelerations");
 
@@ -2891,10 +2895,6 @@ void Rockable::accelerations() {
       Particles[i].stress.symmetrize();
       // mat9r strain = Cinv.getStrain(Particles[i].stress);
       Particles[i].uniformTransformation = mat9r::unit();  // + strain;
-      //__SHOW(volume);
-      //__SHOW(Particles[i].stress);
-      //__SHOW(strain);
-      //__SHOW(Particles[i].uniformTransformation);
     }
   }
 
@@ -2908,18 +2908,14 @@ void Rockable::accelerations() {
   if (velocityBarrier > 0.0) applyVelocityBarrier();
   if (angularVelocityBarrier > 0.0) applyAngularVelocityBarrier();
 
-  //if (usePeriodicCell == 1) {
-  //  realToReducedKinematics();
-  //}
-
   compute_accelerations_from_resultants();
 }
 
 /**
-    @brief This is the so-called Cundall damping solution
-    @attention It acts on forces, so call this method after the summation of forces/moment
-               and before the computation of accelerations
-*/
+ *   @brief This is the so-called Cundall damping solution
+ *   @attention It acts on forces, so call this method after the summation of forces/moment
+ *              and before the computation of accelerations
+ */
 void Rockable::numericalDamping() {
   START_TIMER("numericalDamping");
   double factor;
@@ -2977,14 +2973,14 @@ void Rockable::numericalDamping() {
 }
 
 /**
-    @brief Component-wise weighting of translation acceleration to limit the velocity components to
-           the value 'VelocityBarrier'
-
-    The weighting factor is equal to 1 when the velocity is of the order of zero,
-    it tends towards 0 when the velocity approaches 'VelocityBarrier',
-    and it becomes negative when the velocity exceeds 'VelocityBarrier'
-    (it tends towards -1 when v tends towards infinity).
-*/
+ *   @brief Component-wise weighting of translation acceleration to limit the velocity components to
+ *          the value 'VelocityBarrier'
+ *
+ *   The weighting factor is equal to 1 when the velocity is of the order of zero,
+ *   it tends towards 0 when the velocity approaches 'VelocityBarrier',
+ *   and it becomes negative when the velocity exceeds 'VelocityBarrier'
+ *   (it tends towards -1 when v tends towards infinity).
+ */
 void Rockable::applyVelocityBarrier() {
   START_TIMER("applyVelocityBarrier");
   for (size_t i = 0; i < Particles.size(); ++i) {
@@ -3000,9 +2996,9 @@ void Rockable::applyVelocityBarrier() {
 }
 
 /**
-    @brief Component-wise weighting of rotation acceleration to limit the velocity components to
-           the value 'AngularVelocityBarrier'
-*/
+ *   @brief Component-wise weighting of rotation acceleration to limit the velocity components to
+ *          the value 'AngularVelocityBarrier'
+ */
 void Rockable::applyAngularVelocityBarrier() {
   START_TIMER("applyAngularVelocityBarrier");
   for (size_t i = 0; i < Particles.size(); ++i) {
@@ -3022,12 +3018,12 @@ void Rockable::applyAngularVelocityBarrier() {
 // ==============================================================================================================
 
 /**
-    @brief   Computes the Axis Aligned Bounding Box (AABB) of a part of the scene.
-    @remark  The AABB (paabb) of each particle is also updated in this method
-
-    @param[in]   first   Smallest ID of particles (default value is 0)
-    @param[in]   last    Largest ID of particles (default value corresponds to the last particle)
-*/
+ *   @brief   Computes the Axis Aligned Bounding Box (AABB) of a part of the scene.
+ *   @remark  The AABB (paabb) of each particle is also updated in this method
+ *
+ *   @param[in]   first   Smallest ID of particles (default value is 0)
+ *   @param[in]   last    Largest ID of particles (default value corresponds to the last particle)
+ */
 void Rockable::computeAABB(size_t first, size_t last) {
   if (last == 0) last = Particles.size() - 1;
 
@@ -3052,13 +3048,13 @@ void Rockable::computeAABB(size_t first, size_t last) {
 }
 
 /**
-    @brief  Get the global kinetic energy for translations and for rotations.
-
-    @param[out]  Etrans  The translation kinetic energy (for particles id in range[first last])
-    @param[out]  Erot    The ratational kinetic energy (for particles id in range[first last])
-    @param[in]   first   Smallest ID of particles (default value is 0)
-    @param[in]   last    Largest ID of particles (default value corresponds to the last particle)
-*/
+ *   @brief  Get the global kinetic energy for translations and for rotations.
+ *
+ *   @param[out]  Etrans  The translation kinetic energy (for particles id in range[first last])
+ *   @param[out]  Erot    The ratational kinetic energy (for particles id in range[first last])
+ *   @param[in]   first   Smallest ID of particles (default value is 0)
+ *   @param[in]   last    Largest ID of particles (default value corresponds to the last particle)
+ */
 void Rockable::getKineticEnergy(double& Etrans, double& Erot, size_t first, size_t last) {
   if (last == 0) last = Particles.size() - 1;
   Etrans = 0.0;
@@ -3074,9 +3070,10 @@ void Rockable::getKineticEnergy(double& Etrans, double& Erot, size_t first, size
 }
 
 /**
-    @brief  Estimate the critical time step according to the stiffness values in dataTable.
-    @param[out]  dtc  minimum value of square root of meff/kn.
-*/
+ *   @brief  Estimate the critical time step according to the stiffness values in dataTable.
+ *
+ *   @param[out]  dtc  minimum value of square root of meff/kn.
+ */
 void Rockable::estimateCriticalTimeStep(double& dtc) {
   // find the particle with the smallest mass
   // (this particle can also be the driven one)
@@ -3106,10 +3103,11 @@ void Rockable::estimateCriticalTimeStep(double& dtc) {
 }
 
 /**
-    @brief  Compute the critical time step by looping over all potential
-            interactions, even those that are not active.
-    @param[out]  dtc  minimum value of square root of meff/kn.
-*/
+ *   @brief  Compute the critical time step by looping over all potential
+ *           interactions, even those that are not active.
+ *
+ *   @param[out]  dtc  minimum value of square root of meff/kn.
+ */
 void Rockable::getCriticalTimeStep(double& dtc) {
   dtc = 0.0;
   double sqrdtcMin = 1.0e20;
@@ -3160,9 +3158,10 @@ void Rockable::getCriticalTimeStep(double& dtc) {
 }
 
 /**
-    @brief Compute the critical time step by looping over all currently active interactions
-    @param[out]  dtc  minimum value of square root of meff/kn.
-*/
+ *   @brief Compute the critical time step by looping over all currently active interactions
+ *
+ *   @param[out]  dtc  minimum value of square root of meff/kn.
+ */
 void Rockable::getCurrentCriticalTimeStep(double& dtc) {
   if (activeInteractions.empty()) {
     dtc = -1.0;
@@ -3200,10 +3199,10 @@ void Rockable::getCurrentCriticalTimeStep(double& dtc) {
 }
 
 /**
-   Fmax is the maximum value of resultant-force norms
-   F_fnmax is the maximum value over all resultant-force norms divided by the maximum normal force acting on them
-   Fmean is the mean value of the resultant-force norms
-*/
+ *  Fmax is the maximum value of resultant-force norms
+ *  F_fnmax is the maximum value over all resultant-force norms divided by the maximum normal force acting on them
+ *  Fmean is the mean value of the resultant-force norms
+ */
 void Rockable::getResultantQuickStats(double& Fmax, double& F_fnmax, double& Fmean, double& Fstddev, size_t first,
                                       size_t last) {
   std::vector<double> fnMax(Particles.size(), 0.0);
@@ -3253,15 +3252,15 @@ void Rockable::getResultantQuickStats(double& Fmax, double& F_fnmax, double& Fme
 }
 
 /**
-    @brief Get some statistics of the normal interaction forces
-
-    @param[out] fnMin     Smallest normal contact force
-    @param[out] fnMin     Biggest normal contact force
-    @param[out] fnMean    Averaged value of normal contact forces
-    @param[out] fnStddev  Standard deviation of normal contact forces
-
-    @remarks Notice that this method needs that 'activeInteractions' is not empty.
-*/
+ *   @brief Get some statistics of the normal interaction forces
+ *
+ *   @param[out] fnMin     Smallest normal contact force
+ *   @param[out] fnMin     Biggest normal contact force
+ *   @param[out] fnMean    Averaged value of normal contact forces
+ *   @param[out] fnStddev  Standard deviation of normal contact forces
+ *
+ *   @remarks Notice that this method needs that 'activeInteractions' is not empty.
+ */
 void Rockable::getInteractionQuickStats(double& fnMin, double& fnMax, double& fnMean, double& fnStddev) {
   if (activeInteractions.empty()) {
     fnMin = fnMax = fnMean = fnStddev = 0.0;

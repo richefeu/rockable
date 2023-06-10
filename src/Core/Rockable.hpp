@@ -45,9 +45,9 @@
 #include <iomanip>
 #include <iostream>
 #include <map>
-#include <unordered_map>
 #include <memory>
 #include <set>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -62,9 +62,11 @@
 
 // toofus headers
 #include "AABB.hpp"
+#include "Compliance.hpp"
 #include "DataTable.hpp"
 #include "Mth.hpp"
 #include "PerfTimer.hpp"
+#include "ProfilingTools.hpp"
 #include "Properties.hpp"
 #include "Tempo.hpp"
 #include "common.hpp"
@@ -73,9 +75,6 @@
 #include "kwParser.hpp"
 #include "linkCells.hpp"
 #include "message.hpp"
-//#include "profiler.hpp"
-#include "Compliance.hpp"
-#include "ProfilingTools.hpp"
 
 // local headers
 #include "BodyForces/BodyForce.hpp"
@@ -91,6 +90,13 @@
 #include "SpringJoint.hpp"
 #include "clusterParticles.hpp"
 
+// TEMPORAIRE POUR FAIRE LES PREMIERS TESTS
+#define ROCKABLE_ENABLE_BOUNDARY
+
+#ifdef ROCKABLE_ENABLE_BOUNDARY
+#include "Boundaries/Boundary.hpp"
+#endif
+
 class Rockable {
  public:
   std::vector<Particle> Particles;                        ///< The particles
@@ -99,6 +105,10 @@ class Rockable {
   std::vector<std::vector<Interaction*> > m_vecInteractions;
   std::vector<Interaction*> activeInteractions;  ///< Hold a pointer to the contact interactions that are active
   std::vector<SpringJoint> joints;
+
+#ifdef ROCKABLE_ENABLE_BOUNDARY
+  Boundary* boundary;
+#endif
 
   ContactPartnership ctcPartnership;  ///< Model to weight the stiffnesses of contacts
                                       ///< in case of multiple contacts between two particles
@@ -119,9 +129,9 @@ class Rockable {
 
   int usePeriodicCell;
   PeriodicCell Cell;
-	
-	int useSoftParticles;
-	Compliance Cinv;
+
+  int useSoftParticles;
+  Compliance Cinv;
 
   // Time parameters
   double t;                  ///< Current Time
@@ -170,7 +180,7 @@ class Rockable {
                                                    ///< as a string also
 
   ForceLaw* forceLaw;  ///< User defined force law
-  
+
   double preventCrossingLength;
 
   // Ctor
@@ -199,8 +209,8 @@ class Rockable {
   void accelerations();                                     ///< Compute accelerations
   void incrementResultants(Interaction&);                   ///< Project force and moment on the interacting particles
   void incrementPeriodicCellTensorialMoment(Interaction&);  ///< Update the tensorial moment of interacting particles
-  void realToReducedKinematics();
-  void reducedToRealKinematics();
+  void realToReducedKinematics();         ///< Go from real coordinates to reduced ones for positions and velocities
+  void reducedToRealKinematics();         ///< Go from reduced coordinates to real ones for positions and velocities
   std::function<void()> integrationStep;  ///< Pointer function for  tion
   void setIntegrator(std::string& Name);  ///< Select the time-integration scheme
 
@@ -258,11 +268,10 @@ class Rockable {
   void dynamicCheckUpdateNL();         ///< Ask for NL reconstruction if the maximum
                                        ///< displacement of rotation is more than given values
 
-  int AddOrRemoveInteractions_bruteForce(size_t i, size_t j,
-                                         double dmax);                   ///< Brute-force approach
-  int AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax);  ///< OBB-tree approach
-  std::function<int(size_t, size_t, double)> AddOrRemoveInteractions;    ///< (Pointer function) Add or remove an
-                                                                         ///< interaction according to the distance dmax
+  int AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax);  ///< Brute-force approach
+  int AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax);     ///< OBB-tree approach
+  std::function<int(size_t, size_t, double)> AddOrRemoveInteractions;       ///< (Pointer function) Add or remove an
+                                                                       ///< interaction according to the distance dmax
   void setAddOrRemoveInteractions(std::string& Name);
 
   void readLawData(std::istream&, size_t id);             ///< Helper method to read a law in loadConf

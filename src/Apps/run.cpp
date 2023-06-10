@@ -33,6 +33,9 @@
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
+#include <filesystem>
+#include <regex>
+
 #include <tclap/CmdLine.h>
 
 #include "Core/Rockable.hpp"
@@ -43,38 +46,86 @@
 #endif
 
 /**
+ *  @brief Deletes files matching the pattern 'conf*', 'kineticEnergy.txt', 'perf.txt', and 'staticBalance.txt'
+ *         in the current directory.
+ */
+void cleanSimulationFolder() {
+  std::vector<std::string> filesToDelete = {"kineticEnergy.txt", "perf.txt", "staticBalance.txt"};
+  std::regex patternToDelete("conf.*");
+
+  std::vector<std::filesystem::path> filesToRemove;
+  size_t nbConfDeleted = 0;
+
+  for (const auto& entry : std::filesystem::directory_iterator(".")) {
+    const std::string& filename = entry.path().filename().string();
+
+    // Collect files matching the pattern "conf*"
+    if (std::filesystem::is_regular_file(entry) && std::regex_match(filename, patternToDelete)) {
+      filesToRemove.push_back(entry.path());
+      nbConfDeleted++;
+    }
+  }
+
+  // Delete files matching the pattern "conf*"
+  for (const auto& fileToRemove : filesToRemove) {
+    std::filesystem::remove(fileToRemove);
+  }
+  std::cout << "Number of conf-files deleted: " << nbConfDeleted << std::endl;
+
+  // Delete specific files
+  for (const auto& fileToDelete : filesToDelete) {
+    std::filesystem::path filePath(fileToDelete);
+    if (std::filesystem::exists(filePath)) {
+      std::filesystem::remove(filePath);
+      std::cout << "File deleted: " << fileToDelete << std::endl;
+    }
+  }
+}
+
+/**
  * @brief This is the command line interface (CLI) for using Rockable
  *
  */
 int main(int argc, char const* argv[]) {
-	RockableProfiler::ProfilerManager prof;
-  StackTracer::initSignals();
-
 
   std::string confFileName;
   int nbThreads = 1;
   int verboseLevel = 0;
+  bool cleanAndLeave = false;
 
   try {
+
     TCLAP::CmdLine cmd("This is the command line interface for Rockable", ' ', GIT_TAG);
-    TCLAP::UnlabeledValueArg<std::string> nameArg("input", "Name of the conf-file", true, "conf0", "conf-file");
+    TCLAP::UnlabeledValueArg<std::string> nameArg("input", "Name of the conf-file", false, "conf0", "conf-file");
     TCLAP::ValueArg<int> nbThreadsArg("j", "nbThreads", "Number of threads to be used", false, 1, "int");
     TCLAP::ValueArg<int> verboseArg(
         "v", "verbose", "Verbose level (0='off', 1='critical', 2='err', 3='warn', 4='info', 5='debug', 6='trace')",
         false, 4, "int");
+    TCLAP::SwitchArg cleanArg("c", "clean", "Clean files", false);
 
     cmd.add(nameArg);
     cmd.add(nbThreadsArg);
     cmd.add(verboseArg);
+    cmd.add(cleanArg);
 
     cmd.parse(argc, argv);
 
     confFileName = nameArg.getValue();
     nbThreads = nbThreadsArg.getValue();
     verboseLevel = verboseArg.getValue();
+    cleanAndLeave = cleanArg.getValue();
+
   } catch (TCLAP::ArgException& e) {
     std::cerr << "error: " << e.error() << " for argument " << e.argId() << std::endl;
   }
+
+  if (cleanAndLeave) {
+    cleanSimulationFolder();
+    return 0;
+  }
+
+  RockableProfiler::ProfilerManager prof;
+  StackTracer::initSignals();
 
   Rockable box;
   box.setVerboseLevel(verboseLevel);

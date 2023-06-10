@@ -20,7 +20,7 @@ void PeriodicCell::precomputeInverse() { hinv = h.get_inverse(); }
  *               then adding it to the position of j will be its image
  */
 vec3r PeriodicCell::getBranchCorrection(const vec3r& ipos, const vec3r& jpos) {
-  vec3r rij = jpos - ipos;  // the branch vector from i to j
+  vec3r rij = ipos - jpos;  // the branch vector from i to j
   vec3r sij = hinv * rij;   // same vector in reduced coordinates
   
   sij.x = std::round(sij.x);

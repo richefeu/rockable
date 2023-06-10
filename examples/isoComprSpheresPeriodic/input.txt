@@ -6,7 +6,7 @@ dt 1e-6
 interVerlet 100e-6
 interConf 1000e-6
 
-DVerlet 0.001
+DVerlet 0.008
 dVerlet 0.001
 
 density 0 2700
