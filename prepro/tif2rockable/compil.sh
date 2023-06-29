@@ -1,0 +1,1 @@
+g++-13 -o test tif2rockable.cpp -I ~/toofus `pkg-config --cflags --libs libtiff-4` -I/usr/X11R6/include -L/usr/X11R6/lib -lX11 -lpthread

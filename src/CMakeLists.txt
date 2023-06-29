@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.12)
  
 if (${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
   set(CMAKE_OSX_COMPILER_ID "GNU")

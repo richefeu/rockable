@@ -208,11 +208,11 @@ vec3r rotatePoint(vec3r const& p, vec3r const& center_, vec3r const& axis, doubl
   double const C = 1.0 - c;
   vec3r tmp = p - center_;
   return center_ + vec3r(tmp[0] * (axis[0] * axis[0] * C + c) + tmp[1] * (axis[0] * axis[1] * C - axis[2] * s) +
-                            tmp[2] * (axis[0] * axis[2] * C + axis[1] * s),
-                        tmp[0] * (axis[1] * axis[0] * C + axis[2] * s) + tmp[1] * (axis[1] * axis[1] * C + c) +
-                            tmp[2] * (axis[1] * axis[2] * C - axis[0] * s),
-                        tmp[0] * (axis[2] * axis[0] * C - axis[1] * s) +
-                            tmp[1] * (axis[2] * axis[1] * C + axis[0] * s) + tmp[2] * (axis[2] * axis[2] * C + c));
+                             tmp[2] * (axis[0] * axis[2] * C + axis[1] * s),
+                         tmp[0] * (axis[1] * axis[0] * C + axis[2] * s) + tmp[1] * (axis[1] * axis[1] * C + c) +
+                             tmp[2] * (axis[1] * axis[2] * C - axis[0] * s),
+                         tmp[0] * (axis[2] * axis[0] * C - axis[1] * s) +
+                             tmp[1] * (axis[2] * axis[1] * C + axis[0] * s) + tmp[2] * (axis[2] * axis[2] * C + c));
 }
 
 void motion(int x, int y) {
@@ -488,13 +488,32 @@ void saveShapeLib(const char* fileName) {
 }
 
 void exportSample() {
+  std::cout << "Find sourrounding box " << std::endl;
+  vec3r minBox(1e12, 1e12, 1e12);
+  vec3r maxBox(-1e12, -1e12, -1e12);
+
+  for (size_t i = 0; i < Shapes.size(); i++) {
+    for (size_t isub = 0; isub < Shapes[i].vertex.size(); isub++) {
+      vec3r pos = Shapes[i].position + Shapes[i].orientation * Shapes[i].vertex[isub];
+      vec3r rad(Shapes[i].radius, Shapes[i].radius, Shapes[i].radius);
+      vec3r posMin = pos - rad;
+      vec3r posMax = pos + rad;
+      if (minBox.x > posMin.x) minBox.x = posMin.x;
+      if (maxBox.x < posMax.x) maxBox.x = posMax.x;
+      if (minBox.y > posMin.y) minBox.y = posMin.y;
+      if (maxBox.y < posMax.y) maxBox.y = posMax.y;
+      if (minBox.z > posMin.z) minBox.z = posMin.z;
+      if (maxBox.z < posMax.z) maxBox.z = posMax.z;
+    }
+  }
+
   std::cout << "Export sample " << std::endl;
 
   std::ofstream file("exportedSample.txt");
-
+  file << "periodicity " << maxBox.x - minBox.x << ' ' << maxBox.y - minBox.y << ' ' << maxBox.z - minBox.z << '\n';
   file << "Particles " << Shapes.size() << '\n';
   for (size_t i = 0; i < Shapes.size(); i++) {
-    file << Shapes[i].name << " 1 0 1  " << Shapes[i].position << "  0 0 0  0 0 0  " << Shapes[i].orientation
+    file << Shapes[i].name << " 1 0 1  " << Shapes[i].position - minBox << "  0 0 0  0 0 0  " << Shapes[i].orientation
          << "  0 0 0  0 0 0\n";
   }
 }

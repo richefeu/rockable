@@ -246,27 +246,28 @@ void Rockable::initOutputFiles() {
 }
 
 /**
-    @brief  If Rockable is not used to make a simulation (in case of its usage for
-            postprocessing) we need to set its mode as being interactive. In this case,
-            the output files (the usual ones and the one for dataExtractors) will not be
-            openned Also, the method 'integrate' is not usable
-*/
+ *   @brief  If Rockable is not used to make a simulation (in case of its usage for
+ *           postprocessing) we need to set its mode as being interactive. In this case,
+ *           the output files (the usual ones and the one for dataExtractors) will not be
+ *           openned Also, the method 'integrate' is not usable
+ */
 void Rockable::setInteractive(bool imode) { interactiveMode = imode; }
 
 /**
-    @return interactiveMode
-*/
+ *   @return interactiveMode
+ */
 bool Rockable::isInteractive() const { return interactiveMode; }
 
 /**
-    @brief Print in the terminal a Banner with some information
-*/
+ *   @brief Print in the terminal a Banner with some information
+ */
 void Rockable::showBanner() {
   std::cout << "\n\n";
-  std::cout << msg::bold() << "   Rockable" << msg::normal()
+  std::cout << msg::bold() << msg::fg_lightBlue() << "   Rockable" << msg::fg_default() << msg::normal()
             << "  Copyright (C) 2016-2023  <vincent.richefeu@univ-grenoble-alpes.fr>\n";
   std::cout << "   This program comes with ABSOLUTELY NO WARRANTY.\n";
-  std::cout << "   " << msg::bold() << "This is academic software" << msg::normal() << "\n\n";
+  std::cout << "   " << msg::bold() << msg::fg_lightBlue() << "This is academic software" << msg::fg_default()
+            << msg::normal() << "\n\n";
   std::cout << "   Documentation:       install sphinx-doc\n";
   std::cout << "   e.g., for mac OS X   brew install sphinx-doc\n";
   std::cout << "                        brew link sphinx-doc --force\n";
@@ -506,6 +507,12 @@ void Rockable::saveConf(const char* fname) {
   if (usePeriodicCell == 1) realToReducedKinematics();
 }
 
+/**
+ * @brief Read law data from an input stream and set it in the data table.
+ *
+ * @param is The input stream to read from.
+ * @param id The identifier for the data to be set in the data table.
+ */
 void Rockable::readLawData(std::istream& is, size_t id) {
   size_t g1, g2;
   double value;
@@ -513,6 +520,12 @@ void Rockable::readLawData(std::istream& is, size_t id) {
   dataTable.set(id, g1, g2, value);
 }
 
+/**
+ * @brief Write law data for a given parameter to an output stream.
+ *
+ * @param os       The output stream to write to.
+ * @param parName  The name of the parameter to write.
+ */
 void Rockable::writeLawData(std::ostream& os, const char* parName) {
   std::string parNameStr(parName);
   size_t id = dataTable.data_id[parNameStr];
@@ -2836,8 +2849,8 @@ void Rockable::compute_accelerations_from_resultants() {
 #pragma omp parallel for default(shared)
   for (size_t i = nDriven; i < Particles.size(); ++i) {
     Particles[i].acc = Particles[i].force / Particles[i].mass;
-		
-		// If there's a periodic cell, the accelerations are rescaled toward reduced coordinates
+
+    // If there's a periodic cell, the accelerations are rescaled toward reduced coordinates
     if (usePeriodicCell == 1) Particles[i].acc = Cell.hinv * Particles[i].acc;
 
     quat Qinv = Particles[i].Q.get_conjugated();
