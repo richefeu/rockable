@@ -140,7 +140,10 @@ void drawGlobalFrame();
 void drawGlobalAABB();
 void drawOBBs();
 void drawProbe();
+
+#ifdef ROCKABLE_ENABLE_PERIODIC
 void drawPeriodicCell();
+#endif
 
 // Callback functions
 void keyboard(unsigned char Key, int x, int y);

@@ -42,12 +42,13 @@
 #include "OBB.hpp"
 #include "vec3.hpp"
 
-//
+// A Boundary is a kind of particle with special shape.
+// It is concave or flat so that only interactions with node spheres are considered. 
+// This is why its structure is so similar to that of a particle.
 class Boundary {
  public:
   int group;            ///< A number that relates to a 'category of bodies'
- // int cluster;          ///< A number that identifies the cluster to which the particle belongs
-  double mass_masstot;  ///< The particle mass
+  double mass_masstot;  ///< ???
   double masstot;       ///< The particle mass
   vec3r pos;            ///< Position
   double force;         ///< Resultant force acting on the particle

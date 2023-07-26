@@ -2,11 +2,11 @@
 #define GRAINSHAPE_HPP
 
 #include <set>
-#include <vector>
 #include <utility>
+#include <vector>
 
-#include "vec3.hpp"
 #include "fastSort3.hpp"
+#include "vec3.hpp"
 
 struct GrainShape {
   int colorId;
@@ -24,35 +24,35 @@ struct GrainShape {
   void saveRockableShape(std::ostream &os, size_t Id, double voxSize = 1.0) {
 
     std::set<std::pair<size_t, size_t>> edges;
-		size_t v0,v1,v2;
+    size_t v0, v1, v2;
     for (size_t i = 0; i < facets.size(); i++) {
-			v0 = facets[i][0];
-			v1 = facets[i][1];
-			v2 = facets[i][2];
-			fastSort3<size_t>(v0, v1, v2);
-			std::pair<size_t, size_t> p01 = std::make_pair(v0, v1);
-			std::pair<size_t, size_t> p02 = std::make_pair(v0, v2);
-			std::pair<size_t, size_t> p12 = std::make_pair(v1, v2);
-			edges.insert(p01);
-			edges.insert(p02);
-			edges.insert(p12);
+      v0 = facets[i][0];
+      v1 = facets[i][1];
+      v2 = facets[i][2];
+      fastSort3<size_t>(v0, v1, v2);
+      std::pair<size_t, size_t> p01 = std::make_pair(v0, v1);
+      std::pair<size_t, size_t> p02 = std::make_pair(v0, v2);
+      std::pair<size_t, size_t> p12 = std::make_pair(v1, v2);
+      edges.insert(p01);
+      edges.insert(p02);
+      edges.insert(p12);
     }
 
     os << "<\n";
-		char name[256];
-		snprintf(name, 256, "GRAIN%zu", Id);
+    char name[256];
+    snprintf(name, 256, "GRAIN%zu", Id);
     os << "name " << name << '\n';
     os << "radius " << R * voxSize << '\n';
     os << "preCompDone n\n";
-		os << "MCnstep 200000\n"; // c'est une valeur ni trop grande nin trop petite
+    os << "MCnstep 200000\n"; // c'est une valeur ni trop grande nin trop petite
     os << "nv " << points.size() << '\n';
     for (size_t i = 0; i < points.size(); i++) {
       os << points[i] * voxSize << '\n';
     }
-		os << "ne " << edges.size() << '\n';
-		for (auto p : edges) {
-			os << p.first << ' ' << p.second << '\n';
-		}
+    os << "ne " << edges.size() << '\n';
+    for (auto p : edges) {
+      os << p.first << ' ' << p.second << '\n';
+    }
     os << "nf " << facets.size() << '\n';
     for (size_t i = 0; i < facets.size(); i++) {
       os << "3 " << facets[i] << '\n';

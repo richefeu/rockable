@@ -92,7 +92,7 @@ int main(int argc, char const* argv[]) {
   int nbThreads = 1;
   int verboseLevel = 0;
   bool cleanAndLeave = false;
-
+  bool printBannerAndLeave = false;
   try {
 
     TCLAP::CmdLine cmd("This is the command line interface for Rockable", ' ', GIT_TAG);
@@ -102,11 +102,13 @@ int main(int argc, char const* argv[]) {
         "v", "verbose", "Verbose level (0='off', 1='critical', 2='err', 3='warn', 4='info', 5='debug', 6='trace')",
         false, 4, "int");
     TCLAP::SwitchArg cleanArg("c", "clean", "Clean files", false);
+    TCLAP::SwitchArg bannerArg("b", "banner", "show banner", false);
 
     cmd.add(nameArg);
     cmd.add(nbThreadsArg);
     cmd.add(verboseArg);
     cmd.add(cleanArg);
+    cmd.add(bannerArg);
 
     cmd.parse(argc, argv);
 
@@ -114,6 +116,7 @@ int main(int argc, char const* argv[]) {
     nbThreads = nbThreadsArg.getValue();
     verboseLevel = verboseArg.getValue();
     cleanAndLeave = cleanArg.getValue();
+    printBannerAndLeave = bannerArg.getValue();
 
   } catch (TCLAP::ArgException& e) {
     std::cerr << "error: " << e.error() << " for argument " << e.argId() << std::endl;
@@ -128,8 +131,13 @@ int main(int argc, char const* argv[]) {
   StackTracer::initSignals();
 
   Rockable box;
-  box.setVerboseLevel(verboseLevel);
+  
   box.showBanner();
+  if (printBannerAndLeave) {
+    return 0;
+  }
+  
+  box.setVerboseLevel(verboseLevel);
 
 #ifdef _OPENMP
   omp_set_num_threads(nbThreads);

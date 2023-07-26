@@ -41,7 +41,7 @@ vec3r center;
 vec3r up;
 
 void drawShape(size_t ishp);
-void recursiveDrawOBB(OBBnode<subBox> * node, int wantedLevel, int level=0);
+void recursiveDrawOBB(OBBnode<subBox> * node, int wantedLevel, int level = 0);
 void drawObbLevel(size_t ishp, size_t wantedLevel);
 void drawFrame();
 void drawInfo();

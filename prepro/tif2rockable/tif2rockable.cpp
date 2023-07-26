@@ -1,9 +1,3 @@
-/*
-g++-12 -o test tif2rockable.cpp -I/usr/X11R6/include
--I/usr/local/Cellar/libtiff/4.4.0_1/include
--L/usr/local/Cellar/libtiff/4.4.0_1/lib -L/usr/X11R6/lib -lX11 -lpthread -ltiff
-*/
-
 #include <cmath>
 #include <fstream>
 #include <iostream>
@@ -153,7 +147,7 @@ int main(int argc, char const *argv[]) {
   std::vector<GrainShape> grains;
   for (size_t i = 0 + 1; i < centers.size(); i++) {
     if (centers[i].N > 0) {
-      GrainShape G(1); // 0 = icosaèdre, 1 = 4x plus de facettes, 2 = x16... 
+      GrainShape G(1); // 0 = icosaèdre, 1 = 4x plus de facettes, 2 = x16...
       G.colorId = (int)i;
       G.pos.x = round(centers[i].x);
       G.pos.y = round(centers[i].y);
@@ -165,17 +159,17 @@ int main(int argc, char const *argv[]) {
   }
 
   // domaine pour les grains exportés
-	vec3r minBox(200, 200, 335);
-	vec3r maxBox(265, 265, 400);
+  vec3r minBox(200, 200, 335);
+  vec3r maxBox(265, 265, 400);
 
   std::ofstream sfile("shapes.txt");
   for (size_t i = 0; i < grains.size(); i++) {
-    //if (grains[i].pos.z < 275 || grains[i].pos.z > 325)
-    //  continue;
-		if ( grains[i].pos.x < minBox.x || grains[i].pos.x > maxBox.x
-			|| grains[i].pos.y < minBox.y || grains[i].pos.y > maxBox.y 
-			|| grains[i].pos.z < minBox.z || grains[i].pos.z > maxBox.z ) continue;	
-		
+
+    if (grains[i].pos.x < minBox.x || grains[i].pos.x > maxBox.x ||
+        grains[i].pos.y < minBox.y || grains[i].pos.y > maxBox.y ||
+        grains[i].pos.z < minBox.z || grains[i].pos.z > maxBox.z)
+      continue;
+
     std::cout << "Building Grains " << grains[i].colorId << std::endl;
     wrap(img, grains[i]);
     grains[i].R = 0.5;

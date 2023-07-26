@@ -601,7 +601,10 @@ void display() {
   if (params["show_obb"].get<int>() == 1) drawOBBs();
   if (params["show_particles"].get<int>() == 1) drawParticles();
   if (params["show_probe"].get<int>() == 1) drawProbe();
+
+#ifdef ROCKABLE_ENABLE_PERIODIC
   if (params["show_periodicBox"].get<int>() == 1) drawPeriodicCell();
+#endif
 
   if (params["show_keybinds"].get<int>() == 1) showKeybinds();
   textZone.draw();
@@ -798,6 +801,7 @@ void drawTrajectories() {
   }
 }
 
+#ifdef ROCKABLE_ENABLE_PERIODIC
 // This function draw the periodic cell
 // ====================================
 //      Z
@@ -854,6 +858,7 @@ void drawPeriodicCell() {
   glVertex3d(p7.x, p7.y, p7.z);
   glEnd();
 }
+#endif
 
 void drawGlobalFrame() {
   glEnable(GL_LIGHTING);
@@ -1470,9 +1475,9 @@ void buildMenu() {
 // =====================================================================
 
 int main(int argc, char* argv[]) {
-  //INIT_TIMERS();
 
   box.setInteractive(true);
+  box.showBanner(); // it will show compilation options that have been used
 
   std::string confFileName;
   std::string trajFileName;

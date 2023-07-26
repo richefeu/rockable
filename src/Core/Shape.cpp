@@ -227,6 +227,7 @@ void Shape::fitObb() {
 
 // Say whether a point is inside the shape
 bool Shape::inside(const vec3r& point) {
+	
   // === inside POLYHEDRON ===
   if (!isSurface) {
     vec3r v1, v2, v3;

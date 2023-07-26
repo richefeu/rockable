@@ -41,7 +41,7 @@
 
 #include "imgui.h"
 #include "backends/imgui_impl_glfw.h"
-#include "backends/imgui_impl_opengl2.h"
+#include "backends/imgui_impl_opengl3.h"
 
 #ifdef __APPLE__
 #define GL_SILENCE_DEPRECATION

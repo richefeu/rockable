@@ -32,6 +32,7 @@
 //
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
+
 #ifndef BODYFORCE_HPP
 #define BODYFORCE_HPP
 
@@ -40,7 +41,7 @@
 
 class Rockable;
 
-//
+// This is actually a volume force that can be any
 class BodyForce {
  public:
   Rockable* box;

@@ -103,56 +103,22 @@ namespace std {
 template <>
 struct less<Interaction> {
   bool operator()(const Interaction& lhs, const Interaction& rhs) const {
-#if 0
-
-    if (lhs.i < rhs.i) return true;
-    if (lhs.i > rhs.i) return false;
-
-    // from here lhs.i == rhs.i
-    if (lhs.j < rhs.j) return true;
-
-    // FIXME: from here lhs.i == rhs.i AND lhs.j == rhs.j if we add if (lhs.j > rhs.j) return false;
-    if (lhs.j == rhs.j && lhs.type < rhs.type) return true;
-    if (lhs.j == rhs.j && lhs.type == rhs.type && lhs.isub < rhs.isub) return true;
-    if (lhs.j == rhs.j && lhs.type == rhs.type && lhs.isub == rhs.isub) return (lhs.jsub < rhs.jsub);
-    return false;
-
-#else
-
     if (lhs.i != rhs.i) return lhs.i < rhs.i;
     if (lhs.j != rhs.j) return lhs.j < rhs.j;
     if (lhs.type != rhs.type) return lhs.type < rhs.type;
     if (lhs.isub != rhs.isub) return lhs.isub < rhs.isub;
     return lhs.jsub < rhs.jsub;
-
-#endif
   }
 };
 
 template <>
 struct less<Interaction*> {
   bool operator()(const Interaction* lhs, const Interaction* rhs) const {
-#if 0
-
-    if (lhs->i < rhs->i) return true;
-    if (lhs->i > rhs->i) return false;
-
-    // from here lhs->i == rhs->i
-    if (lhs->j < rhs->j) return true;
-    if (lhs->j == rhs->j && lhs->type < rhs->type) return true;
-    if (lhs->j == rhs->j && lhs->type == rhs->type && lhs->isub < rhs->isub) return true;
-    if (lhs->j == rhs->j && lhs->type == rhs->type && lhs->isub == rhs->isub) return (lhs->jsub < rhs->jsub);
-    return false;
-
-#else
-
     if (lhs->i != rhs->i) return lhs->i < rhs->i;
     if (lhs->j != rhs->j) return lhs->j < rhs->j;
     if (lhs->type != rhs->type) return lhs->type < rhs->type;
     if (lhs->isub != rhs->isub) return lhs->isub < rhs->isub;
     return lhs->jsub < rhs->jsub;
-
-#endif
   }
 };
 }  // namespace std

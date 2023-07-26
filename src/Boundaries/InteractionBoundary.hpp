@@ -41,16 +41,15 @@
 
 #include "Core/Particle.hpp"
 
-#include "Ball.hpp"
+//#include "Ball.hpp"
 
 #include "vec3.hpp"
 
 /// Data of Interaction
 class InteractionBoundary {
  public:
-  size_t i;     ///< ID-number of the particle
-  size_t isub;  ///< id of sub-body (that can be vertex, edge or face depending
-                ///< on type) in sphero-polyhedron i
+  size_t i;     ///< Id-number of the particle
+  size_t isub;  ///< id of sub-body (that can be vertex, edge or face depending on type) in Boundary i
 
   vec3r prev_n;  ///< Normal unit vector at the previous step
   vec3r n;       ///< Normal unit vector (from j to i)

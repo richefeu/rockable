@@ -66,7 +66,6 @@
 #include "DataTable.hpp"
 #include "Mth.hpp"
 #include "PerfTimer.hpp"
-#include "ProfilingTools.hpp"
 #include "Properties.hpp"
 #include "Tempo.hpp"
 #include "common.hpp"
@@ -77,6 +76,7 @@
 #include "message.hpp"
 
 // local headers
+#include "ProfilingTools.hpp"
 #include "BodyForces/BodyForce.hpp"
 #include "BreakableInterface.hpp"
 #include "ContactPartnership.hpp"
@@ -90,25 +90,18 @@
 #include "SpringJoint.hpp"
 #include "clusterParticles.hpp"
 
-// TEMPORAIRE POUR FAIRE LES PREMIERS TESTS
-#define ROCKABLE_ENABLE_BOUNDARY
-
 #ifdef ROCKABLE_ENABLE_BOUNDARY
 #include "Boundaries/Boundary.hpp"
 #endif
 
 class Rockable {
  public:
-  std::vector<Particle> Particles;                        ///< The particles
-  std::vector<std::set<Interaction> > Interactions;       ///< The interactions (contacts and potential contacts)
-  std::vector<std::set<BreakableInterface> > Interfaces;  ///< The interfaces
-  std::vector<std::vector<Interaction*> > m_vecInteractions;
+  std::vector<Particle> Particles;                            ///< The particles
+  std::vector<std::set<Interaction> > Interactions;           ///< The interactions (contacts and potential contacts)
+  std::vector<std::set<BreakableInterface> > Interfaces;      ///< The interfaces
+  std::vector<std::vector<Interaction*> > m_vecInteractions;  ///< Vector of interaction pointers
   std::vector<Interaction*> activeInteractions;  ///< Hold a pointer to the contact interactions that are active
-  std::vector<SpringJoint> joints;
-
-#ifdef ROCKABLE_ENABLE_BOUNDARY
-  Boundary* boundary;
-#endif
+  std::vector<SpringJoint> joints;               ///< The spring joints
 
   ContactPartnership ctcPartnership;  ///< Model to weight the stiffnesses of contacts
                                       ///< in case of multiple contacts between two particles
@@ -127,11 +120,13 @@ class Rockable {
   std::vector<Shape> Shapes;              ///< Loaded library of shapes
   std::map<std::string, size_t> shapeId;  ///< Associate a name of shape with its id in the vector 'Shapes'
 
-  int usePeriodicCell;
-  PeriodicCell Cell;
+#ifdef ROCKABLE_ENABLE_PERIODIC
+  int usePeriodicCell;  ///< Flag indicating if periodic cell is used
+  PeriodicCell Cell;    ///< The periodic cell
+#endif
 
-  int useSoftParticles;
-  Compliance Cinv;
+  int useSoftParticles;  ///< Flag indicating if soft particles are used
+  Compliance Cinv;       ///< The inverse compliance
 
   // Time parameters
   double t;                  ///< Current Time
@@ -140,8 +135,7 @@ class Rockable {
   int computationStopAsked;  ///< Ask to break the integration loop if positive
 
   // Simulation flow
-  double interVerlet;  ///< Time interval between each update of the
-                       ///< neighbor-list
+  double interVerlet;  ///< Time interval between each update of the neighbor-list
   double interConf;    ///< Time interval between the CONF files
 
   // Neighbor list
@@ -181,11 +175,11 @@ class Rockable {
 
   ForceLaw* forceLaw;  ///< User defined force law
 
-  double preventCrossingLength;
+  double preventCrossingLength;  ///< The length used to prevent crossing
 
   // Ctor
   Rockable();
-  void ExplicitRegistrations();
+  void ExplicitRegistrations();  ///< Performs explicit registrations of various features.
 
   // Initialization methods
   void setVerboseLevel(int v);                         ///< Defines verbosity with an integer
@@ -194,7 +188,7 @@ class Rockable {
   void setInteractive(bool imode = true);              ///< Set in a computation mode
   bool isInteractive() const;                          ///< Set in a visualization mode
   void showBanner();                                   ///< Display a banner about the code
-  void setOpenMPThreads(int nbThreads = 1);
+  void setOpenMPThreads(int nbThreads = 1);            ///< Set the number of threads
 
   void initialChecks();  ///< Checks before runing a computation
 
@@ -206,24 +200,27 @@ class Rockable {
   void initIntegrator();      ///< Set additionally stored data required by some integrator
   void integrate();           ///< Simulation flow (make time increments and check for updates or saving)
 
-  void accelerations();                                     ///< Compute accelerations
-  void incrementResultants(Interaction&);                   ///< Project force and moment on the interacting particles
+  void accelerations();                    ///< Compute accelerations
+  void incrementResultants(Interaction&);  ///< Project force and moment on the interacting particles
+#ifdef ROCKABLE_ENABLE_PERIODIC
   void incrementPeriodicCellTensorialMoment(Interaction&);  ///< Update the tensorial moment of interacting particles
   void realToReducedKinematics();         ///< Go from real coordinates to reduced ones for positions and velocities
   void reducedToRealKinematics();         ///< Go from reduced coordinates to real ones for positions and velocities
+#endif
   std::function<void()> integrationStep;  ///< Pointer function for  tion
   void setIntegrator(std::string& Name);  ///< Select the time-integration scheme
 
  private:
   // These methods are subparts of the method accelerations()
-  void initialise_particle_forces_and_moments();
-  void update_interactions();
-  void build_activeInteractions();
-  void compute_forces_and_moments();
-  void compute_resultants();
-  void compute_SpringJoints();
-  void breakage_of_interfaces();
-  void compute_accelerations_from_resultants();
+  void initialise_particle_forces_and_moments();  ///< Initialise the forces and moments
+  void update_interactions();                     ///< Update the interactions
+  void update_interactions_boundary();            ///< Update the interactions
+  void build_activeInteractions();                ///< Build the active interactions
+  void compute_forces_and_moments();              ///< Compute forces and moments
+  void compute_resultants();                      ///< Compute the resulting forces and moments
+  void compute_SpringJoints();                    ///< Compute the spring joints
+  void breakage_of_interfaces();                  ///< Break the interfaces
+  void compute_accelerations_from_resultants();   ///< Compute accelerations
 
  public:
   // Core CD method (TODO)
@@ -249,15 +246,28 @@ class Rockable {
                                         ///< (update the neighbor-list) method
   void setUpdateNL(std::string& Name);  ///< select the Neighbor list updator
 
+#ifdef ROCKABLE_ENABLE_BOUNDARY
+  Boundary* boundary{nullptr};
+  std::vector<std::set<InteractionBoundary*> > InteractionsBoundary;
+  std::vector<InteractionCylinder*> activeInteractionsBoundary;
+  std::function<bool(InteractionCylinder&)> forceLawCylinderPtr;
+  // void incrementResultantsPiCylinder(InteractionCylinder&);
+  // void UpdateNL_bruteForce_Cylinder();
+  // bool forceLawAvalanchesCylinder(InteractionCylinder&);
+  // bool forceLawHertzCylinder(InteractionCylinder&);
+  // bool forceLawCohesiveForceCylinder(InteractionCylinder&);
+#endif
+
   // Processing methods
   void computeAABB(size_t first = 0, size_t last = 0);  ///< Compute Axis Aligned Bounding Box of a part of the sample
-  void getCriticalTimeStep(double& dtc);
-  void getCurrentCriticalTimeStep(double& dtc);
-  void estimateCriticalTimeStep(double& dtc);
+  void getCriticalTimeStep(double& dtc);                ///< Get the critical time step
+  void getCurrentCriticalTimeStep(double& dtc);         ///< Get the current critical time step
+  void estimateCriticalTimeStep(double& dtc);           ///< Estimate the critical time step
   void getResultantQuickStats(double& Fmax, double& F_fnmax, double& Fmean, double& Fstddev, size_t first = 0,
-                              size_t last = 0);
-  void getInteractionQuickStats(double& fnMin, double& fnMax, double& fnMean, double& fnStddev);
-  void getKineticEnergy(double& Etrans, double& Erot, size_t first = 0, size_t last = 0);
+                              size_t last = 0);  ///> Get the quick statistics
+  void getInteractionQuickStats(double& fnMin, double& fnMax, double& fnMean,
+                                double& fnStddev);                                         ///> Get the quick statistics
+  void getKineticEnergy(double& Etrans, double& Erot, size_t first = 0, size_t last = 0);  ///> Get the kinetic energy
 
   // =============================================================================================================
 
@@ -272,14 +282,14 @@ class Rockable {
   int AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax);     ///< OBB-tree approach
   std::function<int(size_t, size_t, double)> AddOrRemoveInteractions;       ///< (Pointer function) Add or remove an
                                                                        ///< interaction according to the distance dmax
-  void setAddOrRemoveInteractions(std::string& Name);
+  void setAddOrRemoveInteractions(std::string& Name);  ///> Select the add or remove interaction
 
   void readLawData(std::istream&, size_t id);             ///< Helper method to read a law in loadConf
   void writeLawData(std::ostream&, const char* parName);  ///< Helper method to write law in saveConf
 
   bool interactiveMode;  ///< computation (false) or visualization (true) modes
 
-  std::shared_ptr<spdlog::logger> console;
+  std::shared_ptr<spdlog::logger> console;  ///> Logger
 
   // Some predefined identifiers to get (quickly) data from input tables
   size_t idDensity;  ///< Identifier of the density parameter

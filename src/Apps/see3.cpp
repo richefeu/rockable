@@ -1172,7 +1172,7 @@ void error(int error, const char* description) {
 }
 
 // =====================================================================
-// IMGUI INPUT TOOLS FOR ROCKABLE
+// Dear My Imgui FOR ROCKABLE
 // =====================================================================
 
 static void HelpPopup(const char* desc) {
@@ -1639,7 +1639,7 @@ int main(int argc, char* argv[]) {
   std::string trajFileName;
 
   try {
-    TCLAP::CmdLine cmd("Visualization of Rockable simulations", ' ', "0.3");
+    TCLAP::CmdLine cmd("Edition of Rockable simulations", ' ', "0.3");
     TCLAP::UnlabeledValueArg<std::string> nameArg("input", "Name of the conf-file", false, "conf0", "conf-file");
     TCLAP::ValueArg<std::string> trajFileNameArg("t", "traj", "Name of a trajectory file", false, "traj.txt", "string");
 
@@ -1690,7 +1690,7 @@ int main(int argc, char* argv[]) {
 
   glfwWindowHint(GLFW_SAMPLES, 4);
 
-  GLFWwindow* window = glfwCreateWindow(width, height, "Rockable visualiser (GLFW + Dear ImGui)", NULL, NULL);
+  GLFWwindow* window = glfwCreateWindow(width, height, "Rockable visual-editor (GLFW + Dear ImGui)", NULL, NULL);
   if (!window) {
     glfwTerminate();
     return -1;
@@ -1714,7 +1714,7 @@ int main(int argc, char* argv[]) {
   ImGui::StyleColorsDark();
   // Platform/Renderer backends
   ImGui_ImplGlfw_InitForOpenGL(window, true);
-  ImGui_ImplOpenGL2_Init();
+  ImGui_ImplOpenGL3_Init();
 
   // ==== Init the visualizer
   center.set(0.0, 0.0, 0.0);  // where we look at
@@ -1777,7 +1777,7 @@ int main(int argc, char* argv[]) {
     glfwPollEvents();
 
     // Start the Dear ImGui frame
-    ImGui_ImplOpenGL2_NewFrame();
+    ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
@@ -1798,14 +1798,14 @@ int main(int argc, char* argv[]) {
     if (request_quit == true) break;
 
     display();
-    ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     glfwMakeContextCurrent(window);
     glfwSwapBuffers(window);
   }
 
   // Dear ImGui cleanup
-  ImGui_ImplOpenGL2_Shutdown();
+  ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();
 

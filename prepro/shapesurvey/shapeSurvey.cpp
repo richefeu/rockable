@@ -7,7 +7,7 @@ void printHelp() {
 
   glColor4f(1.0f, 1.0f, 1.0f, 0.6f);
   glBegin(GL_QUADS);
-  int nbLines = 16;  // update this value when a line is added
+  int nbLines = 17;  // update this value when a line is added
   int by = height - nbLines * 15 - 3;
   glVertex2i(0, height);
   glVertex2i(width, height);
@@ -31,12 +31,12 @@ void printHelp() {
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[e]      print extents of the current shape");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[h]      Show this help");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[K][k]   Tune the level of displayed OBB-tree");
-  // glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[L][l]   Tune OBB-tree level of the current shape");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[N][n]   Tune number of Monte-Carlo steps");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[p]      Export as particles (Rockable sample)");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[q]      Quit");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[s]      Save the shape library");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[t]      Compute the OBB-tree of the current shape");
+	glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[W][w]   Rotate arround the view axis");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[+][-]   Navigate through the shapes");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[*]      reset preCompDone to 'n'");
 #undef _nextLine_
@@ -104,18 +104,7 @@ void keyboard(unsigned char Key, int /*x*/, int /*y*/) {
         maxOBBLevel -= 1;
       }
       break;
-      /*
-    case 'L':
-      if (Shapes[ishape].OBBtreeLevel < 50) {
-        Shapes[ishape].OBBtreeLevel += 1;
-      }
-      break;
-    case 'l':
-      if (Shapes[ishape].OBBtreeLevel > 0) {
-        Shapes[ishape].OBBtreeLevel -= 1;
-      }
-      break;
-*/
+      
     case 'N':  // The max is 10,000,000
       if (Shapes[ishape].MCnstep < 100000000) {
         Shapes[ishape].MCnstep *= 10;
@@ -140,8 +129,6 @@ void keyboard(unsigned char Key, int /*x*/, int /*y*/) {
       break;
 
     case 't': {
-      // maxOBBLevel = Shapes[ishape].OBBtreeLevel;
-      // Shapes[ishape].buildOBBtree();
       maxOBBLevel = 0;
       Shapes[ishape].buildOBBtree();
     } break;
@@ -153,6 +140,7 @@ void keyboard(unsigned char Key, int /*x*/, int /*y*/) {
       up = rotatePoint(up, eye, axis, -0.005 * M_PI);
       up.normalize();
     } break;
+		
     case 'W': {
       vec3r axis = center - eye;
       axis.normalize();
@@ -266,7 +254,7 @@ void drawInfo() {
                 Shapes[ishape].vertex.size(), Shapes[ishape].edge.size(), Shapes[ishape].face.size());
   glText::print(GLUT_BITMAP_9_BY_15, 10, 55, "preCompDone %c", Shapes[ishape].preCompDone);
 
-  if (Shapes[ishape].preCompDone == 'y') glColor3f(0.0f, 1.0f, 0.0f);  // green
+  if (Shapes[ishape].preCompDone == 'y') glColor3f(0.153f, 0.486f, 0.22f);  // green
 
   glText::print(GLUT_BITMAP_9_BY_15, 10, 70, "MCnstep = %lu, Volume = %g", Shapes[ishape].MCnstep,
                 Shapes[ishape].volume);
@@ -295,7 +283,7 @@ void display() {
 
   drawShape(ishape);
 
-  glColor3f(0.8f, 0.2f, 0.2f);
+  glColor3f(0.8f, 0.11f, 0.78f);
   glutShape::drawObb(Shapes[ishape].obb);
 
   drawObbLevel(ishape, maxOBBLevel);
@@ -363,12 +351,6 @@ void drawObbLevel(size_t ishp, size_t wantedLevel) {
   glColor3f(0.2f, 0.2f, 0.8f);
 
   recursiveDrawOBB(Shapes[ishp].tree.root, wantedLevel);
-
-  /*for (size_t i = 0; i < Shapes[ishp].tree.nodes.size(); i++) {
-    if (Shapes[ishp].tree.nodes[i].level != maxOBBLevel) continue;
-    glutShape::drawObb(Shapes[ishp].tree.nodes[i].obb);
-  }
-  */
 }
 
 void drawFrame() {
@@ -389,7 +371,8 @@ void drawShape(size_t ishp) {
   if (mouse_mode != NOTHING) return;
 
   double R = Shapes[ishp].radius;
-  glColor4f(0.666f, 0.729f, 0.09f, alpha);
+  //glColor4f(0.666f, 0.729f, 0.09f, alpha); // yellow
+	glColor4f(.761f, .733f, .976f, alpha);
 
   size_t nv = Shapes[ishp].vertex.size();
   for (size_t v = 0; v < nv; ++v) {

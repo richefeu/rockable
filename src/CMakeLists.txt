@@ -14,8 +14,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 ######################################################################
 # OPTIONS
 option(ROCKABLE_USE_FT_CORR "add objectivity correction to tangent forces" OFF)
-option(ROCKABLE_ENABLE_PROFILING "enable the time profiling" OFF)
+option(ROCKABLE_ENABLE_PROFILING "enable the time profiling" ON)
 option(ROCKABLE_ENABLE_BOUNDARY "enable the special boundaries like Ball or Cylinder" OFF)
+option(ROCKABLE_ENABLE_SOFT_PARTICLES "enable strainning of particles" OFF)
+option(ROCKABLE_ENABLE_PERIODIC "enable full periodic boundary conditions" OFF)
 
 option(ROCKABLE_COMPILE_SEE "Compile the application to visualize the conf-files" ON)
 option(ROCKABLE_COMPILE_SEE3 "Compile the application to edit graphically the input files" OFF)
@@ -79,7 +81,7 @@ endif()
 
 ######################################################################
 ##### MATools
-if(ROCKABLE_ENABLE_PROFILING)
+if(ROCKABLE_ENABLE_PROFILING)	
 	FetchContent_Declare (
 		matools
   	GIT_REPOSITORY https://github.com/rprat-pro/MATools
@@ -90,7 +92,7 @@ if(ROCKABLE_ENABLE_PROFILING)
 	if(NOT matools_POPULATED)
   	message(STATUS "Fetching MATools")
   	FetchContent_Populate(matools)
-		SET(MATOOLS_MPI OFF CACHE BOOL "Use some expat option")
+		SET(MATOOLS_MPI OFF CACHE BOOL "Use some expat option")		
 		add_subdirectory(${CMAKE_BINARY_DIR}/_deps/matools-src)
 	endif()
 endif()
@@ -200,11 +202,12 @@ endif()
 
 ######################################################################
 #### glfw
-#find_package(GLFW3 3.3 REQUIRED)
-#if(GLFW3_FOUND)
-#  message(STATUS "GLFW3_INCLUDE_DIRS = " ${GLFW_INCLUDE_DIR})
-#  message(STATUS "GLFW3_LIBRARIES = " ${GLFW3_LIBRARIES})
-#endif()
+find_package(glfw3 REQUIRED)
+
+if(glfw3_FOUND)
+  message(STATUS "glfw3_INCLUDE_DIRS = " ${GLFW_INCLUDE_DIRS})
+  message(STATUS "glfw3_LIBRARIES = " ${glfw3_LIBRARIES})
+endif()
 
 
 ######################################################################
@@ -227,10 +230,10 @@ file(GLOB core_object_files ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 if(ROCKABLE_ENABLE_BOUNDARY)
-    file(GLOB boundaries_files ${CMAKE_CURRENT_SOURCE_DIR}
-    /Boundaries/*.cpp
-    )
-    list(APPEND core_object_files ${boundaries_files})
+file(GLOB boundaries_files ${CMAKE_CURRENT_SOURCE_DIR}
+	/Boundaries/*.cpp
+)
+list(APPEND core_object_files ${boundaries_files})
 endif()
 
 ######################################################################
@@ -256,27 +259,28 @@ target_link_libraries (see PUBLIC OpenGL::GL ${GLUT_LIBRARIES} Rockable_core)
 endif()
 
 ######################################################################
-##### interactive preprocessing (TODO see3 -> will be renamed)
+##### interactive preprocessing (TODO see3 -> will be renamed )
 if(ROCKABLE_COMPILE_SEE3)
-#set(imgui_object_files
-#  ${imgui_SOURCE_DIR}/imgui.cpp
-#  ${imgui_SOURCE_DIR}/imgui_demo.cpp
-#  ${imgui_SOURCE_DIR}/imgui_draw.cpp
-#  ${imgui_SOURCE_DIR}/imgui_tables.cpp
-#  ${imgui_SOURCE_DIR}/imgui_widgets.cpp
-#  ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
-#  ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl2.cpp
-#)
+set(imgui_object_files
+  ${imgui_SOURCE_DIR}/imgui.cpp
+  ${imgui_SOURCE_DIR}/imgui_demo.cpp
+  ${imgui_SOURCE_DIR}/imgui_draw.cpp
+  ${imgui_SOURCE_DIR}/imgui_tables.cpp
+  ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+  ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
+  ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
+)
 #add_library(imgui STATIC ${imgui_object_files})
 #target_include_directories(imgui PUBLIC 
 #	${OPENGL_INCLUDE_DIR} 
 #	${imgui_SOURCE_DIR}
 #)
-#add_executable(see3 Apps/see3.cpp)
-#target_include_directories(see3 PUBLIC 
-#	${OPENGL_INCLUDE_DIR} 
-#	${nlohmann-json_SOURCE_DIR}/include
-#	${imgui_SOURCE_DIR}
-#)
-#target_link_libraries (see3 PUBLIC OpenGL::GL glfw imgui Rockable_core)
+add_executable(see3 Apps/see3.cpp ${imgui_object_files})
+target_include_directories(see3 PUBLIC 
+	${OPENGL_INCLUDE_DIR} 
+	${nlohmann-json_SOURCE_DIR}/include
+	${imgui_SOURCE_DIR}
+	${imgui_SOURCE_DIR}/backends
+)
+target_link_libraries (see3 PUBLIC OpenGL::GL glfw Rockable_core)
 endif()

@@ -69,6 +69,10 @@
 //  INITIALISATIONS
 // ==============================================================================================================
 
+/**
+ *   Construct a new Rockable:: Rockable object
+ *
+ */
 Rockable::Rockable() {
   // Some default values (actually, most of them will be reset after)
   t = 0.0;
@@ -88,7 +92,10 @@ Rockable::Rockable() {
   gravity.set(0.0, -9.81, 0.0);
   bodyForce = nullptr;
 
+#ifdef ROCKABLE_ENABLE_PERIODIC
   usePeriodicCell = 0;
+#endif
+
   useSoftParticles = 0;
   Cinv.set(1e10, 0.0);
 
@@ -158,12 +165,14 @@ Rockable::Rockable() {
   initParser();
 }
 
+/**
+ * Registers various features explicitly to build a static library.
+ *
+ * With automatic registration, merging the *.o into a single *.a breaks everything.
+ *
+ * Note: Compilation is slightly slower due to explicit registrations.
+ */
 void Rockable::ExplicitRegistrations() {
-  // We need to make these explicit registrations of various features to be able to build a static library.
-  // With the automatic registration, this is not possible (merging the *.o into a single *.a breaks everything)
-  //
-  // Because of that, the compilation is now a bit slower
-
   // BodyForces
   REGISTRER_BASE_DERIVED(BodyForce, AttractingPoint);
   REGISTRER_BASE_DERIVED(BodyForce, PreferredDirection);
@@ -199,9 +208,9 @@ void Rockable::ExplicitRegistrations() {
 }
 
 /**
- * @brief The version of setVerboseLevel that takes a integer number as argument
+ *   The version of setVerboseLevel that takes a integer number as argument
  *
- * @param v The verbose level (trace = 6, debug = 5, info = 4, warn = 3, err = 2, critical = 1, off = 0)
+ *   @param v The verbose level (trace = 6, debug = 5, info = 4, warn = 3, err = 2, critical = 1, off = 0)
  */
 void Rockable::setVerboseLevel(int v) {
   std::string levelNames[] = {"off", "critical", "err", "warn", "info", "debug", "trace"};
@@ -219,9 +228,9 @@ void Rockable::setVerboseLevel(int v) {
 }
 
 /**
- * @brief A version of setVerboseLevel that takes a string as argument
+ *   A version of setVerboseLevel that takes a string as argument
  *
- * @param levelName Name of the verbose level
+ *   @param levelName Name of the verbose level
  */
 void Rockable::setVerboseLevel(const std::string& levelName) {
   std::unordered_map<std::string, int> levelMap = {{"off", 0},  {"critical", 1}, {"err", 2},  {"warn", 3},
@@ -235,8 +244,7 @@ void Rockable::setVerboseLevel(const std::string& levelName) {
 }
 
 /**
- * @brief It opens some files if interactiveMode is false
- *
+ *   It opens some files (only if interactiveMode is false)
  */
 void Rockable::initOutputFiles() {
   if (interactiveMode == true) return;
@@ -246,20 +254,22 @@ void Rockable::initOutputFiles() {
 }
 
 /**
- *   @brief  If Rockable is not used to make a simulation (in case of its usage for
- *           postprocessing) we need to set its mode as being interactive. In this case,
- *           the output files (the usual ones and the one for dataExtractors) will not be
- *           openned Also, the method 'integrate' is not usable
+ *   If Rockable is not used to make a simulation (in case of its usage for
+ *   postprocessing) we need to set its mode as being interactive. In this case,
+ *   the output files (the usual ones and the one for dataExtractors) will not be
+ *   openned Also, the method 'integrate' is not usable
  */
 void Rockable::setInteractive(bool imode) { interactiveMode = imode; }
 
 /**
- *   @return interactiveMode
+ * Checks if the Rockable object is in interactive mode.
+ *
+ * @return true if the Rockable object is in interactive mode, false otherwise
  */
 bool Rockable::isInteractive() const { return interactiveMode; }
 
 /**
- *   @brief Print in the terminal a Banner with some information
+ *   Print in the terminal a Banner with some information
  */
 void Rockable::showBanner() {
   std::cout << "\n\n";
@@ -276,24 +286,47 @@ void Rockable::showBanner() {
   std::cout << std::endl;
 
 #ifdef FT_CORR
-  console->info("Compilation option: FT_CORR = YES");
+  console->info("Compilation option: FT_CORR = \033[1;32mYES\033[0m");
 #else
-  console->info("Compilation option: FT_CORR = NO");
+  console->info("Compilation option: FT_CORR = \033[1;31mNO\033[0m");
 #endif
 
 #ifdef COMPONENTWISE_NUM_DAMPING
-  console->info("Compilation option: COMPONENTWISE_NUM_DAMPING = YES");
+  console->info("Compilation option: COMPONENTWISE_NUM_DAMPING = \033[1;32mYES\033[0m");
 #else
-  console->info("Compilation option: COMPONENTWISE_NUM_DAMPING = NO");
+  console->info("Compilation option: COMPONENTWISE_NUM_DAMPING = \033[1;31mNO\033[0m");
 #endif
 
 #ifdef ROCKABLE_ENABLE_PROFILING
-  console->info("Compilation option: ROCKABLE_ENABLE_PROFILING = YES");
+  console->info("Compilation option: ROCKABLE_ENABLE_PROFILING = \033[1;32mYES\033[0m");
 #else
-  console->info("Compilation option: ROCKABLE_ENABLE_PROFILING = NO");
+  console->info("Compilation option: ROCKABLE_ENABLE_PROFILING = \033[1;31mNO\033[0m");
+#endif
+
+#ifdef ROCKABLE_ENABLE_BOUNDARY
+  console->info("Compilation option: ROCKABLE_ENABLE_BOUNDARY = \033[1;32mYES\033[0m");
+#else
+  console->info("Compilation option: ROCKABLE_ENABLE_BOUNDARY = \033[1;31mNO\033[0m");
+#endif
+
+#ifdef ROCKABLE_ENABLE_PERIODIC
+  console->info("Compilation option: ROCKABLE_ENABLE_PERIODIC = \033[1;32mYES\033[0m");
+#else
+  console->info("Compilation option: ROCKABLE_ENABLE_PERIODIC = \033[1;31mNO\033[0m");
+#endif
+
+#ifdef ROCKABLE_ENABLE_SOFT_PARTICLES
+  console->info("Compilation option: ROCKABLE_ENABLE_SOFT_PARTICLES = \033[1;32mYES\033[0m");
+#else
+  console->info("Compilation option: ROCKABLE_ENABLE_SOFT_PARTICLES = \033[1;31mNO\033[0m");
 #endif
 }
 
+/**
+ *  Sets the number of OpenMP threads for acceleration.
+ *
+ *  @param nbThreads the number of threads to set
+ */
 void Rockable::setOpenMPThreads(int nbThreads) {
 #ifdef _OPENMP
   omp_set_num_threads(nbThreads);
@@ -307,6 +340,9 @@ void Rockable::setOpenMPThreads(int nbThreads) {
 //  CHECK METHODS
 // ==================================================================================================================
 
+/**
+ * Performs initial checks for the Rockable class.
+ */
 void Rockable::initialChecks() {
 
   console->debug("Option forceLaw is {}", optionNames["forceLaw"]);
@@ -338,7 +374,7 @@ void Rockable::initialChecks() {
 // ==================================================================================================================
 
 /**
- *   @bried Clear the memory (exepted the shape library)
+ *   Clear the memory (exepted the shape library)
  */
 void Rockable::clearMemory() {
   Particles.clear();
@@ -352,7 +388,7 @@ void Rockable::clearMemory() {
 }
 
 /**
- *   @brief Save a configuration-file named 'conf<i>'
+ *   Save a configuration-file named 'conf<i>'
  */
 void Rockable::saveConf(int i) {
   char fname[256];
@@ -361,13 +397,17 @@ void Rockable::saveConf(int i) {
 }
 
 /**
- *   @brief Save a configuration-file
+ *   Save a configuration-file
+ *
  *   @param[in]  name  The name of the conf-file
  */
 void Rockable::saveConf(const char* fname) {
   START_TIMER("saveConf");
 
+#ifdef ROCKABLE_ENABLE_PERIODIC
   if (usePeriodicCell == 1) reducedToRealKinematics();
+#endif
+
   std::ofstream conf(fname);
 
   conf << "Rockable " << CONF_VERSION_DATE << '\n';  // format: progName version-date(dd-mm-yyyy)
@@ -397,6 +437,7 @@ void Rockable::saveConf(const char* fname) {
     conf << "angleUpdateNL " << Mth::rad2deg * angleUpdateNL << '\n';
   }
 
+#ifdef ROCKABLE_ENABLE_PERIODIC
   if (usePeriodicCell == 1) {
     conf << "usePeriodicCell 1\n";
     conf << "h " << Cell.h << '\n';
@@ -406,6 +447,7 @@ void Rockable::saveConf(const char* fname) {
   } else {
     conf << "usePeriodicCell 0\n";
   }
+#endif
 
   conf << "numericalDampingCoeff " << numericalDampingCoeff << '\n';
 
@@ -504,14 +546,17 @@ void Rockable::saveConf(const char* fname) {
   }
 
   conf << std::flush;
+
+#ifdef ROCKABLE_ENABLE_PERIODIC
   if (usePeriodicCell == 1) realToReducedKinematics();
+#endif
 }
 
 /**
- * @brief Read law data from an input stream and set it in the data table.
+ *   Read law data from an input stream and set it in the data table.
  *
- * @param is The input stream to read from.
- * @param id The identifier for the data to be set in the data table.
+ *   @param is The input stream to read from.
+ *   @param id The identifier for the data to be set in the data table.
  */
 void Rockable::readLawData(std::istream& is, size_t id) {
   size_t g1, g2;
@@ -521,10 +566,10 @@ void Rockable::readLawData(std::istream& is, size_t id) {
 }
 
 /**
- * @brief Write law data for a given parameter to an output stream.
+ *   Write law data for a given parameter to an output stream.
  *
- * @param os       The output stream to write to.
- * @param parName  The name of the parameter to write.
+ *   @param os       The output stream to write to.
+ *   @param parName  The name of the parameter to write.
  */
 void Rockable::writeLawData(std::ostream& os, const char* parName) {
   std::string parNameStr(parName);
@@ -570,11 +615,14 @@ void Rockable::initParser() {
     angleUpdateNL *= Mth::deg2rad;
   };
 
+#ifdef ROCKABLE_ENABLE_PERIODIC
   parser.kwMap["usePeriodicCell"] = __GET__(conf, usePeriodicCell);
+
   parser.kwMap["h"] = __GET__(conf, Cell.h);
   parser.kwMap["vh"] = __GET__(conf, Cell.vh);
   parser.kwMap["ah"] = __GET__(conf, Cell.ah);
   parser.kwMap["mh"] = __GET__(conf, Cell.mass);
+#endif
 
   parser.kwMap["useSoftParticles"] = __DO__(conf) {
     useSoftParticles = 1;
@@ -912,7 +960,7 @@ void Rockable::initParser() {
 }
 
 /**
- *   @brief Load a configuration-file named 'conf<i>'
+ *   Load a configuration-file named 'conf<i>'
  */
 void Rockable::loadConf(int i) {
   char fname[256];
@@ -921,7 +969,8 @@ void Rockable::loadConf(int i) {
 }
 
 /**
- *   @brief Load a configuration file named name
+ *   Load a configuration file named name
+ *
  *   @param[in]  name  The name of the conf-file
  */
 void Rockable::loadConf(const char* name) {
@@ -947,9 +996,11 @@ void Rockable::loadConf(const char* name) {
   // This single line actually parses the file
   parser.parse(conf);
 
+#ifdef ROCKABLE_ENABLE_PERIODIC
   if (usePeriodicCell == 1) {
     Cell.precomputeInverse();
   }
+#endif
 
   Interactions_from_set_to_vec();
 
@@ -958,9 +1009,11 @@ void Rockable::loadConf(const char* name) {
   // It will also populate the vector 'activeInteractions'.
   if (interactiveMode == false) {
     accelerations();
+#ifdef ROCKABLE_ENABLE_PERIODIC
     if (usePeriodicCell == 1) {
       realToReducedKinematics();
     }
+#endif
   }
 }
 
@@ -998,9 +1051,9 @@ void Rockable::readDataExtractors() {
 }
 
 /**
- *   @brief Load all shapes defined in the file 'fileName'.
- *          If the library has already been loaded (ie. the file name is the same as
- *          the one in the previously read conf-file), then it is not re-read.
+ *   Load all shapes defined in the file 'fileName'.
+ *   If the library has already been loaded (ie. the file name is the same as
+ *   the one in the previously read conf-file), then it is not re-read.
  */
 void Rockable::loadShapes(const char* fileName) {
   // If a library file is in the running folder, so it is preferably used
@@ -1042,6 +1095,11 @@ void Rockable::loadShapes(const char* fileName) {
   }
 }
 
+/**
+ * Runs the console for the Rockable class.
+ *
+ * @param confFileName the name of the configuration file to load
+ */
 void Rockable::console_run(const std::string& confFileName) {
   loadConf(confFileName.c_str());
   initOutputFiles();
@@ -1065,6 +1123,8 @@ void Rockable::console_run(const std::string& confFileName) {
   std::cout << std::endl << std::endl;
 
   console->info("INITIAL UPDATE OF NEIGHBOR LIST");
+
+#ifdef ROCKABLE_ENABLE_PERIODIC
   if (usePeriodicCell == 1) {
     reducedToRealKinematics();
     UpdateNL();
@@ -1072,6 +1132,9 @@ void Rockable::console_run(const std::string& confFileName) {
   } else {
     UpdateNL();
   }
+#else
+  UpdateNL();
+#endif
 
   console->info("COMPUTATION STARTS");
   integrate();
@@ -1082,6 +1145,11 @@ void Rockable::console_run(const std::string& confFileName) {
 //  ADD OR REMOVE A SINGLE INTERACTION
 // ==================================================================================================================
 
+/**
+ * Sets the `AddOrRemoveInteractions` function based on the given `Name`.
+ *
+ * @param Name the name of the function to set
+ */
 void Rockable::setAddOrRemoveInteractions(std::string& Name) {
   if (Name == "bruteForce") {
 
@@ -1105,12 +1173,12 @@ void Rockable::setAddOrRemoveInteractions(std::string& Name) {
 }
 
 /**
- *   @brief This is the brute-force O(N^2) version of the algorithm.
- *          It means that the proximity of all sub-elements of i is tested with all
- *          sub-elements of j
+ *   This is the brute-force O(N^2) version of the algorithm.
+ *   It means that the proximity of all sub-elements of i is tested with all
+ *   sub-elements of j
  */
 int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax) {
-  START_TIMER("AddOrRemoveInteractions (brute force)");
+  START_TIMER("AddOrRemoveInteractions_bruteForce");
 
   double Damp = 0.0;
   int nbAdd = 0;
@@ -1142,7 +1210,9 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
       };
 
   vec3r jPeriodicShift;
+#ifdef ROCKABLE_ENABLE_PERIODIC
   if (usePeriodicCell == 1) jPeriodicShift = Cell.getBranchCorrection(Particles[i].pos, Particles[j].pos);
+#endif
 
   size_t nvi = Particles[i].shape->vertex.size();
   size_t nvj = Particles[j].shape->vertex.size();
@@ -1229,7 +1299,7 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
  *   REMARK: obbi and obbj need to be already placed BEFORE calling this method
  */
 int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
-  START_TIMER("AddOrRemoveInteractions (OBB-tree)");
+  START_TIMER("AddOrRemoveInteractions_OBBtree");
 
   static Interaction to_find;
   static std::set<Interaction>::iterator exist_it;
@@ -1261,7 +1331,9 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
       };
 
   vec3r jPeriodicShift;
+#ifdef ROCKABLE_ENABLE_PERIODIC
   if (usePeriodicCell) jPeriodicShift = Cell.getBranchCorrection(Particles[i].pos, Particles[j].pos);
+#endif
 
   // Precompute the viscous damping parameter
   double en2 = dataTable.get(idEn2Contact, Particles[i].group, Particles[j].group);
@@ -1328,6 +1400,11 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
 //  UPDATING THE NEIGHBOR LIST
 // ==================================================================================================================
 
+/**
+ * Sets the update function for Neighbor lists, with a specified name.
+ *
+ * @param Name the name of the update function
+ */
 void Rockable::setUpdateNL(std::string& Name) {
   if (Name == "bruteForce") {
 
@@ -1344,6 +1421,9 @@ void Rockable::setUpdateNL(std::string& Name) {
   }
 }
 
+/**
+ * Updates the dynamic check for the Rockable object's position and rotation.
+ */
 void Rockable::dynamicCheckUpdateNL() {
   START_TIMER("dynamicCheckUpdateNL");
 
@@ -1369,6 +1449,7 @@ void Rockable::dynamicCheckUpdateNL() {
 
 void Rockable::Interactions_from_set_to_vec() {
   START_TIMER("Interactions_from_set_to_vec");
+
   m_vecInteractions.resize(Interactions.size());
 
 #pragma omp parallel for schedule(static)
@@ -1379,11 +1460,11 @@ void Rockable::Interactions_from_set_to_vec() {
 }
 
 /**
- *   @brief  The most basic algorithm for building a neighbor list.
- *           That is the O(N^2) complexity
+ *   The most basic algorithm for building a neighbor list.
+ *   That is the O(N^2) complexity
  */
 void Rockable::UpdateNL_bruteForce() {
-  START_TIMER("UpdateNL (bruteForce)");
+  START_TIMER("UpdateNL_bruteForce");
 
 #pragma omp parallel for default(shared)
   for (size_t i = 0; i < Particles.size(); ++i) {
@@ -1411,9 +1492,11 @@ void Rockable::UpdateNL_bruteForce() {
 
       OBB obbj = Particles[j].obb;
       obbj.enlarge(0.5 * DVerlet);
+#ifdef ROCKABLE_ENABLE_PERIODIC
       if (usePeriodicCell) {
         obbj.center += Cell.getBranchCorrection(obbi.center, obbj.center);
       }
+#endif
 
       // Check intersection
       if (obbi.intersect(obbj)) {
@@ -1427,10 +1510,10 @@ void Rockable::UpdateNL_bruteForce() {
 }
 
 /**
- *   @brief  A broad-phase collision detection that should have a complexity of nearly O(N).
+ *   A broad-phase collision detection that should have a complexity of nearly O(N).
  */
 void Rockable::UpdateNL_linkCells() {
-  START_TIMER("UpdateNL (linkCells)");
+  START_TIMER("UpdateNL_linkCells");
 
 #pragma omp parallel for default(shared)
   for (size_t i = 0; i < Particles.size(); ++i) {
@@ -1484,9 +1567,11 @@ void Rockable::UpdateNL_linkCells() {
 
               OBB obbj = Particles[j].obb;
               obbj.enlarge(0.5 * DVerlet);
+#ifdef ROCKABLE_ENABLE_PERIODIC
               if (usePeriodicCell) {
                 obbj.center += Cell.getBranchCorrection(obbi.center, obbj.center);
               }
+#endif
 
               // Check intersection
               if (obbi.intersect(obbj)) {
@@ -1553,6 +1638,11 @@ void Rockable::UpdateNL_linkCells() {
 //  INTEGRATORS
 // ==============================================================================================================
 
+/**
+ * Sets the integrator for the Rockable object.
+ *
+ * @param Name the name of the integrator to be set
+ */
 void Rockable::setIntegrator(std::string& Name) {
   if (Name == "velocityVerlet") {
     integrationStep = [this]() { this->velocityVerletStep(); };
@@ -1571,6 +1661,9 @@ void Rockable::setIntegrator(std::string& Name) {
   }
 }
 
+/**
+ * Initializes the integrator based on the selected option.
+ */
 void Rockable::initIntegrator() {
   if (optionNames["Integrator"] == "Beeman") {
     for (size_t i = 0; i < Particles.size(); ++i) {
@@ -1583,6 +1676,9 @@ void Rockable::initIntegrator() {
   }
 }
 
+/**
+ *  Updates the velocity-controlled drive of the Rockable object.
+ */
 void Rockable::velocityControlledDrive() {
   START_TIMER("velocityControlledDrive");
   for (size_t c = 0; c < System.controls.size(); ++c) {
@@ -1630,7 +1726,7 @@ void Rockable::velocityControlledDrive() {
 }
 
 /**
- *   @brief Makes a single step with the Euler scheme.
+ *  Makes a single step with the Euler scheme.
  */
 void Rockable::EulerStep() {
   START_TIMER("Step (Euler)");
@@ -1704,8 +1800,8 @@ void Rockable::EulerStep() {
 }
 
 /**
-    @brief Makes a single step with the velocity-Verlet scheme.
-*/
+ *  Makes a single step with the velocity-Verlet scheme.
+ */
 void Rockable::velocityVerletStep() {
   START_TIMER("Step (velocity-Verlet)");
 
@@ -1766,8 +1862,10 @@ void Rockable::velocityVerletStep() {
     Particles[i].pos += dt * Particles[i].vel + dt2_2 * Particles[i].acc;
     Particles[i].vel += dt_2 * Particles[i].acc;
 
+#ifdef ROCKABLE_ENABLE_PERIODIC
     // remember here that we use reduced coordinates here, in case of periodic cell
     if (usePeriodicCell == 1) Cell.forceToStayInside(Particles[i].pos);
+#endif
 
     // Rotation: Q(k+1) = Q(k) + dQ(k) * dt + ddQ(k) * dt2/2
     // It reads like this with quaternions
@@ -1778,6 +1876,7 @@ void Rockable::velocityVerletStep() {
     Particles[i].vrot += dt_2 * Particles[i].arot;
   }
 
+#ifdef ROCKABLE_ENABLE_PERIODIC
   if (usePeriodicCell == 1) {
 
     for (size_t c = 0; c < 9; c++) {  // loop over components
@@ -1799,6 +1898,9 @@ void Rockable::velocityVerletStep() {
   } else {
     accelerations();
   }
+#else
+  accelerations();
+#endif
 
   // Bodies where a component is controlled by force (like free in the corresponding direction)
   for (size_t c = 0; c < System.controls.size(); ++c) {
@@ -1837,6 +1939,7 @@ void Rockable::velocityVerletStep() {
   }
 
   // Free bodies
+#ifdef ROCKABLE_ENABLE_PERIODIC
   if (usePeriodicCell == 1) {
     vec3r vmean;
     for (size_t i = nDriven; i < Particles.size(); i++) {
@@ -1861,11 +1964,20 @@ void Rockable::velocityVerletStep() {
       Particles[i].vrot += dt_2 * Particles[i].arot;
     }
   }
+#else
+
+#pragma omp parallel for default(shared)
+  for (size_t i = nDriven; i < Particles.size(); ++i) {
+    Particles[i].vel += dt_2 * Particles[i].acc;
+    Particles[i].vrot += dt_2 * Particles[i].arot;
+  }
+
+#endif
 }
 
 /**
-    @brief Makes a single step with the Beeman scheme.
-*/
+ * Makes a single step with the Beeman scheme.
+ */
 void Rockable::BeemanStep() {
   START_TIMER("Step (Beeman)");
 
@@ -1988,8 +2100,8 @@ void Rockable::BeemanStep() {
 }
 
 /**
-    @brief Makes a single step with the Runge-Kutta-Nystrom (4th order) scheme.
-*/
+ * Makes a single step with the Runge-Kutta-Nystrom (4th order) scheme.
+ */
 void Rockable::RungeKutta4Step() {
   START_TIMER("Step (RK4)");
 
@@ -2233,8 +2345,9 @@ void Rockable::RungeKutta4Step() {
 // ==============================================================================================================
 
 /**
-    @brief The integration LOOP
-*/
+ * Integrate the system over time.
+ *
+ */
 void Rockable::integrate() {
   START_TIMER("Integrate");
 
@@ -2326,6 +2439,7 @@ void Rockable::integrate() {
                              ForcePercent, 100.0 - NLPercent - ForcePercent),
                  frameWidth);
 
+#ifdef ROCKABLE_ENABLE_PERIODIC
       if (usePeriodicCell == 1) {
         fmt::print("│{0: <{1}}│\n", "  Periodic Cell:", frameWidth);
         fmt::print("│{0: <{1}}│\n",
@@ -2346,6 +2460,7 @@ void Rockable::integrate() {
                    fmt::format("    {:<12.4e}  {:<12.4e}  {:<12.4e} ", Cell.Sig.zx, Cell.Sig.zy, Cell.Sig.zz),
                    frameWidth);
       }
+#endif
 
       fmt::print("│{0: <{1}}│\n", "  Resultant forces on particles:", frameWidth);
       fmt::print("│{0: <{1}}│\n",
@@ -2389,6 +2504,7 @@ void Rockable::integrate() {
     if (needUpdate || interVerletC >= interVerlet - dt_2) {
       PerfTimer tm;
 
+#ifdef ROCKABLE_ENABLE_PERIODIC
       if (usePeriodicCell == 1) {
         reducedToRealKinematics();
         UpdateNL();
@@ -2396,6 +2512,9 @@ void Rockable::integrate() {
       } else {
         UpdateNL();
       }
+#else
+      UpdateNL();
+#endif
 
       timeInUpdateNL += tm.getElapsedTimeSeconds();
       if (!needUpdate)
@@ -2426,11 +2545,12 @@ void Rockable::integrate() {
 }
 
 /**
-    @brief Increments the resultant forces and moments of the interacting bodies
-           with the local forces and moments.
-*/
+ *  Increments the resultant forces and moments of the interacting bodies
+ *  with the local forces and moments.
+ */
 void Rockable::incrementResultants(Interaction& I) {
   START_TIMER("incrementResultants");
+
   // Forces
   vec3r f = I.fn * I.n + I.ft;
   Particles[I.i].force += f;
@@ -2465,13 +2585,15 @@ void Rockable::incrementResultants(Interaction& I) {
   }
 }
 
+#ifdef ROCKABLE_ENABLE_PERIODIC
 /**
- * @brief This function increment the moment tensor. To be used in real world
+ * This function increment the moment tensor. To be used in real world
  *
- * @param I
+ * @param I concerned Interaction
  */
 void Rockable::incrementPeriodicCellTensorialMoment(Interaction& I) {
   START_TIMER("incrementPeriodicCellTensorialMoment");
+
   vec3r branch = (Particles[I.j].pos + I.jPeriodicShift) - Particles[I.i].pos;
 
   vec3r f = I.fn * I.n + I.ft;
@@ -2488,10 +2610,15 @@ void Rockable::incrementPeriodicCellTensorialMoment(Interaction& I) {
   Cell.Sig.zz += f.z * branch.z;
 }
 
-// s = hinv . r
-// dots = hinv . (dotr - doth . s)
+/**
+ * Convert the real coordinates of the particles to reduced coordinates.
+ *
+ */
 void Rockable::realToReducedKinematics() {
   START_TIMER("realToReducedKinematics");
+
+  // s = hinv . r
+  // dots = hinv . (dotr - doth . s)
 
 #pragma omp parallel for default(shared)
   for (size_t i = 0; i < Particles.size(); ++i) {
@@ -2507,10 +2634,15 @@ void Rockable::realToReducedKinematics() {
   }
 }
 
-// r = h . s
-// dotr = doth . s + h . dots
+/**
+ * Transforms the reduced coordinates of the particles to real coordinates.
+ *
+ */
 void Rockable::reducedToRealKinematics() {
   START_TIMER("reducedToRealKinematics");
+
+  // r = h . s
+  // dotr = doth . s + h . dots
 
 #pragma omp parallel for default(shared)
   for (size_t i = 0; i < Particles.size(); ++i) {
@@ -2525,7 +2657,12 @@ void Rockable::reducedToRealKinematics() {
     // Particles[i].acc = Cell.h * dds;
   }
 }
+#endif
 
+/**
+ * Initializes the forces and moments for the Rockable class.
+ *
+ */
 void Rockable::initialise_particle_forces_and_moments() {
   START_TIMER("initialise_particle_forces_and_moments");
 
@@ -2538,7 +2675,9 @@ void Rockable::initialise_particle_forces_and_moments() {
     Particles[i].arot.reset();
     Particles[i].stress.reset();
   }
+#ifdef ROCKABLE_ENABLE_PERIODIC
   if (usePeriodicCell == 1) Cell.Sig.reset();
+#endif
 
 #pragma omp parallel for default(shared)
   for (size_t i = nDriven; i < Particles.size(); ++i) {
@@ -2581,9 +2720,13 @@ void Rockable::initialise_particle_forces_and_moments() {
   }
 }
 
+/**
+ *  Updates the interactions in the Rockable class.
+ */
 void Rockable::update_interactions() {
   START_TIMER("update_interactions");
 
+#ifdef ROCKABLE_ENABLE_PERIODIC
   if (usePeriodicCell == 1) {
 
     // In the following loop, ALL interactions are updated,
@@ -2609,8 +2752,47 @@ void Rockable::update_interactions() {
       }
     }
   }
+#else
+
+// In the following loop, ALL interactions are updated,
+// including the interactions that are sticked or with positive dn
+#pragma omp parallel for default(shared)
+  for (size_t k = 0; k < m_vecInteractions.size(); ++k) {
+    std::vector<Interaction*>& InterLoc = m_vecInteractions[k];
+    for (auto it = InterLoc.begin(); it != InterLoc.end(); ++it) {
+      Interaction::UpdateDispatcher[(*it)->type](**it, Particles[(*it)->i], Particles[(*it)->j]);
+    }
+  }
+
+#endif
 }
 
+/**
+ * Updates the interactions boundary for the Rockable class.
+ *
+ */
+void Rockable::update_interactions_boundary() {
+  START_TIMER("update_interactions_boundary");
+
+  // Remark: there can be only one Boundary
+  //         For now, periodic boundary conditions cannot be used together with Boundary
+
+#ifdef ROCKABLE_ENABLE_BOUNDARY
+  activeInteractionsBoundary.clear();
+
+#pragma omp parallel for default(shared)
+  for (size_t k = 0; k < InteractionsBoundary.size(); ++k) {
+    for (auto it = InteractionsBoundary[k].begin(); it != InteractionsBoundary[k].end(); ++it) {
+      it->update(boundary, Particles[it->i]);
+    }
+  }
+#endif
+}
+
+/**
+ * Builds the active interactions for the Rockable class.
+ *
+ */
 void Rockable::build_activeInteractions() {
   START_TIMER("build_activeInteractions");
 
@@ -2637,6 +2819,10 @@ void Rockable::build_activeInteractions() {
                            activeInteractions.end());
 }
 
+/**
+ * Compute the forces and moments for the Rockable object.
+ *
+ */
 void Rockable::compute_forces_and_moments() {
   START_TIMER("compute_forces_and_moments");
 
@@ -2650,12 +2836,17 @@ void Rockable::compute_forces_and_moments() {
   }
 }
 
+/**
+ * Compute the resultants (forces and moments) on the bodies.
+ *
+ * The increment of resultants cannot be parallelised because of possible conflicts.
+ * Pointer to interactions are stored in the vector 'activeInteractions'.
+ *
+ */
 void Rockable::compute_resultants() {
   START_TIMER("compute_resultants");
 
-  //  The increment of resultants (forces and moments) on the bodies
-  //  cannot be parallelised (because of possible conflicts).
-  //  Pointer to interactions are stored in the vector 'activeInteractions'
+#ifdef ROCKABLE_ENABLE_PERIODIC
   if (usePeriodicCell == 1) {
 
     for (size_t i = 0; i < activeInteractions.size(); ++i) {
@@ -2675,15 +2866,30 @@ void Rockable::compute_resultants() {
       }
     }
   }
+
+#else
+
+  for (size_t i = 0; i < activeInteractions.size(); ++i) {
+    Interaction& I = *activeInteractions[i];
+    if (I.dn < 0.0 || I.stick != nullptr) {
+      incrementResultants(I);
+    }
+  }
+
+#endif
 }
 
+/**
+ * Compute the SpringJoints for the Rockable object.
+ *
+ */
 void Rockable::compute_SpringJoints() {
   START_TIMER("compute_SpringJoints");
 
   // SpringJoints
   for (size_t sj = 0; sj < joints.size(); ++sj) {
     vec3r forceOnj;
-    joints[sj].getForceOnj(Particles, forceOnj);  // WARNING !!! this is not yet ok with periodic boundary conditions
+    joints[sj].getForceOnj(Particles, forceOnj);  // WARNING!!! this is not yet ok with periodic boundary conditions
     vec3r forceOni = -forceOnj;
     Particle* ip = &(Particles[joints[sj].ibody]);
     Particle* jp = &(Particles[joints[sj].jbody]);
@@ -2700,6 +2906,10 @@ void Rockable::compute_SpringJoints() {
   }
 }
 
+/**
+ * Breaks the identified bonds in the interfaces.
+ *
+ */
 void Rockable::breakage_of_interfaces() {
   START_TIMER("breakage_of_interfaces");
 
@@ -2751,9 +2961,14 @@ void Rockable::breakage_of_interfaces() {
   }
 }
 
+/**
+ * Compute the accelerations of the particles based on the resultants.
+ *
+ */
 void Rockable::compute_accelerations_from_resultants() {
   START_TIMER("compute_accelerations_from_resultants");
 
+#ifdef ROCKABLE_ENABLE_PERIODIC
   if (usePeriodicCell == 1) {
 
     double Vcell = fabs(Cell.h.det());
@@ -2777,6 +2992,7 @@ void Rockable::compute_accelerations_from_resultants() {
       }
     }
   }
+#endif
 
   // Acceleration of controlled bodies
   for (size_t c = 0; c < System.controls.size(); ++c) {
@@ -2850,8 +3066,10 @@ void Rockable::compute_accelerations_from_resultants() {
   for (size_t i = nDriven; i < Particles.size(); ++i) {
     Particles[i].acc = Particles[i].force / Particles[i].mass;
 
+#ifdef ROCKABLE_ENABLE_PERIODIC
     // If there's a periodic cell, the accelerations are rescaled toward reduced coordinates
     if (usePeriodicCell == 1) Particles[i].acc = Cell.hinv * Particles[i].acc;
+#endif
 
     quat Qinv = Particles[i].Q.get_conjugated();
     vec3r omega = Qinv * Particles[i].vrot;  // Express omega in the body framework
@@ -2865,7 +3083,7 @@ void Rockable::compute_accelerations_from_resultants() {
 }
 
 /**
- *   @brief  Compute the particle accelerations (translations and rotations)
+ *   Compute the particle accelerations (translations and rotations)
  *
  *   The method computes actually 3 things:\n
  *     1. the interaction forces and moments with the force laws,\n
@@ -2897,6 +3115,7 @@ void Rockable::accelerations() {
 
   compute_SpringJoints();
 
+#ifdef ROCKABLE_ENABLE_SOFT_PARTICLES
   // compute_SoftParticles_transformation();
   if (useSoftParticles == 1) {
     // pour le moment on code en dure la loi. ***** DEVEL
@@ -2910,6 +3129,7 @@ void Rockable::accelerations() {
       Particles[i].uniformTransformation = mat9r::unit();  // + strain;
     }
   }
+#endif
 
   breakage_of_interfaces();
 
@@ -2925,12 +3145,14 @@ void Rockable::accelerations() {
 }
 
 /**
- *   @brief This is the so-called Cundall damping solution
+ *   This is the so-called Cundall damping solution
+ *
  *   @attention It acts on forces, so call this method after the summation of forces/moment
  *              and before the computation of accelerations
  */
 void Rockable::numericalDamping() {
   START_TIMER("numericalDamping");
+
   double factor;
   double factorMinus = 1.0 - numericalDampingCoeff;
   double factorPlus = 1.0 + numericalDampingCoeff;
@@ -2986,8 +3208,8 @@ void Rockable::numericalDamping() {
 }
 
 /**
- *   @brief Component-wise weighting of translation acceleration to limit the velocity components to
- *          the value 'VelocityBarrier'
+ *   Component-wise weighting of translation acceleration to limit the velocity components to
+ *   the value 'VelocityBarrier'
  *
  *   The weighting factor is equal to 1 when the velocity is of the order of zero,
  *   it tends towards 0 when the velocity approaches 'VelocityBarrier',
@@ -2996,6 +3218,7 @@ void Rockable::numericalDamping() {
  */
 void Rockable::applyVelocityBarrier() {
   START_TIMER("applyVelocityBarrier");
+
   for (size_t i = 0; i < Particles.size(); ++i) {
     double vxratio = pow(fabs(Particles[i].vel.x / velocityBarrier), velocityBarrierExponent);
     Particles[i].acc.x *= (1.0 - vxratio) / (1.0 + vxratio);
@@ -3009,11 +3232,12 @@ void Rockable::applyVelocityBarrier() {
 }
 
 /**
- *   @brief Component-wise weighting of rotation acceleration to limit the velocity components to
- *          the value 'AngularVelocityBarrier'
+ *   Component-wise weighting of rotation acceleration to limit the velocity components to
+ *   the value 'AngularVelocityBarrier'
  */
 void Rockable::applyAngularVelocityBarrier() {
   START_TIMER("applyAngularVelocityBarrier");
+
   for (size_t i = 0; i < Particles.size(); ++i) {
     double vrotxratio = pow(fabs(Particles[i].vrot.x / angularVelocityBarrier), angularVelocityBarrierExponent);
     Particles[i].arot.x *= (1.0 - vrotxratio) / (1.0 + vrotxratio);
@@ -3031,7 +3255,8 @@ void Rockable::applyAngularVelocityBarrier() {
 // ==============================================================================================================
 
 /**
- *   @brief   Computes the Axis Aligned Bounding Box (AABB) of a part of the scene.
+ *   Computes the Axis Aligned Bounding Box (AABB) of a part of the scene.
+ *
  *   @remark  The AABB (paabb) of each particle is also updated in this method
  *
  *   @param[in]   first   Smallest ID of particles (default value is 0)
@@ -3061,7 +3286,7 @@ void Rockable::computeAABB(size_t first, size_t last) {
 }
 
 /**
- *   @brief  Get the global kinetic energy for translations and for rotations.
+ *   Get the global kinetic energy for translations and for rotations.
  *
  *   @param[out]  Etrans  The translation kinetic energy (for particles id in range[first last])
  *   @param[out]  Erot    The ratational kinetic energy (for particles id in range[first last])
@@ -3083,7 +3308,7 @@ void Rockable::getKineticEnergy(double& Etrans, double& Erot, size_t first, size
 }
 
 /**
- *   @brief  Estimate the critical time step according to the stiffness values in dataTable.
+ *   Estimate the critical time step according to the stiffness values in dataTable.
  *
  *   @param[out]  dtc  minimum value of square root of meff/kn.
  */
@@ -3116,8 +3341,8 @@ void Rockable::estimateCriticalTimeStep(double& dtc) {
 }
 
 /**
- *   @brief  Compute the critical time step by looping over all potential
- *           interactions, even those that are not active.
+ *   Compute the critical time step by looping over all potential
+ *   interactions, even those that are not active.
  *
  *   @param[out]  dtc  minimum value of square root of meff/kn.
  */
@@ -3171,9 +3396,9 @@ void Rockable::getCriticalTimeStep(double& dtc) {
 }
 
 /**
- *   @brief Compute the critical time step by looping over all currently active interactions
+ *   Compute the critical time step by looping over all currently active interactions
  *
- *   @param[out]  dtc  minimum value of square root of meff/kn.
+ *   @param  dtc  minimum value of square root of meff/kn.
  */
 void Rockable::getCurrentCriticalTimeStep(double& dtc) {
   if (activeInteractions.empty()) {
@@ -3212,9 +3437,17 @@ void Rockable::getCurrentCriticalTimeStep(double& dtc) {
 }
 
 /**
- *  Fmax is the maximum value of resultant-force norms
- *  F_fnmax is the maximum value over all resultant-force norms divided by the maximum normal force acting on them
- *  Fmean is the mean value of the resultant-force norms
+ * Calculates the resultant quick statistics for a range of particles in the Rockable class.
+ *
+ * @param Fmax    output parameter to store the maximum resultant force
+ * @param F_fnmax output parameter to store the maximum resultant force normalized by the maximum interaction force
+ * @param Fmean   output parameter to store the mean resultant force
+ * @param Fstddev output parameter to store the standard deviation of resultant forces
+ * @param first   the index of the first particle in the range
+ * @param last    the index of the last particle in the range. If 0, the last particle is the last in the Particles
+ * vector
+ *
+ * @throws None
  */
 void Rockable::getResultantQuickStats(double& Fmax, double& F_fnmax, double& Fmean, double& Fstddev, size_t first,
                                       size_t last) {
@@ -3265,12 +3498,12 @@ void Rockable::getResultantQuickStats(double& Fmax, double& F_fnmax, double& Fme
 }
 
 /**
- *   @brief Get some statistics of the normal interaction forces
+ *   Get some statistics of the normal interaction forces
  *
- *   @param[out] fnMin     Smallest normal contact force
- *   @param[out] fnMin     Biggest normal contact force
- *   @param[out] fnMean    Averaged value of normal contact forces
- *   @param[out] fnStddev  Standard deviation of normal contact forces
+ *   @param fnMin     Smallest normal contact force
+ *   @param fnMin     Biggest normal contact force
+ *   @param fnMean    Averaged value of normal contact forces
+ *   @param fnStddev  Standard deviation of normal contact forces
  *
  *   @remarks Notice that this method needs that 'activeInteractions' is not empty.
  */
