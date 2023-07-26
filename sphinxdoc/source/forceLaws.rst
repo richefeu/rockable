@@ -23,6 +23,7 @@ Normal component
 The elastic part of the normal contact force is
 
 .. math::
+
    f_n^{el} = -k_n d_n
 
 where :math:`d_n \leq 0` is the normal distance, so :math:`f_n^{el} \geq 0`.
@@ -32,6 +33,7 @@ The value of :math:`k_n` can be set with the keyword ``knContact``
 The viscuous part of the normal contact force is
 
 .. math::
+
    f_n^{visc} = \alpha_n \sqrt{2 m_\text{eff}} v_n
 
 where :math:`v_n` is the relative velocity,  :math:`m_\text{eff}=(m_i m_j)/(m_i+m_j)` is the effective mass, 
@@ -40,11 +42,13 @@ and :math:`\alpha_n \in [0, 1[` is the rate of normal viscuous damping. There ar
 1. The keyword ``en2Contact`` that is the energy normal restitution rate (:math:`e_n^2`). In this case, the viscuous damping rate will be set associated
 
 .. math::
+
    \alpha_n = \frac{- \ln e_n}{\sqrt{\ln^2 e_n + \pi^2}}
 
 2. The keyword ``en2ContactFromViscRate`` that will  
 
 .. math:: 
+
    e_n^2 = \exp \left(-\frac{\alpha_n \pi}{\sqrt{1 - \alpha_n^2}}\right)
 
 Because of the viscuous part of the normal force, the total normal force :math:`f_n = f_n^{el} + f_n^{visc}` can be negative. 
@@ -73,7 +77,7 @@ Moment  component
 Law for rock avalanches (keywork ``Avalanche``)
 -----------------------------------------------
 
-This is historically the first law that has been implemented in Rockable (actually in DEMbox, its ancestor).
+This is historically the first law that has been implemented in ``Rockable`` (actually in ``DEMbox``, its ancestor).
 
 .. TODO
 
