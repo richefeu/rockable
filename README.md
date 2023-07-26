@@ -45,4 +45,3 @@ If you are lucky, the compilation is as simple as `make` in the `src`folder of `
 - should have a look at [tinyexpr](https://github.com/codeplea/tinyexpr) so that the user can provide some custom expressions
 - processing application could be written using [libcmdf](https://github.com/ronen25/libcmdf)
 - https://github.com/p-ranav/indicators
-- 
