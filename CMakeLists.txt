@@ -212,25 +212,27 @@ endif()
 
 ######################################################################
 ##### libRockable_core
+set(CMAKE_SOURCE_DIR "src/")
+
 include_directories(
-	${CMAKE_CURRENT_SOURCE_DIR} 
+	${CMAKE_SOURCE_DIR} 
 	${toofus_SOURCE_DIR}
 	${spdlog_SOURCE_DIR}/include
 	${tclap_SOURCE_DIR}/include
 )
 
-file(GLOB core_object_files ${CMAKE_CURRENT_SOURCE_DIR}
-  BodyForces/*.cpp
-  Core/*.cpp
-  DataExtractors/*.cpp
-  ForceLaws/*.cpp
-  PostProcessors/*.cpp
-  PreproCommands/*.cpp
-  ProcessingTools/*.cpp
+file(GLOB core_object_files 
+  ${CMAKE_SOURCE_DIR}/BodyForces/*.cpp
+  ${CMAKE_SOURCE_DIR}/Core/*.cpp
+  ${CMAKE_SOURCE_DIR}/DataExtractors/*.cpp
+  ${CMAKE_SOURCE_DIR}/ForceLaws/*.cpp
+  ${CMAKE_SOURCE_DIR}/PostProcessors/*.cpp
+  ${CMAKE_SOURCE_DIR}/PreproCommands/*.cpp
+  ${CMAKE_SOURCE_DIR}/ProcessingTools/*.cpp
 )
 
 if(ROCKABLE_ENABLE_BOUNDARY)
-file(GLOB boundaries_files ${CMAKE_CURRENT_SOURCE_DIR}
+file(GLOB boundaries_files ${CMAKE_SOURCE_DIR}
 	/Boundaries/*.cpp
 )
 list(APPEND core_object_files ${boundaries_files})
@@ -242,13 +244,13 @@ add_library(Rockable_core STATIC ${core_object_files})
 if(ROCKABLE_ENABLE_PROFILING)
 	target_link_libraries(Rockable_core MATools)
 endif()
-add_executable(rockable Apps/run.cpp)
+add_executable(rockable ${CMAKE_SOURCE_DIR}/Apps/run.cpp)
 target_link_libraries(rockable PUBLIC Rockable_core)
 
 ######################################################################
 ##### visualiser see
 if(ROCKABLE_COMPILE_SEE)
-add_executable(see Apps/see.cpp)
+add_executable(see ${CMAKE_SOURCE_DIR}/Apps/see.cpp)
 target_include_directories(see PUBLIC 
 	${OPENGL_INCLUDE_DIR} 
 	${GLUT_INCLUDE_DIRS}
@@ -279,7 +281,7 @@ set(imgui_object_files
 #	${OPENGL_INCLUDE_DIR} 
 #	${imgui_SOURCE_DIR}
 #)
-add_executable(see3 Apps/see3.cpp ${imgui_object_files})
+add_executable(see3 ${CMAKE_SOURCE_DIR}/Apps/see3.cpp ${imgui_object_files})
 target_include_directories(see3 PUBLIC 
 	${OPENGL_INCLUDE_DIR} 
 	${nlohmann-json_SOURCE_DIR}/include
