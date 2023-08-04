@@ -973,17 +973,27 @@ void Rockable::loadConf(int i) {
  *
  *   @param[in]  name  The name of the conf-file
  */
-void Rockable::loadConf(const char* name) {
+void Rockable::loadConf(const char* a_name) {
+  std::string name = m_path + std::string(a_name);
   std::ifstream conf(name);
   if (!conf.is_open()) {
     console->warn("@Rockable::loadConf, cannot read {}", name);
-    return;
+    std::abort();//return;
   }
 
   // Check header
   std::string prog;
   conf >> prog;
   if (prog != "Rockable") {
+    // used for testing
+    if (prog == "redirection") {
+      std::string newName = std::string();  // conf name
+      conf >> m_path;
+      conf >> newName;
+      std::cout << m_path << std::endl;
+      loadConf(newName.c_str());
+      return;
+    }
     console->warn("@Rockable::loadConf, this doesn't seem to be a file for the code Rockable!");
   }
   std::string date;

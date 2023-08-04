@@ -21,7 +21,7 @@ option(ROCKABLE_ENABLE_PERIODIC "enable full periodic boundary conditions" OFF)
 
 option(ROCKABLE_COMPILE_SEE "Compile the application to visualize the conf-files" ON)
 option(ROCKABLE_COMPILE_SEE3 "Compile the application to edit graphically the input files" ON)
-
+option(ROCKABLE_USE_TESTING "add tests" ON)
 
 ######################################################################
 # compilation flags
@@ -48,6 +48,11 @@ execute_process(
 )
 add_definitions(-DROCKABLE_GIT_TAG="${GIT_TAG}")
 
+# the default mode is release
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release")
+endif()
+
 include(FetchContent)
 ######################################################################
 ##### Fetching TOOFUS
@@ -56,29 +61,25 @@ FetchContent_Declare (
   GIT_REPOSITORY https://github.com/richefeu/toofus.git
   GIT_TAG        main
 )
-
 FetchContent_GetProperties(toofus)
 if(NOT toofus_POPULATED)
   message(STATUS "Fetching toofus")
   FetchContent_Populate(toofus)
-	#add_subdirectory(${toofus_SOURCE_DIR})
 endif()
 
 ######################################################################
 ##### Fetching spdlog
-FetchContent_Declare (
-	spdlog
-  GIT_REPOSITORY https://github.com/gabime/spdlog.git
-  GIT_TAG        v1.11.0
-)
-
-FetchContent_GetProperties(spdlog)
-if(NOT spdlog_POPULATED)
-  message(STATUS "Fetching spdlog")
-  FetchContent_Populate(spdlog)
-	#add_subdirectory(${spdlog_SOURCE_DIR})
-endif()
-
+#FetchContent_Declare (
+#	spdlog
+#  GIT_REPOSITORY https://github.com/gabime/spdlog.git
+#  GIT_TAG        v1.11.0
+#)
+#FetchContent_GetProperties(spdlog)
+#if(NOT spdlog_POPULATED)
+#  message(STATUS "Fetching spdlog")
+#  FetchContent_Populate(spdlog)
+#	#add_subdirectory(${spdlog_SOURCE_DIR})
+#endif()
 ######################################################################
 ##### MATools
 if(ROCKABLE_ENABLE_PROFILING)	
@@ -87,7 +88,6 @@ if(ROCKABLE_ENABLE_PROFILING)
   	GIT_REPOSITORY https://github.com/rprat-pro/MATools
   	GIT_TAG        v1.1
 	)
-
 	FetchContent_GetProperties(matools)
 	if(NOT matools_POPULATED)
   	message(STATUS "Fetching MATools")
@@ -96,7 +96,6 @@ if(ROCKABLE_ENABLE_PROFILING)
 		add_subdirectory(${CMAKE_BINARY_DIR}/_deps/matools-src)
 	endif()
 endif()
-
 ######################################################################
 ##### tclap
 FetchContent_Declare (
@@ -104,14 +103,12 @@ FetchContent_Declare (
   GIT_REPOSITORY https://github.com/xguerin/tclap.git
   GIT_TAG        v1.2.5
 )
-
 FetchContent_GetProperties(tclap)
 if(NOT tclap_POPULATED)
   message(STATUS "Fetching tclap")
   FetchContent_Populate(tclap)
 	#add_subdirectory(${tclap_SOURCE_DIR})
 endif()
-
 ######################################################################
 ##### nlohmann-json
 FetchContent_Declare (
@@ -119,14 +116,12 @@ FetchContent_Declare (
   GIT_REPOSITORY https://github.com/nlohmann/json.git
   GIT_TAG        v3.11.2
 )
-
 FetchContent_GetProperties(nlohmann-json)
 if(NOT nlohmann-json_POPULATED)
   message(STATUS "Fetching nlohmann-json")
   FetchContent_Populate(nlohmann-json)
 	#add_subdirectory(${nlohmann-json_SOURCE_DIR})
 endif()
-
 ######################################################################
 ##### imgui
 FetchContent_Declare (
@@ -134,7 +129,6 @@ FetchContent_Declare (
   GIT_REPOSITORY https://github.com/ocornut/imgui.git
   GIT_TAG        v1.89.5
 )
-
 FetchContent_GetProperties(imgui)
 if(NOT imgui_POPULATED)
   message(STATUS "Fetching imgui")
@@ -142,8 +136,9 @@ if(NOT imgui_POPULATED)
 	#add_subdirectory(${imgui_SOURCE_DIR})
 endif()
 
-######################################################################
-##### Chaiscript
+
+####################################################################
+### Chaiscript
 #FetchContent_Declare (
 #	ChaiScript
 #  GIT_REPOSITORY https://github.com/ChaiScript/ChaiScript.git
@@ -212,7 +207,7 @@ endif()
 
 ######################################################################
 ##### libRockable_core
-set(CMAKE_SOURCE_DIR "src/")
+set(CMAKE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
 
 include_directories(
 	${CMAKE_SOURCE_DIR} 
@@ -294,4 +289,9 @@ else()
   target_link_libraries (see3 PUBLIC OpenGL::GL glfw Rockable_core)
 endif()
 
+endif()
+
+if(ROCKABLE_USE_TESTING)
+  enable_testing()
+	add_subdirectory(test)
 endif()
