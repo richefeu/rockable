@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.12)
- 
+cmake_minimum_required(VERSION 3.23)
+   
 if (${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
   set(CMAKE_OSX_COMPILER_ID "GNU")
 	set(CMAKE_CXX_COMPILER "g++-13")
@@ -14,13 +14,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 ######################################################################
 # OPTIONS
 option(ROCKABLE_USE_FT_CORR "add objectivity correction to tangent forces" OFF)
-option(ROCKABLE_ENABLE_PROFILING "enable the time profiling" ON)
+option(ROCKABLE_ENABLE_PROFILING "enable the time profiling" OFF)
 option(ROCKABLE_ENABLE_BOUNDARY "enable the special boundaries like Ball or Cylinder" OFF)
 option(ROCKABLE_ENABLE_SOFT_PARTICLES "enable strainning of particles" OFF)
 option(ROCKABLE_ENABLE_PERIODIC "enable full periodic boundary conditions" OFF)
 
 option(ROCKABLE_COMPILE_SEE "Compile the application to visualize the conf-files" ON)
-option(ROCKABLE_COMPILE_SEE3 "Compile the application to edit graphically the input files" OFF)
+option(ROCKABLE_COMPILE_SEE3 "Compile the application to edit graphically the input files" ON)
 
 
 ######################################################################
@@ -255,7 +255,11 @@ target_include_directories(see PUBLIC
 	${nlohmann-json_SOURCE_DIR}/include
 )
 target_link_directories(see PUBLIC ${GLUT_LIBRARY_DIRS})
-target_link_libraries (see PUBLIC OpenGL::GL ${GLUT_LIBRARIES} Rockable_core)
+if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
+  target_link_libraries (see PUBLIC OpenGL::GL OpenGL::GLU ${GLUT_LIBRARIES} Rockable_core)
+else()
+  target_link_libraries (see PUBLIC OpenGL::GL ${GLUT_LIBRARIES} Rockable_core)
+endif()
 endif()
 
 ######################################################################
@@ -282,5 +286,10 @@ target_include_directories(see3 PUBLIC
 	${imgui_SOURCE_DIR}
 	${imgui_SOURCE_DIR}/backends
 )
-target_link_libraries (see3 PUBLIC OpenGL::GL glfw Rockable_core)
+if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
+  target_link_libraries (see3 PUBLIC OpenGL::GL OpenGL::GLU glfw Rockable_core)
+else()
+  target_link_libraries (see3 PUBLIC OpenGL::GL glfw Rockable_core)
+endif()
+
 endif()

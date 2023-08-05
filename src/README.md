@@ -15,7 +15,7 @@ For compilations, `gcc` (version >=10 if possible) is required.
 Some dependencies need to be installed (the examples are for a linux system):
 
 - for `run`(or `rockable`):
-- 
+ 
   - `spdlog`
   
   ```

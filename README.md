@@ -1,4 +1,4 @@
-## What is `Rockable`?
+## What is `Rockable`?  
 
 Rockable is a DEM code written in C++ by <vincent.richefeu@3sr-grenoble.fr>. The two main specificities of the code are (_i_) to hold sphero-polyhedral shapes, (_ii_) to manage breakable interfaces. It is developed for an **academic usage**. This means that the code is not intended to be a tool for all purposes. It can easily be used to do what it is designed for, but to extend it, it is necessary to master both the model (DEM, complex shapes and interaction laws) and its implementation (data structure). The benefit of a good understanding is to avoid a "hacking" that would eventually limit the developed possibilities. In other words, the design of the code (neither too specific nor too general) is intended to avoid any tendency towards a single thought.
 
@@ -44,4 +44,9 @@ If you are lucky, the compilation is as simple as `make` in the `src`folder of `
 
 - should have a look at [tinyexpr](https://github.com/codeplea/tinyexpr) so that the user can provide some custom expressions
 - processing application could be written using [libcmdf](https://github.com/ronen25/libcmdf)
+<<<<<<< HEAD
 - https://github.com/p-ranav/indicators
+=======
+- https://github.com/p-ranav/indicators
+- 
+>>>>>>> 5824f22ccdfa82c6f6547f74931a3e29dd07a19c
