@@ -33,17 +33,7 @@
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
-#include <filesystem>
-#include <regex>
-
-#include <tclap/CmdLine.h>
-
-#include "Core/Rockable.hpp"
-#include "stackTracer.hpp"
-
-#ifndef GIT_TAG
-#define GIT_TAG "unknown"
-#endif
+#include "run.hpp"
 
 /**
  *  @brief Deletes files matching the pattern 'conf*', 'kineticEnergy.txt', 'perf.txt', and 'staticBalance.txt'
