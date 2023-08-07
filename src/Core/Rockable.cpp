@@ -978,7 +978,7 @@ void Rockable::loadConf(const char* a_name) {
   std::ifstream conf(name);
   if (!conf.is_open()) {
     console->warn("@Rockable::loadConf, cannot read {}", name);
-    std::abort();//return;
+    exit(-1);
   }
 
   // Check header
@@ -1075,7 +1075,7 @@ void Rockable::loadShapes(const char* fileName) {
 
   if (!fileTool::fileExists(ModFileName.c_str())) {
     console->warn("@Rockable::loadShapes, shape library named '{}' has not been found", ModFileName);
-    return;
+    exit(-1);
   }
 
   Shapes.clear();

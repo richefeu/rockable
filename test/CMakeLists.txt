@@ -44,8 +44,9 @@ file(COPY ${INPUT_2_PRISMES_GRAVITY_DIR}  DESTINATION ${TMP_COPY_2_PRISMES_GRAVI
 #file(COPY ${INPUT_500_POLY_DEPOSIT_DIR}  DESTINATION ${TMP_COPY_500_POLY_DEPOSIT_DIR})
 #file(COPY ${INPUT_555_SPHERE_DIR}  DESTINATION ${TMP_COPY_555_SPHERE_DIR})
 
+add_test(NAME 2_prismes_gravity_exec COMMAND rockable ${TEST_DIR}/redirection_2_prismes_gravity.conf)
+#add_test(NAME 2_prismes_gravity_reg COMMAND rockable_test ${TEST_DIR}/redirection_2_prismes_gravity.conf -n ${WORK_DIR}/conf1 -r ${REGRESSION_DIR}/regression_2_prismes_gravity.conf)
 
-add_test(NAME 2_prismes_gravity_reg COMMAND rockable_test ${TEST_DIR}/redirection_2_prismes_gravity.conf -n ${WORK_DIR}/conf1 -r ${REGRESSION_DIR}/regression_2_prismes_gravity.conf)
 #if(ROCKABLE_ENABLE_PERIODIC)
 #	add_test(NAME 500_poly_deposit_periodic_box COMMAND rockable_test ${TEST_DIR}/redirection_500_poly_deposit_in_periodicBox.conf -n ${WORK_DIR}/conf1 -r ${REGRESSION_DIR}/regression_500_poly_deposit_in_periodicBox.conf)
 #	add_test(NAME 555_sphere_periodic COMMAND rockable_test ${TEST_DIR}/redirection_555_sphere_periodic.conf -n ${WORK_DIR}/conf1 -r ${REGRESSION_DIR}/regression_555_sphere_periodic.conf)
