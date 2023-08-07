@@ -35,3 +35,5 @@ src/imgui/examples
 perflog*
 conf*
 !examples/**/input.txt
+BUILD
+INSTALL
