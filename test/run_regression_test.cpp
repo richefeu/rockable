@@ -92,7 +92,6 @@ bool compareConf(std::string a_newConf, std::string a_regConf)
 	}
 	
 
-		
 	while(std::getline(regConf,lineRegConf))
 	{
 		std::getline(newConf,lineNewConf);
@@ -108,44 +107,10 @@ bool compareConf(std::string a_newConf, std::string a_regConf)
 	
 }
 
-void cleanSimulationFolder() {
-  std::vector<std::string> filesToDelete = {"kineticEnergy.txt", "perf.txt", "staticBalance.txt"};
-  std::regex patternToDelete("conf.*");
-
-  std::vector<std::filesystem::path> filesToRemove;
-  size_t nbConfDeleted = 0;
-
-  for (const auto& entry : std::filesystem::directory_iterator(".")) {
-    const std::string& filename = entry.path().filename().string();
-
-    // Collect files matching the pattern "conf*"
-    if (std::filesystem::is_regular_file(entry) && std::regex_match(filename, patternToDelete)) {
-      filesToRemove.push_back(entry.path());
-      nbConfDeleted++;
-    }
-  }
-
-  // Delete files matching the pattern "conf*"
-  for (const auto& fileToRemove : filesToRemove) {
-    std::filesystem::remove(fileToRemove);
-  }
-  std::cout << "Number of conf-files deleted: " << nbConfDeleted << std::endl;
-
-  // Delete specific files
-  for (const auto& fileToDelete : filesToDelete) {
-    std::filesystem::path filePath(fileToDelete);
-    if (std::filesystem::exists(filePath)) {
-      std::filesystem::remove(filePath);
-      std::cout << "File deleted: " << fileToDelete << std::endl;
-    }
-  }
-}
-
 int main(int argc, char const* argv[]) {
   std::string confFileName;
   int nbThreads = 1;
   int verboseLevel = 0;
-  bool cleanAndLeave = false;
   bool printBannerAndLeave = false;
 
   std::string newconf;
@@ -176,18 +141,12 @@ int main(int argc, char const* argv[]) {
     confFileName = nameArg.getValue();
     nbThreads = nbThreadsArg.getValue();
 	verboseLevel = verboseArg.getValue();
-    cleanAndLeave = cleanArg.getValue();
     printBannerAndLeave = bannerArg.getValue();
     newconf = _newConf.getValue();
     correct = _regConf.getValue();
 
   } catch (TCLAP::ArgException& e) {
     std::cerr << "error: " << e.error() << " for argument " << e.argId() << std::endl;
-  }
-  
-  if (cleanAndLeave) {
-    cleanSimulationFolder();
-    return 0;
   }
 
   RockableProfiler::ProfilerManager prof;
@@ -214,41 +173,11 @@ int main(int argc, char const* argv[]) {
   box.console->info("No multithreading (compiled without OpenMP)");
 #endif
 
-
 box.console_run(confFileName);
-
-  //Rockable box;
-  //box.showBanner();
-
-  //box.loadConf(confFileName.c_str());
-  //box.initOutputFiles();
-
-  //box.initialChecks();
-
-  //const bool warning = true;
-  //box.updateDrivingSystem(warning);
-  //box.readDataExtractors();
-
-  //if (!box.dataExtractors.empty()) {
-  //  std::ofstream docfile("extractedDataDoc.txt");
-  //  for (size_t d = 0; d < box.dataExtractors.size(); d++) {
-  //    box.dataExtractors[d]->generateHelp(docfile);
-  //    // The initialisation of dataExtractors can be necessary after conf is loaded
-  //    // and the System is read
-  //    box.dataExtractors[d]->init();
-  //  }
-  //  docfile.close();
-  //}
-
-  //std::cout << std::endl << std::endl;
-  //std::cout << msg::info() << "COMPUTATION STARTS" << msg::normal() << std::endl;
-  //box.UpdateNL();
-  //box.integrate();
-  //std::cout << msg::info() << "COMPUTATION NORMALLY STOPPED" << msg::normal() << std::endl;
 
 if (argc < 3) {
   std::cout << " not enough parameters " << std::endl;
-  return -1; //std::abort();
+  exit(-1);
 }
 else {
   bool succeed = compareConf(newconf,correct);
@@ -257,9 +186,9 @@ else {
   }
   else{
 	std::cout << "Test not passed"<<std::endl;
-    return -1; //std::abort();
+    exit(-1);
   }	
 }
-std::cout << "Coucou"<<std::endl;
-return -1;
+
+return 0;
 }
