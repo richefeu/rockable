@@ -21,6 +21,7 @@ option(ROCKABLE_ENABLE_PERIODIC "enable full periodic boundary conditions" OFF)
 
 option(ROCKABLE_COMPILE_SEE "Compile the application to visualize the conf-files" ON)
 option(ROCKABLE_COMPILE_SEE3 "Compile the application to edit graphically the input files" ON)
+option(ROCKABLE_COMPILE_PREPRO "Compile the preprocessings" ON)
 option(ROCKABLE_USE_TESTING "add tests" ON)
 
 ######################################################################
@@ -298,3 +299,8 @@ if(ROCKABLE_USE_TESTING)
   enable_testing()
 	add_subdirectory(test)
 endif()
+
+if(ROCKABLE_COMPILE_PREPRO)
+	add_subdirectory(prepro)
+endif()
+
