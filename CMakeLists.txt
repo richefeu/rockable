@@ -241,6 +241,7 @@ if(ROCKABLE_ENABLE_PROFILING)
 endif()
 add_executable(rockable ${CMAKE_SOURCE_DIR}/Apps/run.cpp)
 target_link_libraries(rockable PUBLIC Rockable_core)
+install(TARGETS rockable DESTINATION bin)
 
 ######################################################################
 ##### visualiser see
@@ -257,7 +258,9 @@ if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
 else()
   target_link_libraries (see PUBLIC OpenGL::GL ${GLUT_LIBRARIES} Rockable_core)
 endif()
+install(TARGETS see DESTINATION bin)
 endif()
+
 
 ######################################################################
 ##### interactive preprocessing (TODO see3 -> will be renamed )
@@ -288,7 +291,7 @@ if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
 else()
   target_link_libraries (see3 PUBLIC OpenGL::GL glfw Rockable_core)
 endif()
-
+install(TARGETS see3 DESTINATION bin)
 endif()
 
 if(ROCKABLE_USE_TESTING)
