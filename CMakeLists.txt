@@ -14,7 +14,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 ######################################################################
 # OPTIONS
 option(ROCKABLE_USE_FT_CORR "add objectivity correction to tangent forces" OFF)
-option(ROCKABLE_ENABLE_PROFILING "enable the time profiling" OFF)
+option(ROCKABLE_ENABLE_PROFILING "enable the time profiling" ON)
 option(ROCKABLE_ENABLE_BOUNDARY "enable the special boundaries like Ball or Cylinder" OFF)
 option(ROCKABLE_ENABLE_SOFT_PARTICLES "enable strainning of particles" OFF)
 option(ROCKABLE_ENABLE_PERIODIC "enable full periodic boundary conditions" OFF)
@@ -22,7 +22,7 @@ option(ROCKABLE_ENABLE_PERIODIC "enable full periodic boundary conditions" OFF)
 option(ROCKABLE_COMPILE_SEE "Compile the application to visualize the conf-files" ON)
 option(ROCKABLE_COMPILE_SEE3 "Compile the application to edit graphically the input files" ON)
 option(ROCKABLE_COMPILE_PREPRO "Compile the preprocessings" ON)
-option(ROCKABLE_COMPILE_CONF2VTK "Convert conf files to VTK" ON)
+option(ROCKABLE_COMPILE_CONF2VTK "Convert conf files to VTK" OFF)
 option(ROCKABLE_USE_TESTING "add tests" ON)
 
 ######################################################################
@@ -56,6 +56,8 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 include(FetchContent)
+set(FETCHCONTENT_BASE_DIR ${CMAKE_SOURCE_DIR}/deps)
+
 ######################################################################
 ##### Fetching TOOFUS
 FetchContent_Declare (
@@ -95,7 +97,7 @@ if(ROCKABLE_ENABLE_PROFILING)
   	message(STATUS "Fetching MATools")
   	FetchContent_Populate(matools)
 		SET(MATOOLS_MPI OFF CACHE BOOL "Use some expat option")		
-		add_subdirectory(${CMAKE_BINARY_DIR}/_deps/matools-src)
+		add_subdirectory(${FETCHCONTENT_BASE_DIR}/matools-src)
 	endif()
 endif()
 ######################################################################
