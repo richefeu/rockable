@@ -27,7 +27,7 @@ src/imgui/examples
 *imgui.ini
 *see.json
 perflog*
-conf*
+#conf*
 !examples/**/input.txt
 BUILD
 INSTALL
