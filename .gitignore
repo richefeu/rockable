@@ -12,12 +12,6 @@ src/bin/postpro
 src/bin
 src/lib
 common/*
-*pack
-*seePack
-*confedit
-*shapeSurvey
-*stl2shape
-*generator
 /examples/**/conf*
 !imconfig.h
 *kineticEnergy.txt

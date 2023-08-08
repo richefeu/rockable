@@ -1,0 +1,5 @@
+file(GLOB stl2shape_SRCS "*.cpp")
+add_executable(stl2shape stl2shape.cpp)
+target_include_directories(stl2shape PUBLIC ${stl2shape_HDRS} ${COMMON_HEADERS})
+target_link_libraries(stl2shape Rockable_core)
+install(TARGETS stl2shape DESTINATION bin)
