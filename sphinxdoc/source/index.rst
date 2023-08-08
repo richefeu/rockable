@@ -13,7 +13,7 @@ The specificities of the code are to handle:
    It is designed and developed for academic use (which means that its source code is not publicly downloadable).
 
 .. image:: images/RockableLogo96dpi.png
-   :width: 363px
+   :width: 150px
    :align: center
 
 

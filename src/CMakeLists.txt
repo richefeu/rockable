@@ -19,8 +19,9 @@ option(ROCKABLE_ENABLE_BOUNDARY "enable the special boundaries like Ball or Cyli
 option(ROCKABLE_ENABLE_SOFT_PARTICLES "enable strainning of particles" OFF)
 option(ROCKABLE_ENABLE_PERIODIC "enable full periodic boundary conditions" OFF)
 
+option(ROCKABLE_COMPILE_POSTPRO "Compile the application to run post-processing commands" ON)
 option(ROCKABLE_COMPILE_SEE "Compile the application to visualize the conf-files" ON)
-option(ROCKABLE_COMPILE_SEE3 "Compile the application to edit graphically the input files" ON)
+option(ROCKABLE_COMPILE_SEE3 "Compile the application to edit graphically the input files" OFF)
 
 
 ######################################################################
@@ -129,6 +130,7 @@ endif()
 
 ######################################################################
 ##### imgui
+if(ROCKABLE_COMPILE_SEE3)
 FetchContent_Declare (
 	imgui
   GIT_REPOSITORY https://github.com/ocornut/imgui.git
@@ -139,8 +141,8 @@ FetchContent_GetProperties(imgui)
 if(NOT imgui_POPULATED)
   message(STATUS "Fetching imgui")
   FetchContent_Populate(imgui)
-	#add_subdirectory(${imgui_SOURCE_DIR})
 endif()
+endif() # end of ROCKABLE_COMPILE_SEE3
 
 ######################################################################
 ##### Chaiscript
@@ -202,13 +204,9 @@ endif()
 
 ######################################################################
 #### glfw
-find_package(glfw3 REQUIRED)
-
-if(glfw3_FOUND)
-  message(STATUS "glfw3_INCLUDE_DIRS = " ${GLFW_INCLUDE_DIRS})
-  message(STATUS "glfw3_LIBRARIES = " ${glfw3_LIBRARIES})
+if(ROCKABLE_COMPILE_SEE3)
+  find_package(glfw3 REQUIRED)
 endif()
-
 
 ######################################################################
 ##### libRockable_core
@@ -234,16 +232,22 @@ file(GLOB boundaries_files ${CMAKE_CURRENT_SOURCE_DIR}
 	/Boundaries/*.cpp
 )
 list(APPEND core_object_files ${boundaries_files})
-endif()
+endif() # end of ROCKABLE_ENABLE_BOUNDARY
 
-######################################################################
-##### rockable executable (to run simulations from the console)
 add_library(Rockable_core STATIC ${core_object_files})
 if(ROCKABLE_ENABLE_PROFILING)
 	target_link_libraries(Rockable_core MATools)
 endif()
+
+######################################################################
+##### rockable executable (to run simulations from the console)
 add_executable(rockable Apps/run.cpp)
 target_link_libraries(rockable PUBLIC Rockable_core)
+
+######################################################################
+##### postpro
+add_executable(postpro Apps/postpro.cpp)
+target_link_libraries(postpro PUBLIC Rockable_core)
 
 ######################################################################
 ##### visualiser see
@@ -260,7 +264,7 @@ if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
 else()
   target_link_libraries (see PUBLIC OpenGL::GL ${GLUT_LIBRARIES} Rockable_core)
 endif()
-endif()
+endif() # end of ROCKABLE_COMPILE_SEE
 
 ######################################################################
 ##### interactive preprocessing (TODO see3 -> will be renamed )
@@ -274,22 +278,29 @@ set(imgui_object_files
   ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
   ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
 )
-#add_library(imgui STATIC ${imgui_object_files})
-#target_include_directories(imgui PUBLIC 
-#	${OPENGL_INCLUDE_DIR} 
-#	${imgui_SOURCE_DIR}
-#)
-add_executable(see3 Apps/see3.cpp ${imgui_object_files})
-target_include_directories(see3 PUBLIC 
+
+add_library(see3_imgui STATIC ${imgui_object_files})
+target_link_libraries(see3_imgui OpenGL::GL OpenGL::GLU glfw)
+include_directories( 
 	${OPENGL_INCLUDE_DIR} 
-	${nlohmann-json_SOURCE_DIR}/include
 	${imgui_SOURCE_DIR}
 	${imgui_SOURCE_DIR}/backends
+  ${nlohmann-json_SOURCE_DIR}/include
 )
-if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
-  target_link_libraries (see3 PUBLIC OpenGL::GL OpenGL::GLU glfw Rockable_core)
-else()
-  target_link_libraries (see3 PUBLIC OpenGL::GL glfw Rockable_core)
-endif()
 
-endif()
+#if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
+#  target_link_libraries (see3 PUBLIC OpenGL::GL OpenGL::GLU glfw Rockable_core)
+#else()
+#  target_link_libraries (see3 PUBLIC OpenGL::GL OpenGL::GLU glfw Rockable_core)
+#endif()
+
+add_executable(see3 Apps/see3.cpp)
+target_link_libraries(see3 PUBLIC see3_imgui Rockable_core)
+#target_include_directories(see3 PUBLIC 
+#	${OPENGL_INCLUDE_DIR} 
+#	${imgui_SOURCE_DIR}
+#	${imgui_SOURCE_DIR}/backends
+# ${nlohmann-json_SOURCE_DIR}/include
+#)
+
+endif() # end of ROCKABLE_COMPILE_SEE3

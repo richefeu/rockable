@@ -39,15 +39,16 @@
 #include <unistd.h>
 #include <sstream>
 
-#include "imgui.h"
-#include "backends/imgui_impl_glfw.h"
-#include "backends/imgui_impl_opengl3.h"
-
 #ifdef __APPLE__
 #define GL_SILENCE_DEPRECATION
 #endif
+
 #define GLFW_INCLUDE_GLU
 #include <GLFW/glfw3.h>
+
+#include "imgui.h"
+#include "backends/imgui_impl_opengl3.h"
+#include "backends/imgui_impl_glfw.h"
 
 #ifdef PNG_H
 #include <png.h>
