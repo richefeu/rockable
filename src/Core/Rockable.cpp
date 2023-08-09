@@ -767,8 +767,10 @@ void Rockable::initParser() {
   parser.kwMap["iconf"] = __GET__(conf, iconf);
   parser.kwMap["nDriven"] = __GET__(conf, nDriven);
   parser.kwMap["shapeFile"] = __DO__(conf) {
-    std::string wantedLib;
-    conf >> wantedLib;
+    std::string name;
+    conf >> name;
+    std::string wantedLib = m_path + std::string(name);
+    console->info("wantedLib is {}", wantedLib);
     if (wantedLib != shapeFile) {  // it means that the library is not already loaded
       shapeFile = wantedLib;
       loadShapes(shapeFile.c_str());
