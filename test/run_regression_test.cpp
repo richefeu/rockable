@@ -161,10 +161,10 @@ int main(int argc, char const* argv[]) {
   
   box.setVerboseLevel(verboseLevel);
 
-  std::cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<std::endl;
-  std::cout << " Compute test: " << newconf << std::endl;
-  std::cout << " Regression file: " << correct << std::endl;
-  std::cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<std::endl;
+//  std::cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<std::endl;
+//  std::cout << " Compute test: " << newconf << std::endl;
+//  std::cout << " Regression file: " << correct << std::endl;
+//  std::cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<std::endl;
 
 #ifdef _OPENMP
   omp_set_num_threads(nbThreads);
