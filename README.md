@@ -14,6 +14,10 @@ The use of the code is not interfaced by any tool (like lua, python or any graph
 * `examples`: examples for usage tutorials or for testing features
 * `prepro`: some pre-processing tools
 * `src`: Rockable C++ source files
+* `test`: Rockable regression test files
+* `deps`: Source files for Rockable dependencies
+* `BUILD`: Compilation files of the code
+* `INSTALL:` Binaries of Rockable routines
 
 ## Credits
 
@@ -33,11 +37,35 @@ git clone https://yourLogin@git.renater.fr/authscm/yourLogin/git/rockable/rockab
 
 where `yourLogin` is your own login in SourceSup. Another way to get this command line is to go in "Ma Page" in SourceSup site, find "Rockable" and then "Code Source". The command can be copy-pasted (choose "via smart HTTP").
 
-`Rockable` uses a header-only library named `toofus`. It needs to be downloaded from [https://richefeu.github.io/toofus/](https://richefeu.github.io/toofus/) (ZIP, TAR or *via* GitHub), and unzipped somewhere. The installation consists simply to copy all the header files in `/usr/local/include/toofus`. To do so, type `make` in `toofus`' folder.
+Using your OS package manager (yum, apt, brew etc) you will need to install several package before compiling: `glfw3`, `opengl`,`freeglut`, `libpng2` (optionnal).
 
-Other libraries are required and need to be installed using the OS package manager (use `brew` for apple). They are `tclap`, `glfw3`, `libpng2` (optionnal).
+If you are lucky, the compilation is as simple as:
+```
+bash install_rockable.sh
+```
+The compilation is done in the BUILD directory and the binaries go to the INSTALL directory
 
-If you are lucky, the compilation is as simple as `make` in the `src`folder of `Rockable` sources.
+Then, if needed, you can manage compilation options (profiling with MATools, full fetch of dependencies, see compilation, prepro compilation etc) using ccmake: 
+```
+cd BUILD
+ccmake .
+# Set up options + `c` + `e` + `g`
+cmake ..
+make -j
+make install 
+```
+
+## How to run 
+
+Before runing rockable you will need to source rockable environnement to add the INSTALL directory to your standard binaries PATH:
+```
+source Env_rockable.sh
+``` 
+
+Then you can launch Rockable everywhere using:
+```
+rockable my_input_file.txt
+```
 
 
 ## Some envisioned features
