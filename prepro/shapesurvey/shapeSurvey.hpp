@@ -3,7 +3,7 @@
 
 #include <GL/freeglut.h>
 
-#include "Shape.hpp"
+#include "Core/Shape.hpp"
 #include "stackTracer.hpp"
 
 #include <fstream>

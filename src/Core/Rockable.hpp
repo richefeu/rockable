@@ -344,6 +344,9 @@ class Rockable {
   double dt2;    ///< Double of time-step
   double dt2_8;  ///< Squared time-step divided by 8
   double dt2_6;  ///< Squared time-step divided by 6
+  
+  // input files
+  std::string m_path = std::string(); ///< Default path to load our input files is the current directory
 
   // output files
   std::ofstream perfFile;           ///< to store performance data in the course of a computation

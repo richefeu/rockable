@@ -11,13 +11,8 @@ src/bin/patatrac
 src/bin/postpro
 src/bin
 src/lib
+deps
 common/*
-*pack
-*seePack
-*confedit
-*shapeSurvey
-*stl2shape
-*generator
 /examples/**/conf*
 !imconfig.h
 *kineticEnergy.txt
@@ -33,5 +28,7 @@ src/imgui/examples
 *imgui.ini
 *see.json
 perflog*
-conf*
+#conf*
 !examples/**/input.txt
+BUILD
+INSTALL

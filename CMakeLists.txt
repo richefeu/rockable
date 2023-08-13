@@ -14,15 +14,18 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 ######################################################################
 # OPTIONS
 option(ROCKABLE_USE_FT_CORR "add objectivity correction to tangent forces" OFF)
-option(ROCKABLE_ENABLE_PROFILING "enable the time profiling" OFF)
+option(ROCKABLE_ENABLE_PROFILING "enable the time profiling" ON)
 option(ROCKABLE_ENABLE_BOUNDARY "enable the special boundaries like Ball or Cylinder" OFF)
 option(ROCKABLE_ENABLE_SOFT_PARTICLES "enable strainning of particles" OFF)
 option(ROCKABLE_ENABLE_PERIODIC "enable full periodic boundary conditions" OFF)
 
 option(ROCKABLE_COMPILE_POSTPRO "Compile the application to run post-processing commands" ON)
 option(ROCKABLE_COMPILE_SEE "Compile the application to visualize the conf-files" ON)
-option(ROCKABLE_COMPILE_SEE3 "Compile the application to edit graphically the input files" OFF)
 
+option(ROCKABLE_COMPILE_SEE3 "Compile the application to edit graphically the input files" OFF)
+option(ROCKABLE_COMPILE_PREPRO "Compile the preprocessings" ON)
+option(ROCKABLE_COMPILE_CONF2VTK "Convert conf files to VTK" OFF)
+option(ROCKABLE_USE_TESTING "add tests" ON)
 
 ######################################################################
 # compilation flags
@@ -49,7 +52,14 @@ execute_process(
 )
 add_definitions(-DROCKABLE_GIT_TAG="${GIT_TAG}")
 
+# the default mode is release
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release")
+endif()
+
 include(FetchContent)
+set(FETCHCONTENT_BASE_DIR ${CMAKE_SOURCE_DIR}/deps)
+
 ######################################################################
 ##### Fetching TOOFUS
 FetchContent_Declare (
@@ -57,12 +67,10 @@ FetchContent_Declare (
   GIT_REPOSITORY https://github.com/richefeu/toofus.git
   GIT_TAG        main
 )
-
 FetchContent_GetProperties(toofus)
 if(NOT toofus_POPULATED)
   message(STATUS "Fetching toofus")
   FetchContent_Populate(toofus)
-	#add_subdirectory(${toofus_SOURCE_DIR})
 endif()
 
 ######################################################################
@@ -72,14 +80,12 @@ FetchContent_Declare (
   GIT_REPOSITORY https://github.com/gabime/spdlog.git
   GIT_TAG        v1.11.0
 )
-
 FetchContent_GetProperties(spdlog)
 if(NOT spdlog_POPULATED)
   message(STATUS "Fetching spdlog")
   FetchContent_Populate(spdlog)
 	#add_subdirectory(${spdlog_SOURCE_DIR})
 endif()
-
 ######################################################################
 ##### MATools
 if(ROCKABLE_ENABLE_PROFILING)	
@@ -88,16 +94,14 @@ if(ROCKABLE_ENABLE_PROFILING)
   	GIT_REPOSITORY https://github.com/rprat-pro/MATools
   	GIT_TAG        v1.1
 	)
-
 	FetchContent_GetProperties(matools)
 	if(NOT matools_POPULATED)
   	message(STATUS "Fetching MATools")
   	FetchContent_Populate(matools)
 		SET(MATOOLS_MPI OFF CACHE BOOL "Use some expat option")		
-		add_subdirectory(${CMAKE_BINARY_DIR}/_deps/matools-src)
+		add_subdirectory(${FETCHCONTENT_BASE_DIR}/matools-src)
 	endif()
 endif()
-
 ######################################################################
 ##### tclap
 FetchContent_Declare (
@@ -105,14 +109,12 @@ FetchContent_Declare (
   GIT_REPOSITORY https://github.com/xguerin/tclap.git
   GIT_TAG        v1.2.5
 )
-
 FetchContent_GetProperties(tclap)
 if(NOT tclap_POPULATED)
   message(STATUS "Fetching tclap")
   FetchContent_Populate(tclap)
 	#add_subdirectory(${tclap_SOURCE_DIR})
 endif()
-
 ######################################################################
 ##### nlohmann-json
 FetchContent_Declare (
@@ -120,14 +122,12 @@ FetchContent_Declare (
   GIT_REPOSITORY https://github.com/nlohmann/json.git
   GIT_TAG        v3.11.2
 )
-
 FetchContent_GetProperties(nlohmann-json)
 if(NOT nlohmann-json_POPULATED)
   message(STATUS "Fetching nlohmann-json")
   FetchContent_Populate(nlohmann-json)
 	#add_subdirectory(${nlohmann-json_SOURCE_DIR})
 endif()
-
 ######################################################################
 ##### imgui
 if(ROCKABLE_COMPILE_SEE3)
@@ -136,7 +136,6 @@ FetchContent_Declare (
   GIT_REPOSITORY https://github.com/ocornut/imgui.git
   GIT_TAG        v1.89.5
 )
-
 FetchContent_GetProperties(imgui)
 if(NOT imgui_POPULATED)
   message(STATUS "Fetching imgui")
@@ -144,8 +143,9 @@ if(NOT imgui_POPULATED)
 endif()
 endif() # end of ROCKABLE_COMPILE_SEE3
 
-######################################################################
-##### Chaiscript
+
+####################################################################
+### Chaiscript
 #FetchContent_Declare (
 #	ChaiScript
 #  GIT_REPOSITORY https://github.com/ChaiScript/ChaiScript.git
@@ -210,25 +210,27 @@ endif()
 
 ######################################################################
 ##### libRockable_core
+set(CMAKE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
+
 include_directories(
-	${CMAKE_CURRENT_SOURCE_DIR} 
+	${CMAKE_SOURCE_DIR} 
 	${toofus_SOURCE_DIR}
 	${spdlog_SOURCE_DIR}/include
 	${tclap_SOURCE_DIR}/include
 )
 
-file(GLOB core_object_files ${CMAKE_CURRENT_SOURCE_DIR}
-  BodyForces/*.cpp
-  Core/*.cpp
-  DataExtractors/*.cpp
-  ForceLaws/*.cpp
-  PostProcessors/*.cpp
-  PreproCommands/*.cpp
-  ProcessingTools/*.cpp
+file(GLOB core_object_files 
+  ${CMAKE_SOURCE_DIR}/BodyForces/*.cpp
+  ${CMAKE_SOURCE_DIR}/Core/*.cpp
+  ${CMAKE_SOURCE_DIR}/DataExtractors/*.cpp
+  ${CMAKE_SOURCE_DIR}/ForceLaws/*.cpp
+  ${CMAKE_SOURCE_DIR}/PostProcessors/*.cpp
+  ${CMAKE_SOURCE_DIR}/PreproCommands/*.cpp
+  ${CMAKE_SOURCE_DIR}/ProcessingTools/*.cpp
 )
 
 if(ROCKABLE_ENABLE_BOUNDARY)
-file(GLOB boundaries_files ${CMAKE_CURRENT_SOURCE_DIR}
+file(GLOB boundaries_files ${CMAKE_SOURCE_DIR}
 	/Boundaries/*.cpp
 )
 list(APPEND core_object_files ${boundaries_files})
@@ -241,18 +243,19 @@ endif()
 
 ######################################################################
 ##### rockable executable (to run simulations from the console)
-add_executable(rockable Apps/run.cpp)
+add_executable(rockable ${CMAKE_SOURCE_DIR}/Apps/run.cpp)
 target_link_libraries(rockable PUBLIC Rockable_core)
+install(TARGETS rockable DESTINATION ./)
 
 ######################################################################
 ##### postpro
-add_executable(postpro Apps/postpro.cpp)
+add_executable(postpro ${CMAKE_SOURCE_DIR}/Apps/postpro.cpp)
 target_link_libraries(postpro PUBLIC Rockable_core)
 
 ######################################################################
 ##### visualiser see
 if(ROCKABLE_COMPILE_SEE)
-add_executable(see Apps/see.cpp)
+add_executable(see ${CMAKE_SOURCE_DIR}/Apps/see.cpp)
 target_include_directories(see PUBLIC 
 	${OPENGL_INCLUDE_DIR} 
 	${GLUT_INCLUDE_DIRS}
@@ -264,7 +267,10 @@ if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
 else()
   target_link_libraries (see PUBLIC OpenGL::GL ${GLUT_LIBRARIES} Rockable_core)
 endif()
-endif() # end of ROCKABLE_COMPILE_SEE
+
+install(TARGETS see DESTINATION ./)
+endif()
+
 
 ######################################################################
 ##### interactive preprocessing (TODO see3 -> will be renamed something like 'craft' or 'look')
@@ -295,7 +301,7 @@ include_directories(
 #  target_link_libraries (see3 PUBLIC OpenGL::GL OpenGL::GLU glfw Rockable_core)
 #endif()
 
-add_executable(see3 Apps/see3.cpp)
+add_executable(see3 ${CMAKE_SOURCE_DIR}/Apps/see3.cpp)
 target_link_libraries(see3 PUBLIC see3_imgui Rockable_core)
 #target_include_directories(see3 PUBLIC 
 #	${OPENGL_INCLUDE_DIR} 
@@ -304,4 +310,33 @@ target_link_libraries(see3 PUBLIC see3_imgui Rockable_core)
 # ${nlohmann-json_SOURCE_DIR}/include
 #)
 
+if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
+  target_link_libraries (see3 PUBLIC OpenGL::GL OpenGL::GLU glfw Rockable_core)
+else()
+  target_link_libraries (see3 PUBLIC OpenGL::GL glfw Rockable_core)
+endif()
+install(TARGETS see3 DESTINATION ./)
+
 endif() # end of ROCKABLE_COMPILE_SEE3
+
+######################################################################
+##### 
+if(ROCKABLE_COMPILE_CONF2VTK)
+  add_executable(conftovtk ${CMAKE_SOURCE_DIR}/Apps/conftovtk.cpp)
+  target_link_libraries (conftovtk Rockable_core)
+  install(TARGETS conftovtk DESTINATION ./)
+endif()
+
+######################################################################
+##### 
+if(ROCKABLE_USE_TESTING)
+  enable_testing()
+	add_subdirectory(test)
+endif()
+
+######################################################################
+##### 
+if(ROCKABLE_COMPILE_PREPRO)
+	add_subdirectory(prepro)
+endif()
+

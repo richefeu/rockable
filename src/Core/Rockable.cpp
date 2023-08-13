@@ -767,8 +767,10 @@ void Rockable::initParser() {
   parser.kwMap["iconf"] = __GET__(conf, iconf);
   parser.kwMap["nDriven"] = __GET__(conf, nDriven);
   parser.kwMap["shapeFile"] = __DO__(conf) {
-    std::string wantedLib;
-    conf >> wantedLib;
+    std::string name;
+    conf >> name;
+    std::string wantedLib = m_path + std::string(name);
+    console->info("wantedLib is {}", wantedLib);
     if (wantedLib != shapeFile) {  // it means that the library is not already loaded
       shapeFile = wantedLib;
       loadShapes(shapeFile.c_str());
@@ -973,17 +975,27 @@ void Rockable::loadConf(int i) {
  *
  *   @param[in]  name  The name of the conf-file
  */
-void Rockable::loadConf(const char* name) {
+void Rockable::loadConf(const char* a_name) {
+  std::string name = m_path + std::string(a_name);
   std::ifstream conf(name);
   if (!conf.is_open()) {
     console->warn("@Rockable::loadConf, cannot read {}", name);
-    return;
+    exit(-1);
   }
 
   // Check header
   std::string prog;
   conf >> prog;
   if (prog != "Rockable") {
+    // used for testing
+    if (prog == "redirection") {
+      std::string newName = std::string();  // conf name
+      conf >> m_path;
+      conf >> newName;
+      std::cout << m_path << std::endl;
+      loadConf(newName.c_str());
+      return;
+    }
     console->warn("@Rockable::loadConf, this doesn't seem to be a file for the code Rockable!");
   }
   std::string date;
@@ -1065,7 +1077,7 @@ void Rockable::loadShapes(const char* fileName) {
 
   if (!fileTool::fileExists(ModFileName.c_str())) {
     console->warn("@Rockable::loadShapes, shape library named '{}' has not been found", ModFileName);
-    return;
+    exit(-1);
   }
 
   Shapes.clear();

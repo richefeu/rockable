@@ -1,0 +1,6 @@
+file(GLOB shapeSurvey_SRCS "*.cpp")
+add_executable(shapeSurvey shapeSurvey.cpp)
+find_package(GLUT REQUIRED)
+include_directories( ${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS} ${SHAPE_SURVEY_HDRS})
+target_link_libraries(shapeSurvey PUBLIC Rockable_core ${GLUT_LIBRARY} glut GLU GL)
+install(TARGETS shapeSurvey DESTINATION ./)    
