@@ -267,7 +267,8 @@ endif()
 endif() # end of ROCKABLE_COMPILE_SEE
 
 ######################################################################
-##### interactive preprocessing (TODO see3 -> will be renamed )
+##### interactive preprocessing (TODO see3 -> will be renamed something like 'craft' or 'look')
+##### Before, the use of glfw will be replaced by glut (to avoid issues with macosx) 
 if(ROCKABLE_COMPILE_SEE3)
 set(imgui_object_files
   ${imgui_SOURCE_DIR}/imgui.cpp
