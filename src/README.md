@@ -8,7 +8,7 @@ If you want to compile with the `makefile`, you will also need to clone toofus i
 
 ```
 cd ~
-git clone https://www.github.com/richefeu/toofus.git
+git clone https://www.github.com/richefeu/toofus.git 
 ```
 
 For compilations, `gcc` (version >=10 if possible) is required.
