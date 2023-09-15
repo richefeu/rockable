@@ -36,6 +36,7 @@
 
 #include <filesystem>
 #include <regex>
+#include <stdexcept>
 
 #include <tclap/CmdLine.h>
 

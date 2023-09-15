@@ -4,7 +4,7 @@
 set(TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(rockable_test run_regression_test.cpp)
-target_link_libraries(rockable_test PUBLIC Rockable_core )
+target_link_libraries(rockable_test PUBLIC Rockable_core)
 
 ##add_test(NAME rockable_brute_force COMMAND run ${TEST_DIR}/redirection_test_brute_force.conf)
 set(WORK_DIR ${CMAKE_CURRENT_BINARY_DIR})
@@ -33,12 +33,15 @@ file(COPY ${INPUT_518_POLY_DIR}  DESTINATION ${TMP_COPY_INPUT_518_POLY_DIR})
 file(COPY ${INPUT_50_PRISMES_GRAVITY_DIR}  DESTINATION ${TMP_COPY_50_PRISMES_GRAVITY_DIR})
 file(COPY ${INPUT_2_PRISMES_GRAVITY_DIR}  DESTINATION ${TMP_COPY_2_PRISMES_GRAVITY_DIR})
 
-add_test(NAME 2_prismes_gravity_exec COMMAND rockable ${TEST_DIR}/redirection_2_prismes_gravity.conf)
-add_test(NAME 2_prismes_gravity_reg COMMAND rockable_test ${TEST_DIR}/redirection_2_prismes_gravity.conf -n ${WORK_DIR}/conf1 -r ${REGRESSION_DIR}/regression_2_prismes_gravity.conf)
-add_test(NAME 50_prismes_gravity_reg COMMAND rockable_test ${TEST_DIR}/redirection_50_prismes_gravity.conf -n ${WORK_DIR}/conf1 -r ${REGRESSION_DIR}/regression_50_prismes_gravity.conf)
-add_test(NAME 518_poly_bruteforce_default_noPeriodicity COMMAND rockable_test ${TEST_DIR}/redirection_test_518_poly_bruteforce_default_noperiod.conf -n ${WORK_DIR}/conf3001 -r ${REGRESSION_DIR}/regression_518_poly_default_noperiod.conf)
-add_test(NAME 518_poly_bruteforce_avalanches_noPeriodicity COMMAND rockable_test ${TEST_DIR}/redirection_test_518_poly_bruteforce_avalanches_noperiod.conf -n ${WORK_DIR}/conf3001 -r ${REGRESSION_DIR}/regression_518_poly_avalanches_noperiod.conf)
-add_test(NAME 512_particles_bruteforce_LawDefault_noPeriodicity COMMAND rockable_test ${TEST_DIR}/redirection_test_512_particles_bruteforce_LawDefault_noPeriodicity.conf -n ${WORK_DIR}/conf101 -r ${REGRESSION_DIR}/regression_512_particles_LawDefault_noPeriodicity.conf)
-add_test(NAME 512_particles_bruteforce_LawAvalanche_noPeriodicity COMMAND rockable_test ${TEST_DIR}/redirection_test_512_particles_bruteforce_LawAvalanche_noPeriodicity.conf -n ${WORK_DIR}/conf101 -r ${REGRESSION_DIR}/regression_512_particles_LawAvalanche_noPeriodicity.conf)
+if (ROCKABLE_ENABLE_PERIODIC)
+  add_test(NAME 2_prismes_gravity_exec COMMAND rockable ${TEST_DIR}/redirection_2_prismes_gravity.conf)
+  add_test(NAME 2_prismes_gravity_reg COMMAND rockable ${TEST_DIR}/redirection_2_prismes_gravity.conf -n ${WORK_DIR}/conf1 -r ${REGRESSION_DIR}/regression_2_prismes_gravity.conf)
+endif()
+
+add_test(NAME 50_prismes_gravity_reg COMMAND rockable ${TEST_DIR}/redirection_50_prismes_gravity.conf -n ${WORK_DIR}/conf1 -r ${REGRESSION_DIR}/regression_50_prismes_gravity.conf)
+add_test(NAME 518_poly_bruteforce_default_noPeriodicity COMMAND rockable ${TEST_DIR}/redirection_test_518_poly_bruteforce_default_noperiod.conf -n ${WORK_DIR}/conf3001 -r ${REGRESSION_DIR}/regression_518_poly_default_noperiod.conf)
+add_test(NAME 518_poly_bruteforce_avalanches_noPeriodicity COMMAND rockable ${TEST_DIR}/redirection_test_518_poly_bruteforce_avalanches_noperiod.conf -n ${WORK_DIR}/conf3001 -r ${REGRESSION_DIR}/regression_518_poly_avalanches_noperiod.conf)
+add_test(NAME 512_particles_bruteforce_LawDefault_noPeriodicity COMMAND rockable ${TEST_DIR}/redirection_test_512_particles_bruteforce_LawDefault_noPeriodicity.conf -n ${WORK_DIR}/conf101 -r ${REGRESSION_DIR}/regression_512_particles_LawDefault_noPeriodicity.conf)
+add_test(NAME 512_particles_bruteforce_LawAvalanche_noPeriodicity COMMAND rockable ${TEST_DIR}/redirection_test_512_particles_bruteforce_LawAvalanche_noPeriodicity.conf -n ${WORK_DIR}/conf101 -r ${REGRESSION_DIR}/regression_512_particles_LawAvalanche_noPeriodicity.conf)
 
 

@@ -14,16 +14,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 ######################################################################
 # OPTIONS
 option(ROCKABLE_USE_FT_CORR "add objectivity correction to tangent forces" OFF)
-option(ROCKABLE_ENABLE_PROFILING "enable the time profiling" ON)
+option(ROCKABLE_ENABLE_PROFILING "enable the time profiling" OFF)
 option(ROCKABLE_ENABLE_BOUNDARY "enable the special boundaries like Ball or Cylinder" OFF)
 option(ROCKABLE_ENABLE_SOFT_PARTICLES "enable strainning of particles" OFF)
 option(ROCKABLE_ENABLE_PERIODIC "enable full periodic boundary conditions" OFF)
 
-option(ROCKABLE_COMPILE_POSTPRO "Compile the application to run post-processing commands" ON)
+option(ROCKABLE_COMPILE_POSTPRO "Compile the application to run post-processing commands" OFF)
 option(ROCKABLE_COMPILE_SEE "Compile the application to visualize the conf-files" ON)
 
 option(ROCKABLE_COMPILE_SEE3 "Compile the application to edit graphically the input files" OFF)
-option(ROCKABLE_COMPILE_PREPRO "Compile the preprocessings" ON)
+option(ROCKABLE_COMPILE_PREPRO "Compile the preprocessings" OFF)
 option(ROCKABLE_COMPILE_CONF2VTK "Convert conf files to VTK" OFF)
 option(ROCKABLE_USE_TESTING "add tests" ON)
 
@@ -265,7 +265,7 @@ target_link_directories(see PUBLIC ${GLUT_LIBRARY_DIRS})
 if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
   target_link_libraries (see PUBLIC OpenGL::GL OpenGL::GLU ${GLUT_LIBRARIES} Rockable_core)
 else()
-  target_link_libraries (see PUBLIC OpenGL::GL ${GLUT_LIBRARIES} Rockable_core)
+  target_link_libraries (see PUBLIC OpenGL::GL OpenGL::GLU ${GLUT_LIBRARIES} Rockable_core)
 endif()
 
 install(TARGETS see DESTINATION ./)
@@ -328,14 +328,14 @@ if(ROCKABLE_COMPILE_CONF2VTK)
 endif()
 
 ######################################################################
-##### 
+##### Enable non regression tests
 if(ROCKABLE_USE_TESTING)
   enable_testing()
 	add_subdirectory(test)
 endif()
 
 ######################################################################
-##### 
+##### Pre-processing tools
 if(ROCKABLE_COMPILE_PREPRO)
 	add_subdirectory(prepro)
 endif()

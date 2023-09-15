@@ -493,10 +493,13 @@ void Rockable::saveConf(const char* fname) {
   conf << "precision " << CommBox().precision << '\n';
   conf << std::scientific << std::setprecision(CommBox().precision);
   conf << "Particles " << Particles.size() << '\n';
+
+  // This commented line can help
   conf << "#name" << ' ' << "group" << ' ' << "cluster" << ' ' << "homothety" << ' ' << "pos.x" << ' ' << "pos.y" << ' '
        << "pos.z" << ' ' << "vel.x" << ' ' << "vel.y" << ' ' << "vel.z" << ' ' << "acc.x" << ' ' << "acc.y" << ' '
        << "acc.z" << ' ' << "Q.w" << ' ' << "Q.x" << ' ' << "Q.y" << ' ' << "Q.z" << ' ' << "vrot.x" << ' ' << "vrot.y"
        << ' ' << "vrot.z" << ' ' << "arot.x" << ' ' << "arot.y" << ' ' << "arot.z" << '\n';
+
   for (size_t i = 0; i < Particles.size(); i++) {
     conf << Particles[i].shape->name << ' ' << Particles[i].group << ' ' << Particles[i].cluster << ' '
          << Particles[i].homothety << ' ' << Particles[i].pos << ' ' << Particles[i].vel << ' ' << Particles[i].acc

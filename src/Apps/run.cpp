@@ -35,6 +35,62 @@
 
 #include "run.hpp"
 
+bool compareConf(std::string a_newConf, std::string a_regConf) {
+  std::ifstream newConf(a_newConf);
+  std::ifstream regConf(a_regConf);
+
+  if (!newConf.is_open()) {
+    std::cerr << msg::warn() << " Cannot read " << a_newConf << msg::normal() << std::endl;
+    return false;
+  }
+
+  if (!regConf.is_open()) {
+    std::cerr << msg::warn() << " Cannot read " << a_regConf << msg::normal() << std::endl;
+    return false;
+  }
+
+  std::string lineNewConf = std::string();
+  std::string lineRegConf = std::string();
+
+  // catch the reference line that includes starter
+  std::string starter = "Particles";
+
+  // get the first line
+  std::getline(regConf, lineRegConf);
+  // test each line until we get a good catch
+  while (lineRegConf.find(starter) == std::string::npos) {
+    if (!(std::getline(regConf, lineRegConf))) break;
+  }
+  // checking step
+  if (lineRegConf.find(starter) == std::string::npos) {
+    std::cout << " The regression file doesn't contain Particles field" << std::endl;
+    return false;
+  }
+
+  // get the first line
+  std::getline(newConf, lineNewConf);
+  // test each line until we get a good catch
+  while (lineNewConf.find(starter) == std::string::npos) {
+    if (!(std::getline(newConf, lineNewConf))) break;
+  }
+  // checking step
+  if (lineNewConf.find(starter) == std::string::npos) {
+    std::cout << " The new file doesn't contain Particles field" << std::endl;
+    return false;
+  }
+
+  while (std::getline(regConf, lineRegConf)) {
+    std::getline(newConf, lineNewConf);
+    if (lineRegConf != lineNewConf) {
+
+      std::cout << " error " << lineRegConf << " != " << lineNewConf << std::endl;
+      return false;
+      return false;
+    }
+  }
+  return true;
+}
+
 /**
  *  @brief Deletes files matching the pattern 'conf*', 'kineticEnergy.txt', 'perf.txt', and 'staticBalance.txt'
  *         in the current directory.
@@ -83,6 +139,9 @@ int main(int argc, char const* argv[]) {
   int verboseLevel = 0;
   bool cleanAndLeave = false;
   bool printBannerAndLeave = false;
+  std::string newconf = "";
+  std::string regconf = "";
+
   try {
 
     TCLAP::CmdLine cmd("This is the command line interface for Rockable", ' ', GIT_TAG);
@@ -93,12 +152,17 @@ int main(int argc, char const* argv[]) {
         false, 4, "int");
     TCLAP::SwitchArg cleanArg("c", "clean", "Clean files", false);
     TCLAP::SwitchArg bannerArg("b", "banner", "show banner", false);
+    TCLAP::ValueArg<std::string> regConfArg("r", "regressionFile", "archive conf", false, "error",
+                                            "regression-conf-file");
+    TCLAP::ValueArg<std::string> newConfArg("n", "newFile", "New conf file to check", false, "error", "new-conf-file");
 
     cmd.add(nameArg);
     cmd.add(nbThreadsArg);
     cmd.add(verboseArg);
     cmd.add(cleanArg);
     cmd.add(bannerArg);
+    cmd.add(newConfArg);
+    cmd.add(regConfArg);
 
     cmd.parse(argc, argv);
 
@@ -107,6 +171,8 @@ int main(int argc, char const* argv[]) {
     verboseLevel = verboseArg.getValue();
     cleanAndLeave = cleanArg.getValue();
     printBannerAndLeave = bannerArg.getValue();
+    newconf = newConfArg.getValue();
+    regconf = regConfArg.getValue();
 
   } catch (TCLAP::ArgException& e) {
     std::cerr << "error: " << e.error() << " for argument " << e.argId() << std::endl;
@@ -121,12 +187,12 @@ int main(int argc, char const* argv[]) {
   StackTracer::initSignals();
 
   Rockable box;
-  
+
   box.showBanner();
   if (printBannerAndLeave) {
     return 0;
   }
-  
+
   box.setVerboseLevel(verboseLevel);
 
 #ifdef _OPENMP
@@ -137,5 +203,17 @@ int main(int argc, char const* argv[]) {
 #endif
 
   box.console_run(confFileName);
+
+  // In case -r and -n arguments have been used
+  if (!(newconf == "") && !(regconf == "")) {
+    bool succeed = compareConf(newconf, regconf);
+    if (succeed) {
+      std::cout << newconf << " and " << regconf << " are the same" << std::endl;
+    } else {
+      std::cout << "Test not passed" << std::endl;
+      exit(-1);
+    }
+  }
+  
   return 0;
 }
