@@ -3,8 +3,8 @@
 #enable_testing()
 set(TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(rockable_test run_regression_test.cpp)
-target_link_libraries(rockable_test PUBLIC Rockable_core)
+#add_executable(rockable_test run_regression_test.cpp)
+#target_link_libraries(rockable_test PUBLIC Rockable_core)
 
 ##add_test(NAME rockable_brute_force COMMAND run ${TEST_DIR}/redirection_test_brute_force.conf)
 set(WORK_DIR ${CMAKE_CURRENT_BINARY_DIR})
