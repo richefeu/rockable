@@ -168,9 +168,9 @@ int main(int argc, char const* argv[]) {
 
 #ifdef _OPENMP
   omp_set_num_threads(nbThreads);
-  box.console->info("OpenMP acceleration (Number of threads = {})", nbThreads);
+  Logger::info("OpenMP acceleration (Number of threads = {})", nbThreads);
 #else
-  box.console->info("No multithreading (compiled without OpenMP)");
+  Logger::info("No multithreading (compiled without OpenMP)");
 #endif
 
 box.console_run(confFileName);

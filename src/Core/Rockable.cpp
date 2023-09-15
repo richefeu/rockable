@@ -158,8 +158,8 @@ Rockable::Rockable() {
 
   preventCrossingLength = 0.0;
 
-  console = spdlog::stdout_color_mt("console");
-  console->set_pattern("[%^%l%$] %v");
+  //console = spdlog::stdout_color_mt("console");
+  //console->set_pattern("[%^%l%$] %v");
 
   ExplicitRegistrations();
   initParser();
@@ -214,15 +214,24 @@ void Rockable::ExplicitRegistrations() {
  */
 void Rockable::setVerboseLevel(int v) {
   std::string levelNames[] = {"off", "critical", "err", "warn", "info", "debug", "trace"};
-  std::unordered_map<int, spdlog::level::level_enum> levelMap = {
-      {0, spdlog::level::off},  {1, spdlog::level::critical}, {2, spdlog::level::err},  {3, spdlog::level::warn},
-      {4, spdlog::level::info}, {5, spdlog::level::debug},    {6, spdlog::level::trace}};
+      
+  std::unordered_map<int, LogLevel> levelMap = {
+      {0, LogLevel::off},  
+      {1, LogLevel::critical}, 
+      {2, LogLevel::error},  
+      {3, LogLevel::warn},
+      {4, LogLevel::info}, 
+      {5, LogLevel::debug},
+      {6, LogLevel::trace}
+  };
 
   if (levelMap.count(v) > 0) {
-    console->set_level(levelMap[v]);
+    //console->set_level(levelMap[v]);
+    Logger::setLevel(levelMap[v]);
     fmt::print("Verbosity level has been set to '{}'\n", levelNames[v]);
   } else {
-    console->set_level(spdlog::level::info);
+    //console->set_level(spdlog::level::info);
+    Logger::setLevel(LogLevel::info);
     fmt::print("The asked-level of verbosity should be in the range 0 to 6. It has been set to '{}'\n", levelNames[4]);
   }
 }
@@ -233,7 +242,7 @@ void Rockable::setVerboseLevel(int v) {
  *   @param levelName Name of the verbose level
  */
 void Rockable::setVerboseLevel(const std::string& levelName) {
-  std::unordered_map<std::string, int> levelMap = {{"off", 0},  {"critical", 1}, {"err", 2},  {"warn", 3},
+  std::unordered_map<std::string, int> levelMap = {{"off", 0},  {"critical", 1}, {"error", 2},  {"warn", 3},
                                                    {"info", 4}, {"debug", 5},    {"trace", 6}};
 
   if (levelMap.count(levelName) > 0) {
@@ -286,39 +295,39 @@ void Rockable::showBanner() {
   std::cout << std::endl;
 
 #ifdef FT_CORR
-  console->info("Compilation option: FT_CORR = \033[1;32mYES\033[0m");
+  Logger::info("Compilation option: FT_CORR = \033[1;32mYES\033[0m");
 #else
-  console->info("Compilation option: FT_CORR = \033[1;31mNO\033[0m");
+  Logger::info("Compilation option: FT_CORR = \033[1;31mNO\033[0m");
 #endif
 
 #ifdef COMPONENTWISE_NUM_DAMPING
-  console->info("Compilation option: COMPONENTWISE_NUM_DAMPING = \033[1;32mYES\033[0m");
+  Logger::info("Compilation option: COMPONENTWISE_NUM_DAMPING = \033[1;32mYES\033[0m");
 #else
-  console->info("Compilation option: COMPONENTWISE_NUM_DAMPING = \033[1;31mNO\033[0m");
+  Logger::info("Compilation option: COMPONENTWISE_NUM_DAMPING = \033[1;31mNO\033[0m");
 #endif
 
 #ifdef ROCKABLE_ENABLE_PROFILING
-  console->info("Compilation option: ROCKABLE_ENABLE_PROFILING = \033[1;32mYES\033[0m");
+  Logger::info("Compilation option: ROCKABLE_ENABLE_PROFILING = \033[1;32mYES\033[0m");
 #else
-  console->info("Compilation option: ROCKABLE_ENABLE_PROFILING = \033[1;31mNO\033[0m");
+  Logger::info("Compilation option: ROCKABLE_ENABLE_PROFILING = \033[1;31mNO\033[0m");
 #endif
 
 #ifdef ROCKABLE_ENABLE_BOUNDARY
-  console->info("Compilation option: ROCKABLE_ENABLE_BOUNDARY = \033[1;32mYES\033[0m");
+  Logger::info("Compilation option: ROCKABLE_ENABLE_BOUNDARY = \033[1;32mYES\033[0m");
 #else
-  console->info("Compilation option: ROCKABLE_ENABLE_BOUNDARY = \033[1;31mNO\033[0m");
+  Logger::info("Compilation option: ROCKABLE_ENABLE_BOUNDARY = \033[1;31mNO\033[0m");
 #endif
 
 #ifdef ROCKABLE_ENABLE_PERIODIC
-  console->info("Compilation option: ROCKABLE_ENABLE_PERIODIC = \033[1;32mYES\033[0m");
+  Logger::info("Compilation option: ROCKABLE_ENABLE_PERIODIC = \033[1;32mYES\033[0m");
 #else
-  console->info("Compilation option: ROCKABLE_ENABLE_PERIODIC = \033[1;31mNO\033[0m");
+  Logger::info("Compilation option: ROCKABLE_ENABLE_PERIODIC = \033[1;31mNO\033[0m");
 #endif
 
 #ifdef ROCKABLE_ENABLE_SOFT_PARTICLES
-  console->info("Compilation option: ROCKABLE_ENABLE_SOFT_PARTICLES = \033[1;32mYES\033[0m");
+  Logger::info("Compilation option: ROCKABLE_ENABLE_SOFT_PARTICLES = \033[1;32mYES\033[0m");
 #else
-  console->info("Compilation option: ROCKABLE_ENABLE_SOFT_PARTICLES = \033[1;31mNO\033[0m");
+  Logger::info("Compilation option: ROCKABLE_ENABLE_SOFT_PARTICLES = \033[1;31mNO\033[0m");
 #endif
 }
 
@@ -330,9 +339,9 @@ void Rockable::showBanner() {
 void Rockable::setOpenMPThreads(int nbThreads) {
 #ifdef _OPENMP
   omp_set_num_threads(nbThreads);
-  console->info("OpenMP acceleration (Number of threads = {})", nbThreads);
+  Logger::info("OpenMP acceleration (Number of threads = {})", nbThreads);
 #else
-  console->info("No multithreading");
+  Logger::info("No multithreading");
 #endif
 }
 
@@ -345,25 +354,25 @@ void Rockable::setOpenMPThreads(int nbThreads) {
  */
 void Rockable::initialChecks() {
 
-  console->debug("Option forceLaw is {}", optionNames["forceLaw"]);
-  console->debug("Option AddOrRemoveInteractions is {}", optionNames["AddOrRemoveInteractions"]);
-  console->debug("Option UpdateNL is {}", optionNames["UpdateNL"]);
-  console->debug("Option Integrator is {}", optionNames["Integrator"]);
+  Logger::debug("Option forceLaw is {}", optionNames["forceLaw"]);
+  Logger::debug("Option AddOrRemoveInteractions is {}", optionNames["AddOrRemoveInteractions"]);
+  Logger::debug("Option UpdateNL is {}", optionNames["UpdateNL"]);
+  Logger::debug("Option Integrator is {}", optionNames["Integrator"]);
 
-  console->trace("DataTable size {}x{}", dataTable.ngroup, dataTable.ngroup);
+  Logger::trace("DataTable size {}x{}", dataTable.ngroup, dataTable.ngroup);
 
   double dtc;
   estimateCriticalTimeStep(dtc);
-  console->info("Considering a single contact between two particles, dt_critical / dt = {} (estimated)", dtc / dt);
+  Logger::info("Considering a single contact between two particles, dt_critical / dt = {} (estimated)", dtc / dt);
 
   getCriticalTimeStep(dtc);
   if (dtc > 0.0) {
-    console->info("dt_critical / dt = {} (over ALL Interactions)", dtc / dt);
+    Logger::info("dt_critical / dt = {} (over ALL Interactions)", dtc / dt);
   }
 
   getCurrentCriticalTimeStep(dtc);
   if (dtc > 0.0) {
-    console->info("dt_critical / dt = {} (over ACTIVE Interactions)", dtc / dt);
+    Logger::info("dt_critical / dt = {} (over ACTIVE Interactions)", dtc / dt);
   }
 
   // TODO: ajouter des verifs par rapport aux groupes définies et le nombre de groupes dans properties et dataTable
@@ -689,9 +698,9 @@ void Rockable::initParser() {
       FL->init();
       forceLaw = FL;
       optionNames["forceLaw"] = lawName;
-      console->trace("The ForceLaw named {} has been activated", lawName);
+      Logger::trace("The ForceLaw named {} has been activated", lawName);
     } else {
-      console->warn("The ForceLaw named {} is unknown! -> set to Default", lawName);
+      Logger::warn("The ForceLaw named {} is unknown! -> set to Default", lawName);
       forceLaw = Factory<ForceLaw>::Instance()->Create("Default");
       forceLaw->plug(this);
       forceLaw->init();
@@ -773,13 +782,13 @@ void Rockable::initParser() {
     std::string name;
     conf >> name;
     std::string wantedLib = m_path + std::string(name);
-    console->info("wantedLib is {}", wantedLib);
+    Logger::info("wantedLib is {}", wantedLib);
     if (wantedLib != shapeFile) {  // it means that the library is not already loaded
       shapeFile = wantedLib;
       loadShapes(shapeFile.c_str());
-      console->info("wantedLib is {}", wantedLib);
+      Logger::info("wantedLib is {}", wantedLib);
     } else {
-      console->info("wantedLib is {} (already loaded)", wantedLib);
+      Logger::info("wantedLib is {} (already loaded)", wantedLib);
     }
   };
   parser.kwMap["separator"] = __DO__(conf) {  // TODO: remove it !?
@@ -800,7 +809,7 @@ void Rockable::initParser() {
   parser.kwMap["Particles"] = __DO__(conf) {
     size_t nb;
     conf >> nb;
-    console->info("Number of bodies: {}", nb);
+    Logger::info("Number of bodies: {}", nb);
     Particles.clear();
     Particle P;
     std::string shpName;
@@ -841,7 +850,7 @@ void Rockable::initParser() {
   parser.kwMap["Interactions"] = __DO__(conf) {
     size_t nb;
     conf >> nb;
-    console->info("Number of interactions: {}", nb);
+    Logger::info("Number of interactions: {}", nb);
 
     if (Interactions.size() != Particles.size()) Interactions.resize(Particles.size());
     for (size_t i = 0; i < Particles.size(); ++i) Interactions[i].clear();
@@ -860,7 +869,7 @@ void Rockable::initParser() {
   parser.kwMap["Interfaces"] = __DO__(conf) {
     size_t nbInterf;
     conf >> nbInterf;
-    console->info("Number of interfaces: {}", nbInterf);
+    Logger::info("Number of interfaces: {}", nbInterf);
 
     if (Interfaces.size() != Particles.size()) Interfaces.resize(Particles.size());
     for (size_t i = 0; i < Particles.size(); ++i) Interfaces[i].clear();
@@ -886,7 +895,7 @@ void Rockable::initParser() {
           BI.concernedBonds[u] = const_cast<Interaction*>(std::addressof(*it));
         } else {
           missed = true;
-          console->warn("Cannot find interaction: i={} j={} type={} isub={} jsub={}", ItoFind.i, ItoFind.j,
+          Logger::warn("Cannot find interaction: i={} j={} type={} isub={} jsub={}", ItoFind.i, ItoFind.j,
                         ItoFind.type, ItoFind.isub, ItoFind.jsub);
         }
       }
@@ -907,7 +916,7 @@ void Rockable::initParser() {
     std::string ExtractorName;
     conf >> ExtractorName;
 
-    console->warn(
+    Logger::warn(
         "The DataExtractor named {} is defined in the input file! It will not be saved in conf-files\nA better "
         "solution is to put them in a file named 'dataExtractors.txt'",
         ExtractorName);
@@ -918,7 +927,7 @@ void Rockable::initParser() {
       DE->read(conf);
       dataExtractors.push_back(DE);
     } else {
-      console->warn("The DataExtractor named {} is unknown", ExtractorName);
+      Logger::warn("The DataExtractor named {} is unknown", ExtractorName);
     }
   };
   parser.kwMap["BodyForce"] = __DO__(conf) {
@@ -931,9 +940,9 @@ void Rockable::initParser() {
       BF->plug(this);
       BF->read(conf);
       bodyForce = BF;
-      console->trace("The BodyForce named {} has been activated", BodyForceName);
+      Logger::trace("The BodyForce named {} has been activated", BodyForceName);
     } else {
-      console->warn("The BodyForce named {} is unknown!", BodyForceName);
+      Logger::warn("The BodyForce named {} is unknown!", BodyForceName);
     }
   };
 
@@ -959,7 +968,7 @@ void Rockable::initParser() {
       PC->plug(this);
       PC->addCommand();
     } else {
-      console->warn("The PreproCommand named {} was not added!", command);
+      Logger::warn("The PreproCommand named {} was not added!", command);
     }
   }
 }
@@ -982,7 +991,7 @@ void Rockable::loadConf(const char* a_name) {
   std::string name = m_path + std::string(a_name);
   std::ifstream conf(name);
   if (!conf.is_open()) {
-    console->warn("@Rockable::loadConf, cannot read {}", name);
+    Logger::warn("@Rockable::loadConf, cannot read {}", name);
     exit(-1);
   }
 
@@ -999,12 +1008,12 @@ void Rockable::loadConf(const char* a_name) {
       loadConf(newName.c_str());
       return;
     }
-    console->warn("@Rockable::loadConf, this doesn't seem to be a file for the code Rockable!");
+    Logger::warn("@Rockable::loadConf, this doesn't seem to be a file for the code Rockable!");
   }
   std::string date;
   conf >> date;
   if (date != CONF_VERSION_DATE) {
-    console->warn("@Rockable::loadConf, the version-date should be '{}'\n(in most cases, this should not be a problem)",
+    Logger::warn("@Rockable::loadConf, the version-date should be '{}'\n(in most cases, this should not be a problem)",
                   CONF_VERSION_DATE);
   }
 
@@ -1058,7 +1067,7 @@ void Rockable::readDataExtractors() {
         DE->read(is);
         dataExtractors.push_back(DE);
       } else {
-        console->warn("The DataExtractor named {} is unknown!", ExtractorName);
+        Logger::warn("The DataExtractor named {} is unknown!", ExtractorName);
       }
     }
     is >> ExtractorName;
@@ -1079,7 +1088,7 @@ void Rockable::loadShapes(const char* fileName) {
   }
 
   if (!fileTool::fileExists(ModFileName.c_str())) {
-    console->warn("@Rockable::loadShapes, shape library named '{}' has not been found", ModFileName);
+    Logger::warn("@Rockable::loadShapes, shape library named '{}' has not been found", ModFileName);
     exit(-1);
   }
 
@@ -1102,7 +1111,7 @@ void Rockable::loadShapes(const char* fileName) {
     is >> token;
   }
 
-  console->info("Number of shapes found in the library file {}: {}", ModFileName, Shapes.size());
+  Logger::info("Number of shapes found in the library file {}: {}", ModFileName, Shapes.size());
 
   for (size_t s = 0; s < Shapes.size(); ++s) {
     Shapes[s].buildOBBtree();
@@ -1137,7 +1146,7 @@ void Rockable::console_run(const std::string& confFileName) {
 
   std::cout << std::endl << std::endl;
 
-  console->info("INITIAL UPDATE OF NEIGHBOR LIST");
+  Logger::info("INITIAL UPDATE OF NEIGHBOR LIST");
 
 #ifdef ROCKABLE_ENABLE_PERIODIC
   if (usePeriodicCell == 1) {
@@ -1151,9 +1160,9 @@ void Rockable::console_run(const std::string& confFileName) {
   UpdateNL();
 #endif
 
-  console->info("COMPUTATION STARTS");
+  Logger::info("COMPUTATION STARTS");
   integrate();
-  console->info("COMPUTATION NORMALLY STOPPED");
+  Logger::info("COMPUTATION NORMALLY STOPPED");
 }
 
 // ==================================================================================================================
@@ -1182,7 +1191,7 @@ void Rockable::setAddOrRemoveInteractions(std::string& Name) {
 
   } else {
 
-    console->warn("AddOrRemoveInteractions {} is unknown, Option remains: AddOrRemoveInteractions = {}", Name,
+    Logger::warn("AddOrRemoveInteractions {} is unknown, Option remains: AddOrRemoveInteractions = {}", Name,
                   optionNames["AddOrRemoveInteractions"]);
   }
 }
@@ -1432,7 +1441,7 @@ void Rockable::setUpdateNL(std::string& Name) {
     optionNames["UpdateNL"] = "linkCells";
 
   } else {
-    console->warn("UpdateNL {} is unknown, Option remains: UpdateNL = {}", Name, optionNames["UpdateNL"]);
+    Logger::warn("UpdateNL {} is unknown, Option remains: UpdateNL = {}", Name, optionNames["UpdateNL"]);
   }
 }
 
@@ -1672,7 +1681,7 @@ void Rockable::setIntegrator(std::string& Name) {
     integrationStep = [this]() { this->RungeKutta4Step(); };
     optionNames["Integrator"] = "RungeKutta4";
   } else {
-    console->warn("Integrator {} is unknown, Option remains: Integrator = {}", Name, optionNames["Integrator"]);
+    Logger::warn("Integrator {} is unknown, Option remains: Integrator = {}", Name, optionNames["Integrator"]);
   }
 }
 
@@ -2367,7 +2376,7 @@ void Rockable::integrate() {
   START_TIMER("Integrate");
 
   if (interactiveMode == true) {
-    console->warn("It is not possible to invoke Rockable::integrate if interactiveMode is true");
+    Logger::warn("It is not possible to invoke Rockable::integrate if interactiveMode is true");
     return;
   }
 
@@ -2391,7 +2400,7 @@ void Rockable::integrate() {
   dt2_6 = dt2 / 6.0;
   dt_6 = dt / 6.0;
 
-  console->trace("initIntegrator");
+  Logger::trace("initIntegrator");
   initIntegrator();
 
   // Save the current configuration
@@ -2400,9 +2409,9 @@ void Rockable::integrate() {
   fmt::print("│{0: <{1}}│\n", "  Initial configuration", frameWidth);
   fmt::print("│{0: <{1}}│\n", fmt::format("  iconf: {:<6d}   Time: {:<13.8e}", iconf, t), frameWidth);
   fmt::print("└{0:─^{1}}┘\n", "", frameWidth);
-  console->trace("start saving first conf");
+  Logger::trace("start saving first conf");
   saveConf(iconf);
-  console->trace("end saving first conf");
+  Logger::trace("end saving first conf");
 
   PerfTimer ptimer;
   size_t step = (size_t)(t / dt);  // suppose that the time-step has not been changed
