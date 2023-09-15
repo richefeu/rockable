@@ -22,5 +22,5 @@ fi
 mkdir BUILD INSTALL
 cd BUILD
 cmake ${CMAKE_OPTION} ..
-make -j
+make -j 8
 make install
