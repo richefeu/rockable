@@ -51,10 +51,13 @@
 #include <utility>
 #include <vector>
 
-#define SPGLOG_HEADER_ONLY
+//#define SPGLOG_HEADER_ONLY
+//#define FMT_HEADER_ONLY
+//#include <spdlog/sinks/stdout_color_sinks.h>
+//#include <spdlog/spdlog.h>
+
 #define FMT_HEADER_ONLY
-#include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/spdlog.h>
+#include "fmtLogger.hpp"
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -289,7 +292,7 @@ class Rockable {
 
   bool interactiveMode;  ///< computation (false) or visualization (true) modes
 
-  std::shared_ptr<spdlog::logger> console;  ///> Logger
+  //std::shared_ptr<spdlog::logger> console;  ///> Logger
 
   // Some predefined identifiers to get (quickly) data from input tables
   size_t idDensity;  ///< Identifier of the density parameter

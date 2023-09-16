@@ -45,10 +45,10 @@ ContactPartnership::ContactPartnership() : name("None"), update(nullptr), getWei
 ContactPartnership::~ContactPartnership() {}
 
 void ContactPartnership::setModel(std::string& modelName) {
-  auto log = spdlog::get("console");
+  //auto log = spdlog::get("console");
   if (modelName == "NumberWeight") {
     name = modelName;
-    log->info("ContactPartnership has been set to 'NumberWeight'");
+    Logger::info("ContactPartnership has been set to 'NumberWeight'");
 
     update = [this](Rockable& box) -> void {
       weightMap.clear();
@@ -94,7 +94,7 @@ void ContactPartnership::setModel(std::string& modelName) {
 
   } else if (modelName == "OverlapWeight") {
     name = modelName;
-    log->info("ContactPartnership has been set to 'OverlapWeight'");
+    Logger::info("ContactPartnership has been set to 'OverlapWeight'");
 
     update = [this](Rockable& box) -> void {
       weightMap.clear();
@@ -137,16 +137,16 @@ void ContactPartnership::setModel(std::string& modelName) {
 
   } else if (modelName == "SurfaceWeight") {
     name = modelName;
-    log->info("ContactPartnership has been set to 'SurfaceWeight'");
+    Logger::info("ContactPartnership has been set to 'SurfaceWeight'");
     ///////////// THAT ONE IS NOT YET IMPLEMENTED ////////////
     ///////////// and maybe it will never be!     ////////////
   } else if (modelName == "None") {
     name = modelName;
-    log->info("No Partnership has been set");
+    Logger::info("No Partnership has been set");
     update = nullptr;
     getWeight = nullptr;
   } else {
-    log->info("ContactPartnership '{}' is unknown. So no Partnership has been set", modelName);
+    Logger::info("ContactPartnership '{}' is unknown. So no Partnership has been set", modelName);
     modelName = "Unknown";
     update = nullptr;
     getWeight = nullptr;

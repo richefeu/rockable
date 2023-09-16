@@ -40,12 +40,12 @@ bool compareConf(std::string a_newConf, std::string a_regConf) {
   std::ifstream regConf(a_regConf);
 
   if (!newConf.is_open()) {
-    std::cerr << msg::warn() << " Cannot read " << a_newConf << msg::normal() << std::endl;
+    Logger::warn("@compareConf, cannot read file {}", a_newConf);
     return false;
   }
 
   if (!regConf.is_open()) {
-    std::cerr << msg::warn() << " Cannot read " << a_regConf << msg::normal() << std::endl;
+    Logger::warn("@compareConf, cannot read file {}", a_regConf);
     return false;
   }
 
@@ -152,9 +152,9 @@ int main(int argc, char const* argv[]) {
         false, 4, "int");
     TCLAP::SwitchArg cleanArg("c", "clean", "Clean files", false);
     TCLAP::SwitchArg bannerArg("b", "banner", "show banner", false);
-    TCLAP::ValueArg<std::string> regConfArg("r", "regressionFile", "archive conf", false, "error",
+    TCLAP::ValueArg<std::string> regConfArg("r", "regressionFile", "archive conf", false, "",
                                             "regression-conf-file");
-    TCLAP::ValueArg<std::string> newConfArg("n", "newFile", "New conf file to check", false, "error", "new-conf-file");
+    TCLAP::ValueArg<std::string> newConfArg("n", "newFile", "New conf file to check", false, "", "new-conf-file");
 
     cmd.add(nameArg);
     cmd.add(nbThreadsArg);
@@ -175,7 +175,7 @@ int main(int argc, char const* argv[]) {
     regconf = regConfArg.getValue();
 
   } catch (TCLAP::ArgException& e) {
-    std::cerr << "error: " << e.error() << " for argument " << e.argId() << std::endl;
+    std::cerr << "TCLAP error: " << e.error() << " for argument " << e.argId() << std::endl;
   }
 
   if (cleanAndLeave) {
@@ -197,9 +197,9 @@ int main(int argc, char const* argv[]) {
 
 #ifdef _OPENMP
   omp_set_num_threads(nbThreads);
-  box.console->info("OpenMP acceleration (Number of threads = {})", nbThreads);
+  Logger::info("OpenMP acceleration (Number of threads = {})", nbThreads);
 #else
-  box.console->info("No multithreading (compiled without OpenMP)");
+  Logger::info("No multithreading (compiled without OpenMP)");
 #endif
 
   box.console_run(confFileName);
@@ -208,9 +208,9 @@ int main(int argc, char const* argv[]) {
   if (!(newconf == "") && !(regconf == "")) {
     bool succeed = compareConf(newconf, regconf);
     if (succeed) {
-      std::cout << newconf << " and " << regconf << " are the same" << std::endl;
+      Logger::info("{} and {} are the same", newconf, regconf);
     } else {
-      std::cout << "Test not passed" << std::endl;
+      Logger::critical("Test not passed");
       exit(-1);
     }
   }

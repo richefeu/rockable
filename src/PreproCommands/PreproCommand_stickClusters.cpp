@@ -94,7 +94,7 @@ void stickClusters::exec() {
   }
 
   if (ctc_packets.empty()) {
-    box->console->info("@PreproCommand::stickClusters, No possible glued points, ctc_packets is empty");
+    Logger::info("@PreproCommand::stickClusters, No possible glued points, ctc_packets is empty");
     return;
   }
 

@@ -51,8 +51,8 @@ void DrivingSystem::read(bool allow_warn) {
 
   if (!fileTool::fileExists("drivingSystem.txt")) {
     if (allow_warn == true) {
-      auto log = spdlog::get("console");
-      log->warn("No file 'drivingSystem.txt' has been found. The first 'nDriven' bodies will not move");
+      //auto log = spdlog::get("console");
+      Logger::warn("No file 'drivingSystem.txt' has been found. The first 'nDriven' bodies will not move");
     }
     return;
   }

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.23)
-   
+
 if (${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
   set(CMAKE_OSX_COMPILER_ID "GNU")
 	set(CMAKE_CXX_COMPILER "g++-13")
@@ -75,29 +75,46 @@ endif()
 
 ######################################################################
 ##### Fetching spdlog
-FetchContent_Declare (
-	spdlog
-  GIT_REPOSITORY https://github.com/gabime/spdlog.git
-  GIT_TAG        v1.11.0
+# FetchContent_Declare (
+# 	spdlog
+#   GIT_REPOSITORY https://github.com/gabime/spdlog.git
+#   GIT_TAG        v1.11.0
+# )
+# FetchContent_GetProperties(spdlog)
+# if(NOT spdlog_POPULATED)
+#   message(STATUS "Fetching spdlog")
+#   FetchContent_Populate(spdlog)
+# 	#add_subdirectory(${spdlog_SOURCE_DIR})
+# endif()
+
+######################################################################
+##### Fetching fmt
+FetchContent_Declare(fmt
+  GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+  GIT_TAG master
+  GIT_PROGRESS    TRUE
+  USES_TERMINAL_DOWNLOAD TRUE
 )
-FetchContent_GetProperties(spdlog)
-if(NOT spdlog_POPULATED)
-  message(STATUS "Fetching spdlog")
-  FetchContent_Populate(spdlog)
-	#add_subdirectory(${spdlog_SOURCE_DIR})
+FetchContent_GetProperties(fmt)
+if(NOT fmt_POPULATED)
+  message(STATUS "Fetching fmt")
+  FetchContent_Populate(fmt)
+  #add_subdirectory(${FETCHCONTENT_BASE_DIR}/fmt-src)
 endif()
+
+
 ######################################################################
 ##### MATools
 if(ROCKABLE_ENABLE_PROFILING)	
 	FetchContent_Declare (
 		matools
-  	GIT_REPOSITORY https://github.com/rprat-pro/MATools
-  	GIT_TAG        v1.1
+    GIT_REPOSITORY https://github.com/rprat-pro/MATools
+    GIT_TAG        v1.1
 	)
 	FetchContent_GetProperties(matools)
 	if(NOT matools_POPULATED)
-  	message(STATUS "Fetching MATools")
-  	FetchContent_Populate(matools)
+    message(STATUS "Fetching MATools")
+    FetchContent_Populate(matools)
 		SET(MATOOLS_MPI OFF CACHE BOOL "Use some expat option")		
 		add_subdirectory(${FETCHCONTENT_BASE_DIR}/matools-src)
 	endif()
@@ -215,8 +232,8 @@ set(CMAKE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
 include_directories(
 	${CMAKE_SOURCE_DIR} 
 	${toofus_SOURCE_DIR}
-	${spdlog_SOURCE_DIR}/include
 	${tclap_SOURCE_DIR}/include
+  ${fmt_SOURCE_DIR}/include
 )
 
 file(GLOB core_object_files 
