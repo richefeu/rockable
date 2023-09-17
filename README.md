@@ -126,9 +126,9 @@ source Env_rockable.sh
 
 To run a simulation, a configuration file has to be written. The format of such a file is described in the documentation. We show here a simple example simulating a sphere bouncing on a plan.
 
-
 **input.txt**
-~~~~
+
+```
 Rockable 20-02-2017
 t 0
 tmax 0.06
@@ -155,11 +155,13 @@ shapeFile SphereAndPlan.shp
 Particles 2
 Plan 0 0 1 0 -0.05 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0
 Sphere 1 0 1 -0.5 0.5 0 3.69 -3.29 0 0 0 0 0.707 0 0.707 0 0 0 -50.52 0 0 0
+```
+
 The shape-file as described in the section Syntax for shape-files is a file named SphereAndPlan.shp with the following content:
-~~~~
 
 **SphereAndPlan.sph**
-~~~~
+
+```
 name Plan
 radius 0.05
 preCompDone y
@@ -199,8 +201,7 @@ obb.e3 0 0 1
 obb.center 0 0 0
 volume 0.004021
 I/m 0.00493333 0.00493333 0.0032
-~~~~
-
+```
 
 Then you can launch Rockable using:
 
