@@ -34,7 +34,7 @@ New functionalities are being studied thanks to new collaborations of people fro
 computing with domain decomposition. *Farhang Radjai* and students, may introduce new breakable interfaces 
 with energy-based criteria. 
 
-Here is the non-exhaustive list of involved people with their main mission: 
+Here is the non-exhaustive list of involved persons with their main mission: 
 
 * **Vincent Richefeu** <vincent.richefeu@univ-grenoble-alpes.fr> (Laboratoire 3SR, UGA): initiated the project
 * **Gael Combe** <gael.combe@univ-grenoble-alpes.fr> (Laboratoire 3SR, G-INP): mechanical modelling 
@@ -99,6 +99,7 @@ cmake ..
 make -j
 make install 
 ```
+
 The options available are listed below:
 
 * `ROCKABLE_USE_FT_CORR` (default is OFF): add objectivity correction to tangent forces.
@@ -119,6 +120,9 @@ Before runing rockable you will need to source rockable environnement to add the
 ```sh
 source Env_rockable.sh
 ``` 
+
+> [!IMPORTANT]
+> This will not yet work for MacOSX. It will be fixed in the future
 
 To run a simulation, a configuration file has to be written. The format of such a file is described in the documentation. We show here a simple example simulating a sphere bouncing on a plan.
 
@@ -199,35 +203,43 @@ I/m 0.00493333 0.00493333 0.0032
 
 
 Then you can launch Rockable using:
+
 ```
 rockable input.txt
 ```
 
 If the executable has been compiled with openMP libraries, you can set the number of threads with the option `-j`:
+
 ```
 rockable -j 8 input.txt
 ```
 
 The verbosity of logs can be managed:
+
 ```
 rockable -v 6 input.txt 
 ```
+
 Highest number corresponds highest verbosity. `6: trace`, `5: debug`, `4: warn`, `3: warn`, `2: err`, `1: critical`, `0: off`
 
 If the files produced by a computation (conf*, kineticEnergy.txt, perf.txt, and staticBalance.txt) have to be deleted, rockable can do the job.
+
 ```
 rockable -c
 ```
 
 ## Visualising the simulations
 
-Normally, the application `see` has been built as the same time than rockable: 
+Normally, the application `see` has been built at the same time than rockable:
+
 ```
 see conf100
 ```
 
-If compiled the application `see3` is also available: 
+If compiled the application `see3` is also available:
+
 ```
 see3 conf100
 ```
+
 It allows to edit confs interactively.
