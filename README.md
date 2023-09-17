@@ -67,16 +67,6 @@ Here is the non-exhaustive list of involved people with their main mission:
 <img src="./gif-doc/gen_doc-rockable.gif" width="90%"/>
 </p>
 
-* **Vincent Richefeu** (Laboratoire 3SR, UGA): initiated the project
-* **Gael Combe** (Laboratoire 3SR, G-INP): mechanical modelling
-* **Lhassan Amarsid** (CEA): mechanical modelling, parallel computing
-* **Raphael Prat** (CEA): parallel computing
-* **Jean-Mathieu Vanson** (CEA): mechanical modelling
-* **Farhang Radjai** (LMGC, CNRS): mechanical/physical Mentor
-* **Jean-Yves Delenne** (IATE, INRAE): mechanical/biological modelling
-* **Saeid Nezamabadi** (LMGC, UM2): Non Smooth Discrete Element Method (NS-DEM)
-* **Patrick Mutabaruka** (Ifremer): coupling with Lattice Boltzmann Method (LBM)
-
 ## How to install
 
 The source code can be cloned from github repository:
