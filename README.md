@@ -124,9 +124,7 @@ source Env_rockable.sh
 > [!IMPORTANT]
 > This will not yet work for MacOSX. It will be fixed in the future
 
-To run a simulation, a configuration file has to be written. The format of such a file is described in the documentation. We show here a simple example simulating a sphere bouncing on a plan.
-
-**input.txt**
+To run a simulation, a configuration file has to be written. The format of such a file is described in the documentation. We show here a simple example (**input.txt**) simulating a sphere bouncing on a plan.
 
 ```
 Rockable 20-02-2017
@@ -157,11 +155,10 @@ Plan 0 0 1 0 -0.05 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0
 Sphere 1 0 1 -0.5 0.5 0 3.69 -3.29 0 0 0 0 0.707 0 0.707 0 0 0 -50.52 0 0 0
 ```
 
-The shape-file as described in the section Syntax for shape-files is a file named SphereAndPlan.shp with the following content:
-
-**SphereAndPlan.sph**
+The shape-file is a file named **SphereAndPlan.shp** with the following content:
 
 ```
+<
 name Plan
 radius 0.05
 preCompDone y
