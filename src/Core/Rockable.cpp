@@ -158,9 +158,6 @@ Rockable::Rockable() {
 
   preventCrossingLength = 0.0;
 
-  //console = spdlog::stdout_color_mt("console");
-  //console->set_pattern("[%^%l%$] %v");
-
   ExplicitRegistrations();
   initParser();
 }
@@ -226,11 +223,9 @@ void Rockable::setVerboseLevel(int v) {
   };
 
   if (levelMap.count(v) > 0) {
-    //console->set_level(levelMap[v]);
     Logger::setLevel(levelMap[v]);
     fmt::print("Verbosity level has been set to '{}'\n", levelNames[v]);
   } else {
-    //console->set_level(spdlog::level::info);
     Logger::setLevel(LogLevel::info);
     fmt::print("The asked-level of verbosity should be in the range 0 to 6. It has been set to '{}'\n", levelNames[4]);
   }

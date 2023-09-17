@@ -74,20 +74,6 @@ if(NOT toofus_POPULATED)
 endif()
 
 ######################################################################
-##### Fetching spdlog
-# FetchContent_Declare (
-# 	spdlog
-#   GIT_REPOSITORY https://github.com/gabime/spdlog.git
-#   GIT_TAG        v1.11.0
-# )
-# FetchContent_GetProperties(spdlog)
-# if(NOT spdlog_POPULATED)
-#   message(STATUS "Fetching spdlog")
-#   FetchContent_Populate(spdlog)
-# 	#add_subdirectory(${spdlog_SOURCE_DIR})
-# endif()
-
-######################################################################
 ##### Fetching fmt
 FetchContent_Declare(fmt
   GIT_REPOSITORY https://github.com/fmtlib/fmt.git
@@ -101,7 +87,6 @@ if(NOT fmt_POPULATED)
   FetchContent_Populate(fmt)
   #add_subdirectory(${FETCHCONTENT_BASE_DIR}/fmt-src)
 endif()
-
 
 ######################################################################
 ##### MATools
@@ -119,6 +104,7 @@ if(ROCKABLE_ENABLE_PROFILING)
 		add_subdirectory(${FETCHCONTENT_BASE_DIR}/matools-src)
 	endif()
 endif()
+
 ######################################################################
 ##### tclap
 FetchContent_Declare (
@@ -132,6 +118,7 @@ if(NOT tclap_POPULATED)
   FetchContent_Populate(tclap)
 	#add_subdirectory(${tclap_SOURCE_DIR})
 endif()
+
 ######################################################################
 ##### nlohmann-json
 FetchContent_Declare (
@@ -145,6 +132,7 @@ if(NOT nlohmann-json_POPULATED)
   FetchContent_Populate(nlohmann-json)
 	#add_subdirectory(${nlohmann-json_SOURCE_DIR})
 endif()
+
 ######################################################################
 ##### imgui
 if(ROCKABLE_COMPILE_SEE3)
@@ -205,7 +193,7 @@ if (${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
   if(GLUT_FOUND)
     message(STATUS "GLUT as been found with PkgConfig")		
 		message(STATUS "GLUT_LIBRARY_DIRS = " ${GLUT_LIBRARY_DIRS})
-	  message(STATUS "GLUT_INCLUDE_DIRS = " ${GLUT_INCLUDE_DIRS})
+    message(STATUS "GLUT_INCLUDE_DIRS = " ${GLUT_INCLUDE_DIRS})
 		message(STATUS "GLUT_LIBRARIES = " ${GLUT_LIBRARIES})
   endif() 
 
@@ -214,7 +202,7 @@ else()
   find_package(GLUT REQUIRED)
   if(GLUT_FOUND)
     message(STATUS "GLUT_INCLUDE_DIRS = " ${GLUT_INCLUDE_DIRS})
-	  message(STATUS "GLUT_LIBRARIES = " ${GLUT_LIBRARIES})
+    message(STATUS "GLUT_LIBRARIES = " ${GLUT_LIBRARIES})
   endif()
 	
 endif()
@@ -274,7 +262,7 @@ target_link_libraries(postpro PUBLIC Rockable_core)
 if(ROCKABLE_COMPILE_SEE)
 add_executable(see ${CMAKE_SOURCE_DIR}/Apps/see.cpp)
 target_include_directories(see PUBLIC 
-	${OPENGL_INCLUDE_DIR} 
+	${OPENGL_INCLUDE_DIR}
 	${GLUT_INCLUDE_DIRS}
 	${nlohmann-json_SOURCE_DIR}/include
 )
