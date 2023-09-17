@@ -37,9 +37,9 @@ The format of the conf-files allows users to define and control various aspects 
 
 .. tip:: 
 
-It is crucial to maintain consistency in the format of conf-files and keep track of changes made 
-to the header date whenever modifications are introduced. This practice ensures clarity and compatibility 
-between different versions of the configuration files and the codebase.
+   It is crucial to maintain consistency in the format of conf-files and keep track of changes made 
+   to the header date whenever modifications are introduced. This practice ensures clarity and compatibility 
+   between different versions of the configuration files and the codebase.
 
 
 Timing

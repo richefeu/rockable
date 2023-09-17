@@ -292,8 +292,6 @@ class Rockable {
 
   bool interactiveMode;  ///< computation (false) or visualization (true) modes
 
-  //std::shared_ptr<spdlog::logger> console;  ///> Logger
-
   // Some predefined identifiers to get (quickly) data from input tables
   size_t idDensity;  ///< Identifier of the density parameter
 

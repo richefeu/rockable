@@ -45,7 +45,7 @@ ContactPartnership::ContactPartnership() : name("None"), update(nullptr), getWei
 ContactPartnership::~ContactPartnership() {}
 
 void ContactPartnership::setModel(std::string& modelName) {
-  //auto log = spdlog::get("console");
+
   if (modelName == "NumberWeight") {
     name = modelName;
     Logger::info("ContactPartnership has been set to 'NumberWeight'");
