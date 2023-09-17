@@ -1,6 +1,6 @@
-<div style="text-align:center;">
+<p align="center">
 <img src="./sphinxdoc/source/images/RockableRocks.png" width="50%"/>
-</div>
+</p>
 
 ## What is `Rockable`?  
 
