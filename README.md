@@ -64,7 +64,7 @@ Here is the non-exhaustive list of involved persons with their main mission:
 * **Documentation**: there is little documentation, although efforts are being made to address this. For now, it is possible to generate the sphinxdoc documentation in your local folder.
 
 <p align="center">
-<img src="./gif-doc/gen_doc-rockable.gif" width="90%"/>
+<img src="./gif-doc/gen-doc-rockable.gif" width="90%"/>
 </p>
 
 ## How to install
@@ -103,7 +103,7 @@ make install
 The options available are listed below:
 
 * `ROCKABLE_USE_FT_CORR` (default is OFF): add objectivity correction to tangent forces.
-* `ROCKABLE_ENABLE_PROFILING` (default is ON): enable time profiling.
+* `ROCKABLE_ENABLE_PROFILING` (default is OFF): enable time profiling.
 * `ROCKABLE_ENABLE_BOUNDARY` (default is OFF): enable the special boundaries like Ball or Cylinder.
 * `ROCKABLE_ENABLE_SOFT_PARTICLES` (default is OFF): enable straining of particles.
 * `ROCKABLE_ENABLE_PERIODIC` (default is OFF): enable full periodic boundary conditions.
@@ -114,6 +114,10 @@ The options available are listed below:
 * `ROCKABLE_COMPILE_PREPRO` (default is OFF): compile the aplications to generate inputs for the code
 
 ## How to run a simulation
+
+<p align="center">
+<img src="./gif-doc/run-rockable.gif" width="90%"/>
+</p>
 
 Before runing rockable you will need to source rockable environnement to add the INSTALL directory to your standard binaries PATH:
 
