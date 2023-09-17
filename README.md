@@ -49,7 +49,7 @@ Here is the non-exhaustive list of involved people with their main mission:
 
 ## Features
 
-* Particle Shapes: the code uses only one 3D shape: sphero-polyhedra or R-shapes. These shapes can be non-convex (with holes if necessary) and have rounded edges and corners (uniform radius per shape).
+* **Particle Shapes:** the code uses only one 3D shape: sphero-polyhedra or R-shapes. These shapes can be non-convex (with holes if necessary) and have rounded edges and corners (uniform radius per shape).
 
   > [!NOTE]
   > Some other shapes are currently considered for special boundary shapes (sphere, cylinder...) and specifique loadings.
@@ -76,14 +76,6 @@ Here is the non-exhaustive list of involved people with their main mission:
 * **Jean-Yves Delenne** (IATE, INRAE): mechanical/biological modelling
 * **Saeid Nezamabadi** (LMGC, UM2): Non Smooth Discrete Element Method (NS-DEM)
 * **Patrick Mutabaruka** (Ifremer): coupling with Lattice Boltzmann Method (LBM)
-
-## Features
-
-* **Particle Shapes:** the code uses only one 3D shape: sphero-polyhedra or R-shapes. These shapes can be non-convex (with holes if necessary) and have rounded edges and corners (uniform radius per shape). Some other shapes are currently considered for special boundary shapes (sphere, cylinder…) and specifique loadings.
-
-* **Boundary Conditions:** any rigid element can be used to apply boundary conditions. It is possible to impose velocity, force, or moment component by component. Some predefined systems with servo-control are also available for complex loading conditions (e.g., loading cycles or controlled pressure).
-
-* **Parallel Computation:** currently, an OpenMP optimization using compilation flags has been implemented.
 
 ## How to install
 
