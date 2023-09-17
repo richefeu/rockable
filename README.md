@@ -63,15 +63,15 @@ Here is the non-exhaustive list of involved people with their main mission:
 
 * **Documentation**: there is little documentation, although efforts are being made to address this. For now, it is possible to generate the sphinxdoc documentation in your local folder.
 
-<div style="text-align:center;">
+<p align="center">
 <img src="./gif-doc/gen_doc-rockable.gif" width="90%"/>
-</div>
+</p>
 
 ## How to install
 
-<div style="text-align:center;">
+<p align="center">
 <img src="./gif-doc/install-script-rockable.gif" width="90%"/>
-</div>
+</p>
 
 Using your OS package manager (yum, apt, brew etc) you will maybe need to install several package before compiling: `glfw3`, `opengl`,`freeglut`, `libpng2` (optionnal).
 
