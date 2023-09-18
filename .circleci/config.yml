@@ -22,6 +22,9 @@ jobs:
     docker:
       - image: node:8.10.0
     steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "c9:4c:6b:6b:67:07:40:97:6e:97:2b:2f:14:ab:55:c7"
       - checkout
       - attach_workspace:
           at: sphinxdoc/build
