@@ -2,7 +2,8 @@
 # See: https://circleci.com/docs/configuration-reference
 version: 2.1
 
-  docs-build:
+jobs:
+  gen-doc:
     docker:
       - image: python:3.7
     steps:
@@ -17,7 +18,11 @@ version: 2.1
           root: sphinxdoc/build
           paths: html
 
-
+workflows:
+  version: 2.1
+  build:
+    jobs:
+      - gen-doc
 
 
 
