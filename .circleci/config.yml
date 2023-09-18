@@ -36,10 +36,9 @@ jobs:
             - "ce:a4:8c:21:55:0a:4f:f2:34:a8:8f:1c:ac:6d:5f:8b"
       - run:
           name: Deploy docs to gh-pages branch
-          command: gh-pages --dotfiles --message "[skip ci] Updates" --dist sphinxdoc/build/html
+          command: gh-pages --dist sphinxdoc/build/html
 
 workflows:
-  version: 2.1
   build:
     jobs:
       - gen-doc
