@@ -24,7 +24,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: sphinxdoc/build/html
+          at: sphinxdoc/build
       - run:
           name: Install and configure dependencies
           command: |
