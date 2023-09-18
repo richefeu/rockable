@@ -15,8 +15,8 @@ jobs:
           name: Build docs
           command: cd sphinxdoc && make html
       - persist_to_workspace:
-          root: sphinxdoc/build/html
-          paths: .
+          root: sphinxdoc/build
+          paths: html
 
   docs-deploy:
     docker:
@@ -24,7 +24,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: sphinxdoc/build
+          at: sphinxdoc/build/html
       - run:
           name: Install and configure dependencies
           command: |
