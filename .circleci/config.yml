@@ -18,11 +18,33 @@ jobs:
           root: sphinxdoc/build
           paths: html
 
+  docs-deploy:
+    docker:
+      - image: node:8.10.0
+    steps:
+      - checkout
+      - attach_workspace:
+          at: sphinxdoc/build
+      - run:
+          name: Install and configure dependencies
+          command: |
+            npm install -g --silent gh-pages@2.0.1
+            git config user.email "ci-build@klukas.net"
+            git config user.name "ci-build"
+      - run:
+          name: Deploy docs to gh-pages branch
+          command: gh-pages --dist sphinxdoc/build/html
+
 workflows:
   version: 2.1
   build:
     jobs:
       - gen-doc
-
+      - docs-deploy:
+          requires:
+            - gen-doc
+          filters:
+            branches:
+              only: main
 
 
