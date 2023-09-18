@@ -10,7 +10,7 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: pip install -r sphinxdoc/requirements.txt
+          command: pip install --upgrade pip && pip install -r sphinxdoc/requirements.txt
       - run:
           name: Build docs
           command: cd sphinxdoc/ && make html
