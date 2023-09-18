@@ -13,10 +13,11 @@ jobs:
           command: pip install --upgrade pip && pip install -r sphinxdoc/requirements.txt
       - run:
           name: Build docs
-          command: cd sphinxdoc/ && make html
+          command: cd sphinxdoc && make html
       - persist_to_workspace:
-          root: sphinxdoc/build
-          paths: html
+          root: sphinxdoc/build/html
+          paths:
+            - echo-output
 
   docs-deploy:
     docker:
