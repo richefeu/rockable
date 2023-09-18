@@ -33,7 +33,7 @@ jobs:
             git config user.name "richefeu"
       - add_ssh_keys:
           fingerprints:
-            - "c2:87:a0:78:24:cc:65:f6:5f:dd:79:66:d0:29:29:2c"
+            - "b4:d0:5f:ab:0a:39:18:e0:8e:06:3b:90:24:92:9c:92"
       - run:
           name: Deploy docs to gh-pages branch
           command: gh-pages --dotfiles --message "[skip ci] Updates" --dist sphinxdoc/build/html
