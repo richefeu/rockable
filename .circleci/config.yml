@@ -22,9 +22,6 @@ jobs:
     docker:
       - image: node:8.10.0
     steps:
-      - add_ssh_keys:
-          fingerprints:
-            - "c9:4c:6b:6b:67:07:40:97:6e:97:2b:2f:14:ab:55:c7"
       - checkout
       - attach_workspace:
           at: sphinxdoc/build
@@ -37,6 +34,12 @@ jobs:
       - run:
           name: Deploy docs to gh-pages branch
           command: gh-pages --dist sphinxdoc/build/html
+      - add_ssh_keys:
+          fingerprints:
+            - "c9:4c:6b:6b:67:07:40:97:6e:97:2b:2f:14:ab:55:c7"
+      - run:
+          name: Deploy docs to gh-pages branch
+          command: gh-pages --dotfiles --message "[skip ci] Updates" --dist sphinxdoc/build/html
 
 workflows:
   version: 2.1
