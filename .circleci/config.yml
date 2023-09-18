@@ -31,9 +31,6 @@ jobs:
             npm install -g --silent gh-pages@2.0.1
             git config user.email "ci-build@klukas.net"
             git config user.name "ci-build"
-      - run:
-          name: Deploy docs to gh-pages branch
-          command: gh-pages --dist sphinxdoc/build/html
       - add_ssh_keys:
           fingerprints:
             - "c9:4c:6b:6b:67:07:40:97:6e:97:2b:2f:14:ab:55:c7"
