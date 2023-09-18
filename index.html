@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to Rockable’s documentation! &mdash; Rockable 1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Quick-start guid" href="quickStart.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            Rockable
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickStart.html">Quick-start guid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntaxConf.html">Format of configuration files (conf-file)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntaxShapes.html">Format of shape-files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forceLaws.html">Force laws</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">Rockable</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Welcome to Rockable’s documentation!</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="welcome-to-rockable-s-documentation">
+<h1>Welcome to Rockable’s documentation!<a class="headerlink" href="#welcome-to-rockable-s-documentation" title="Permalink to this heading"></a></h1>
+<p>Rockable is a code, written in C++, implementing the classical discrete element method.</p>
+<p>The specificities of the code are to handle:</p>
+<ol class="arabic simple">
+<li><p>Sphero-polyhedral shapes</p></li>
+<li><p>Breakable interfaces</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is designed and developed for academic use (which means that its source code is not publicly downloadable).</p>
+</div>
+<a class="reference internal image-reference" href="_images/RockableRocks.png"><img alt="_images/RockableRocks.png" class="align-center" src="_images/RockableRocks.png" style="width: 192px;" /></a>
+<section id="credits">
+<h2>Credits<a class="headerlink" href="#credits" title="Permalink to this heading"></a></h2>
+<p>The code was initially developed by <em>Vincent Richefeu</em>, at Laboratoire 3SR, to model rockfalls and rock avalanches. This has been done through The PhD work of <em>Stiven Cuervo</em> and <em>Bruna Garcia</em>, but it actually started before in a code named <code class="docutils literal notranslate"><span class="pre">DEMbox</span></code> (no longer maintained).</p>
+<p>Then, the breakable interfaces have been implemented during the PhD work of <em>Marta Stasiak</em>. A number of improvements have been added at that time thanks to intensive review with <em>Gael Combe</em>, Laboratoire 3SR.</p>
+<p>New functionalities are being studied thanks to new collaborations of people from CEA, IATE and CNRS. For example,
+<em>Lhassan Amarsid</em> (CEA) is working on the introduction of periodic boundary conditions, and multi-processor
+computing with domain decomposition. <em>Farhang Radjai</em> and students, may introduce new breakable interfaces
+with energy-based criteria.</p>
+<p>Here is the non-exhaustive list of involved people with their main mission:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="mailto:vincent&#46;richefeu&#37;&#52;&#48;univ-grenoble-alpes&#46;fr">Vincent Richefeu</a> (Laboratoire 3SR, UGA): initiated the project</p></li>
+<li><p><a class="reference external" href="mailto:gael&#46;combe&#37;&#52;&#48;univ-grenoble-alpes&#46;fr">Gael Combe</a> (Laboratoire 3SR, G-INP): mechanical modelling</p></li>
+<li><p><a class="reference external" href="mailto:Lhassan&#46;AMARSID&#37;&#52;&#48;cea&#46;fr">Lhassan Amarsid</a> (CEA): mechanical modelling, parallel computing</p></li>
+<li><p><a class="reference external" href="mailto:Raphael&#46;PRAT&#37;&#52;&#48;cea&#46;fr">Raphael Prat</a> (CEA): parallel computing</p></li>
+<li><p><a class="reference external" href="mailto:Jean-Mathieu&#46;VANSON&#37;&#52;&#48;cea&#46;fr">Jean-Mathieu Vanson</a> (CEA): mechanical modelling</p></li>
+<li><p><a class="reference external" href="mailto:franck&#46;radjai&#37;&#52;&#48;umontpellier&#46;fr">Farhang Radjai</a> (LMGC, CNRS): mechanical/physical Mentor</p></li>
+<li><p><a class="reference external" href="mailto:jean-yves&#46;delenne&#37;&#52;&#48;inrae&#46;fr">Jean-Yves Delenne</a> (IATE, INRAE): mechanical/biological modelling</p></li>
+<li><p><a class="reference external" href="mailto:saeid&#46;nezamabadi&#37;&#52;&#48;umontpellier&#46;fr">Saeid Nezamabadi</a> (LMGC, UM2): Non Smooth Discrete Element Method (NS-DEM)</p></li>
+<li><p><a class="reference external" href="mailto:Patrick&#46;Mutabaruka&#37;&#52;&#48;ifremer&#46;fr">Patrick Mutabaruka</a> (Ifremer): coupling with Lattice Boltzmann Method (LBM)</p></li>
+</ul>
+</section>
+<section id="features">
+<h2>Features<a class="headerlink" href="#features" title="Permalink to this heading"></a></h2>
+<ul>
+<li><p><strong>Particle Shapes</strong>: the code uses only one 3D shape: sphero-polyhedra or R-shapes. These shapes can be non-convex (with holes if necessary) and have rounded edges and corners (uniform radius per shape).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Some other shapes are currently considered for special boundary shapes (sphere, cylinder…) and specifique loadings.</p>
+</div>
+</li>
+<li><p><strong>Boundary Conditions</strong>: any rigid element can be used to apply boundary conditions. It is possible to impose velocity, force, or moment component by component. Some predefined systems with servo-control are also available for complex loading conditions (e.g., loading cycles or controlled pressure).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The possibility of applying tri-periodic loading to an assembly is implemented and currently in the testing phase.</p>
+</div>
+</li>
+<li><p><strong>Parallel Computation</strong>: currently, an OpenMP optimization using compilation flags has been implemented. However, the computational speedup is relatively low. Typically, 8 cores are needed to halve the simulation time (for a dense system with a large number of elements).</p></li>
+<li><p><strong>Documentation</strong>: there is little documentation, although efforts are being made to address this.</p></li>
+</ul>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickStart.html">Quick-start guid</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickStart.html#what-is-rockable">What is Rockable?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickStart.html#compilation-with-cmake">Compilation with cmake</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickStart.html#compilation-with-makefile">Compilation with <cite>Makefile</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickStart.html#running-a-simulation">Running a simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickStart.html#visualising-the-simulations">Visualising the simulations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="syntaxConf.html">Format of configuration files (conf-file)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#header">Header</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#keywords">Keywords</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#timing">Timing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#neighbor-list-nl">Neighbor List (NL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#configuration-backups">Configuration Backups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#computation-options">Computation options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#library-of-particle-shapes">Library of Particle Shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#particles">Particles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#interactions">Interactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#force-laws">Force Laws</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#time-integration-scheme">Time-Integration Scheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#dissipation">Dissipation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#loading">Loading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#file-drivingsystem-txt">File drivingSystem.txt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#pre-processing-commands">Pre-processing Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#data-extractors">Data Extractors</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="syntaxShapes.html">Format of shape-files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="syntaxShapes.html#definition-of-a-shape">Definition of a shape</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="forceLaws.html">Force laws</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="forceLaws.html#default-model-keywork-default">Default model (keywork <code class="docutils literal notranslate"><span class="pre">Default</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="forceLaws.html#law-for-rock-avalanches-keywork-avalanche">Law for rock avalanches (keywork <code class="docutils literal notranslate"><span class="pre">Avalanche</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="forceLaws.html#breakable-elastic-solid-bonds-keywork-stickedlinks">Breakable elastic solid bonds (keywork <code class="docutils literal notranslate"><span class="pre">StickedLinks</span></code>)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dissipation.html#cundall-damping">Cundall damping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dissipation.html#velocity-barrier">Velocity barrier</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dissipation.html#particles-in-viscous-fluid">Particles in viscous fluid</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="integrationSchemes.html#euler-scheme-keyword-euler">Euler scheme (keyword <code class="docutils literal notranslate"><span class="pre">Euler</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integrationSchemes.html#velocity-verlet-scheme-keyword-velocityverlet-default">Velocity-Verlet scheme (keyword <code class="docutils literal notranslate"><span class="pre">velocityVerlet</span></code>, Default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integrationSchemes.html#beeman-scheme-keyword-beeman">Beeman scheme (keyword <code class="docutils literal notranslate"><span class="pre">Beeman</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integrationSchemes.html#runge-kutta-nystrom-4th-order-scheme-keyword-rungekutta4">Runge-Kutta-Nyström 4th-order scheme (keyword <code class="docutils literal notranslate"><span class="pre">RungeKutta4</span></code>)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="servoControllers.html#the-tritri-series-servos">The <code class="docutils literal notranslate"><span class="pre">tritri</span></code> series servos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="servoControllers.html#shakers">shakers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="quickStart.html" class="btn btn-neutral float-right" title="Quick-start guid" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2022, Vincent Richefeu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

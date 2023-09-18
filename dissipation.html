@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Global dissipation features &mdash; Rockable 1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Integration schemes" href="integrationSchemes.html" />
+    <link rel="prev" title="Force laws" href="forceLaws.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Rockable
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickStart.html">Quick-start guid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntaxConf.html">Format of configuration files (conf-file)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntaxShapes.html">Format of shape-files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forceLaws.html">Force laws</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Global dissipation features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#cundall-damping">Cundall damping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#velocity-barrier">Velocity barrier</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#particles-in-viscous-fluid">Particles in viscous fluid</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Rockable</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Global dissipation features</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/dissipation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="global-dissipation-features">
+<span id="dissipation"></span><h1>Global dissipation features<a class="headerlink" href="#global-dissipation-features" title="Permalink to this heading"></a></h1>
+<section id="cundall-damping">
+<h2>Cundall damping<a class="headerlink" href="#cundall-damping" title="Permalink to this heading"></a></h2>
+<p>In DEM, Cundall damping is a numerical technique employed to introduce artificial dissipation and stabilize quasistatic simulations of granular materials. Unlike physical processes that naturally dissipate energy, Cundall damping is a purely numerical approach aimed at controlling the excessive accumulation of energy and preventing unrealistic behavior in the simulation.</p>
+<p>By incorporating Cundall damping, a damping force proportional to the relative velocity between particles is applied, which leads to the gradual reduction of particle velocities over time. This numerical dissipation helps stabilize the simulation, particularly in situations where quasi-static equilibrium is desired.</p>
+<p>To summarize, Cundall damping in DEM is a numerical dissipation technique implemented to stabilize quasi-static simulations of granular materials, by artificially introducing a damping force that reduces particle velocities without directly modeling physical dissipative processes.</p>
+<p>In <code class="docutils literal notranslate"><span class="pre">Rockable</span></code>, both translations and rotations are affected. If the code has been compiled with <code class="docutils literal notranslate"><span class="pre">COMPONENTWISE_NUM_DAMPING</span></code> option, the damping of each component will be processed separately. It is not clear at all what the right solution should be. To activate this damping, the keyword is <code class="docutils literal notranslate"><span class="pre">numericalDampingCoeff</span></code>, set with a positive value that can vary depending on the specific simulation and the desired level of damping. Basically, here is what the damping works:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">Pseudo-code</span><a class="headerlink" href="#id1" title="Permalink to this code"></a></div>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">force</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">velocity</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">force</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">numericalDampingCoeff</span><span class="p">)</span>
+<span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">force</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">numericalDampingCoeff</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>There is no universally fixed or commonly used value for the Cundall coefficient since it depends on factors such as the material properties, particle interactions, and the desired behavior of the simulation. The appropriate value of <code class="docutils literal notranslate"><span class="pre">numericalDampingCoeff</span></code> is typically determined through calibration and validation against experimental data or known behavior of the material being simulated. It is common practice to start with a small value and gradually increase it until the desired level of damping is achieved. The specific value used can vary widely, ranging from very small values (<em>e.g.</em>, 0.001) to larger values (<em>e.g.</em>, 0.1) or even higher, depending on the simulation requirements and the desired damping effect.</p>
+<p>It’s important to note that the choice of the Cundall damping coefficient involves a trade-off. A larger value can provide stronger damping but may also introduce more artificial dissipation and affect the overall accuracy of the simulation. Therefore, it is often necessary to conduct sensitivity analyses and validation studies to determine the appropriate value of this coefficient for a specific DEM simulation.</p>
+</section>
+<section id="velocity-barrier">
+<h2>Velocity barrier<a class="headerlink" href="#velocity-barrier" title="Permalink to this heading"></a></h2>
+<p>An alternative solution to mitigate the excessive free motion of particles in DEM simulations is to apply a barrier function to translational and rotational velocities. This approach aims to impose limits on the particle velocities, preventing them from exceeding certain thresholds and thus restraining overly fast or unstable movements. This is an original idea of Farhang Radjai.</p>
+<p>The barrier function is typically defined as a threshold function that specifies a maximum allowable value for the translational and rotational velocities. If a particle surpasses these limits, its velocity is appropriately reduced to adhere to the imposed constraints. Here is the pseudo-code for each component of force (or equivalently, of acceleration):</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Pseudo-code</span><a class="headerlink" href="#id2" title="Permalink to this code"></a></div>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="n">ratio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pow</span><span class="p">(</span><span class="n">fabs</span><span class="p">(</span><span class="n">velocity</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">Barrier</span><span class="p">),</span><span class="w"> </span><span class="n">Exponent</span><span class="p">);</span>
+<span class="w"> </span><span class="n">force</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">ratio</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ratio</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<p>The advantage of this method is that it can be used to specifically control particle velocities without introducing artificial dissipation forces. Hence, it provides an alternative to dissipate energy, in particular for deposition of particles. The keywords are: <code class="docutils literal notranslate"><span class="pre">velocityBarrier</span></code> with <code class="docutils literal notranslate"><span class="pre">velocityBarrierExponent</span></code> for translation, and <code class="docutils literal notranslate"><span class="pre">angularVelocityBarrier</span></code> with <code class="docutils literal notranslate"><span class="pre">angularVelocityBarrierExponent</span></code> for rotations.</p>
+</section>
+<section id="particles-in-viscous-fluid">
+<h2>Particles in viscous fluid<a class="headerlink" href="#particles-in-viscous-fluid" title="Permalink to this heading"></a></h2>
+<p>This dissipation strategy involves adding a viscosity term to the particle movements in order to simulate the presence of a viscous fluid surrounding the particles. This approach is commonly used to model interactions between particles and a surrounding fluid, such as in fluid-structure interaction simulations. In this strategy, a damping force is introduced that is proportional to the velocity of the particles, similar to the behavior of a viscous fluid. The damping force opposes the particle’s motion and causes energy dissipation over time.</p>
+<p>Mathematically, the damping force can be expressed as:</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Pseudo-code</span><a class="headerlink" href="#id3" title="Permalink to this code"></a></div>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">F_damping</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">viscuous_damping</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">velocity</span>
+</pre></div>
+</div>
+</div>
+<p>By incorporating this damping force, the particle’s motion is gradually slowed down, and its kinetic energy is dissipated. This mimics the effect of a surrounding viscous fluid, which would resist and dampen the particle’s motion over time.</p>
+<p>This is actually implemented as the <code class="docutils literal notranslate"><span class="pre">BodyForce</span></code> named <code class="docutils literal notranslate"><span class="pre">ViscousFluid</span></code> in <code class="docutils literal notranslate"><span class="pre">Rockable</span></code>.</p>
+<p>To set a more or less appropriate value of the viscuous damping coefficient, the user can set a fluid density <span class="math notranslate nohighlight">\(\rho\)</span> that way:</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">input.txt</span><a class="headerlink" href="#id4" title="Permalink to this code"></a></div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>ViscousFluid 1000
+</pre></div>
+</div>
+</div>
+<p>And the viscuous damping value will be set to <span class="math notranslate nohighlight">\(\frac{1}{2} C_X\ \rho\ V^{2/3}\)</span>, with <span class="math notranslate nohighlight">\(C_X = 0.47\)</span> just like if the particle was a sphere.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="forceLaws.html" class="btn btn-neutral float-left" title="Force laws" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="integrationSchemes.html" class="btn btn-neutral float-right" title="Integration schemes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2022, Vincent Richefeu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

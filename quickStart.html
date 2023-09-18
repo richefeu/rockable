@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quick-start guid &mdash; Rockable 1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Format of configuration files (conf-file)" href="syntaxConf.html" />
+    <link rel="prev" title="Welcome to Rockable’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Rockable
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quick-start guid</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-rockable">What is Rockable?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#compilation-with-cmake">Compilation with cmake</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#compilation-with-makefile">Compilation with <cite>Makefile</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-a-simulation">Running a simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#visualising-the-simulations">Visualising the simulations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="syntaxConf.html">Format of configuration files (conf-file)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntaxShapes.html">Format of shape-files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forceLaws.html">Force laws</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Rockable</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Quick-start guid</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/quickStart.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="quick-start-guid">
+<h1>Quick-start guid<a class="headerlink" href="#quick-start-guid" title="Permalink to this heading"></a></h1>
+<section id="what-is-rockable">
+<h2>What is Rockable?<a class="headerlink" href="#what-is-rockable" title="Permalink to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">Rockable</span></code> is a DEM code written in C++11 (tend to become C++17). The two main specificities of the code are (<em>i</em>) to hold sphero-polyhedral shapes, (<em>ii</em>) to manage breakable interfaces. This technique has been developed in another code named <code class="docutils literal notranslate"><span class="pre">DEMbox</span></code> which was designed to do more things, with a higher degree of abstraction. Also, it is designed and developed for an academic usage.</p>
+</section>
+<section id="compilation-with-cmake">
+<h2>Compilation with cmake<a class="headerlink" href="#compilation-with-cmake" title="Permalink to this heading"></a></h2>
+<p>The preferred method for building the project is by using CMake, a widely-used build system. Follow these steps to compile the project:</p>
+<ol class="arabic simple">
+<li><p>Create a new directory called build (you can choose any name) in the project’s root directory:</p></li>
+</ol>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>build
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Navigate into the build directory:</p></li>
+</ol>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>build
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>Run CMake configuration command from within the build directory. This command sets up the build environment and generates the necessary build files based on the CMake configuration files present in the project:</p></li>
+</ol>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>..
+</pre></div>
+</div>
+<p>If you wish to disable the compilation of the <code class="docutils literal notranslate"><span class="pre">see</span></code> application, you can pass the <code class="docutils literal notranslate"><span class="pre">-DROCKABLE_COMPILE_SEE=OFF</span></code> option to CMake during the configuration step:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>..<span class="w"> </span>-DROCKABLE_COMPILE_SEE<span class="o">=</span>OFF
+</pre></div>
+</div>
+<p>To enable the installation with profiling tools, you can use the <code class="docutils literal notranslate"><span class="pre">-DROCKABLE_ENABLE_PROFILING=ON</span></code> option during the CMake configuration step:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>..<span class="w"> </span>-DROCKABLE_ENABLE_PROFILING<span class="o">=</span>ON
+</pre></div>
+</div>
+<p>These options will set up the CMake build system accordingly to either include or exclude the <code class="docutils literal notranslate"><span class="pre">see</span></code> feature and enable or disable the profiling tools during the build process. After configuring CMake with the desired options, you can proceed with the usual build process (<em>e.g.</em>, using <code class="docutils literal notranslate"><span class="pre">make</span></code> or your preferred build command) to compile the project with the chosen settings.</p>
+<p>All the options are listed below:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_USE_FT_CORR</span></code> (default is <code class="docutils literal notranslate"><span class="pre">OFF</span></code>): add objectivity correction to tangent forces.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_PROFILING</span></code> (default is <code class="docutils literal notranslate"><span class="pre">ON</span></code>): enable time profiling.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_BOUNDARY</span></code> (default is <code class="docutils literal notranslate"><span class="pre">OFF</span></code>): enable the special boundaries like Ball or Cylinder.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_SOFT_PARTICLES`</span></code> (default is <code class="docutils literal notranslate"><span class="pre">OFF</span></code>): enable straining of particles.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_PERIODIC</span></code> (default is <code class="docutils literal notranslate"><span class="pre">OFF</span></code>): enable full periodic boundary conditions.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_COMPILE_SEE</span></code> (default is <code class="docutils literal notranslate"><span class="pre">ON</span></code>): compile the application to visualize the conf-files.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_COMPILE_SEE3</span></code> (default is <code class="docutils literal notranslate"><span class="pre">OFF</span></code>): compile the application to edit graphically the input files.</p></li>
+</ul>
+</section>
+<section id="compilation-with-makefile">
+<h2>Compilation with <cite>Makefile</cite><a class="headerlink" href="#compilation-with-makefile" title="Permalink to this heading"></a></h2>
+<p>The compilation is managed with a classic <cite>Makefile</cite>. Some options can be set at compile time: <code class="docutils literal notranslate"><span class="pre">FT_CORR</span></code>, and <code class="docutils literal notranslate"><span class="pre">COMPONENTWISE_NUM_DAMPING</span></code>. To disable an option it is advised to rename it by adding a letter ‘n’ at the beginning.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">FT_CORR</span></code>: with this option, the tangential force is corrected to account for the rotation of the local framework</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">COMPONENTWISE_NUM_DAMPING</span></code>: it activates the component-wise numerical damping (so called Cundall damping)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_PROFILING</span></code>: enable the use of MATools for performance profiling</p></li>
+</ul>
+<p>Depending on the computer you use (Apple or PC with Linux) <code class="docutils literal notranslate"><span class="pre">CXX</span></code>, <code class="docutils literal notranslate"><span class="pre">CXXFLAGS</span></code> and <code class="docutils literal notranslate"><span class="pre">GLLINK</span></code> have to be set in the right section for setting, respectively, the compiler name, the options of compilation, and the options of linkage with openGL.
+The rest of the file should normally not be changed.
+Finally, the applications run and see can be compiled with the following command:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>make
+</pre></div>
+</div>
+<p>It is sometimes necessary to remove all object files (.o) together with the compiled applications. this can be made with:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>clean
+</pre></div>
+</div>
+</section>
+<section id="running-a-simulation">
+<h2>Running a simulation<a class="headerlink" href="#running-a-simulation" title="Permalink to this heading"></a></h2>
+<p>To run a simulation, a configuration file has to be written. The format of such a file is described in the section Syntax for conf-files. We show here a simple example simulating a sphere bouncing on a plan.</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">input.txt</span><a class="headerlink" href="#id1" title="Permalink to this code"></a></div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Rockable 20-02-2017
+t 0
+tmax 0.06
+dt 1e-6
+interVerlet 0.01
+interConf 0.01
+
+DVerlet 0.08
+dVerlet 0.02
+density 0 2700
+density 1 2700
+
+forceLaw Avalanches
+knContact 0 1 1e6
+en2Contact 0 1 0.05
+ktContact 0 1 1e7
+muContact 0 1 0.4
+krContact 0 1 1e7
+murContact 0 1 0.0
+
+iconf 0
+nDriven 1
+shapeFile SphereAndPlan.shp
+Particles 2
+Plan 0 0 1 0 -0.05 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0
+Sphere 1 0 1 -0.5 0.5 0 3.69 -3.29 0 0 0 0 0.707 0 0.707 0 0 0 -50.52 0 0 0
+</pre></div>
+</div>
+</div>
+<p>The shape-file as described in the section Syntax for shape-files is a file named SphereAndPlan.shp with the following content:</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">SphereAndPlan.sph</span><a class="headerlink" href="#id2" title="Permalink to this code"></a></div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&lt;
+name Plan
+radius 0.05
+preCompDone y
+nv 4
+2 0 0.5
+2 0 -0.5
+-2 0 -0.5
+-2 0 0.5
+ne 4
+0 1
+1 2
+2 3
+3 0
+nf 1
+4 0 1 2 3
+obb.extent 2.0 0.05 0.5
+obb.e1 1 0 0
+obb.e2 0 1 0
+obb.e3 0 0 1
+obb.center 0 0 0
+volume 1
+I/m 1 1 1
+&gt;
+
+&lt;
+name Sphere
+radius 0.08
+preCompDone y
+nv 1
+0 0 0
+ne 0
+nf 0
+obb.extent 1 1 1
+obb.e1 1 0 0
+obb.e2 0 1 0
+obb.e3 0 0 1
+obb.center 0 0 0
+volume 0.004021
+I/m 0.00493333 0.00493333 0.0032
+&gt;
+</pre></div>
+</div>
+</div>
+<p>Supposing that the executable named <code class="docutils literal notranslate"><span class="pre">rockable</span></code> stands in the same folder as the configuration and shape files, the simulation is launched that way:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>./rockable<span class="w"> </span>bouncingSphere.txt
+</pre></div>
+</div>
+<p>If the executable has been compiled with openMP abilities, the number of threads can be set with the option <code class="docutils literal notranslate"><span class="pre">-j</span></code>, for example:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>./rockable<span class="w"> </span>bouncingSphere.txt<span class="w"> </span>-j<span class="w"> </span><span class="m">24</span>
+</pre></div>
+</div>
+<p>In this particular example, it is clearly not a good idea to use so much threads because the number of particles is to small and the computation duration will be worst.</p>
+<p>The verbosity of logs is set with a number that way:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>./rockable<span class="w"> </span>bouncingSphere.txt<span class="w"> </span>-v<span class="w"> </span><span class="m">6</span>
+</pre></div>
+</div>
+<p>Highest number corresponds highest verbosity: <code class="docutils literal notranslate"><span class="pre">trace</span></code> = 6, <code class="docutils literal notranslate"><span class="pre">debug</span></code> = 5, <code class="docutils literal notranslate"><span class="pre">info</span></code> = 4, <code class="docutils literal notranslate"><span class="pre">warn</span></code> = 3, <code class="docutils literal notranslate"><span class="pre">err</span></code> = 2, <code class="docutils literal notranslate"><span class="pre">critical</span></code> = 1, <code class="docutils literal notranslate"><span class="pre">off</span></code> = 0</p>
+<p>If the files produced by a computation (<code class="docutils literal notranslate"><span class="pre">conf*</span></code>, <code class="docutils literal notranslate"><span class="pre">kineticEnergy.txt</span></code>, <code class="docutils literal notranslate"><span class="pre">perf.txt</span></code>, and <code class="docutils literal notranslate"><span class="pre">staticBalance.txt</span></code>) have to be deleted, <code class="docutils literal notranslate"><span class="pre">rockable</span></code> can do the job.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>./rockable<span class="w"> </span>-c
+</pre></div>
+</div>
+</section>
+<section id="visualising-the-simulations">
+<h2>Visualising the simulations<a class="headerlink" href="#visualising-the-simulations" title="Permalink to this heading"></a></h2>
+<p>Normally, the application <code class="docutils literal notranslate"><span class="pre">see</span></code> has been built as the same time than <code class="docutils literal notranslate"><span class="pre">rockable</span></code>.
+The application <code class="docutils literal notranslate"><span class="pre">see</span></code> needs <code class="docutils literal notranslate"><span class="pre">freeglut</span></code>, the simplest way to use openMP and display 3D things.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to Rockable’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="syntaxConf.html" class="btn btn-neutral float-right" title="Format of configuration files (conf-file)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2022, Vincent Richefeu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

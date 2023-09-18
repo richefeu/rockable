@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Format of shape-files &mdash; Rockable 1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Force laws" href="forceLaws.html" />
+    <link rel="prev" title="Format of configuration files (conf-file)" href="syntaxConf.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Rockable
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickStart.html">Quick-start guid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntaxConf.html">Format of configuration files (conf-file)</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Format of shape-files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#definition-of-a-shape">Definition of a shape</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="forceLaws.html">Force laws</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Rockable</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Format of shape-files</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/syntaxShapes.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="format-of-shape-files">
+<span id="syntaxshape"></span><h1>Format of shape-files<a class="headerlink" href="#format-of-shape-files" title="Permalink to this heading"></a></h1>
+<section id="definition-of-a-shape">
+<h2>Definition of a shape<a class="headerlink" href="#definition-of-a-shape" title="Permalink to this heading"></a></h2>
+<p>A shape-file is a library of shapes, which is in fact a file with a number of shapes defined between brackets (starting with <code class="docutils literal notranslate"><span class="pre">&lt;</span></code> and ending with <code class="docutils literal notranslate"><span class="pre">&gt;</span></code>).
+To run a simulation, we need that all required shapes are defined in a single shape-file. The keywords are given here after:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code> (<em>string</em>) <strong>shapeName</strong></p>
+<p>The name of the shape (without space). When the particles are listed in a conf-file, its shape is referred to as this defined keyword</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">radius</span></code> (<em>double</em>) <strong>MinskowskiRadius</strong></p>
+<p>The radius of the rounded edges (so-called Minskowski radius) of the shape (there is only one radius per sphero-polyhedron)</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">preCompDone</span></code> <code class="docutils literal notranslate"><span class="pre">y</span></code> or <code class="docutils literal notranslate"><span class="pre">n</span></code></p>
+<p>If yes, the computation of mass properties will not be run at the beginning of a computation
+in Rockable or in the program shapeSurvey</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OBBtreeLevel</span></code> (<em>int</em>) <strong>number</strong></p>
+<p>(deprecated) set the number of levels for building an OBB-tree</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nv</span></code> (<em>int</em>) <strong>numberOfVertices</strong></p>
+<div class="line-block">
+<div class="line">Then repeat <strong>numberOfVertices</strong> times:</div>
+<div class="line">(<em>double</em>) <strong>x</strong> (<em>double</em>) <strong>y</strong> (<em>double</em>) <strong>z</strong></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ne</span></code> (<em>int</em>) <strong>numberOfEdges</strong></p>
+<div class="line-block">
+<div class="line">Then repeat <strong>numberOfEdges</strong> times:</div>
+<div class="line">(<em>int</em>) <strong>from</strong> (<em>int</em>) <strong>to</strong></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nf</span></code> (<em>int</em>) <strong>numberOfFaces</strong></p>
+<div class="line-block">
+<div class="line">Then repeat <strong>numberOfFaces</strong> times:</div>
+<div class="line">(<em>int</em>) <strong>numberOfVertices</strong> [(<em>int</em>) <strong>V1</strong> (<em>int</em>) <strong>V2</strong> …]</div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">obb.extent</span></code> (<em>double</em>) <strong>extent1</strong> (<em>double</em>) <strong>extent2</strong> (<em>double</em>) <strong>extent3</strong></p>
+<p>The 3 components of the extents in the 3 directions defined by <code class="docutils literal notranslate"><span class="pre">obb.e1</span></code>, <code class="docutils literal notranslate"><span class="pre">obb.e2</span></code> and <code class="docutils literal notranslate"><span class="pre">obb.e3</span></code></p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">obb.e1</span></code> (<em>vec3r</em>) <strong>e1</strong></p>
+<p>Extent unit vector in the first direction</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">obb.e2</span></code> (<em>vec3r</em>) <strong>e2</strong></p>
+<p>Extent unit vector in the second direction</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">obb.e3</span></code> (<em>vec3r</em>) <strong>e3</strong></p>
+<p>Extent unit vector in the third direction</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">obb.center</span></code> (<em>vec3r</em>) <strong>center</strong></p>
+<p>Position of the OBB center relative to the mass center of the shape, given in the framework (principal direction of
+inertia) of the shape</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">volume</span></code> (<em>double</em>) <strong>V</strong></p>
+<p>Volume of the shape</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">I/m</span></code> (<em>double</em>) <strong>I1/m</strong> (<em>double</em>) <strong>I2/m</strong> (<em>double</em>) <strong>I3/m</strong></p>
+<p>Eigenvalues of the moment of inertia divided by the mass. It supposes that the positions of the vertices
+are given in the eigen-frame of the shape</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">position</span></code> (<em>vec3r</em>) <strong>pos</strong></p>
+<p>A position that can be stored for processing purpose. Most of the time, it is not useful to define this position,
+but it is actually a position reminder generated by an automated pre-computation</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">orientation</span></code> (<em>quat</em>) <strong>Q</strong></p>
+<p>As the position defined previouly, an orientation can also be stored for processing purpose</p>
+</li>
+</ul>
+<p>As an example, this is how a cube with unit side can be defined (radius of 0.1):</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&lt;
+name Cube_r0.1
+radius 0.1
+preCompDone y
+
+nv 8
+0.4 0.4 -0.4
+-0.4 0.4 -0.4
+-0.4 -0.4 -0.4
+0.4 -0.4 -0.4
+0.4 0.4 0.4
+-0.4 0.4 0.4
+-0.4 -0.4 0.4
+0.4 -0.4 0.4
+
+ne 12
+0 1
+1 2
+2 3
+3 0
+4 5
+5 6
+6 7
+7 4
+0 4
+1 5
+2 6
+3 7
+
+nf 6
+4 0 1 2 3
+4 4 5 6 7
+4 0 1 5 4
+4 2 3 7 6
+4 1 2 6 5
+4 0 4 7 3
+
+obb.extent 0.5 0.5 0.5
+obb.e1 1 0 0
+obb.e2 0 1 0
+obb.e3 0 0 1
+obb.center 0 0 0
+
+volume 0.975587
+I/m 0.166667 0.166667 0.166667
+&gt;
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="syntaxConf.html" class="btn btn-neutral float-left" title="Format of configuration files (conf-file)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="forceLaws.html" class="btn btn-neutral float-right" title="Force laws" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2022, Vincent Richefeu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

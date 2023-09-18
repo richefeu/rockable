@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Integration schemes &mdash; Rockable 1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Available servo-controllers" href="servoControllers.html" />
+    <link rel="prev" title="Global dissipation features" href="dissipation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Rockable
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickStart.html">Quick-start guid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntaxConf.html">Format of configuration files (conf-file)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntaxShapes.html">Format of shape-files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forceLaws.html">Force laws</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Integration schemes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#euler-scheme-keyword-euler">Euler scheme (keyword <code class="docutils literal notranslate"><span class="pre">Euler</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#velocity-verlet-scheme-keyword-velocityverlet-default">Velocity-Verlet scheme (keyword <code class="docutils literal notranslate"><span class="pre">velocityVerlet</span></code>, Default)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#beeman-scheme-keyword-beeman">Beeman scheme (keyword <code class="docutils literal notranslate"><span class="pre">Beeman</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#runge-kutta-nystrom-4th-order-scheme-keyword-rungekutta4">Runge-Kutta-Nyström 4th-order scheme (keyword <code class="docutils literal notranslate"><span class="pre">RungeKutta4</span></code>)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Rockable</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Integration schemes</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/integrationSchemes.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="integration-schemes">
+<span id="integrationschemes"></span><h1>Integration schemes<a class="headerlink" href="#integration-schemes" title="Permalink to this heading"></a></h1>
+<p>In a <code class="docutils literal notranslate"><span class="pre">conf-file</span></code>, the integration scheme to be used is set with the keyword <code class="docutils literal notranslate"><span class="pre">Integrator</span></code>
+followed by the name of the scheme (defined below). The position, velocity and acceleration
+vectors is noted <span class="math notranslate nohighlight">\(\underline{x}\)</span>, <span class="math notranslate nohighlight">\(\underline{v}\)</span> and <span class="math notranslate nohighlight">\(\underline{a}\)</span>, respectively;
+and for rotations they are <span class="math notranslate nohighlight">\(\mathbf{Q}\)</span> (a quaternion), <span class="math notranslate nohighlight">\(\underline{\omega}\)</span> and <span class="math notranslate nohighlight">\(\underline{\dot{\omega}}\)</span>.</p>
+<p>For all these schemes, the driven bodies with force or moment are updated similarly to the chosen scheme,
+and the driven bodies with velocity imposed (translation or rotation) are updated that way:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{cases}
+\underline{x}_{t+\Delta t} &amp;= \underline{x}_{t} + \underline{v}^\mbox{imposed}_{t} \Delta t \\
+\mathbf{Q}_{t+\Delta t} &amp;= \mathbf{Q}_{t} + \mathbf{\dot{Q}}\left(\underline{\omega}^\mbox{imposed}_{t}\right) \Delta t
+\end{cases}\end{split}\]</div>
+<section id="euler-scheme-keyword-euler">
+<h2>Euler scheme (keyword <code class="docutils literal notranslate"><span class="pre">Euler</span></code>)<a class="headerlink" href="#euler-scheme-keyword-euler" title="Permalink to this heading"></a></h2>
+<p>The Euler scheme is a simple and intuitive time integration method, but it has limitations. One of the main limitations is that it is conditionally stable. Therefore, the time step size must be carefully chosen to ensure numerical stability. Additionally, the explicit Euler method is only first-order accurate, meaning that errors in position and velocity tend to accumulate over time, especially for stiff systems. This can lead to inaccuracies in the simulation, especially for long integration times or complex systems.</p>
+<p>For a discrete particle in DEM, the equations used to update its position and velocity using the Euler scheme are as follows:</p>
+<p><strong>Position update</strong></p>
+<p>The new position and orientation of a particle, <span class="math notranslate nohighlight">\(\underline{x}_{t+\Delta t}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{Q}_{t+\Delta t}\)</span>, at the next time step (<span class="math notranslate nohighlight">\(t+\Delta t\)</span>) are obtained from its current position and orientation, <span class="math notranslate nohighlight">\(\underline{x}_t\)</span> and <span class="math notranslate nohighlight">\(\mathbf{Q}_{t}\)</span>, and its velocity, <span class="math notranslate nohighlight">\(\underline{v}_t\)</span> and <span class="math notranslate nohighlight">\(\mathbf{\dot{Q}}_t\)</span>, at the current time step (<span class="math notranslate nohighlight">\(t\)</span>). The position update equation is given by:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{cases}
+\underline{x}_{t+\Delta t} &amp;= \underline{x}_t + \underline{v}_t \Delta t \\
+      \mathbf{Q}_{t+\Delta t} &amp;= \mathbf{Q}_t + \mathbf{\dot{Q}}(\underline{\omega}_{t}) \Delta t
+      \end{cases}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Delta t\)</span> is the time step size, which is a user-defined parameter.</p>
+<p><strong>Velocity update</strong></p>
+<p>The new velocity of a particle, <span class="math notranslate nohighlight">\(\underline{v}_{t+\Delta t}\)</span> and <span class="math notranslate nohighlight">\(\underline{\omega}_{t+\Delta t}\)</span>, at the next time step (<span class="math notranslate nohighlight">\(t+\Delta t\)</span>) is obtained from its current velocity, <span class="math notranslate nohighlight">\(\underline{v}_t\)</span> and <span class="math notranslate nohighlight">\(\underline{\omega}_t\)</span>, and the acceleration, <span class="math notranslate nohighlight">\(\underline{a}_t\)</span> and <span class="math notranslate nohighlight">\(\underline{\dot{\omega}}_t\)</span>, at the current time step (<span class="math notranslate nohighlight">\(t\)</span>). The velocity update equation is given by:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{cases}
+\underline{v}_{t+\Delta t}     &amp;= \underline{v}_t + \underline{a}_t \Delta t \\
+      \underline{\omega}_{t+\Delta t} &amp;= \underline{\omega}_t + \underline{\dot{\omega}}_t \Delta t
+      \end{cases}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\underline{a}_t\)</span> (and <span class="math notranslate nohighlight">\(\underline{\dot{\omega}}_t\)</span>) is the acceleration calculated from the forces (and moments) acting on the particle at time step <span class="math notranslate nohighlight">\(t\)</span>.</p>
+</section>
+<section id="velocity-verlet-scheme-keyword-velocityverlet-default">
+<h2>Velocity-Verlet scheme (keyword <code class="docutils literal notranslate"><span class="pre">velocityVerlet</span></code>, Default)<a class="headerlink" href="#velocity-verlet-scheme-keyword-velocityverlet-default" title="Permalink to this heading"></a></h2>
+<p>The Velocity Verlet method has several advantages. It is second-order accurate, meaning that it reduces the numerical errors in position and velocity and improves the overall accuracy of the simulation. Additionally, the Velocity Verlet method is time-reversible, which means that the integration process can be reversed without introducing significant errors. Moreover, it conserves energy, making it particularly suitable for conservative systems like those encountered in DEM.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Because this scheme is the default one, most new features may be implemented here and maybe not in other                schemes. Check the code to be sure.</p>
+</div>
+<p>For a discrete particle in DEM, the equations used to update its position and velocity using the Velocity Verlet method are as follows:</p>
+<p><strong>Position update</strong></p>
+<p>The new position of a particle, <span class="math notranslate nohighlight">\(\underline{x}_{t+\Delta t}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{Q}_{t+\Delta t}\)</span>, at the next time step (<span class="math notranslate nohighlight">\(t+\Delta t\)</span>) is obtained from its current position, <span class="math notranslate nohighlight">\(\underline{x}_t\)</span> and <span class="math notranslate nohighlight">\(\mathbf{Q}_{t}\)</span>, its velocity, <span class="math notranslate nohighlight">\(\underline{v}_t\)</span> and <span class="math notranslate nohighlight">\(\underline{\omega}_t\)</span>, and its acceleration, <span class="math notranslate nohighlight">\(\underline{a}_t\)</span> and <span class="math notranslate nohighlight">\(\underline{\dot{\omega}}_t\)</span>, at the current time step (<span class="math notranslate nohighlight">\(t\)</span>). The position update equation is given by:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{cases}
+\underline{x}_{t+\Delta t} &amp;= \underline{x}_t + \underline{v}_t \Delta t + \frac{1}{2}\underline{a}_t \Delta t^2\\
+      \mathbf{Q}_{t+\Delta t} &amp;= \mathbf{Q}(t) + \mathbf{\dot{Q}}\left(\underline{\omega}_t\right) \Delta t + \frac{1}{2} \mathbf{\ddot{Q}}\left(\underline{\omega}_t,\underline{\dot{\omega}}_t\right) \Delta t^2 \\
+\end{cases}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Delta t\)</span> is the time step size, which is a user-defined parameter.</p>
+<p><strong>Velocity update</strong></p>
+<p>The new velocity of a particle, <span class="math notranslate nohighlight">\(\underline{v}_{t+\Delta t}\)</span> and <span class="math notranslate nohighlight">\(\underline{\omega}_{t+\Delta t}\)</span>, at the next time step (<span class="math notranslate nohighlight">\(t+\Delta t\)</span>) is obtained from its current velocity, <span class="math notranslate nohighlight">\(\underline{v}_t\)</span> and <span class="math notranslate nohighlight">\(\underline{\omega}_t\)</span>, and an intermediate acceleration between the current and the next time steps. The velocity update equation is given by:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{cases}
+\underline{v}_{t+\Delta t} &amp;= \underline{v}_t + \frac{1}{2} \left( \underline{a}_t + \underline{a}_{t+\Delta t} \right) \Delta t \\
+\underline{\omega}_{t+\Delta t} &amp;= \underline{\omega}(t) + \frac{1}{2} \left( \underline{\dot{\omega}}_t + \underline{\dot{\omega}}_{t+\Delta t} \right) \Delta t \\
+      \end{cases}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\underline{a}_{t+\Delta t}\)</span> (and <span class="math notranslate nohighlight">\(\underline{\dot{\omega}}_{t+\Delta t}\)</span>)  is the acceleration calculated from the forces (and moments) acting on the particle at time step <span class="math notranslate nohighlight">\(t+\Delta t\)</span>.</p>
+</section>
+<section id="beeman-scheme-keyword-beeman">
+<h2>Beeman scheme (keyword <code class="docutils literal notranslate"><span class="pre">Beeman</span></code>)<a class="headerlink" href="#beeman-scheme-keyword-beeman" title="Permalink to this heading"></a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>REDACTION EN COURS</p>
+</div>
+<p>The Beeman method is a second-order accurate integration technique, which means it provides better accuracy compared to the first-order explicit Euler (or Velocity Verlet) method. This leads to more accurate and reliable simulations of particle dynamics in DEM. Additionally, the Beeman method is relatively easy to implement and computationally efficient compared to some higher-order methods.</p>
+<p>For a discrete particle in DEM, the equations used to update its position and velocity using the Beeman method are as follows:</p>
+<p><strong>Position update</strong></p>
+<p>The new position of a particle, <span class="math notranslate nohighlight">\(\underline{x}_{t+1}\)</span>, at the next time step (<span class="math notranslate nohighlight">\(t+1\)</span>) is calculated using the current position, <span class="math notranslate nohighlight">\(\underline{x}_t\)</span>, current velocity, <span class="math notranslate nohighlight">\(\underline{v}_t\)</span>, and current acceleration, <span class="math notranslate nohighlight">\(\underline{a}_t\)</span>. The position update equation for particle ‘i’ is given by:</p>
+<div class="math notranslate nohighlight">
+\[\underline{x}_{t+1} = \underline{x}_t + \Delta t \cdot \underline{v}_t + \frac{1}{6} \Delta t^2 \left( 5 \underline{a}_t - \underline{a}_{t-1} \right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Delta t\)</span> is the time step size, and <span class="math notranslate nohighlight">\(\underline{a}_{t-1}\)</span> represents the acceleration at the previous time step (<span class="math notranslate nohighlight">\(t-1\)</span>).</p>
+<p><strong>Velocity update</strong></p>
+<p>The new velocity of a particle, <span class="math notranslate nohighlight">\(\underline{v}_{t+1}\)</span>, at the next time step (<span class="math notranslate nohighlight">\(t+1\)</span>) is calculated using the current velocity, <span class="math notranslate nohighlight">\(\underline{v}_t\)</span>, current acceleration, <span class="math notranslate nohighlight">\(\underline{a}_t\)</span>, and the acceleration, <span class="math notranslate nohighlight">\(\underline{a}_{t+1}\)</span>, at the next time step (<span class="math notranslate nohighlight">\(t+1\)</span>). The velocity update equation for particle ‘i’ is given by:</p>
+<div class="math notranslate nohighlight">
+\[\underline{v}_{t+1} = \underline{v}_t + \frac{\Delta t}{6} \left( 2 \underline{a}_{t+1} + 5 \underline{a}_t - \underline{a}_{t-1} \right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\underline{a}_{t+1}\)</span> represents the acceleration calculated from the forces acting on the particle at time step <span class="math notranslate nohighlight">\(t+1\)</span>.</p>
+</section>
+<section id="runge-kutta-nystrom-4th-order-scheme-keyword-rungekutta4">
+<h2>Runge-Kutta-Nyström 4th-order scheme (keyword <code class="docutils literal notranslate"><span class="pre">RungeKutta4</span></code>)<a class="headerlink" href="#runge-kutta-nystrom-4th-order-scheme-keyword-rungekutta4" title="Permalink to this heading"></a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>REDACTION EN COURS</p>
+</div>
+<p>The Runge-Kutta-Nyström (RKN) 4th-order scheme is a higher-order accurate integration technique, providing better accuracy compared to lower-order methods like the explicit Euler or Velocity Verlet. This can lead to more accurate and reliable simulations of particle dynamics in DEM. Additionally, the RKN 4th-order scheme has good stability properties and can handle stiff systems more effectively than lower-order methods.</p>
+<p>For a discrete particle in DEM, the equations used to update its position and velocity using the RKN 4th-order scheme are as follows:</p>
+<p><strong>Position update</strong></p>
+<p>The new position of a particle, <span class="math notranslate nohighlight">\(\underline{x}_{t+1}\)</span>, at the next time step (<span class="math notranslate nohighlight">\(t+1\)</span>) is obtained using the current position, <span class="math notranslate nohighlight">\(\underline{x}_t\)</span>, current velocity, <span class="math notranslate nohighlight">\(\underline{v}_t\)</span>, and the calculated intermediate velocities, <span class="math notranslate nohighlight">\(\underline{v}_{1/2}\)</span>, <span class="math notranslate nohighlight">\(\underline{v}_{1}\)</span>, and <span class="math notranslate nohighlight">\(\underline{v}_{2}\)</span>. The position update equation for particle ‘i’ is given by:</p>
+<div class="math notranslate nohighlight">
+\[\underline{x}_{t+1} = \underline{x}_t + \Delta t \left( \underline{v}_{1/2} + 2 \underline{v}_{1} + 2 \underline{v}_{2} + \underline{v}_t \right) \, \frac{\Delta t}{6}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Delta t\)</span> is the time step size, and the intermediate velocities are calculated as follows:</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}\underline{v}_{1/2} &amp;= \underline{v}_t + \frac{\Delta t}{2} \, \underline{a}_t\\\underline{v}_{1}   &amp;= \underline{v}_t + \frac{\Delta t}{2} \, \underline{a}_{1/2}\\\underline{v}_{2}   &amp;= \underline{v}_t + \Delta t \, \underline{a}_{1}\end{aligned}\end{align} \]</div>
+<p>where <span class="math notranslate nohighlight">\(\underline{a}_t\)</span> is the acceleration calculated from the forces acting on the particle at time step <span class="math notranslate nohighlight">\(t\)</span>, and the subsequent accelerations are computed as:</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}\underline{a}_{1/2} &amp;= \text{accelerations}(\underline{x}_t, \underline{v}_{1/2})\\\underline{a}_{1}   &amp;= \text{accelerations}(\underline{x}_t, \underline{v}_{1})\end{aligned}\end{align} \]</div>
+<p><strong>Velocity update</strong></p>
+<p>The new velocity of a particle, <span class="math notranslate nohighlight">\(\underline{v}_{t+1}\)</span>, at the next time step (<span class="math notranslate nohighlight">\(t+1\)</span>) is obtained using the calculated intermediate accelerations, <span class="math notranslate nohighlight">\(\underline{a}_{1/2}\)</span>, <span class="math notranslate nohighlight">\(\underline{a}_{1}\)</span>, and <span class="math notranslate nohighlight">\(\underline{a}_{2}\)</span>. The velocity update equation for particle ‘i’ is given by:</p>
+<div class="math notranslate nohighlight">
+\[\underline{v}_{t+1} = \underline{v}_t + \Delta t \left( \underline{a}_{1/2} + 2 \underline{a}_{1} + 2 \underline{a}_{2} + \underline{a}_t \right) \, \frac{\Delta t}{6}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Delta t\)</span> is the time step size, and the intermediate accelerations are calculated as follows:</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}\underline{a}_{1/2} &amp;= \text{accelerations}(\underline{x}_t, \underline{v}_{1/2})\\\underline{a}_{1}   &amp;= \text{accelerations}(\underline{x}_t, \underline{v}_{1})\\\underline{a}_{2}   &amp;= \text{accelerations}(\underline{x}_{t+1}, \underline{v}_{t+1})\end{aligned}\end{align} \]</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="dissipation.html" class="btn btn-neutral float-left" title="Global dissipation features" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="servoControllers.html" class="btn btn-neutral float-right" title="Available servo-controllers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2022, Vincent Richefeu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

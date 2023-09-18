@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Format of configuration files (conf-file) &mdash; Rockable 1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Format of shape-files" href="syntaxShapes.html" />
+    <link rel="prev" title="Quick-start guid" href="quickStart.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Rockable
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickStart.html">Quick-start guid</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Format of configuration files (conf-file)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#header">Header</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#keywords">Keywords</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#timing">Timing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#neighbor-list-nl">Neighbor List (NL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-backups">Configuration Backups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#computation-options">Computation options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#library-of-particle-shapes">Library of Particle Shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#particles">Particles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interactions">Interactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#force-laws">Force Laws</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#time-integration-scheme">Time-Integration Scheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dissipation">Dissipation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#loading">Loading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#file-drivingsystem-txt">File drivingSystem.txt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pre-processing-commands">Pre-processing Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data-extractors">Data Extractors</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="syntaxShapes.html">Format of shape-files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forceLaws.html">Force laws</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Rockable</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Format of configuration files (conf-file)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/syntaxConf.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="format-of-configuration-files-conf-file">
+<h1>Format of configuration files (conf-file)<a class="headerlink" href="#format-of-configuration-files-conf-file" title="Permalink to this heading"></a></h1>
+<p>The conf-files are the files that hold the whole configuration at a given time. They are used for the following purposes:</p>
+<ol class="arabic simple">
+<li><p>Defining the initial configuration and parameters of a simulation.</p></li>
+<li><p>Running some preprocessing commands.</p></li>
+<li><p>Saving periodically the history of a simulation.</p></li>
+</ol>
+<section id="header">
+<h2>Header<a class="headerlink" href="#header" title="Permalink to this heading"></a></h2>
+<p>A conf-file always starts with the following header format: <code class="docutils literal notranslate"><span class="pre">Rockable</span> <span class="pre">dd-mm-yyyy</span></code> (e.g., <code class="docutils literal notranslate"><span class="pre">Rockable</span> <span class="pre">29-11-2018</span></code>).
+The header includes the date (<code class="docutils literal notranslate"><span class="pre">dd-mm-yyyy</span></code>) corresponding to the version of the format.
+Whenever a noticeable change is made in the format, the date in the header is updated to reflect the new version.
+The version date is defined in the preprocessor define of <code class="docutils literal notranslate"><span class="pre">CONF_VERSION_DATE</span></code> in the source code.</p>
+</section>
+<section id="keywords">
+<h2>Keywords<a class="headerlink" href="#keywords" title="Permalink to this heading"></a></h2>
+<p>The conf-files contain specific keywords that define various aspects of the configuration.
+These keywords are used throughout the file to specify different settings and parameters.</p>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading"></a></h2>
+<p>These conf-files are essential for setting up and managing simulations. They are used for:</p>
+<ol class="arabic simple">
+<li><p>Initializing the simulation with specific configurations and parameters.</p></li>
+<li><p>Executing preprocessing commands to prepare the simulation environment.</p></li>
+<li><p>Periodically saving simulation history to track its progress over time.</p></li>
+</ol>
+<p>The format of the conf-files allows users to define and control various aspects of the simulation accurately.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>It is crucial to maintain consistency in the format of conf-files and keep track of changes made
+to the header date whenever modifications are introduced. This practice ensures clarity and compatibility
+between different versions of the configuration files and the codebase.</p>
+</div>
+</section>
+<section id="timing">
+<h2>Timing<a class="headerlink" href="#timing" title="Permalink to this heading"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">t</span></code> (<em>double</em>) <strong>value</strong></p>
+<p>Current time.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tmax</span></code> (<em>double</em>) <strong>value</strong></p>
+<p>Maximum time. The simulation will end when time reaches <code class="docutils literal notranslate"><span class="pre">tmax</span></code>.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dt</span></code> (<em>double</em>) <strong>value</strong></p>
+<p>Time step increments.</p>
+</li>
+</ul>
+</section>
+<section id="neighbor-list-nl">
+<h2>Neighbor List (NL)<a class="headerlink" href="#neighbor-list-nl" title="Permalink to this heading"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">interVerlet</span></code> (<em>double</em>) <strong>value</strong></p>
+<p>Elapsed time between each rebuild of the neighbor list.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DVerlet</span></code> (<em>double</em>) <strong>value</strong></p>
+<p>Distance used to define if two sphero-polyhedra are neighbors.
+This length is added to the Object-Bounding Boxes (OBBs) before testing for overlap.
+In other words, half of this length is added to each side of the OBBs.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dVerlet</span></code> (<em>double</em>) <strong>value</strong></p>
+<p>Distance used to define if two sub-elements (sphere for vertices, tubes for edges,
+or thick 3D polygons for faces) between two sphero-polyhedra are neighbors.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dynamicUpdateNL</span></code> (0 | 1)</p>
+<p>If dynamic update of the neighbor list is activated (set to 1),
+the list will be updated if the maximum distance a body has moved since the last update
+becomes larger than <code class="docutils literal notranslate"><span class="pre">dispUpdateNL</span></code>, or if the maximum rotation becomes larger than <code class="docutils literal notranslate"><span class="pre">angleUpdateNL</span></code>.
+These dynamic updates will not affect the regular updates (every <code class="docutils literal notranslate"><span class="pre">interVerlet</span></code>).</p>
+<p>Additional parameters to be set:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dispUpdateNL</span></code> (<em>double</em>) <strong>distance</strong></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">angleUpdateNL</span></code> (<em>double</em>) <strong>angleDegree</strong></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="configuration-backups">
+<h2>Configuration Backups<a class="headerlink" href="#configuration-backups" title="Permalink to this heading"></a></h2>
+<p>As mentioned earlier, the “conf-files” store a configuration (i.e., the entire dataset of a simulation state).
+The format described here can be used as both input and output of a simulation.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">interConf</span></code> (<em>double</em>) <strong>value</strong></p>
+<p>Elapsed time between each backup of the configuration.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">iconf</span></code> (<em>double</em>) <strong>value</strong></p>
+<p>Number of the current configuration. This number is used to name the conf-file.</p>
+</li>
+</ul>
+</section>
+<section id="computation-options">
+<h2>Computation options<a class="headerlink" href="#computation-options" title="Permalink to this heading"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">AddOrRemoveInteractions</span></code> (<em>string</em>) <strong>Option</strong></p>
+<p>Choose the method for handling interactions between particles (sphero-polyhedra).</p>
+<ul class="simple">
+<li><p><strong>Options</strong>: <code class="docutils literal notranslate"><span class="pre">bruteForce</span></code> (default) or <code class="docutils literal notranslate"><span class="pre">OBBtree</span></code></p></li>
+<li><dl class="simple">
+<dt><strong>Description</strong>: The interactions between particles involve different types of interaction,</dt><dd><p>such as sphere-sphere, sphere-tube, sphere-polygon, and tube-tube. The best strategy to be used depends
+on the complexity of the involved shapes.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">UpdateNLStrategy</span></code> (<em>string</em>) <strong>Option</strong></p>
+<p>Choose the strategy for updating neighbor lists.</p>
+<ul class="simple">
+<li><p><strong>Options</strong>: <code class="docutils literal notranslate"><span class="pre">bruteForce</span></code> (default) or <code class="docutils literal notranslate"><span class="pre">linkCells</span></code></p></li>
+<li><p><strong>Description</strong>: In the case of the <code class="docutils literal notranslate"><span class="pre">linkCells</span></code> strategy, the following additional settings need to be configured:</p>
+<ul>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">cellMinSizes</span></code> (<em>double</em>) <strong>xmin</strong> (<em>double</em>) <strong>ymin</strong> (<em>double</em>) <strong>zmin</strong>: Set the minimum size of</dt><dd><p>a cell in each direction.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">boxForLinkCellsOpt</span></code> (0 | 1): A flag to determine if the first driven bodies are part of the overall</dt><dd><p>bounding box, which will be split into cells.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Integrator</span></code> (<em>string</em>) <strong>Option</strong></p>
+<p>Choose the time-integration scheme to be used.</p>
+<ul class="simple">
+<li><p><strong>Options</strong>: <code class="docutils literal notranslate"><span class="pre">Euler</span></code>, <code class="docutils literal notranslate"><span class="pre">velocityVerlet</span></code> (default), <code class="docutils literal notranslate"><span class="pre">Beeman</span></code>, or <code class="docutils literal notranslate"><span class="pre">RungeKutta4</span></code></p></li>
+<li><dl class="simple">
+<dt><strong>Description</strong>: This option determines the time-integration method for the simulation. For more details,</dt><dd><p>see <a class="reference internal" href="integrationSchemes.html#integrationschemes"><span class="std std-ref">Integration schemes</span></a>.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="library-of-particle-shapes">
+<h2>Library of Particle Shapes<a class="headerlink" href="#library-of-particle-shapes" title="Permalink to this heading"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">shapeFile</span></code> (<em>string</em>) <strong>path</strong></p>
+<p>Path of the file that defines the shapes used.
+The format to define a shape is explained here: <a class="reference internal" href="syntaxShapes.html#syntaxshape"><span class="std std-ref">Format of shape-files</span></a></p>
+</li>
+</ul>
+</section>
+<section id="particles">
+<h2>Particles<a class="headerlink" href="#particles" title="Permalink to this heading"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">density</span></code> (<em>int</em>) <strong>groupNumber</strong> (<em>double</em>) <strong>density</strong></p>
+<p>Set the density (in kilograms per cubic meter) for particles belonging to a given group number.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Particles</span></code> (<em>int</em>) <strong>numberOfParticles</strong></p>
+<p>The following entries are repeated for each particle:
+(<em>string</em>)shapeName (<em>int</em>) <strong>group</strong> (<em>int</em>) <strong>cluster</strong> (<em>double</em>) <strong>homothety</strong> (<em>vec3r</em>) <strong>position</strong>
+(<em>vec3r</em>) <strong>velocity</strong> (<em>vec3r</em>) <strong>acceleration</strong> (<em>quat</em>) <strong>angularPosition</strong> (<em>vec3r</em>) <strong>angularVelocity</strong>
+(<em>vec3r</em>) <strong>angularAcceleration</strong></p>
+</li>
+</ul>
+</section>
+<section id="interactions">
+<h2>Interactions<a class="headerlink" href="#interactions" title="Permalink to this heading"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Interactions</span></code> (<em>int</em>) <strong>numberOfInteractions</strong></p>
+<p>The following <strong>numberOfInteractions</strong> entries are repeated for each interaction:
+(<em>int</em>) <strong>i</strong> (<em>int</em>) <strong>j</strong> (<em>int</em>) <strong>type</strong> (<em>int</em>) <strong>isub</strong> (<em>int</em>) <strong>jsub</strong> (<em>vec3r</em>) <strong>n</strong> (<em>double</em>) <strong>dn</strong>
+(<em>vec3r</em>) <strong>position</strong> (<em>vec3r</em>) <strong>relativeVelocity</strong> (<em>double</em>) <strong>fn</strong> (<em>vec3r</em>) <strong>ft</strong> (<em>vec3r</em>) <strong>mom</strong>
+(<em>double</em>) <strong>viscousDampingValue</strong></p>
+<ul class="simple">
+<li><p><strong>type</strong>: 0 for vertex-vertex, 1 for vertex-edge, 2 for vertex-face, or 3 for edge-edge.</p></li>
+<li><p><strong>relativeVelocity</strong>: The velocity of body <strong>j</strong> relative to body <strong>i</strong> at the contact point.</p></li>
+<li><p><strong>n</strong>: Vector oriented from <strong>j</strong> to <strong>i</strong>.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="force-laws">
+<h2>Force Laws<a class="headerlink" href="#force-laws" title="Permalink to this heading"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">forceLaw</span></code> (<em>string</em>) <strong>Name</strong></p>
+<p>Select a model for the computation of forces. For possible <strong>Name</strong>, see <a class="reference internal" href="forceLaws.html#force-laws"><span class="std std-ref">Force laws</span></a>.</p>
+</li>
+</ul>
+</section>
+<section id="time-integration-scheme">
+<h2>Time-Integration Scheme<a class="headerlink" href="#time-integration-scheme" title="Permalink to this heading"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Integrator</span></code> (<em>string</em>) <strong>Name</strong></p>
+<p>Select a scheme for time integration. For possible <strong>Name</strong>, see <a class="reference internal" href="integrationSchemes.html#integrationschemes"><span class="std std-ref">Integration schemes</span></a>.</p>
+</li>
+</ul>
+</section>
+<section id="dissipation">
+<h2>Dissipation<a class="headerlink" href="#dissipation" title="Permalink to this heading"></a></h2>
+<p>There are several dissipation strategies that can be used (see <a class="reference internal" href="dissipation.html#dissipation"><span class="std std-ref">Global dissipation features</span></a>).</p>
+</section>
+<section id="loading">
+<h2>Loading<a class="headerlink" href="#loading" title="Permalink to this heading"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">nDriven</span></code> (<em>int</em>) <strong>Value</strong></p>
+<p>Set the number of bodies, at the beginning of the list, that are not free to move.
+By default, the <strong>nDriven</strong> first bodies are fixed (all velocities imposed to zero),
+but if we want to set a velocity or a force/moment, some commands have to be added
+in a file named <code class="docutils literal notranslate"><span class="pre">drivingSystem.txt</span></code>.</p>
+</li>
+</ul>
+</section>
+<section id="file-drivingsystem-txt">
+<h2>File drivingSystem.txt<a class="headerlink" href="#file-drivingsystem-txt" title="Permalink to this heading"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Control</span></code> (<em>string</em>) <strong>mode</strong> (<em>int</em>) <strong>bodyNumber</strong> (<em>double</em>) <strong>value</strong></p>
+<p>Use <strong>mode</strong> to set a velocity or force/moment for a specific body.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>There are two additional mode keywords for which the single <strong>value</strong> has to be replaced by three values
+(a vector of three components): <code class="docutils literal notranslate"><span class="pre">_xyzrot_Vel_</span></code> and <code class="docutils literal notranslate"><span class="pre">_xyzrot_Mom_</span></code>.</p>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Servo</span></code> (<em>string</em>) <strong>servoName</strong> &lt;<em>PARAMETERS</em>&gt;</p>
+<p>Set the parameter list depending on the selected servo (see <a class="reference internal" href="servoControllers.html#servo-controllers"><span class="std std-ref">Available servo-controllers</span></a>).</p>
+</li>
+</ul>
+</section>
+<section id="pre-processing-commands">
+<h2>Pre-processing Commands<a class="headerlink" href="#pre-processing-commands" title="Permalink to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">Rockable</span></code> provides several commands for performing preprocessing tasks.
+These commands are typically entered at the end of an input <code class="docutils literal notranslate"><span class="pre">conf-file</span></code>, after the definition of particles
+and interactions. For details on these commands, refer to: <a class="reference internal" href="preProcessing.html#prepro"><span class="std std-ref">Pre-processing commands</span></a></p>
+</section>
+<section id="data-extractors">
+<h2>Data Extractors<a class="headerlink" href="#data-extractors" title="Permalink to this heading"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">DataExtractor</span></code> (<em>string</em>) <strong>ExtractorName</strong> &lt;<em>PARAMETERS</em>&gt;</p>
+<p>The parameter list depends on the <strong>ExtractorName</strong>. Details are listed below.</p>
+</li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="quickStart.html" class="btn btn-neutral float-left" title="Quick-start guid" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="syntaxShapes.html" class="btn btn-neutral float-right" title="Format of shape-files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2022, Vincent Richefeu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

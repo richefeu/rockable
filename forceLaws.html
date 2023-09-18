@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Force laws &mdash; Rockable 1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Global dissipation features" href="dissipation.html" />
+    <link rel="prev" title="Format of shape-files" href="syntaxShapes.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Rockable
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickStart.html">Quick-start guid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntaxConf.html">Format of configuration files (conf-file)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntaxShapes.html">Format of shape-files</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Force laws</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#default-model-keywork-default">Default model (keywork <code class="docutils literal notranslate"><span class="pre">Default</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#law-for-rock-avalanches-keywork-avalanche">Law for rock avalanches (keywork <code class="docutils literal notranslate"><span class="pre">Avalanche</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#breakable-elastic-solid-bonds-keywork-stickedlinks">Breakable elastic solid bonds (keywork <code class="docutils literal notranslate"><span class="pre">StickedLinks</span></code>)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Rockable</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Force laws</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/forceLaws.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="force-laws">
+<span id="id1"></span><h1>Force laws<a class="headerlink" href="#force-laws" title="Permalink to this heading"></a></h1>
+<p>We provide here the interaction models existing in <code class="docutils literal notranslate"><span class="pre">Rockable</span></code>.
+The equations are explained with the associated parameters.
+The parameters <code class="docutils literal notranslate"><span class="pre">[PARAMETER]</span></code> are to be defined in the input conf-file in the following way:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[PARAMETER]</span></code> (<em>int</em>) <strong>firstGroupNumber</strong> (<em>int</em>) <strong>secondGroupNumber</strong> (<em>double</em>) <strong>value</strong></p></li>
+</ul>
+<p>For example, to set the value <span class="math notranslate nohighlight">\(10^8\)</span> to the normal stiffness <span class="math notranslate nohighlight">\(k_n\)</span> between the elements that belong to the group number <code class="docutils literal notranslate"><span class="pre">0</span></code> and the elements that belong to the group number <code class="docutils literal notranslate"><span class="pre">2</span></code>, we will write:</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">input.txt</span><a class="headerlink" href="#id2" title="Permalink to this code"></a></div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>      ...
+knContact 0 2 1e8
+      ...
+</pre></div>
+</div>
+</div>
+<section id="default-model-keywork-default">
+<h2>Default model (keywork <code class="docutils literal notranslate"><span class="pre">Default</span></code>)<a class="headerlink" href="#default-model-keywork-default" title="Permalink to this heading"></a></h2>
+<p>This is the force law to be used in most cases.
+In short, the model includes elastic linear normal force for contact, normal viscosity force, constant normal cohesion force at contact,
+Coulomb friction tangent force, and rolling resistance moment</p>
+<ol class="arabic simple">
+<li><p><strong>Normal component</strong></p></li>
+</ol>
+<blockquote>
+<div><ol class="loweralpha simple">
+<li><p>The elastic part of the normal contact force is</p></li>
+</ol>
+<div class="math notranslate nohighlight">
+\[f_n^\text{elas} = -k_n d_n\]</div>
+<p>where <span class="math notranslate nohighlight">\(d_n \leq 0\)</span> is the normal distance, so <span class="math notranslate nohighlight">\(f_n^\text{elas} \geq 0\)</span>. When <span class="math notranslate nohighlight">\(d_n &gt; 0\)</span>, this force is zero. The value of <span class="math notranslate nohighlight">\(k_n\)</span> can be set with the keyword <code class="docutils literal notranslate"><span class="pre">knContact</span></code></p>
+<ol class="loweralpha simple" start="2">
+<li><p>The viscuous part of the normal contact force is</p></li>
+</ol>
+<div class="math notranslate nohighlight">
+\[f_n^\text{visc} = \alpha_n \sqrt{2 m_\text{eff}} v_n\]</div>
+<p>where <span class="math notranslate nohighlight">\(v_n\)</span> is the relative normal velocity, <span class="math notranslate nohighlight">\(m_\text{eff}=(m_i m_j)/(m_i+m_j)\)</span> is the effective mass, and <span class="math notranslate nohighlight">\(\alpha_n \in [0, 1[\)</span> is the rate of normal viscuous damping. There are two ways to set the value of <span class="math notranslate nohighlight">\(\alpha_n\)</span>:</p>
+<blockquote>
+<div><ol class="lowerroman simple">
+<li><p>The keyword <code class="docutils literal notranslate"><span class="pre">en2Contact</span></code> that is the energy normal restitution rate (<span class="math notranslate nohighlight">\(e_n^2\)</span>). In this case, the viscuous damping rate will be set associated</p></li>
+</ol>
+<div class="math notranslate nohighlight">
+\[\alpha_n = \frac{- \ln e_n}{\sqrt{\ln^2 e_n + \pi^2}}\]</div>
+<ol class="lowerroman simple" start="2">
+<li><p>The keyword <code class="docutils literal notranslate"><span class="pre">en2ContactFromViscRate</span></code> that will</p></li>
+</ol>
+<div class="math notranslate nohighlight">
+\[e_n^2 = \exp \left(-\frac{\alpha_n \pi}{\sqrt{1 - \alpha_n^2}}\right)\]</div>
+</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Because of the viscuous part of the normal force, the total normal force <span class="math notranslate nohighlight">\(f_n = f_n^\text{elas} + f_n^\text{visc}\)</span> can be negative. Although the physical meaning of this negative value is arguable, the normal force is by default restricted to remain positive or zero.</p>
+</div>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p><strong>Tangential component</strong></p></li>
+</ol>
+<p>The tangential force represents the frictional resistance between particles when they slide against each other. It is calculated based on the relative tangential velocity (<span class="math notranslate nohighlight">\(v_t\)</span>) and a tangential stiffness parameter (<span class="math notranslate nohighlight">\(k_t\)</span>, keyword <code class="docutils literal notranslate"><span class="pre">ktContact</span></code>). The Coulomb friction model is used to limit the tangential force, ensuring that it does not exceed the product of the friction coefficient (<span class="math notranslate nohighlight">\(\mu\)</span>, keyword <code class="docutils literal notranslate"><span class="pre">muContact</span></code>) and the normal elastic force (<span class="math notranslate nohighlight">\(f_n^\text{elas}\)</span>). The tangential force is incrementally updated with the following relation, at each time step <span class="math notranslate nohighlight">\(\Delta t\)</span>, since the onset of contact:</p>
+<div class="math notranslate nohighlight">
+\[\Delta f_t = \left [ k_t v_t \Delta t \right ]_{\pm \mu f_n^\text{elas}}\]</div>
+<p>The friction force <span class="math notranslate nohighlight">\(f_t\)</span> is cancelled as soon as contact is lost.</p>
+<ol class="arabic simple" start="3">
+<li><p><strong>Moment  vector</strong></p></li>
+</ol>
+<p>The resistant moment (<span class="math notranslate nohighlight">\(\underline{M}\)</span>) accounts for rotational resistance between particles. It is calculated based on the rotational velocity difference (<span class="math notranslate nohighlight">\(\underline{\omega}_i - \underline{\omega}_j\)</span>) and the rotational stiffness parameter (<span class="math notranslate nohighlight">\(k_r\)</span>, keyword <code class="docutils literal notranslate"><span class="pre">krContact</span></code>). Additionally, the moment is limited by the product of the moment length coefficient (<span class="math notranslate nohighlight">\(\mu_r\)</span>, keyword <code class="docutils literal notranslate"><span class="pre">murContact</span></code>), the normal force (<span class="math notranslate nohighlight">\(f_n\)</span>), and the length of the branch vector (<span class="math notranslate nohighlight">\(\ell\)</span>). The resistant moment is updated, similarly to the friction force, as follows:</p>
+<div class="math notranslate nohighlight">
+\[\Delta \underline{M} = \left [ k_r (\underline{\omega}_i - \underline{\omega}_j) \Delta t \right ]_{\pm \mu_r \ell f_n^\text{elas}}\]</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The moment resistance is applied only when <span class="math notranslate nohighlight">\(k_r &gt; 0\)</span>.</p>
+</div>
+</section>
+<section id="law-for-rock-avalanches-keywork-avalanche">
+<h2>Law for rock avalanches (keywork <code class="docutils literal notranslate"><span class="pre">Avalanche</span></code>)<a class="headerlink" href="#law-for-rock-avalanches-keywork-avalanche" title="Permalink to this heading"></a></h2>
+<p>This is historically the first law that has been implemented in <code class="docutils literal notranslate"><span class="pre">Rockable</span></code> (actually in <code class="docutils literal notranslate"><span class="pre">DEMbox</span></code>, its ancestor).</p>
+<p>The force-law implemented is specifically designed for simulating rock avalanches at Laboratoire 3SR. It governs the interactions between particles or bodies in a granular material, considering both normal and tangential forces as well as resistant moments due to rotational motion.</p>
+<ol class="arabic">
+<li><p><strong>Normal component</strong></p>
+<p>The normal force (<cite>I.fn</cite>) between particles is calculated to represent the contact forces that resist compression and prevent interpenetration. The calculation involves considering the change in the normal displacement (<cite>I.dn</cite>) and the normal stiffness parameter (<cite>kn</cite>). The normal force may also undergo unloading or loading depending on the change in normal displacement.</p>
+</li>
+<li><p><strong>Tangential component</strong></p>
+<p>The tangential force (<cite>I.ft</cite>) represents the frictional resistance between particles when they slide against each other. The calculation considers the tangential velocity (<cite>vt</cite>) and a tangential stiffness parameter (<cite>kt</cite>). Frictional forces are limited by the friction coefficient (<cite>mu</cite>) and the normal force (<cite>I.fn</cite>).</p>
+</li>
+<li><p><strong>Resistant moment</strong></p>
+<p>The resistant moment (<cite>I.mom</cite>) accounts for the rotational resistance between particles. The calculation considers the rotational velocity difference (<cite>box-&gt;Particles[I.j].vrot - box-&gt;Particles[I.i].vrot</cite>) and the rotational stiffness parameter (<cite>kr</cite>). Additionally, there is a correction applied to the branch vector (<cite>branch</cite>) to account for different scenarios when the free body is either particle <cite>i</cite> or particle <cite>j</cite>.</p>
+</li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Weighted Interaction Parameters. The force-law allows for adjusting the interaction parameters (<cite>kn</cite>, <cite>kt</cite>, <cite>kr</cite>) based on a weight factor (<cite>w</cite>). This weighting is determined by the function <cite>box-&gt;ctcPartnership.getWeight</cite>, which can influence the forces and moments between the particles.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The code includes conditional blocks for certain options (<cite>FT_CORR</cite>) which may affect the actual computations. Additionally, the equations use specific parameters (<cite>en2</cite> and <cite>mur</cite>), which should be defined and obtained from relevant data sources in the simulation setup.</p>
+</div>
+</section>
+<section id="breakable-elastic-solid-bonds-keywork-stickedlinks">
+<h2>Breakable elastic solid bonds (keywork <code class="docutils literal notranslate"><span class="pre">StickedLinks</span></code>)<a class="headerlink" href="#breakable-elastic-solid-bonds-keywork-stickedlinks" title="Permalink to this heading"></a></h2>
+<p>This law has been introduced since the PhD work of <em>Marta Stasiak</em>.</p>
+<p>Two states can exist: cohesive bond and contact.</p>
+<ol class="arabic">
+<li><p><strong>Cohesive bond</strong></p>
+<blockquote>
+<div><p>When a cohesive bond exists between two particles, the force-law employs the following equations:</p>
+<ol class="loweralpha">
+<li><p><strong>Normal component</strong></p>
+<p>The normal force (<span class="math notranslate nohighlight">\(f_n = f_n^\text{elas} + f_n^\text{visc}\)</span>) between the particles is calculated using
+Hooke’s elastic contact, combined with viscous damping:</p>
+<div class="math notranslate nohighlight">
+\[f_n^\text{elas} = -k_n (d_n - d_n^0)\]</div>
+<p>where <span class="math notranslate nohighlight">\(d_n^0\)</span> is the initial normal distance. This time, the parameter <span class="math notranslate nohighlight">\(k_n\)</span> is set with the keyword <code class="docutils literal notranslate"><span class="pre">knInnerBond</span></code> or <code class="docutils literal notranslate"><span class="pre">knOuterBond</span></code>.
+The viscous normal force is:</p>
+<div class="math notranslate nohighlight">
+\[f_n^\text{visc} = \alpha_n \sqrt{2 m_\text{eff}} v_n\]</div>
+<p>where <span class="math notranslate nohighlight">\(\alpha_n\)</span> is indirectly set with the keywork <code class="docutils literal notranslate"><span class="pre">en2InnerBond</span></code> or <code class="docutils literal notranslate"><span class="pre">en2OuterBond</span></code>.</p>
+</li>
+<li><p><strong>Tangential component</strong></p>
+<p>The tangential elastic force (<span class="math notranslate nohighlight">\(f_t\)</span>) is incrementally calculated based on the relative tangential velocity (<span class="math notranslate nohighlight">\(v_t\)</span>) and a tangential stiffness parameter (<span class="math notranslate nohighlight">\(k_t\)</span>, keyword <code class="docutils literal notranslate"><span class="pre">ktInnerBond</span></code> or <code class="docutils literal notranslate"><span class="pre">ktOuterBond</span></code>):</p>
+<div class="math notranslate nohighlight">
+\[\Delta f_t = k_t (v_t \Delta t)\]</div>
+</li>
+</ol>
+<p>Optionally, an additional term for tangential viscosity (<span class="math notranslate nohighlight">\(f_t^\text{visc} = \alpha_n \sqrt{2 m_\text{eff}} v_t\)</span>) can be added to the elastic part of the tangential force. However, this approach accumulates viscosity over time and may not be accurate:</p>
+<ol class="loweralpha simple" start="3">
+<li><p><strong>Moment vector</strong></p></li>
+</ol>
+<p>TODO</p>
+<ol class="loweralpha" start="4">
+<li><p><strong>Rupture criterion</strong></p>
+<p>The rupture criterion determines if the cohesive bond should break. If the yield value is greater than 0, the bond is irreversibly broken (actually, the breakage of the whole interface is scheduled as soon as possible). The yield function reads:</p>
+<div class="math notranslate nohighlight">
+\[\varphi = \left( \frac{\vert f_t \vert}{f_t^0} \right)^p + \left(\frac{\Vert\underline{M}\Vert}{M_0}\right)^p - \frac{f_n}{f_n^0} - 1\]</div>
+</li>
+</ol>
+</div></blockquote>
+</li>
+<li><p><strong>Contact</strong></p>
+<blockquote>
+<div><p>When particles are in contact (no cohesive bond), the force-law employs the following equations:</p>
+<ol class="loweralpha">
+<li><p><strong>Normal component</strong></p>
+<p>The normal force (<cite>I.fn</cite>) between the particles is calculated similar to the cohesive bond case, but with different interaction parameters (<cite>kn</cite>, <cite>kt</cite>, <cite>damp</cite>, etc.):</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}\text{vn} = \mathbf{I.vel} \cdot \mathbf{I.n}\\\text{fne} = -\text{kn} \cdot \text{I.dn}\\\text{fnv} = \text{damp} \cdot \text{vn}\\\text{I.fn} = \text{fne} + \text{fnv}\end{aligned}\end{align} \]</div>
+</li>
+<li><p><strong>Tangential component</strong> (Friction)</p>
+<p>The tangential force (<cite>I.ft</cite>) due to friction between the particles is calculated in a similar manner to the cohesive bond case but with different interaction parameters (<cite>kt</cite>, <cite>mu</cite>, etc.).</p>
+</li>
+<li><p><strong>Resistant moment vector</strong></p>
+<p>If the contact allows for rotational motion (<cite>kr</cite> parameter), a resistant moment (<cite>I.mom</cite>) is calculated based on the relative rotational velocity of the particles.</p>
+</li>
+</ol>
+</div></blockquote>
+</li>
+</ol>
+<p>Note: The code includes conditional blocks for certain options (<cite>FT_CORR</cite> and <cite>box-&gt;ctcPartnership.getWeight != nullptr</cite>) which may affect the actual computations.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="syntaxShapes.html" class="btn btn-neutral float-left" title="Format of shape-files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="dissipation.html" class="btn btn-neutral float-right" title="Global dissipation features" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2022, Vincent Richefeu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
