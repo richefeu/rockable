@@ -16,8 +16,7 @@ jobs:
           command: cd sphinxdoc && make html
       - persist_to_workspace:
           root: sphinxdoc/build/html
-          paths:
-            - echo-output
+          paths: .
 
   docs-deploy:
     docker:
