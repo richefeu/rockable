@@ -1,7 +1,7 @@
 Welcome to Rockable's documentation!
 ====================================
 
-[Rockable](https://github.com/richefeu/rockable) is a code, written in C++, implementing the classical discrete element method.
+`Rockable <https://github.com/richefeu/rockable>`_ is a code, written in C++, implementing the classical discrete element method.
 
 The specificities of the code are to handle:
 
