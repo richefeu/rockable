@@ -6,12 +6,11 @@
 
 Rockable is a DEM code written in C++, initiated by <vincent.richefeu@3sr-grenoble.fr>. The two main specificities of the code are (_i_) to hold sphero-polyhedral shapes, (_ii_) to manage breakable interfaces. It is developed for an **academic usage**. This means that the code is not intended to be a tool for all purposes. It can easily be used to do what it is designed for, but to extend it, it is necessary to master both the model (DEM, complex shapes and interaction laws) and its implementation (data structure). The benefit of a good understanding is to avoid a "hacking" that would eventually limit the developed possibilities. In other words, the design of the code (neither too specific nor too general) is intended to avoid any tendency towards a single thought.
 
-The use of the code is not interfaced by any tool (like lua, python or any graphical interface) to facilitate its use, except the input format as described in the documentation. This makes it particularly streamlined and greatly facilitates its integration with other calculation codes. It is in this sense that Rockable is qualified of "academic code".
+The use of the code is not interfaced by any tool (like lua, python or any graphical interface) to facilitate its use, except the input format as described in the [documentation](https://richefeu.github.io/rockable/). This makes it particularly streamlined and greatly facilitates its integration with other calculation codes. It is in this sense that Rockable is qualified of "academic code".
 
 ### Source tree 
 
-* `doc`: place to generate the doxygen html documentation of the source files of Rockable
-* `sphinxdoc`: user documentation (sphinx with ReStructuredText)
+* `sphinxdoc`: user [documentation](https://richefeu.github.io/rockable/) (sphinx with ReStructuredText)
 * `examples`: examples for usage tutorials or for testing features
 * `prepro`: some pre-processing tools
 * `src`: C++ source files
@@ -61,7 +60,7 @@ Here is the non-exhaustive list of involved persons with their main mission:
 
 * **Parallel Computation**: currently, an OpenMP optimization using compilation flags has been implemented. However, the computational speedup is relatively low. Typically, 8 cores are needed to halve the simulation time (for a dense system with a large number of elements).
 
-* **Documentation**: there is little documentation, although efforts are being made to address this. For now, it is possible to generate the sphinxdoc documentation in your local folder.
+* **Documentation**: there is little [documentation](https://richefeu.github.io/rockable/), although efforts are being made to address this. For now, it is possible to generate the sphinxdoc documentation in your local folder.
 
 <p align="center">
 <img src="./gif-doc/gen-doc-rockable.gif" width="90%"/>
