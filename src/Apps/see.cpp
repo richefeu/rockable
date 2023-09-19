@@ -1487,7 +1487,7 @@ int main(int argc, char* argv[]) {
     TCLAP::CmdLine cmd("Visualisation of Rockable simulations", ' ', "0.3");
     TCLAP::UnlabeledValueArg<std::string> nameArg("input", "Name of the conf-file", false, "conf0", "conf-file");
     TCLAP::ValueArg<std::string> trajFileNameArg("t", "traj", "Name of a trajectory file", false, "traj.txt", "string");
-    TCLAP::ValueArg<int> verboseArg("v", "verbose", "Verbose level", false, 2, "int");
+    TCLAP::ValueArg<int> verboseArg("v", "verbose", "Verbose level", false, 0, "int");
 
     cmd.add(nameArg);
     cmd.add(trajFileNameArg);
