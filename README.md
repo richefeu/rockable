@@ -37,13 +37,13 @@ Here is the non-exhaustive list of involved persons with their main mission:
 
 * **Vincent Richefeu** <vincent.richefeu@univ-grenoble-alpes.fr> (Laboratoire 3SR, UGA): initiated the project
 * **Gael Combe** <gael.combe@univ-grenoble-alpes.fr> (Laboratoire 3SR, G-INP): mechanical modelling 
-* **Lhassan Amarsid** <Lhassan.AMARSID@cea.fr> (CEA): mechanical modelling, parallel computing
-* **Raphael Prat** <Raphael.PRAT@cea.fr> (CEA): parallel computing
-* **Jean-Mathieu Vanson** <Jean-Mathieu.VANSON@cea.fr> (CEA): mechanical modelling
+* **Lhassan Amarsid** <lhassan.amarsid@cea.fr> (CEA): mechanical modelling, parallel computing
+* **Raphael Prat** <raphael.prat@cea.fr> (CEA): parallel computing
+* **Jean-Mathieu Vanson** <jean-mathieu.vanson@cea.fr> (CEA): mechanical modelling
 * **Farhang Radjai** <franck.radjai@umontpellier.fr> (LMGC, CNRS): mechanical/physical Mentor
 * **Jean-Yves Delenne** <jean-yves.delenne@inrae.fr> (IATE, INRAE): mechanical/biological modelling
 * **Saeid Nezamabadi** <saeid.nezamabadi@umontpellier.fr> (LMGC, UM2): Non Smooth Discrete Element Method (NS-DEM)
-* **Patrick Mutabaruka** <Patrick.Mutabaruka@ifremer.fr> (Ifremer): coupling with Lattice Boltzmann Method (LBM)
+* **Patrick Mutabaruka** <patrick.mutabaruka@ifremer.fr> (Ifremer): coupling with Lattice Boltzmann Method (LBM)
 
 
 ## Features
