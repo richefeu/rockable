@@ -121,11 +121,14 @@ The options available are listed below:
 Before runing rockable you will need to source rockable environnement to add the INSTALL directory to your standard binaries PATH:
 
 ```sh
-source Env_rockable.sh
+source add_install_to_path.sh
 ``` 
 
 > [!IMPORTANT]
-> This will not yet work for MacOSX. It will be fixed in the future
+> When you run a script, it runs in a subshell, which means any environment variables or changes to the environment,
+> such as adding the INSTALL folder to the PATH, will not persist outside of the script's execution. 
+> To make the  changes to the PATH persist in your current shell session, 
+> you should `source` the script rather than executing it.
 
 To run a simulation, a configuration file has to be written. The format of such a file is described in the documentation. We show here a simple example (**input.txt**) simulating a sphere bouncing on a plan.
 
