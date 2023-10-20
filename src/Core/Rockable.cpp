@@ -1197,7 +1197,7 @@ void Rockable::setAddOrRemoveInteractions(std::string& Name) {
  *   sub-elements of j
  */
 int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax) {
-  START_TIMER("AddOrRemoveInteractions_bruteForce");
+//  START_TIMER("AddOrRemoveInteractions_bruteForce");
 
   double Damp = 0.0;
   int nbAdd = 0;
@@ -1318,7 +1318,7 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
  *   REMARK: obbi and obbj need to be already placed BEFORE calling this method
  */
 int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
-  START_TIMER("AddOrRemoveInteractions_OBBtree");
+//  START_TIMER("AddOrRemoveInteractions_OBBtree");
 
   static Interaction to_find;
   static std::set<Interaction>::iterator exist_it;
@@ -2611,7 +2611,7 @@ void Rockable::incrementResultants(Interaction& I) {
  * @param I concerned Interaction
  */
 void Rockable::incrementPeriodicCellTensorialMoment(Interaction& I) {
-  START_TIMER("incrementPeriodicCellTensorialMoment");
+//  START_TIMER("incrementPeriodicCellTensorialMoment");
 
   vec3r branch = (Particles[I.j].pos + I.jPeriodicShift) - Particles[I.i].pos;
 
