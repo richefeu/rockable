@@ -93,6 +93,8 @@
 #include "SpringJoint.hpp"
 #include "clusterParticles.hpp"
 
+#include "Traversals.hpp"
+#include "preComputeUpdate.hpp"
 #ifdef ROCKABLE_ENABLE_BOUNDARY
 #include "Boundaries/Boundary.hpp"
 #endif
@@ -177,6 +179,8 @@ class Rockable {
                                                    ///< as a string also
 
   ForceLaw* forceLaw;  ///< User defined force law
+  linkCells m_linkCells; ///< Used to dectect contact by using the linkCell method
+	Traversals m_traversals;  ///< Used to store different cell traversal.
 
   double preventCrossingLength;  ///< The length used to prevent crossing
 
@@ -224,6 +228,15 @@ class Rockable {
   void compute_SpringJoints();                    ///< Compute the spring joints
   void breakage_of_interfaces();                  ///< Break the interfaces
   void compute_accelerations_from_resultants();   ///< Compute accelerations
+
+	bool computeInterArray();
+  void applyForces();
+  void buildPreComputeUpdate();
+//  void updateDispatcher();
+  void computeForcesAndMoments();
+  void updateForcesAndMoments();
+	std::vector<std::vector<Interaction*>> testInter;
+	preComputeUpdate m_reorg;                    ///< Some stuff to update in parallel forces and moments in OpenMP
 
  public:
   // Core CD method (TODO)
