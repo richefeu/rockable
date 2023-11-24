@@ -55,8 +55,8 @@ Here is the non-exhaustive list of involved persons with their main mission:
 	
 * **Boundary Conditions**: any rigid element can be used to apply boundary conditions. It is possible to impose velocity, force, or moment component by component. Some predefined systems with servo-control are also available for complex loading conditions (e.g., loading cycles or controlled pressure).
 
-  > [!NOTE]
-  > The possibility of applying tri-periodic loading to an assembly is implemented and currently in the testing phase.
+> [!NOTE]
+> The possibility of applying tri-periodic loading to an assembly is implemented and currently in the testing phase.
 
 * **Parallel Computation**: currently, an OpenMP optimization using compilation flags has been implemented. However, the computational speedup is relatively low. Typically, 8 cores are needed to halve the simulation time (for a dense system with a large number of elements).
 
