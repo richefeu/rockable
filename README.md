@@ -50,8 +50,8 @@ Here is the non-exhaustive list of involved persons with their main mission:
 
 * **Particle Shapes:** the code uses only one 3D shape: sphero-polyhedra or R-shapes. These shapes can be non-convex (with holes if necessary) and have rounded edges and corners (uniform radius per shape).
 
-  > [!NOTE]
-  > Some other shapes are currently considered for special boundary shapes (sphere, cylinder...) and specifique loadings.
+> [!NOTE]
+> Some other shapes are currently considered for special boundary shapes (sphere, cylinder...) and specifique loadings.
 	
 * **Boundary Conditions**: any rigid element can be used to apply boundary conditions. It is possible to impose velocity, force, or moment component by component. Some predefined systems with servo-control are also available for complex loading conditions (e.g., loading cycles or controlled pressure).
 
