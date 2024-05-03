@@ -10,6 +10,14 @@
 #include "message.hpp"
 #include "quat.hpp"
 
+
+// This function generates a grid of particles and writes their data to an output stream. 
+// The function takes as input the output stream, a name, the origin and size of the box, 
+// the number of particles in each direction, a group number, a homothety factor, and a flag 
+// to randomize the orientation of the particles. The function uses nested loops to iterate 
+// over each particle in the grid, calculates its position and orientation, and
+// writes this data to the output stream. The function finally returns the total number of particles.
+//
 int generatePacking_grid(std::ostream& os, const char* name, vec3r& origBox, vec3r& boxSize, vec3i& n, int group,
                          double homothety, int randQ = 1) {
   using namespace std;

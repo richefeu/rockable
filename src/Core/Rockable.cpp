@@ -2132,7 +2132,6 @@ void Rockable::RungeKutta4Step() {
 
   // Bodies that are free to move
 
-  // k1 ........
   for (size_t c = 0; c < System.controls.size(); ++c) {
     switch (System.controls[c].type) {
       case _x_For_: {
@@ -2162,6 +2161,8 @@ void Rockable::RungeKutta4Step() {
     Particles[i].RK4Data->vel0 = Particles[i].vel;
     Particles[i].RK4Data->vrot0 = Particles[i].vrot;
   }
+  
+  // k1 ........
   accelerations();
 #pragma omp parallel for default(shared)
   for (size_t i = 0; i < Particles.size(); ++i) {
@@ -2169,7 +2170,6 @@ void Rockable::RungeKutta4Step() {
     Particles[i].RK4Data->k1arot = Particles[i].arot;
   }
 
-  // k2 ........
   for (size_t c = 0; c < System.controls.size(); ++c) {
     switch (System.controls[c].type) {
       case _x_For_: {
@@ -2210,6 +2210,8 @@ void Rockable::RungeKutta4Step() {
     // vrot0 + h_2 * k1arot
     Particles[i].vrot = Particles[i].RK4Data->vrot0 + dt_2 * Particles[i].RK4Data->k1arot;
   }
+  
+  // k2 ........
   accelerations();
 #pragma omp parallel for default(shared)
   for (size_t i = 0; i < Particles.size(); ++i) {
@@ -2217,7 +2219,6 @@ void Rockable::RungeKutta4Step() {
     Particles[i].RK4Data->k2arot = Particles[i].arot;
   }
 
-  // k3 ........
   for (size_t c = 0; c < System.controls.size(); ++c) {
     switch (System.controls[c].type) {
       case _x_For_: {
@@ -2245,6 +2246,8 @@ void Rockable::RungeKutta4Step() {
     // vrot0 + h_2 * k2arot
     Particles[i].vrot = Particles[i].RK4Data->vrot0 + dt_2 * Particles[i].RK4Data->k2arot;
   }
+  
+  // k3 ........
   accelerations();
 #pragma omp parallel for default(shared)
   for (size_t i = 0; i < Particles.size(); ++i) {
@@ -2252,7 +2255,6 @@ void Rockable::RungeKutta4Step() {
     Particles[i].RK4Data->k3arot = Particles[i].arot;
   }
 
-  // k4 ........
   for (size_t c = 0; c < System.controls.size(); ++c) {
     switch (System.controls[c].type) {
       case _x_For_: {
@@ -2293,6 +2295,8 @@ void Rockable::RungeKutta4Step() {
     // vrot0 + h * k3arot
     Particles[i].vrot = Particles[i].RK4Data->vrot0 + dt * Particles[i].RK4Data->k3arot;
   }
+  
+  // k4 ........
   accelerations();
 #pragma omp parallel for default(shared)
   for (size_t i = 0; i < Particles.size(); ++i) {
