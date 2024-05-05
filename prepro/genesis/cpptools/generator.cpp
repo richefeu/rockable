@@ -1,7 +1,10 @@
+#include <algorithm>
+#include <cctype>
 #include <cmath>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <locale>
 #include <string>
 
 #include "kwParser.hpp"
@@ -49,6 +52,18 @@ void readCommands(const char* name) {
       fileStream.close();
       outputStream = &std::cout;
     }
+  };
+
+  parser.kwMap["print"] = __DO__(com) {
+    std::string line;
+    getline(com, line);
+    // trim from start (in place)
+    line.erase(line.begin(),
+               std::find_if(line.begin(), line.end(), [](unsigned char ch) { return !std::isspace(ch); }));
+    // trim from end (in place)
+    line.erase(std::find_if(line.rbegin(), line.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(),
+               line.end());
+    *outputStream << line << '\n';
   };
 
   parser.kwMap["addParticle"] = __DO__(com) {
