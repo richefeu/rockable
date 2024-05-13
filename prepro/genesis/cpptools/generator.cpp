@@ -145,10 +145,27 @@ void readCommands(const char* name) {
     vec3r boxSize;
     vec3i n;
     int group;
+    int clust;
     double homothety;
     int randQ;
-    com >> name >> origBox >> boxSize >> n >> group >> homothety >> randQ;
-    int nbAdded = generatePacking_grid(*outputStream, name.c_str(), origBox, boxSize, n, group, homothety, randQ);
+    com >> name >> origBox >> boxSize >> n >> group >> clust >> homothety >> randQ;
+    int nbAdded =
+        generatePacking_grid(*outputStream, name.c_str(), origBox, boxSize, n, group, clust, homothety, randQ);
+    std::cerr << "@grid, Number of added bodies: " << nbAdded << '\n';
+  };
+  
+  parser.kwMap["generatePacking:grid_clust"] = __DO__(com) {
+    std::string name;
+    vec3r origBox;
+    vec3r boxSize;
+    vec3i n;
+    int group;
+    int clust;
+    double homothety;
+    int randQ;
+    com >> name >> origBox >> boxSize >> n >> group >> clust >> homothety >> randQ;
+    int nbAdded =
+        generatePacking_grid_clust(*outputStream, name.c_str(), origBox, boxSize, n, group, clust, homothety, randQ);
     std::cerr << "@grid, Number of added bodies: " << nbAdded << '\n';
   };
 

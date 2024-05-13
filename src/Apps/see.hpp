@@ -37,6 +37,10 @@
 #define SEE_HPP
 #include <tclap/CmdLine.h>
 
+#ifndef GL_SILENCE_DEPRECATION
+#define GL_SILENCE_DEPRECATION
+#endif
+
 #include <GL/freeglut.h>
 
 #ifdef PNG_H

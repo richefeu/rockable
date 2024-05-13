@@ -35,8 +35,8 @@
 
 #include "factory.hpp"
 
-#include "PreproCommand_stickVerticesInClusters.hpp"
 #include "Core/Rockable.hpp"
+#include "PreproCommand_stickVerticesInClusters.hpp"
 
 stickVerticesInClusters::stickVerticesInClusters() {}
 
@@ -58,6 +58,8 @@ void stickVerticesInClusters::exec() {
     box->Particles[i].updateObb();
   }
 
+  int count = 0;
+
   for (size_t i = box->nDriven; i < box->Particles.size(); i++) {
 
     OBB obbi = box->Particles[i].obb;
@@ -65,7 +67,9 @@ void stickVerticesInClusters::exec() {
 
     for (size_t j = i + 1; j < box->Particles.size(); j++) {
 
-      if (box->Particles[i].cluster != box->Particles[j].cluster) continue;
+      if (box->Particles[i].cluster != box->Particles[j].cluster) {
+        continue;
+      }
 
       OBB obbj = box->Particles[j].obb;
       obbj.enlarge(0.5 * box->DVerlet);
@@ -95,14 +99,15 @@ void stickVerticesInClusters::exec() {
                 double logen = 0.5 * log(en2);
                 double dampRate = -logen / sqrt(logen * logen + Mth::piSqr);
                 Damp = dampRate * 2.0 * sqrt(kn * meff);
-              } else if (en2 <= 0.0)
+              } else if (en2 <= 0.0) {
                 Damp = 2.0 * sqrt(kn * meff);
-              else
+              } else {
                 Damp = 0.0;
+              }
 
               BreakableInterface BI_toInsert(i, j);
               BI_toInsert.isInner = 1;
-              BI_toInsert.kn = kn;
+              BI_toInsert.kn = kn; // ????????
               BI_toInsert.kt = box->dataTable.get(box->idKtInnerBond, box->Particles[i].group, box->Particles[j].group);
               BI_toInsert.kr = 0.0;
               box->dataTable.set(box->idKrInnerBond, box->Particles[i].group, box->Particles[j].group, 0.0);
@@ -122,13 +127,15 @@ void stickVerticesInClusters::exec() {
               Interaction* Iptr = const_cast<Interaction*>(std::addressof(*((box->Interactions[i].insert(I)).first)));
               BI->concernedBonds.push_back(Iptr);
               box->activeInteractions.push_back(Iptr);
-            }
-          }
-        }
+              count++;
+            }  // if (distSqr < dMaxSqr)
+          }  // for jv
+        }  // for iv
 
       }  // if obb intersect
-    }    // j
-  }      // i
+    }  // j
+  }  // i
 
   std::sort(box->activeInteractions.begin(), box->activeInteractions.end(), std::less<Interaction*>());
+  std::cout << "nb interfaces added = " << count << '\n';
 }

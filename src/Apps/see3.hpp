@@ -39,7 +39,7 @@
 #include <unistd.h>
 #include <sstream>
 
-#ifdef __APPLE__
+#ifndef GL_SILENCE_DEPRECATION
 #define GL_SILENCE_DEPRECATION
 #endif
 
@@ -49,6 +49,7 @@
 #include "imgui.h"
 #include "backends/imgui_impl_opengl3.h"
 #include "backends/imgui_impl_glfw.h"
+//#include "backends/imgui_impl_glut.h"
 
 #ifdef PNG_H
 #include <png.h>

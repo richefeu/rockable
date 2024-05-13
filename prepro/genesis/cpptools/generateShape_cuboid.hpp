@@ -7,7 +7,7 @@
 
 // sideSize = external sizes of the cuboid block (it includes the radius)
 void generateShape_cuboid(std::ostream& os, const char* name, double radius, vec3r& sideSize) {
-  using namespace std;
+  //using namespace std;
   double lx = 0.5 * sideSize.x - radius;
 	double ly = 0.5 * sideSize.y - radius;
 	double lz = 0.5 * sideSize.z - radius;

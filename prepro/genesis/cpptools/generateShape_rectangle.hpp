@@ -6,7 +6,7 @@
 #include "vec3.hpp"
 
 void generateShape_rectangle_xz(std::ostream& os, const char* name, double radius, double sidex, double sidez) {
-  using namespace std;
+  //using namespace std;
   double lx = 0.5 * sidex - radius;
   double lz = 0.5 * sidez - radius;
 

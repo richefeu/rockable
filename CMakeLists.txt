@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.23)
 
 if (${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
   set(CMAKE_OSX_COMPILER_ID "GNU")
-	set(CMAKE_CXX_COMPILER "g++-13")
-	message(STATUS "On apple computers, you need to install the last g++ compiler (g++-13)")
+	set(CMAKE_CXX_COMPILER "g++-14")
+	message(STATUS "On apple computers, you need to install the last g++ compiler (g++-14)")
 endif()
 
 project(Rockable LANGUAGES CXX)
@@ -13,7 +13,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 ######################################################################
 # OPTIONS
+
 option(ROCKABLE_USE_FT_CORR "add objectivity correction to tangent forces" OFF)
+option(ROCKABLE_USE_TESTING "add tests" ON)
+
 option(ROCKABLE_ENABLE_PROFILING "enable the time profiling" OFF)
 option(ROCKABLE_ENABLE_BOUNDARY "enable the special boundaries like Ball or Cylinder" OFF)
 option(ROCKABLE_ENABLE_SOFT_PARTICLES "enable strainning of particles" OFF)
@@ -21,11 +24,9 @@ option(ROCKABLE_ENABLE_PERIODIC "enable full periodic boundary conditions" OFF)
 
 option(ROCKABLE_COMPILE_POSTPRO "Compile the application to run post-processing commands" OFF)
 option(ROCKABLE_COMPILE_SEE "Compile the application to visualize the conf-files" ON)
-
 option(ROCKABLE_COMPILE_SEE3 "Compile the application to edit graphically the input files" OFF)
-option(ROCKABLE_COMPILE_PREPRO "Compile the preprocessings" OFF)
-option(ROCKABLE_COMPILE_CONF2VTK "Convert conf files to VTK" OFF)
-option(ROCKABLE_USE_TESTING "add tests" ON)
+option(ROCKABLE_COMPILE_PREPRO "Compile the preprocessings" ON)
+option(ROCKABLE_COMPILE_CONF2VTK "Convert conf files to VTK" ON)
 
 ######################################################################
 # compilation flags
@@ -50,7 +51,8 @@ execute_process(
     OUTPUT_VARIABLE ROCKABLE_GIT_TAG
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
-add_definitions(-DROCKABLE_GIT_TAG="${GIT_TAG}")
+add_definitions(-DROCKABLE_GIT_TAG="${ROCKABLE_GIT_TAG}")
+message(STATUS "ROCKABLE_GIT_TAG = " ${ROCKABLE_GIT_TAG})
 
 # the default mode is release
 if(NOT CMAKE_BUILD_TYPE)
@@ -59,6 +61,8 @@ endif()
 
 include(FetchContent)
 set(FETCHCONTENT_BASE_DIR ${CMAKE_SOURCE_DIR}/deps)
+
+#include(ExternalProject)
 
 ######################################################################
 ##### Fetching TOOFUS
@@ -136,16 +140,23 @@ endif()
 ######################################################################
 ##### imgui
 if(ROCKABLE_COMPILE_SEE3)
+  
 FetchContent_Declare (
 	imgui
   GIT_REPOSITORY https://github.com/ocornut/imgui.git
   GIT_TAG        v1.89.5
 )
+
 FetchContent_GetProperties(imgui)
+
 if(NOT imgui_POPULATED)
   message(STATUS "Fetching imgui")
   FetchContent_Populate(imgui)
 endif()
+  
+# Il faudrait simplement cloner imgui.git quelque part pour que les headers soient accessibles
+# pour compiler see3
+
 endif() # end of ROCKABLE_COMPILE_SEE3
 
 
@@ -209,9 +220,9 @@ endif()
 
 ######################################################################
 #### glfw
-if(ROCKABLE_COMPILE_SEE3)
-  find_package(glfw3 REQUIRED)
-endif()
+#if(ROCKABLE_COMPILE_SEE3)
+#  find_package(glfw3 REQUIRED)
+#endif()
 
 ######################################################################
 ##### libRockable_core
@@ -254,12 +265,15 @@ install(TARGETS rockable DESTINATION ./)
 
 ######################################################################
 ##### postpro
-add_executable(postpro ${CMAKE_SOURCE_DIR}/Apps/postpro.cpp)
-target_link_libraries(postpro PUBLIC Rockable_core)
+if(ROCKABLE_COMPILE_POSTPRO)
+  add_executable(postpro ${CMAKE_SOURCE_DIR}/Apps/postpro.cpp)
+  target_link_libraries(postpro PUBLIC Rockable_core)
+endif()
 
 ######################################################################
-##### visualiser see
+##### visualiser see (it uses glut)
 if(ROCKABLE_COMPILE_SEE)
+
 add_executable(see ${CMAKE_SOURCE_DIR}/Apps/see.cpp)
 target_include_directories(see PUBLIC 
 	${OPENGL_INCLUDE_DIR}
@@ -267,6 +281,7 @@ target_include_directories(see PUBLIC
 	${nlohmann-json_SOURCE_DIR}/include
 )
 target_link_directories(see PUBLIC ${GLUT_LIBRARY_DIRS})
+
 if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
   target_link_libraries (see PUBLIC OpenGL::GL OpenGL::GLU ${GLUT_LIBRARIES} Rockable_core)
 else()
@@ -274,6 +289,7 @@ else()
 endif()
 
 install(TARGETS see DESTINATION ./)
+
 endif()
 
 
@@ -281,7 +297,12 @@ endif()
 ##### interactive preprocessing (TODO see3 -> will be renamed something like 'craft' or 'look')
 ##### Before, the use of glfw will be replaced by glut (to avoid issues with macosx) 
 if(ROCKABLE_COMPILE_SEE3)
-set(imgui_object_files
+  
+#find_package(glfw3)
+pkg_check_modules(GLFW REQUIRED glfw3)
+
+set(see3_files
+  ${CMAKE_SOURCE_DIR}/Apps/see3.cpp
   ${imgui_SOURCE_DIR}/imgui.cpp
   ${imgui_SOURCE_DIR}/imgui_demo.cpp
   ${imgui_SOURCE_DIR}/imgui_draw.cpp
@@ -291,35 +312,21 @@ set(imgui_object_files
   ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
 )
 
-add_library(see3_imgui STATIC ${imgui_object_files})
-target_link_libraries(see3_imgui OpenGL::GL OpenGL::GLU glfw)
+add_executable(see3 ${see3_files})
 include_directories( 
-	${OPENGL_INCLUDE_DIR} 
+	${OPENGL_INCLUDE_DIR}
+  ${GLFW_INCLUDE_DIRS}
 	${imgui_SOURCE_DIR}
 	${imgui_SOURCE_DIR}/backends
   ${nlohmann-json_SOURCE_DIR}/include
 )
 
-#if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
-#  target_link_libraries (see3 PUBLIC OpenGL::GL OpenGL::GLU glfw Rockable_core)
-#else()
-#  target_link_libraries (see3 PUBLIC OpenGL::GL OpenGL::GLU glfw Rockable_core)
-#endif()
-
-add_executable(see3 ${CMAKE_SOURCE_DIR}/Apps/see3.cpp)
-target_link_libraries(see3 PUBLIC see3_imgui Rockable_core)
-#target_include_directories(see3 PUBLIC 
-#	${OPENGL_INCLUDE_DIR} 
-#	${imgui_SOURCE_DIR}
-#	${imgui_SOURCE_DIR}/backends
-# ${nlohmann-json_SOURCE_DIR}/include
-#)
-
 if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
-  target_link_libraries (see3 PUBLIC OpenGL::GL OpenGL::GLU glfw Rockable_core)
+  target_link_libraries (see3 PUBLIC OpenGL::GL OpenGL::GLU ${GLFW_LIBRARIES} Rockable_core)
 else()
-  target_link_libraries (see3 PUBLIC OpenGL::GL glfw Rockable_core)
+  target_link_libraries (see3 PUBLIC OpenGL::GL OpenGL::GLU ${GLFW_LIBRARIES} Rockable_core)
 endif()
+
 install(TARGETS see3 DESTINATION ./)
 
 endif() # end of ROCKABLE_COMPILE_SEE3
