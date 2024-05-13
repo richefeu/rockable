@@ -1,0 +1,86 @@
+open shapes.txt
+generateShape:rectangle_xz SOL0 1e-2 100e-2 30e-2 
+#generateShape:rectangle_xz SOL 1 100 30 
+generateShape:cuboid Domino_1   0.00125	0.005	0.04	0.02
+generateShape:cuboid Domino_2   0.001875	0.0075	0.06	0.03
+generateShape:cuboid Domino_3   0.0028125	0.01125	0.09	0.045
+generateShape:cuboid Domino_4   0.00421875	0.016875	0.135	0.0675
+generateShape:cuboid Domino_5   0.006328125	0.0253125	0.2025	0.10125
+generateShape:cuboid Domino_6   0.009492188	0.03796875	0.30375	0.151875
+generateShape:cuboid Domino_7   0.014238281	0.056953125	0.455625	0.2278125
+#generateShape:cuboid Domino_8   0.021357422	0.085429688	0.6834375	0.34171875
+#generateShape:cuboid Domino_9   0.032036133	0.128144531	1.02515625	0.512578125
+#generateShape:cuboid Domino_10  0.048054199	0.192216797	1.537734375	0.768867188
+#generateShape:cuboid Domino_11  0.072081299	0.288325195	2.306601563	1.153300781
+#generateShape:cuboid Domino_12  0.108121948	0.432487793	3.459902344	1.729951172
+#generateShape:cuboid Domino_13  0.162182922	0.648731689	5.189853516	2.594926758
+#generateShape:cuboid Domino_14  0.243274384	0.973097534	7.784780273	3.892390137
+#generateShape:cuboid Domino_15  0.364911575	1.459646301	11.67717041	5.838585205
+#generateShape:cuboid Domino_16  0.547367363	2.189469452	17.51575562	8.757877808
+#generateShape:cuboid Domino_17  0.821051044	3.284204178	26.27363342	13.13681671
+#generateShape:cuboid Domino_18  1.231576567	4.926306267	39.41045013	19.70522507
+#generateShape:cuboid Domino_19  1.84736485	7.3894594	59.1156752	29.5578376
+close
+
+open input.txt
+print Rockable 21-08-2022
+print 
+print #### time #############################
+print t 0
+print tmax 5.0
+print dt 1e-6
+print interVerlet 1e-4
+print interConf 0.05
+print 
+print #### proximity of the particles #######
+print DVerlet .0025
+print dVerlet 0.00125
+print 
+print #### properties for particles #########
+print density 0 2700
+print density 1 2700
+print 
+print #### interaction model ################
+print forceLaw StickedLinks
+print 
+print #### interaction parameters ###########
+print knContact 0 1 1e7
+print en2Contact 0 1 0.02
+print ktContact 0 1 1e7
+print muContact 0 1 0.9
+print krContact 0 1 1e7
+print murContact 0 1 0.0
+print
+print knContact 1 1 1e7
+print en2Contact 1 1 0.02
+print ktContact 1 1 1e7
+print muContact 1 1 0.9
+print krContact 1 1 1e7
+print murContact 1 1 0.0
+print 
+print knInnerBond 1 1 1e7
+print en2InnerBond 1 1 0.02
+print ktInnerBond 1 1 1e7
+print fn0InnerBond 1 1 5.
+print ft0InnerBond 1 1 5.0
+print powInnerBond 1 1 2.0
+print
+print #### the system #######################
+print iconf 0
+print nDriven 1
+print shapeFile shapes.txt
+print Particles 132
+
+print SOL0 0 0 1.0       48e-2 -1.0e-2 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
+print Domino_1 1 1 1.0   0.0 0.02 0   0 0 0   0 0 0   1 0 0 0   0 0 -10   0 0 0
+print Domino_2 1 2 1.0   0.02 0.03 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
+print Domino_3 1 3 1.0   0.05 0.045 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
+print Domino_4 1 4 1.0   0.095 0.0675 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
+print Domino_5 1 5 1.0   0.1625 0.10125 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
+print Domino_6 1 6 1.0   0.26375 0.151875 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
+#print Domino_7 1 7 1.0   0.415625 0.2278125 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
+
+generatePacking:grid_clust Domino_1  0.55 0.0 -0.05   0.025	0.2	0.1   5 5 5    1  8  1.0  0
+print stickVerticesInClusters 0.001
+
+close

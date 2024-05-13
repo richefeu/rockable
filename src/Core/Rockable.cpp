@@ -211,16 +211,10 @@ void Rockable::ExplicitRegistrations() {
  */
 void Rockable::setVerboseLevel(int v) {
   std::string levelNames[] = {"off", "critical", "err", "warn", "info", "debug", "trace"};
-      
-  std::unordered_map<int, LogLevel> levelMap = {
-      {0, LogLevel::off},  
-      {1, LogLevel::critical}, 
-      {2, LogLevel::error},  
-      {3, LogLevel::warn},
-      {4, LogLevel::info}, 
-      {5, LogLevel::debug},
-      {6, LogLevel::trace}
-  };
+
+  std::unordered_map<int, LogLevel> levelMap = {{0, LogLevel::off},  {1, LogLevel::critical}, {2, LogLevel::error},
+                                                {3, LogLevel::warn}, {4, LogLevel::info},     {5, LogLevel::debug},
+                                                {6, LogLevel::trace}};
 
   if (levelMap.count(v) > 0) {
     Logger::setLevel(levelMap[v]);
@@ -237,7 +231,7 @@ void Rockable::setVerboseLevel(int v) {
  *   @param levelName Name of the verbose level
  */
 void Rockable::setVerboseLevel(const std::string& levelName) {
-  std::unordered_map<std::string, int> levelMap = {{"off", 0},  {"critical", 1}, {"error", 2},  {"warn", 3},
+  std::unordered_map<std::string, int> levelMap = {{"off", 0},  {"critical", 1}, {"error", 2}, {"warn", 3},
                                                    {"info", 4}, {"debug", 5},    {"trace", 6}};
 
   if (levelMap.count(levelName) > 0) {
@@ -251,10 +245,51 @@ void Rockable::setVerboseLevel(const std::string& levelName) {
  *   It opens some files (only if interactiveMode is false)
  */
 void Rockable::initOutputFiles() {
-  if (interactiveMode == true) return;
+  if (interactiveMode == true) {
+    return;
+  }
+  
   perfFile.open("perf.txt");
   staticBalanceFile.open("staticBalance.txt");
   kineticEnergyFile.open("kineticEnergy.txt");
+
+  std::ofstream gnuplotFile("checkplots.txt");
+  gnuplotFile << "set terminal png size 1000,1000\n";
+  gnuplotFile << "set output 'checkplots.png'\n";
+  gnuplotFile << "set multiplot\n";
+  gnuplotFile << "set origin 0.0, 0.5\n";
+  gnuplotFile << "set size 0.5, 0.5\n";
+  gnuplotFile << "set xlabel 'Time'\n";
+  gnuplotFile << "set y2tics\n";
+  gnuplotFile << "set ylabel 'Efficiency'\n";
+  gnuplotFile << "set y2label 'Percent'\n";
+  gnuplotFile << "plot 'perf.txt' u 1:2 w l axes x1y1 lw 2 t 'efficiency', \\\n";
+  gnuplotFile << "'' u 1:3 w lp axes x1y2 lw 2 t 'Neighbor List', \\\n";
+  gnuplotFile << "'' u 1:3 w l axes x1y2 lw 2 t 'Forces'\n";
+  gnuplotFile << "\n";
+  gnuplotFile << "set origin 0.5, 0.5\n";
+  gnuplotFile << "set size 0.5, 0.5\n";
+  gnuplotFile << "set xlabel 'Time'\n";
+  gnuplotFile << "set y2tics\n";
+  gnuplotFile << "set ylabel 'E translation'\n";
+  gnuplotFile << "set y2label 'E rotation'\n";
+  gnuplotFile << "plot 'kineticEnergy.txt' u 1:2 w l axes x1y1 lw 2 t 'Etrans', \\\n";
+  gnuplotFile << "'' u 1:3 w l axes x1y2 lw 2 t 'Erot'\n";
+  gnuplotFile << "\n";
+  gnuplotFile << "set origin 0.0, 0.0\n";
+  gnuplotFile << "set size 1.0, 0.5\n";
+  gnuplotFile << "set xlabel 'Time'\n";
+  gnuplotFile << "set y2tics\n";
+  gnuplotFile << "set ylabel 'max(F/fnMax)'\n";
+  gnuplotFile << "set y2label 'Fmax/fnMean'\n";
+  gnuplotFile << "set log y\n";
+  gnuplotFile << "set log y2\n";
+  gnuplotFile << "set format y '10^{%L}'\n";
+  gnuplotFile << "set format y2 '10^{%L}'\n";
+  gnuplotFile << "plot 'staticBalance.txt' u 1:2 w l axes x1y1 lw 2 t '/max', \\\n";
+  gnuplotFile << "'' u 1:3 w l axes x1y2 lw 2 t '/mean'\n";
+  gnuplotFile << "\n";
+  gnuplotFile << "unset multiplot\n";
 }
 
 /**
@@ -278,7 +313,7 @@ bool Rockable::isInteractive() const { return interactiveMode; }
 void Rockable::showBanner() {
   std::cout << "\n\n";
   std::cout << msg::bold() << msg::fg_lightBlue() << "   Rockable" << msg::fg_default() << msg::normal()
-            << "  Copyright (C) 2016-2023  <vincent.richefeu@univ-grenoble-alpes.fr>\n";
+            << "  Copyright (C) 2016-2024  <vincent.richefeu@univ-grenoble-alpes.fr>\n";
   std::cout << "   This program comes with ABSOLUTELY NO WARRANTY.\n";
   std::cout << "   " << msg::bold() << msg::fg_lightBlue() << "This is academic software" << msg::fg_default()
             << msg::normal() << "\n\n";
@@ -890,8 +925,8 @@ void Rockable::initParser() {
           BI.concernedBonds[u] = const_cast<Interaction*>(std::addressof(*it));
         } else {
           missed = true;
-          Logger::warn("Cannot find interaction: i={} j={} type={} isub={} jsub={}", ItoFind.i, ItoFind.j,
-                        ItoFind.type, ItoFind.isub, ItoFind.jsub);
+          Logger::warn("Cannot find interaction: i={} j={} type={} isub={} jsub={}", ItoFind.i, ItoFind.j, ItoFind.type,
+                       ItoFind.isub, ItoFind.jsub);
         }
       }
       // Connection of the BreakableInterface with the Interactions
@@ -1009,7 +1044,7 @@ void Rockable::loadConf(const char* a_name) {
   conf >> date;
   if (date != CONF_VERSION_DATE) {
     Logger::warn("@Rockable::loadConf, the version-date should be '{}'\n(in most cases, this should not be a problem)",
-                  CONF_VERSION_DATE);
+                 CONF_VERSION_DATE);
   }
 
   // This single line actually parses the file
@@ -1187,7 +1222,7 @@ void Rockable::setAddOrRemoveInteractions(std::string& Name) {
   } else {
 
     Logger::warn("AddOrRemoveInteractions {} is unknown, Option remains: AddOrRemoveInteractions = {}", Name,
-                  optionNames["AddOrRemoveInteractions"]);
+                 optionNames["AddOrRemoveInteractions"]);
   }
 }
 
@@ -1598,13 +1633,13 @@ void Rockable::UpdateNL_linkCells() {
               }
 
             }  // jcv
-          }    // icc
+          }  // icc
 
         }  // c (neighbor cells)
 
       }  // iz
-    }    // iy
-  }      // ix
+    }  // iy
+  }  // ix
 
   // Now we test if a too large bodies can collide another body in the
   Cc = &(LinkCells.oversized_bodies);
@@ -1644,11 +1679,11 @@ void Rockable::UpdateNL_linkCells() {
             }
 
           }  // jcv
-        }    // icc
+        }  // icc
 
       }  // iz
-    }    // iy
-  }      // ix
+    }  // iy
+  }  // ix
 
   Interactions_from_set_to_vec();
 }
@@ -2161,7 +2196,7 @@ void Rockable::RungeKutta4Step() {
     Particles[i].RK4Data->vel0 = Particles[i].vel;
     Particles[i].RK4Data->vrot0 = Particles[i].vrot;
   }
-  
+
   // k1 ........
   accelerations();
 #pragma omp parallel for default(shared)
@@ -2210,7 +2245,7 @@ void Rockable::RungeKutta4Step() {
     // vrot0 + h_2 * k1arot
     Particles[i].vrot = Particles[i].RK4Data->vrot0 + dt_2 * Particles[i].RK4Data->k1arot;
   }
-  
+
   // k2 ........
   accelerations();
 #pragma omp parallel for default(shared)
@@ -2246,7 +2281,7 @@ void Rockable::RungeKutta4Step() {
     // vrot0 + h_2 * k2arot
     Particles[i].vrot = Particles[i].RK4Data->vrot0 + dt_2 * Particles[i].RK4Data->k2arot;
   }
-  
+
   // k3 ........
   accelerations();
 #pragma omp parallel for default(shared)
@@ -2295,7 +2330,7 @@ void Rockable::RungeKutta4Step() {
     // vrot0 + h * k3arot
     Particles[i].vrot = Particles[i].RK4Data->vrot0 + dt * Particles[i].RK4Data->k3arot;
   }
-  
+
   // k4 ........
   accelerations();
 #pragma omp parallel for default(shared)
