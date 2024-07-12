@@ -39,6 +39,7 @@ jobs:
         root: ${{github.workspace}}
 
     - name: Generate a code coverage report
+      working-directory: ${{github.workspace}}
       run: gcovr --html-details coverage.html
 
     - name: Archive code coverage results
