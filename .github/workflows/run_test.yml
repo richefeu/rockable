@@ -1,4 +1,4 @@
-name: CMake
+name: CMake && Test && Coverage
 
 on:
   push:
@@ -23,7 +23,7 @@ jobs:
       run: sudo apt-get install -y freeglut3-dev
 
     - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      run: cmake -DCMAKE_CXX_FLAGS="--coverage -g" -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
     - name: Build
       # Build your program with the given configuration
@@ -32,3 +32,17 @@ jobs:
     - name: Test
       working-directory: ${{github.workspace}}/build
       run: ctest -C --rerun-failed --output-on-failure ${{env.BUILD_TYPE}}
+
+    - name: Generate a code coverage report
+      uses: threeal/gcovr-action@v1.0.0
+      with:
+        root: ${{github.workspace}}
+
+    - name: Generate a code coverage report
+      run: gcovr --html-details coverage.html
+
+    - name: Archive code coverage results
+      uses: actions/upload-artifact@v4
+      with:
+        name: code-coverage-report
+        path: coverage.html      
