@@ -30,8 +30,11 @@ option(ROCKABLE_COMPILE_CONF2VTK "Convert conf files to VTK" ON)
 
 ######################################################################
 # compilation flags
-set(CMAKE_CXX_FLAGS "-O3 -Wall")
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
+
+if(NOT DEFINED CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE Release)
+ 	message(STATUS "Build type is set to Release")
+ endif()
 
 if(ROCKABLE_USE_FT_CORR)
 	add_definitions(-DFT_CORR)
