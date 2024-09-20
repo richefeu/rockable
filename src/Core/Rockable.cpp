@@ -248,7 +248,7 @@ void Rockable::initOutputFiles() {
   if (interactiveMode == true) {
     return;
   }
-  
+
   perfFile.open("perf.txt");
   staticBalanceFile.open("staticBalance.txt");
   kineticEnergyFile.open("kineticEnergy.txt");
@@ -3171,7 +3171,7 @@ void Rockable::accelerations() {
 
   compute_resultants();
 
-  compute_SpringJoints();
+  compute_SpringJoints();  // compute the projected resultants
 
 #ifdef ROCKABLE_ENABLE_SOFT_PARTICLES
   // compute_SoftParticles_transformation();
@@ -3195,11 +3195,11 @@ void Rockable::accelerations() {
 
   if (numericalDampingCoeff > 0.0) numericalDamping();
 
+  compute_accelerations_from_resultants();
+
   // damping solutions based on the weighting of accelerations
   if (velocityBarrier > 0.0) applyVelocityBarrier();
   if (angularVelocityBarrier > 0.0) applyAngularVelocityBarrier();
-
-  compute_accelerations_from_resultants();
 }
 
 /**

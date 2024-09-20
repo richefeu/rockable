@@ -43,13 +43,14 @@
 #define GL_SILENCE_DEPRECATION
 #endif
 
+//#define GLFW_INCLUDE_GLCOREARB
+//#define GLFW_INCLUDE_NONE
 #define GLFW_INCLUDE_GLU
 #include <GLFW/glfw3.h>
 
 #include "imgui.h"
 #include "backends/imgui_impl_opengl3.h"
 #include "backends/imgui_impl_glfw.h"
-//#include "backends/imgui_impl_glut.h"
 
 #ifdef PNG_H
 #include <png.h>

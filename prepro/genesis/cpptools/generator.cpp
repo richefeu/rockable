@@ -11,6 +11,10 @@
 #include "message.hpp"
 #include "quat.hpp"
 #include "vec3.hpp"
+#include "transformation.hpp"
+
+Transformation<double> globalTransformation;
+quat individualParticleRotation;
 
 #include "addParticle.hpp"
 #include "generatePacking_grid.hpp"
@@ -66,6 +70,25 @@ void readCommands(const char* name) {
     *outputStream << line << '\n';
   };
 
+  parser.kwMap["tranformation:add_translation"] = __DO__(com) {
+    double xtrans, ytrans, ztrans;
+    com >> xtrans >> ytrans >> ztrans;
+    globalTransformation.translate(xtrans, ytrans, ztrans);
+  };
+  
+  parser.kwMap["tranformation:add_rotation"] = __DO__(com) {
+    double xaxe, yaxe, zaxe, angle;
+    com >> xaxe >> yaxe >> zaxe >> angle;
+    globalTransformation.rotate(xaxe, yaxe, zaxe, angle);
+    vec3r axis(xaxe, yaxe, zaxe);
+    axis.normalize();
+    individualParticleRotation.set_axis_angle(axis, angle);
+  };
+  
+  parser.kwMap["tranformation:reset"] = __DO__() {
+    globalTransformation.reset();
+  };
+
   parser.kwMap["addParticle"] = __DO__(com) {
     std::string name;
     int group;
@@ -74,6 +97,8 @@ void readCommands(const char* name) {
     vec3r position;
     quat angularPosition;
     com >> name >> group >> cluster >> homothety >> position >> angularPosition;
+    angularPosition = angularPosition * individualParticleRotation;
+    globalTransformation.apply(position); 
     addParticle(*outputStream, name.c_str(), group, cluster, homothety, position, angularPosition);
   };
 

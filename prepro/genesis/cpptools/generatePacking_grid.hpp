@@ -1,6 +1,9 @@
 #ifndef GENERATEPACKING_GRID_HPP
 #define GENERATEPACKING_GRID_HPP
 
+// globalTransformation and individualParticleRotation are global variables
+// This file is included in the main cpp file (no separated compilation in .o file)
+
 #include <cmath>
 #include <fstream>
 #include <iostream>
@@ -28,8 +31,11 @@ int generatePacking_grid(std::ostream& os, const char* name, vec3r& origBox, vec
       for (int iz = 0; iz < n.z; iz++) {
 
         vec3r gridPos = orig + vec3r(ix * step.x, iy * step.y, iz * step.z);
+        globalTransformation.apply(gridPos);
         if (randQ == 1) {
           Qclust.randomize();
+        } else {
+          Qclust = individualParticleRotation;
         }
 
         msg::bestPrecision(os);
@@ -63,8 +69,11 @@ int generatePacking_grid_clust(std::ostream& os, const char* name, vec3r& origBo
       for (int iz = 0; iz < n.z; iz++) {
 
         vec3r gridPos = orig + vec3r(ix * step.x, iy * step.y, iz * step.z);
+        globalTransformation.apply(gridPos);
         if (randQ == 1) {
           Qclust.randomize();
+        } else {
+          Qclust = individualParticleRotation;
         }
 
         msg::bestPrecision(os);

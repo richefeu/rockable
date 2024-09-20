@@ -132,8 +132,9 @@ void keyboardSpecial(int Key, int /*x*/, int /*y*/) {
 void keyboard(unsigned char Key, int x, int y) {
   switch (Key) {
     case 27:  // ESCAPE
+    {
       selectedParticle = -1;
-      break;
+    } break;
 
     case '!': {
       params["show_probe"] = 1 - params["show_probe"].get<int>();
@@ -150,26 +151,28 @@ void keyboard(unsigned char Key, int x, int y) {
       std::cout << "Solid Fraction in probe: " << SF << '\n';
     } break;
 
-    case ' ':
+    case ' ': {
       textZone.reset();
-      break;
+    } break;
 
-    case '*':
+    case '*': {
       selection(x, y);
-      break;
+    } break;
 
-    case 'a':
-      if (params["alpha_fixparticles"].get<GLfloat>() > 0.1f)
-        params["alpha_fixparticles"] = params["alpha_fixparticles"].get<GLfloat>() - 0.05f;
-      break;
-    case 'A':
-      if (params["alpha_fixparticles"].get<GLfloat>() <= 0.95f)
-        params["alpha_fixparticles"] = params["alpha_fixparticles"].get<GLfloat>() + 0.05f;
-      break;
+    case 'a': {
+      if (params["alpha_fixparticles"].get<GLfloat>() > 0.0f) {
+        params["alpha_fixparticles"] = std::max(0.0f, params["alpha_fixparticles"].get<GLfloat>() - 0.05f);
+      }
+    } break;
+    case 'A': {
+      if (params["alpha_fixparticles"].get<GLfloat>() < 1.0f) {
+        params["alpha_fixparticles"] = std::min(1.0f, params["alpha_fixparticles"].get<GLfloat>() + 0.05f);
+      }
+    } break;
 
-    case 'b':
+    case 'b': {
       params["show_background"] = 1 - params["show_background"].get<int>();
-      break;
+    } break;
 
     case 'c': {  // compute a few steps (for debugging)
       box.UpdateNL();
@@ -177,22 +180,24 @@ void keyboard(unsigned char Key, int x, int y) {
       textZone.addLine("5000 time steps have been done.");
     } break;
 
-    case 'd':
+    case 'd': {
       params["show_driven"] = 1 - params["show_driven"].get<int>();
-      break;
+    } break;
 
-    case 'e':
-      if (params["alpha_particles"].get<GLfloat>() > 0.1f)
-        params["alpha_particles"] = params["alpha_particles"].get<GLfloat>() - 0.05f;
-      break;
-    case 'E':
-      if (params["alpha_particles"].get<GLfloat>() <= 0.95f)
-        params["alpha_particles"] = params["alpha_particles"].get<GLfloat>() + 0.05f;
-      break;
+    case 'e': {
+      if (params["alpha_particles"].get<GLfloat>() > 0.0f) {
+        params["alpha_particles"] = std::max(0.0f, params["alpha_particles"].get<GLfloat>() - 0.05f);
+      }
+    } break;
+    case 'E': {
+      if (params["alpha_particles"].get<GLfloat>() < 1.0f) {
+        params["alpha_particles"] = std::min(1.0f, params["alpha_particles"].get<GLfloat>() + 0.05f);
+      }
+    } break;
 
-    case 'f':
+    case 'f': {
       params["show_forces"] = 1 - params["show_forces"].get<int>();
-      break;
+    } break;
 
     case 'h': {
       textZone.addLine("");
@@ -250,9 +255,9 @@ void keyboard(unsigned char Key, int x, int y) {
       textZone.addLine("Configuration file see.json has been saved");
     } break;
 
-    case 'k':
+    case 'k': {
       params["show_keybinds"] = 1 - params["show_keybinds"].get<int>();
-      break;
+    } break;
 
     case 'g': {
       std::cout << ">>>>>>>>>> CONF NUMBER (negative number to escape): ";
@@ -261,24 +266,24 @@ void keyboard(unsigned char Key, int x, int y) {
       tryToReadConf(Num);
     } break;
 
-    case 'l':
+    case 'l': {
       params["show_interFrames"] = 1 - params["show_interFrames"].get<int>();
-      break;
+    } break;
 
-    case 'm':
+    case 'm': {
       params["show_interTypes"] = 1 - params["show_interTypes"].get<int>();
-      break;
+    } break;
 
-    case 'n':
+    case 'n': {
       params["show_particles"] = 1 - params["show_particles"].get<int>();
-      break;
+    } break;
 
-    case 'o':
+    case 'o': {
       params["show_obb"] = 1 - params["show_obb"].get<int>();
-      break;
-    case 'O':
+    } break;
+    case 'O': {
       params["enlarged_obb"] = 1 - params["enlarged_obb"].get<int>();
-      break;
+    } break;
 
     case 'p': {
       editSelection();
@@ -288,9 +293,9 @@ void keyboard(unsigned char Key, int x, int y) {
       params["show_periodicBox"] = 1 - params["show_periodicBox"].get<int>();
     } break;
 
-    case 'q':
+    case 'q': {
       exit(0);
-      break;
+    } break;
 
     case 'r': {
       params["rescaleColorRange"] = 1 - params["rescaleColorRange"].get<int>();
@@ -303,9 +308,9 @@ void keyboard(unsigned char Key, int x, int y) {
       }
     } break;
 
-    case 'v':
+    case 'v': {
       params["show_velocities"] = 1 - params["show_velocities"].get<int>();
-      break;
+    } break;
 
     case 'w': {
       vec3r d = center - eye;
@@ -337,9 +342,9 @@ void keyboard(unsigned char Key, int x, int y) {
       textZone.addLine(" Zmin = %f, Zmax = %f", box.aabb.min.z, box.aabb.max.z);
     } break;
 
-    case 'y':
+    case 'y': {
       shapeWithoutThickness = 1 - shapeWithoutThickness;
-      break;
+    } break;
 
     case 'z': {
 #ifdef PNG_H
@@ -348,6 +353,7 @@ void keyboard(unsigned char Key, int x, int y) {
       screenshot("oneshot.tga");
 #endif
     } break;
+
     case 'Z': {
       // be carreful there's no way to stop this loop
       // if the process if too long
@@ -363,13 +369,13 @@ void keyboard(unsigned char Key, int x, int y) {
       }
     } break;
 
-    case '-':
+    case '-': {
       if (confNum > 0) tryToReadConf(confNum - 1);
-      break;
+    } break;
 
-    case '+':
+    case '+': {
       tryToReadConf(confNum + 1);
-      break;
+    } break;
 
     case '=': {
       fitView();
@@ -594,19 +600,38 @@ void display() {
   glEnable(GL_DEPTH_TEST);
 
   // if (params["show_velocities"].get<int>() == 1) drawVelocities();
-  if (params["show_traj"].get<int>() == 1) drawTrajectories();
-  if (params["show_forces"].get<int>() == 1) drawForces();
-  if (params["show_interFrames"].get<int>() == 1) drawInteractionFrames();
-  if (params["show_interTypes"].get<int>() == 1) drawInteractionTypes();
-  if (params["show_obb"].get<int>() == 1) drawOBBs();
-  if (params["show_particles"].get<int>() == 1) drawParticles();
-  if (params["show_probe"].get<int>() == 1) drawProbe();
+  if (params["show_traj"].get<int>() == 1) {
+    drawTrajectories();
+  }
+  if (params["show_forces"].get<int>() == 1) {
+    drawForces();
+  }
+  if (params["show_interFrames"].get<int>() == 1) {
+    drawInteractionFrames();
+  }
+  if (params["show_interTypes"].get<int>() == 1) {
+    drawInteractionTypes();
+  }
+  if (params["show_obb"].get<int>() == 1) {
+    drawOBBs();
+  }
+  if (params["show_particles"].get<int>() == 1) {
+    drawParticles();
+  }
+  if (params["show_probe"].get<int>() == 1) {
+    drawProbe();
+  }
 
 #ifdef ROCKABLE_ENABLE_PERIODIC
-  if (params["show_periodicBox"].get<int>() == 1) drawPeriodicCell();
+  if (params["show_periodicBox"].get<int>() == 1) {
+    drawPeriodicCell();
+  }
 #endif
 
-  if (params["show_keybinds"].get<int>() == 1) showKeybinds();
+  if (params["show_keybinds"].get<int>() == 1) {
+    showKeybinds();
+  }
+
   textZone.draw();
   glFlush();
   glutSwapBuffers();
@@ -1215,6 +1240,11 @@ void drawForces() {
 
 void drawVelocities() {
   /*
+
+  // TODO
+  //glShape::arrow(const vec3r &orig, const vec3r &arrow, double arrowSize = -1.0, double arrowAngle = 0.7);
+
+
   // Scaling
   double velMax = 0.0;
   double velSqr;
@@ -1477,7 +1507,7 @@ void buildMenu() {
 int main(int argc, char* argv[]) {
 
   box.setInteractive(true);
-  box.showBanner(); // it will show compilation options that have been used
+  box.showBanner();  // it will show compilation options that have been used
 
   std::string confFileName;
   std::string trajFileName;

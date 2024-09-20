@@ -11,6 +11,10 @@ project(Rockable LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# All compiled applications will be in the BUILD folder
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+
+
 ######################################################################
 # OPTIONS
 
@@ -23,9 +27,10 @@ option(ROCKABLE_ENABLE_SOFT_PARTICLES "enable strainning of particles" OFF)
 option(ROCKABLE_ENABLE_PERIODIC "enable full periodic boundary conditions" OFF)
 
 option(ROCKABLE_COMPILE_POSTPRO "Compile the application to run post-processing commands" OFF)
-option(ROCKABLE_COMPILE_SEE "Compile the application to visualize the conf-files" ON)
+option(ROCKABLE_COMPILE_SEE "Compile the glut application to visualize the conf-files" ON)
+option(ROCKABLE_COMPILE_SEE2 "Compile the glfw application to visualize the conf-files" OFF)
 option(ROCKABLE_COMPILE_SEE3 "Compile the application to edit graphically the input files" OFF)
-option(ROCKABLE_COMPILE_PREPRO "Compile the preprocessings" ON)
+option(ROCKABLE_COMPILE_PREPRO "Compile the preprocessing tools" ON)
 option(ROCKABLE_COMPILE_CONF2VTK "Convert conf files to VTK" ON)
 
 ######################################################################
@@ -77,7 +82,8 @@ FetchContent_Declare (
 FetchContent_GetProperties(toofus)
 if(NOT toofus_POPULATED)
   message(STATUS "Fetching toofus")
-  FetchContent_Populate(toofus)
+  # FetchContent_Populate(toofus) # will be deprecated
+  FetchContent_MakeAvailable(toofus)
 endif()
 
 ######################################################################
@@ -91,7 +97,8 @@ FetchContent_Declare(fmt
 FetchContent_GetProperties(fmt)
 if(NOT fmt_POPULATED)
   message(STATUS "Fetching fmt")
-  FetchContent_Populate(fmt)
+  # FetchContent_Populate(fmt)
+  FetchContent_MakeAvailable(fmt)
   #add_subdirectory(${FETCHCONTENT_BASE_DIR}/fmt-src)
 endif()
 
@@ -106,7 +113,8 @@ if(ROCKABLE_ENABLE_PROFILING)
 	FetchContent_GetProperties(matools)
 	if(NOT matools_POPULATED)
     message(STATUS "Fetching MATools")
-    FetchContent_Populate(matools)
+    #FetchContent_Populate(matools)
+    FetchContent_MakeAvailable(matools)
 		SET(MATOOLS_MPI OFF CACHE BOOL "Use some expat option")		
 		add_subdirectory(${FETCHCONTENT_BASE_DIR}/matools-src)
 	endif()
@@ -122,7 +130,8 @@ FetchContent_Declare (
 FetchContent_GetProperties(tclap)
 if(NOT tclap_POPULATED)
   message(STATUS "Fetching tclap")
-  FetchContent_Populate(tclap)
+  #FetchContent_Populate(tclap)
+  FetchContent_MakeAvailable(tclap)
 	#add_subdirectory(${tclap_SOURCE_DIR})
 endif()
 
@@ -136,7 +145,8 @@ FetchContent_Declare (
 FetchContent_GetProperties(nlohmann-json)
 if(NOT nlohmann-json_POPULATED)
   message(STATUS "Fetching nlohmann-json")
-  FetchContent_Populate(nlohmann-json)
+  #FetchContent_Populate(nlohmann-json)
+  FetchContent_MakeAvailable(nlohmann-json)
 	#add_subdirectory(${nlohmann-json_SOURCE_DIR})
 endif()
 
@@ -154,11 +164,9 @@ FetchContent_GetProperties(imgui)
 
 if(NOT imgui_POPULATED)
   message(STATUS "Fetching imgui")
-  FetchContent_Populate(imgui)
+  #FetchContent_Populate(imgui)
+  FetchContent_MakeAvailable(imgui)
 endif()
-  
-# Il faudrait simplement cloner imgui.git quelque part pour que les headers soient accessibles
-# pour compiler see3
 
 endif() # end of ROCKABLE_COMPILE_SEE3
 
@@ -199,7 +207,7 @@ endif()
 
 ######################################################################
 #### glut
-if (${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
+if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
 	
   # here, we do not uses find_package(glut) so that the version installed by apple is NOT used
   find_package(PkgConfig REQUIRED)
@@ -223,9 +231,28 @@ endif()
 
 ######################################################################
 #### glfw
-#if(ROCKABLE_COMPILE_SEE3)
-#  find_package(glfw3 REQUIRED)
-#endif()
+if(ROCKABLE_COMPILE_SEE2 OR ROCKABLE_COMPILE_SEE3)
+  #find_package(glfw3 CONFIG REQUIRED)  
+  
+  FetchContent_Declare(
+          glfw
+          GIT_REPOSITORY https://github.com/glfw/glfw
+  )
+
+  FetchContent_GetProperties(glfw)
+  if(NOT glfw_POPULATED)
+      #FetchContent_Populate(glfw)
+      FetchContent_MakeAvailable(glfw)
+
+      set(GLFW_BUILD_EXAMPLES OFF CACHE INTERNAL "Build the GLFW example programs")
+      set(GLFW_BUILD_TESTS OFF CACHE INTERNAL "Build the GLFW test programs")
+      set(GLFW_BUILD_DOCS OFF CACHE INTERNAL "Build the GLFW documentation")
+      set(GLFW_INSTALL OFF CACHE INTERNAL "Generate installation target")
+
+      add_subdirectory(${glfw_SOURCE_DIR} ${glfw_BINARY_DIR})
+  endif()
+  
+endif()
 
 ######################################################################
 ##### libRockable_core
@@ -277,18 +304,22 @@ endif()
 ##### visualiser see (it uses glut)
 if(ROCKABLE_COMPILE_SEE)
 
+find_package(PNG REQUIRED)
+
 add_executable(see ${CMAKE_SOURCE_DIR}/Apps/see.cpp)
 target_include_directories(see PUBLIC 
 	${OPENGL_INCLUDE_DIR}
 	${GLUT_INCLUDE_DIRS}
 	${nlohmann-json_SOURCE_DIR}/include
+  ${PNG_INCLUDE_DIRS}
 )
-target_link_directories(see PUBLIC ${GLUT_LIBRARY_DIRS})
+#target_compile_options(see PUBLIC "-DPNG_H") # ne fonctionne pas pour le moment
+target_link_directories(see PUBLIC ${GLUT_LIBRARY_DIRS} ${PNG_LIBRARY})
 
 if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
-  target_link_libraries (see PUBLIC OpenGL::GL OpenGL::GLU ${GLUT_LIBRARIES} Rockable_core)
+  target_link_libraries (see PUBLIC OpenGL::GL OpenGL::GLU ${GLUT_LIBRARIES} Rockable_core PNG::PNG)
 else()
-  target_link_libraries (see PUBLIC OpenGL::GL OpenGL::GLU ${GLUT_LIBRARIES} Rockable_core)
+  target_link_libraries (see PUBLIC OpenGL::GL OpenGL::GLU ${GLUT_LIBRARIES} Rockable_core PNG::PNG)
 endif()
 
 install(TARGETS see DESTINATION ./)
@@ -300,9 +331,6 @@ endif()
 ##### interactive preprocessing (TODO see3 -> will be renamed something like 'craft' or 'look')
 ##### Before, the use of glfw will be replaced by glut (to avoid issues with macosx) 
 if(ROCKABLE_COMPILE_SEE3)
-  
-#find_package(glfw3)
-pkg_check_modules(GLFW REQUIRED glfw3)
 
 set(see3_files
   ${CMAKE_SOURCE_DIR}/Apps/see3.cpp
@@ -316,18 +344,17 @@ set(see3_files
 )
 
 add_executable(see3 ${see3_files})
-include_directories( 
+target_include_directories(see3 PUBLIC
 	${OPENGL_INCLUDE_DIR}
-  ${GLFW_INCLUDE_DIRS}
 	${imgui_SOURCE_DIR}
 	${imgui_SOURCE_DIR}/backends
   ${nlohmann-json_SOURCE_DIR}/include
 )
 
 if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
-  target_link_libraries (see3 PUBLIC OpenGL::GL OpenGL::GLU ${GLFW_LIBRARIES} Rockable_core)
+  target_link_libraries (see3 PUBLIC glfw OpenGL::GL OpenGL::GLU Rockable_core)
 else()
-  target_link_libraries (see3 PUBLIC OpenGL::GL OpenGL::GLU ${GLFW_LIBRARIES} Rockable_core)
+  target_link_libraries (see3 PUBLIC glfw OpenGL::GL OpenGL::GLU Rockable_core)
 endif()
 
 install(TARGETS see3 DESTINATION ./)

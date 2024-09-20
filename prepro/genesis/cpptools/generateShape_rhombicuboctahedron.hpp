@@ -31,7 +31,7 @@ void generateShape_rhombicuboctahedron(std::ostream& os, const char* name, doubl
   os << "name " << name << '\n';
   os << "radius " << radius << '\n';
   os << "preCompDone n" << '\n';
-  os << "MCnstep 100000" << '\n';
+  os << "MCnstep 200000" << '\n';
 
   os << "nv 24" << '\n';
   os << lx << " " << -iy << " " << iz << '\n';
