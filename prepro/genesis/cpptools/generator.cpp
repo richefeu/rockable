@@ -9,9 +9,10 @@
 
 #include "kwParser.hpp"
 #include "message.hpp"
+#include "nanoExprParser.hpp"
 #include "quat.hpp"
-#include "vec3.hpp"
 #include "transformation.hpp"
+#include "vec3.hpp"
 
 Transformation<double> globalTransformation;
 quat individualParticleRotation;
@@ -29,6 +30,14 @@ quat individualParticleRotation;
 std::ostream* outputStream = &std::cout;
 std::ofstream fileStream;
 
+void inplace_trim(std::string& line) {
+  // trim from start (in place)
+  line.erase(line.begin(), std::find_if(line.begin(), line.end(), [](unsigned char ch) { return !std::isspace(ch); }));
+  // trim from end (in place)
+  line.erase(std::find_if(line.rbegin(), line.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(),
+             line.end());
+}
+
 void readCommands(const char* name) {
   std::ifstream com(name);
   if (!com.is_open()) {
@@ -38,7 +47,6 @@ void readCommands(const char* name) {
 
   kwParser parser;
 
-  // Map "open" command to a function
   parser.kwMap["open"] = __DO__(com) {
     std::string filename;
     com >> filename;
@@ -50,7 +58,6 @@ void readCommands(const char* name) {
     }
   };
 
-  // Map "close" command to a function
   parser.kwMap["close"] = __DO__(com) {
     if (fileStream.is_open()) {
       fileStream.close();
@@ -61,13 +68,46 @@ void readCommands(const char* name) {
   parser.kwMap["print"] = __DO__(com) {
     std::string line;
     getline(com, line);
-    // trim from start (in place)
-    line.erase(line.begin(),
-               std::find_if(line.begin(), line.end(), [](unsigned char ch) { return !std::isspace(ch); }));
-    // trim from end (in place)
-    line.erase(std::find_if(line.rbegin(), line.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(),
-               line.end());
+    inplace_trim(line);
     *outputStream << line << '\n';
+  };
+
+  parser.kwMap["print>"] = __DO__(com) {
+    std::string line;
+    getline(com, line);
+    inplace_trim(line);
+    *outputStream << line;
+  };
+
+  parser.kwMap["compute"] = __DO__(com) {
+    std::string preword;
+    com >> preword;
+
+    std::string line;
+    getline(com, line);
+
+    nanoExprParser<double> parser;
+    double result;
+    if (parser.parse(line, result)) {
+      *outputStream << preword << ' ' << result << '\n';
+    } else {
+      std::cerr << "Error parsing expression: " << line << std::endl;
+      *outputStream << preword << " ???_parse_error_???\n";
+    }
+  };
+
+  parser.kwMap["<compute"] = __DO__(com) {
+    std::string line;
+    getline(com, line);
+
+    nanoExprParser<double> parser;
+    double result;
+    if (parser.parse(line, result)) {
+      *outputStream << " " << result << '\n';
+    } else {
+      std::cerr << "Error parsing expression: " << line << std::endl;
+      *outputStream << " ???_parse_error_???\n";
+    }
   };
 
   parser.kwMap["tranformation:add_translation"] = __DO__(com) {
@@ -75,19 +115,18 @@ void readCommands(const char* name) {
     com >> xtrans >> ytrans >> ztrans;
     globalTransformation.translate(xtrans, ytrans, ztrans);
   };
-  
+
   parser.kwMap["tranformation:add_rotation"] = __DO__(com) {
-    double xaxe, yaxe, zaxe, angle;
-    com >> xaxe >> yaxe >> zaxe >> angle;
+    double xaxe, yaxe, zaxe, angleDeg;
+    com >> xaxe >> yaxe >> zaxe >> angleDeg;
+    double angle = angleDeg * M_PI / 180.0;
     globalTransformation.rotate(xaxe, yaxe, zaxe, angle);
     vec3r axis(xaxe, yaxe, zaxe);
     axis.normalize();
     individualParticleRotation.set_axis_angle(axis, angle);
   };
-  
-  parser.kwMap["tranformation:reset"] = __DO__() {
-    globalTransformation.reset();
-  };
+
+  parser.kwMap["tranformation:reset"] = __DO__() { globalTransformation.reset(); };
 
   parser.kwMap["addParticle"] = __DO__(com) {
     std::string name;
@@ -98,7 +137,7 @@ void readCommands(const char* name) {
     quat angularPosition;
     com >> name >> group >> cluster >> homothety >> position >> angularPosition;
     angularPosition = angularPosition * individualParticleRotation;
-    globalTransformation.apply(position); 
+    globalTransformation.apply(position);
     addParticle(*outputStream, name.c_str(), group, cluster, homothety, position, angularPosition);
   };
 
@@ -178,7 +217,7 @@ void readCommands(const char* name) {
         generatePacking_grid(*outputStream, name.c_str(), origBox, boxSize, n, group, clust, homothety, randQ);
     std::cerr << "@grid, Number of added bodies: " << nbAdded << '\n';
   };
-  
+
   parser.kwMap["generatePacking:grid_clust"] = __DO__(com) {
     std::string name;
     vec3r origBox;

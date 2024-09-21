@@ -17,7 +17,7 @@ generator <prepro-command-file>
 
 The program currently supports the following commands:
 
-- `open <string:filename>`
+- `open [string:filename]`
   
   Opens the file specified by `filename` (without space) for output.
 
@@ -25,38 +25,60 @@ The program currently supports the following commands:
 
   Closes the currently open output file, if any.
 
-- `print <text>` 
+- `print [text up to the line end]` 
 
-  Prints the specified `text` to the currently open output file or to the console if no file is open.
+  Prints the specified `text` to the currently open output file or to the console if no file is open. The spaces at the beginning and at the end of the text are trimmed. After printing, a cariage return is added (next print will star at the next line).
+  
+- `print> [text up to the line end]` 
 
-- `addParticle <string:name> <int:group> <int:cluster> <double:homothety> <double:position_x> <double:position_y> <double:position_z> <double:angularQuaternion_s> <double:angularQuaternion_x> <double:angularQuaternion_y> <double:angularQuaternion_z>` 
+  Similar to `print` but without cariage return at the end. Next Print will follow at the end.
+
+- `<compute`
+
+  Blabla
+  
+- `compute`
+
+- `transformation:rotate`
+
+  Blabla
+
+- `transformation:translate`
+  
+  Blabla
+
+- `transformation:reset`
+  
+  Blabla
+  
+- `addParticle [string:name] [int:group] [int:cluster] [double:homothety] [double:position_x] [double:position_y] [double:position_z] [double:angularQuaternion_s] [double:angularQuaternion_x] [double:angularQuaternion_y] [double:angularQuaternion_z]` 
 
   Adds a new particle with the specified parameters.
 
 
 ### Commands for generating a shape 
 
-- `generateShape:sphere <string:name> <double:radius>`
+- `generateShape:sphere [string:name] [double:radius]`
 
   Generates a spherical shape with the specified parameters.
 
-- `generateShape:cube <string:name> <double:radius> <vec3r:sideSize>` 
+- `generateShape:cube [string:name] [double:radius] [double:sideSize_x] [double:sideSize_y] [double:sideSize_z]` 
 
   Generates a cubic shape with the specified parameters.
 
-- `generateShape:cuboid <name> <radius> <sideSize_x> <sideSize_y> <sideSize_z>`
+- `generateShape:cuboid [string:name] [double:radius] [double:sideSize_x] [double:sideSize_y] [double:sideSize_z]`
 
   Generates a cuboid shape with the specified parameters.
 
-- `generateShape:rectangle_xz <name> <radius> <side_x> <side_z>`
+- `generateShape:rectangle_xz [string:name] [double:radius] [double:side_x] [double:side_z]`
 
   Generates a rectangle shape (in plane xz) with the specified parameters.
 
-- `generateShape:rhombicuboctahedron <name> <radius> <sideSize_x> <sideSize_y> <sideSize_z>`
+- `generateShape:rhombicuboctahedron [string:name] [double:radius] [double:sideSize_x] [double:sideSize_y] [double:sideSize_z]`
 
   Generates a rhombicuboctahedron shape with the specified parameters.
 
-- `generateShape:xyz_walls <size_x> <size_y> <size_z> <Rw>`
+- `generateShape:xyz_walls [double:size_x] [double:size_y] [double:size_z] [double:Rw]`
 
   Generates 3 wall-shapes with the specified parameters.
 
@@ -64,14 +86,14 @@ The program currently supports the following commands:
 ### Commands for generating a packing
 
 
-- `generatePacking:wallBox <group> <LX> <LY> <LZ> <Rw>`
+- `generatePacking:wallBox [group] [double:LX] [double:LY] [double:LZ] [double:Rw]`
 
   Generates a packing using the wallBox method with the specified parameters.
 
-- `generatePacking:grid <name> <origBox_x> <origBox_y> <origBox_z> <boxSize_x> <boxSize_y> <boxSize_z> <n_x> <n_y> <n_z> <group> <clust> <homothety> <randQ>`
+- `generatePacking:grid [string:name] [double:origBox_x] [double:origBox_y] [double:origBox_z] [double:boxSize_x] [double:boxSize_y] [double:boxSize_z] [int:n_x] [int:n_y] [int:n_z] [int:group] [int:clust] [double:homothety] [int:randQ]`
 
   Generates a packing using the grid method with the specified parameters.
 
-- `generatePacking:grid_clust <name> <origBox_x> <origBox_y> <origBox_z> <boxSize_x> <boxSize_y> <boxSize_z> <n_x> <n_y> <n_z> <group> <clust> <homothety> <randQ>`
+- `generatePacking:grid_clust [string:name] [double:origBox_x] [double:origBox_y] [double:origBox_z] [double:boxSize_x] [double:boxSize_y] [double:boxSize_z] [int:n_x] [int:n_y] [int:n_z] [int:group] [int:clust] [double:homothety] [int:randQ]`
 
   Generates a packing using the grid method with clustering with the specified parameters.

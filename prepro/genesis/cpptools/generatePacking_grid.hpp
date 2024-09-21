@@ -1,9 +1,6 @@
 #ifndef GENERATEPACKING_GRID_HPP
 #define GENERATEPACKING_GRID_HPP
 
-// globalTransformation and individualParticleRotation are global variables
-// This file is included in the main cpp file (no separated compilation in .o file)
-
 #include <cmath>
 #include <fstream>
 #include <iostream>
@@ -12,6 +9,11 @@
 
 #include "message.hpp"
 #include "quat.hpp"
+#include "transformation.hpp"
+
+// RECALL:
+// globalTransformation and individualParticleRotation are global variables
+// this .h file is included in the generator.cpp 
 
 // This function generates a grid of particles and writes their data to an output stream.
 // The cluter number is incremented, starting with clustID

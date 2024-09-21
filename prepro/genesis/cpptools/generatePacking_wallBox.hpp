@@ -1,6 +1,12 @@
 #ifndef GENERATEPACKING_WALLBOX_HPP
 #define GENERATEPACKING_WALLBOX_HPP
 
+// RECALL:
+// globalTransformation and individualParticleRotation are global variables
+// this .h file is included in the generator.cpp 
+
+// TODO: for now the transformations are not applied
+
 #include <iostream>
 
 // Lengths LX, LY and LZ are inside (walls are placed outside this cube)
