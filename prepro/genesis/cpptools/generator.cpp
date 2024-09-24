@@ -7,6 +7,7 @@
 #include <locale>
 #include <string>
 
+#include "OBBpacker.hpp"
 #include "kwParser.hpp"
 #include "message.hpp"
 #include "nanoExprParser.hpp"
@@ -16,6 +17,9 @@
 
 Transformation<double> globalTransformation;
 quat individualParticleRotation;
+
+int NumberOfParticles = 0;
+std::streampos Np_pos = std::streampos(0);
 
 #include "addParticle.hpp"
 #include "generatePacking_grid.hpp"
@@ -38,6 +42,7 @@ void inplace_trim(std::string& line) {
              line.end());
 }
 
+// This is a very basic kind of language to generate rockable initial conf-file
 void readCommands(const char* name) {
   std::ifstream com(name);
   if (!com.is_open()) {
@@ -60,6 +65,10 @@ void readCommands(const char* name) {
 
   parser.kwMap["close"] = __DO__(com) {
     if (fileStream.is_open()) {
+      if (Np_pos != std::streampos(0)) {
+        fileStream.seekp(Np_pos);
+        fileStream << NumberOfParticles;
+      }
       fileStream.close();
       outputStream = &std::cout;
     }
@@ -110,6 +119,20 @@ void readCommands(const char* name) {
     }
   };
 
+  parser.kwMap["incrementNoParticles"] = __DO__(com) {
+    int inc;
+    com >> inc;
+    NumberOfParticles += inc;
+  };
+
+  parser.kwMap["Particles:placeHolder"] = __DO__() {
+    if (fileStream.is_open()) {
+      fileStream << "Particles ";
+      Np_pos = fileStream.tellp();
+      fileStream << "            \n";
+    }
+  };
+
   parser.kwMap["tranformation:add_translation"] = __DO__(com) {
     double xtrans, ytrans, ztrans;
     com >> xtrans >> ytrans >> ztrans;
@@ -126,7 +149,10 @@ void readCommands(const char* name) {
     individualParticleRotation.set_axis_angle(axis, angle);
   };
 
-  parser.kwMap["tranformation:reset"] = __DO__() { globalTransformation.reset(); };
+  parser.kwMap["tranformation:reset"] = __DO__() {
+    globalTransformation.reset();
+    individualParticleRotation.reset();
+  };
 
   parser.kwMap["addParticle"] = __DO__(com) {
     std::string name;
@@ -136,9 +162,8 @@ void readCommands(const char* name) {
     vec3r position;
     quat angularPosition;
     com >> name >> group >> cluster >> homothety >> position >> angularPosition;
-    angularPosition = angularPosition * individualParticleRotation;
-    globalTransformation.apply(position);
     addParticle(*outputStream, name.c_str(), group, cluster, homothety, position, angularPosition);
+    NumberOfParticles++;
   };
 
   parser.kwMap["generateShape:sphere"] = __DO__(com) {
@@ -200,7 +225,8 @@ void readCommands(const char* name) {
     double Rw;
     com >> group >> LX >> LY >> LZ >> Rw;
     int nbAdded = generatePacking_wallBox(*outputStream, group, LX, LY, LZ, Rw);
-    std::cerr << "@wallBox, Number of added bodies: " << nbAdded << '\n';
+    NumberOfParticles += nbAdded;
+    std::cerr << "@generatePacking:wallBox, Number of added bodies: " << nbAdded << '\n';
   };
 
   parser.kwMap["generatePacking:grid"] = __DO__(com) {
@@ -215,7 +241,8 @@ void readCommands(const char* name) {
     com >> name >> origBox >> boxSize >> n >> group >> clust >> homothety >> randQ;
     int nbAdded =
         generatePacking_grid(*outputStream, name.c_str(), origBox, boxSize, n, group, clust, homothety, randQ);
-    std::cerr << "@grid, Number of added bodies: " << nbAdded << '\n';
+    NumberOfParticles += nbAdded;
+    std::cerr << "@generatePacking:grid, Number of added bodies: " << nbAdded << '\n';
   };
 
   parser.kwMap["generatePacking:grid_clust"] = __DO__(com) {
@@ -230,7 +257,60 @@ void readCommands(const char* name) {
     com >> name >> origBox >> boxSize >> n >> group >> clust >> homothety >> randQ;
     int nbAdded =
         generatePacking_grid_clust(*outputStream, name.c_str(), origBox, boxSize, n, group, clust, homothety, randQ);
-    std::cerr << "@grid, Number of added bodies: " << nbAdded << '\n';
+    NumberOfParticles += nbAdded;
+    std::cerr << "@generatePacking:grid_clust, Number of added bodies: " << nbAdded << '\n';
+  };
+
+  parser.kwMap["generatePacking:RandomClosePacking"] = __DO__(com) {
+    std::string name;
+    std::string boxShape;
+    std::string direction;
+    vec3r boxSize;
+    double xOBB;
+    double yOBB;
+    double zOBB;
+    double homothety_min;
+    double homothety_max;
+    size_t nbTarget;
+    double solidFractionTarget;
+    int group;
+    int clust;
+
+    com >> name >> boxShape >> direction >> boxSize >> xOBB >> yOBB >> zOBB >> homothety_min >> homothety_max >>
+        nbTarget >> solidFractionTarget >> group >> clust;
+
+    OBBPacker packer;
+    packer.setOBBDimensions(xOBB, yOBB, zOBB);
+    packer.setHomothetyRange(homothety_min, homothety_max);
+    packer.setNbOBBsTarget(nbTarget);
+    packer.setSolidFractionTarget(solidFractionTarget);
+    packer.setContainerLength(boxSize.x, boxSize.y, boxSize.z);
+    if (boxShape == "CYLINDER") {
+      packer.setContainerType(OBBPacker::CYLINDER);
+    } else {
+      packer.setContainerType(OBBPacker::CUBOID);
+    }
+    if (direction == "X") {
+      packer.setPackingDirection(OBBPacker::X);
+    } else if (direction == "Y") {
+      packer.setPackingDirection(OBBPacker::Y);
+    } else if (direction == "Z") {
+      packer.setPackingDirection(OBBPacker::Z);
+    }
+
+    std::vector<OBB> obbs;
+    packer.pack(obbs);
+    packer.sort(obbs);
+
+    for (size_t i = 0; i < obbs.size(); i++) {
+      double homothety = 2.0 * obbs[i].extent.x / xOBB;
+      quat angularPosition = obbs[i].getQuaternion();
+      vec3r position = obbs[i].center;  // Ok only if the particle center is the obb center
+      addParticle(*outputStream, name.c_str(), group, clust, homothety, position, angularPosition);
+    }
+
+    std::cerr << "@generatePacking:RandomClosePacking, Number of added bodies: " << obbs.size() << '\n';
+    NumberOfParticles += (int)(obbs.size());
   };
 
   // This single line actually parses the file
