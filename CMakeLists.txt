@@ -82,7 +82,6 @@ FetchContent_Declare (
 FetchContent_GetProperties(toofus)
 if(NOT toofus_POPULATED)
   message(STATUS "Fetching toofus")
-  # FetchContent_Populate(toofus) # will be deprecated
   FetchContent_MakeAvailable(toofus)
 endif()
 
@@ -97,9 +96,7 @@ FetchContent_Declare(fmt
 FetchContent_GetProperties(fmt)
 if(NOT fmt_POPULATED)
   message(STATUS "Fetching fmt")
-  # FetchContent_Populate(fmt)
   FetchContent_MakeAvailable(fmt)
-  #add_subdirectory(${FETCHCONTENT_BASE_DIR}/fmt-src)
 endif()
 
 ######################################################################
@@ -113,9 +110,8 @@ if(ROCKABLE_ENABLE_PROFILING)
 	FetchContent_GetProperties(matools)
 	if(NOT matools_POPULATED)
     message(STATUS "Fetching MATools")
-    #FetchContent_Populate(matools)
     FetchContent_MakeAvailable(matools)
-		SET(MATOOLS_MPI OFF CACHE BOOL "Use some expat option")		
+		SET(MATOOLS_MPI OFF CACHE BOOL "Use some expat option")
 		add_subdirectory(${FETCHCONTENT_BASE_DIR}/matools-src)
 	endif()
 endif()
@@ -130,9 +126,7 @@ FetchContent_Declare (
 FetchContent_GetProperties(tclap)
 if(NOT tclap_POPULATED)
   message(STATUS "Fetching tclap")
-  #FetchContent_Populate(tclap)
   FetchContent_MakeAvailable(tclap)
-	#add_subdirectory(${tclap_SOURCE_DIR})
 endif()
 
 ######################################################################
@@ -145,9 +139,7 @@ FetchContent_Declare (
 FetchContent_GetProperties(nlohmann-json)
 if(NOT nlohmann-json_POPULATED)
   message(STATUS "Fetching nlohmann-json")
-  #FetchContent_Populate(nlohmann-json)
   FetchContent_MakeAvailable(nlohmann-json)
-	#add_subdirectory(${nlohmann-json_SOURCE_DIR})
 endif()
 
 ######################################################################
@@ -164,7 +156,6 @@ FetchContent_GetProperties(imgui)
 
 if(NOT imgui_POPULATED)
   message(STATUS "Fetching imgui")
-  #FetchContent_Populate(imgui)
   FetchContent_MakeAvailable(imgui)
 endif()
 
@@ -185,9 +176,6 @@ endif() # end of ROCKABLE_COMPILE_SEE3
 #	add_subdirectory(${chaiscript_SOURCE_DIR})
 #endif()
 
-######################################################################
-##### Making available all fetched things
-#FetchContent_MakeAvailable(MATools)
 
 ######################################################################
 ##### OpenMP
@@ -241,7 +229,6 @@ if(ROCKABLE_COMPILE_SEE2 OR ROCKABLE_COMPILE_SEE3)
 
   FetchContent_GetProperties(glfw)
   if(NOT glfw_POPULATED)
-      #FetchContent_Populate(glfw)
       FetchContent_MakeAvailable(glfw)
 
       set(GLFW_BUILD_EXAMPLES OFF CACHE INTERNAL "Build the GLFW example programs")
@@ -305,16 +292,31 @@ endif()
 if(ROCKABLE_COMPILE_SEE)
 
 find_package(PNG REQUIRED)
+if(PNG_FOUND)
+  message(STATUS "libpng found: ${PNG_INCLUDE_DIRS}")
+else()
+  message(STATUS "libpng not found")
+endif()
 
 add_executable(see ${CMAKE_SOURCE_DIR}/Apps/see.cpp)
-target_include_directories(see PUBLIC 
+
+if(PNG_FOUND)
+  # Pour le moment on compile sans libpng car il y a un problème sur mac
+  # Les screenshots seront sauvegardés en tga
+  # target_compile_options(see PRIVATE -DPNG_H)
+endif()
+
+target_include_directories(see PRIVATE 
 	${OPENGL_INCLUDE_DIR}
 	${GLUT_INCLUDE_DIRS}
 	${nlohmann-json_SOURCE_DIR}/include
   ${PNG_INCLUDE_DIRS}
 )
-#target_compile_options(see PUBLIC "-DPNG_H") # ne fonctionne pas pour le moment
-target_link_directories(see PUBLIC ${GLUT_LIBRARY_DIRS} ${PNG_LIBRARY})
+
+target_link_directories(see PRIVATE 
+  ${GLUT_LIBRARY_DIRS} 
+  ${PNG_LIBRARY}
+)
 
 if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
   target_link_libraries (see PUBLIC OpenGL::GL OpenGL::GLU ${GLUT_LIBRARIES} Rockable_core PNG::PNG)

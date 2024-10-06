@@ -51,7 +51,7 @@ void DrivingSystem::read(bool allow_warn) {
 
   if (!fileTool::fileExists("drivingSystem.txt")) {
     if (allow_warn == true) {
-      Logger::warn("No file 'drivingSystem.txt' has been found. The first 'nDriven' bodies will not move");
+      Logger::info("No file 'drivingSystem.txt' has been found. The first 'nDriven' bodies will not move");
     }
     return;
   }
@@ -63,14 +63,16 @@ void DrivingSystem::read(bool allow_warn) {
 
   controls.clear();
   while (is) {
-    if (token[0] == '/' || token[0] == '#' || token[0] == '!')
+    if (token[0] == '/' || token[0] == '#' || token[0] == '!') {
       getline(is, token);
-	
+    }
+
     else if (token == "PeriodicLoading") {
 
       std::string LoadingName;
       is >> LoadingName;
       if (LoadingName == "IsotropicCompression") {
+
         double pressure;
         is >> pressure;
         cellControl.Drive.xx = cellControl.Drive.yy = cellControl.Drive.zz = ForceDriven;
@@ -92,6 +94,7 @@ void DrivingSystem::read(bool allow_warn) {
       }
 
     } else if (token == "Control") {
+
       std::string typeStr;
       Control C;
       is >> typeStr >> C.i;
@@ -102,7 +105,9 @@ void DrivingSystem::read(bool allow_warn) {
         is >> C.value;
       }
       controls.push_back(C);
+
     } else if (token == "Servo") {
+
       std::string servoName;
       is >> servoName;
       if (servoName.substr(0, 6) == "tritri") {  // if the name of the servo starts with "tritri"
@@ -156,13 +161,14 @@ void DrivingSystem::read(bool allow_warn) {
     */
 
         if (servoName == "tritriIsostaticCompression") {
+
           // This is an isostatic compression.
           // the pressure is applied on the walls with the maximum positions
           // along the x-, y- and z-axis.
           // The walls with the minimum positions are fixed (velocity imposed at zero)
           double pressure;
           is >> pressure;
-           
+
           ServoFunction = [icontr, idXmin, idXmax, idYmin, idYmax, idZmin, idZmax, pressure](Rockable& box) -> void {
             const double Xmin = box.Particles[idXmin].pos.x + box.Particles[idXmin].MinskowskiRadius();
             const double Xmax = box.Particles[idXmax].pos.x - box.Particles[idXmax].MinskowskiRadius();
@@ -180,9 +186,10 @@ void DrivingSystem::read(bool allow_warn) {
             box.System.controls[icontr + 1].value = -pressure * surfX;
             box.System.controls[icontr + 3].value = -pressure * surfY;
             box.System.controls[icontr + 5].value = -pressure * surfZ;
-
           };
+
         } else if (servoName == "tritriBiaxialCompression") {
+
           // This is a biaxial compression along the y-axis
           // the pressure is applied laterally along the x- and z-axis
           // The walls with the minimum positions are fixed (velocity imposed at
@@ -208,7 +215,9 @@ void DrivingSystem::read(bool allow_warn) {
             box.System.controls[icontr + 1].value = -pressure * surfX;
             box.System.controls[icontr + 5].value = -pressure * surfZ;
           };
+
         } else if (servoName == "tritriCustom") {
+
           int xminType, xmaxType;
           int yminType, ymaxType;
           int zminType, zmaxType;
@@ -268,6 +277,7 @@ void DrivingSystem::read(bool allow_warn) {
           };
 
         } else if (servoName == "tritriLodeAngle") {
+
           // ADD COMMENTS HERE...
           // **** NOT YET FULLY TESTED !!!!!!
           double pressure;
@@ -306,6 +316,7 @@ void DrivingSystem::read(bool allow_warn) {
         }
 
       } else if (servoName == "shaker") {
+
         vec3r dir;       // direction of oscillation
         double A, freq;  // amplitude and frequency
         Control C;
@@ -326,7 +337,9 @@ void DrivingSystem::read(bool allow_warn) {
           box.System.controls[icontr + 1].value = v.y;
           box.System.controls[icontr + 2].value = v.z;
         };
+
       } else if (servoName == "triangle_shaker") {
+
         vec3r dir;       // direction of oscillation
         double A, freq;  // amplitude and frequency
         Control C;
@@ -350,7 +363,9 @@ void DrivingSystem::read(bool allow_warn) {
           box.System.controls[icontr + 1].value = v.y;
           box.System.controls[icontr + 2].value = v.z;
         };
+
       } else if (servoName == "sawtooth_shaker") {
+
         // version de triangle_shaker avec possibilité de définir un temps initial
         vec3r dir;       // direction of oscillation
         double A, freq;  // amplitude and frequency
@@ -376,7 +391,9 @@ void DrivingSystem::read(bool allow_warn) {
           box.System.controls[icontr + 1].value = v.y;
           box.System.controls[icontr + 2].value = v.z;
         };
+
       } else if (servoName == "ramp") {
+
         std::string typeStr;
         double valueBegin, valueEnd, tBegin, tEnd;
         Control C;

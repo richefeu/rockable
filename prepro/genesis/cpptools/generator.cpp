@@ -1,3 +1,38 @@
+//  Copyright or © or Copr. Rockable
+//
+//  vincent.richefeu@3sr-grenoble.fr
+//
+//  This software is a computer program whose purpose is
+//    (i)  to hold sphero-polyhedral shapes,
+//    (ii) to manage breakable interfaces.
+//  It is developed for an ACADEMIC USAGE
+//
+//  This software is governed by the CeCILL-B license under French law and
+//  abiding by the rules of distribution of free software.  You can  use,
+//  modify and/ or redistribute the software under the terms of the CeCILL-B
+//  license as circulated by CEA, CNRS and INRIA at the following URL
+//  "http://www.cecill.info".
+//
+//  As a counterpart to the access to the source code and  rights to copy,
+//  modify and redistribute granted by the license, users are provided only
+//  with a limited warranty  and the software's author,  the holder of the
+//  economic rights,  and the successive licensors  have only  limited
+//  liability.
+//
+//  In this respect, the user's attention is drawn to the risks associated
+//  with loading,  using,  modifying and/or developing or reproducing the
+//  software by the user in light of its specific status of free software,
+//  that may mean  that it is complicated to manipulate,  and  that  also
+//  therefore means  that it is reserved for developers  and  experienced
+//  professionals having in-depth computer knowledge. Users are therefore
+//  encouraged to load and test the software's suitability as regards their
+//  requirements in conditions enabling the security of their systems and/or
+//  data to be ensured and,  more generally, to use and operate it in the
+//  same conditions as regards security.
+//
+//  The fact that you are presently reading this means that you have had
+//  knowledge of the CeCILL-B license and that you accept its terms.
+
 #include <algorithm>
 #include <cctype>
 #include <cmath>
@@ -26,6 +61,7 @@ std::streampos Np_pos = std::streampos(0);
 #include "generatePacking_wallBox.hpp"
 #include "generateShape_cube.hpp"
 #include "generateShape_cuboid.hpp"
+#include "generateShape_cuboid_container.hpp"
 #include "generateShape_rectangle.hpp"
 #include "generateShape_rhombicuboctahedron.hpp"
 #include "generateShape_sphere.hpp"
@@ -154,6 +190,15 @@ void readCommands(const char* name) {
     individualParticleRotation.reset();
   };
 
+  parser.kwMap["tranformation:reset_translation"] = __DO__() {
+    globalTransformation.reset_translation();
+  };
+  
+  parser.kwMap["tranformation:reset_rotation"] = __DO__() {
+    globalTransformation.reset_rotation();
+    individualParticleRotation.reset();
+  };
+
   parser.kwMap["addParticle"] = __DO__(com) {
     std::string name;
     int group;
@@ -192,6 +237,18 @@ void readCommands(const char* name) {
     std::cerr << "A cuboid shape has been generated\n";
   };
 
+  parser.kwMap["generateShape:cuboid_container"] = __DO__(com) {
+    std::string name;
+    double radius;
+    vec3r sideSize;
+    int hasTop = 1, hasBottom = 1;
+    com >> name >> radius >> sideSize >> hasTop >> hasBottom;
+    bool hasTopBool = (hasTop == 0) ? false : true;
+    bool hasBottomBool = (hasBottom == 0) ? false : true;
+    generateShape_cuboid_container(*outputStream, name.c_str(), radius, sideSize, hasTopBool, hasBottomBool);
+    std::cerr << "A cuboid container shape has been generated\n";
+  };
+
   parser.kwMap["generateShape:rectangle_xz"] = __DO__(com) {
     std::string name;
     double radius;
@@ -200,6 +257,16 @@ void readCommands(const char* name) {
     com >> name >> radius >> sidex >> sidez;
     generateShape_rectangle_xz(*outputStream, name.c_str(), radius, sidex, sidez);
     std::cerr << "A rectangle shape (in plane xz) has been generated\n";
+  };
+
+  parser.kwMap["generateShape:rectangle_xy"] = __DO__(com) {
+    std::string name;
+    double radius;
+    double sidex;
+    double sidey;
+    com >> name >> radius >> sidex >> sidey;
+    generateShape_rectangle_xy(*outputStream, name.c_str(), radius, sidex, sidey);
+    std::cerr << "A rectangle shape (in plane xy) has been generated\n";
   };
 
   parser.kwMap["generateShape:rhombicuboctahedron"] = __DO__(com) {

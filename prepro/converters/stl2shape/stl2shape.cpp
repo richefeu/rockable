@@ -1,20 +1,42 @@
-// Copyright (C) shapeSurvey <vincent.richefeu@3sr-grenoble.fr>
+//  Copyright or © or Copr. Rockable
 //
-// This file is part of mbox.
+//  vincent.richefeu@3sr-grenoble.fr
 //
-// shapeSurvey can not be copied and/or distributed without the express
-// permission of the authors.
-// It is coded for academic purposes.
+//  This software is a computer program whose purpose is
+//    (i)  to hold sphero-polyhedral shapes,
+//    (ii) to manage breakable interfaces.
+//  It is developed for an ACADEMIC USAGE
 //
-// Note
-// Without a license, the code is copyrighted by default.
-// People can read the code, but they have no legal right to use it.
-// To use the code, you must contact the author directly and ask permission.
+//  This software is governed by the CeCILL-B license under French law and
+//  abiding by the rules of distribution of free software.  You can  use,
+//  modify and/ or redistribute the software under the terms of the CeCILL-B
+//  license as circulated by CEA, CNRS and INRIA at the following URL
+//  "http://www.cecill.info".
+//
+//  As a counterpart to the access to the source code and  rights to copy,
+//  modify and redistribute granted by the license, users are provided only
+//  with a limited warranty  and the software's author,  the holder of the
+//  economic rights,  and the successive licensors  have only  limited
+//  liability.
+//
+//  In this respect, the user's attention is drawn to the risks associated
+//  with loading,  using,  modifying and/or developing or reproducing the
+//  software by the user in light of its specific status of free software,
+//  that may mean  that it is complicated to manipulate,  and  that  also
+//  therefore means  that it is reserved for developers  and  experienced
+//  professionals having in-depth computer knowledge. Users are therefore
+//  encouraged to load and test the software's suitability as regards their
+//  requirements in conditions enabling the security of their systems and/or
+//  data to be ensured and,  more generally, to use and operate it in the
+//  same conditions as regards security.
+//
+//  The fact that you are presently reading this means that you have had
+//  knowledge of the CeCILL-B license and that you accept its terms.
 //
 // Convert STL to shapeSurvey format
-// Author: Vincent.Richefeu@3sr-grenoble.fr
+// Author: Vincent.Richefeu@univ-grenoble-alpes.fr
 // Lab 3SR, Grenoble
-// 2016
+// 2016, 2024
 
 #include <cmath>
 #include <cstdlib>
@@ -290,7 +312,7 @@ void exportShape(mesh& Mesh) {
   file << "nv " << Mesh.points.size() << std::endl;
 
   for (size_t v = 0; v < Mesh.points.size(); v++) {
-    file << Mesh.points[v].x << " " << Mesh.points[v].y << " " << Mesh.points[v].z << " " << std::endl;
+    file << Mesh.points[v].x << " " << Mesh.points[v].y << " " << Mesh.points[v].z << std::endl;
   }
   file << std::endl;
 

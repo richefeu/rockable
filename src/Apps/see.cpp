@@ -117,13 +117,13 @@ void showKeybinds() {
 
 void keyboardSpecial(int Key, int /*x*/, int /*y*/) {
   switch (Key) {
-    case GLUT_KEY_UP:
+    case GLUT_KEY_UP: {
       textZone.increase_nbLine();
-      break;
+    } break;
 
-    case GLUT_KEY_DOWN:
+    case GLUT_KEY_DOWN: {
       textZone.decrease_nbLine();
-      break;
+    } break;
   };
 
   glutPostRedisplay();
@@ -234,6 +234,8 @@ void keyboard(unsigned char Key, int x, int y) {
     } break;
 
     case 'j': {
+      // read the json configuration file 'see.json' if it exists
+      // create the file 'see.json' if it does not exist
       if (fileTool::fileExists("see.json")) {
         std::ifstream file("see.json");
         nlohmann::json patch = nlohmann::json::parse(file);
@@ -248,7 +250,7 @@ void keyboard(unsigned char Key, int x, int y) {
       }
     } break;
 
-    case 'J': {
+    case 'J': {  // create the file 'see.json'
       local_to_json();
       std::ofstream file("see.json");
       file << std::setw(4) << params;
@@ -300,11 +302,11 @@ void keyboard(unsigned char Key, int x, int y) {
     case 'r': {
       params["rescaleColorRange"] = 1 - params["rescaleColorRange"].get<int>();
       if (params["rescaleColorRange"].get<int>() == 0) {
-        std::cout << "rescaleColorRange = 0\n";
+        std::cout << "color range scaled to colorRangeMin and colorRangeMax (can be set in 'see.json')\n";
         std::cout << "colorRangeMin = " << params["colorRangeMin"].get<double>() << '\n';
         std::cout << "colorRangeMax = " << params["colorRangeMax"].get<double>() << '\n';
       } else if (params["rescaleColorRange"].get<int>() == 1) {
-        std::cout << "rescaleColorRange = 1\n";
+        std::cout << "color range automatically rescaled when a conf-file is read\n";
       }
     } break;
 
@@ -468,7 +470,9 @@ void selection(int x, int y) {
   if (params["show_particles"].get<int>()) {
     glColor3f(0.5f, 0.5f, 0.5f);
     size_t i0 = 0;
-    if (params["show_driven"].get<int>() == 0) i0 = box.nDriven;
+    if (params["show_driven"].get<int>() == 0) {
+      i0 = box.nDriven;
+    }
     for (size_t i = i0; i < box.Particles.size(); ++i) {
       glLoadName(i);
       vec3r pos = box.Particles[i].pos;
@@ -527,21 +531,23 @@ void mouse(int button, int state, int x, int y) {
 
     switch (button) {
       case GLUT_LEFT_BUTTON: {
-        if (glutGetModifiers() == GLUT_ACTIVE_SHIFT)
+        if (glutGetModifiers() == GLUT_ACTIVE_SHIFT) {
           mouse_mode = PAN;
-        else if (glutGetModifiers() == GLUT_ACTIVE_ALT)
+        } else if (glutGetModifiers() == GLUT_ACTIVE_ALT) {
           selection(x, y);
-        else if (glutGetModifiers() == GLUT_ACTIVE_CTRL)
+        } else if (glutGetModifiers() == GLUT_ACTIVE_CTRL) {
           mouse_mode = ZOOM;
-        else
+        } else {
           mouse_mode = ROTATION;
+        }
       } break;
 
       case GLUT_MIDDLE_BUTTON: {
-        if (glutGetModifiers() == GLUT_ACTIVE_SHIFT)
+        if (glutGetModifiers() == GLUT_ACTIVE_SHIFT) {
           selection(x, y);
-        else
+        } else {
           mouse_mode = ZOOM;
+        }
       } break;
     }
   }
@@ -557,26 +563,26 @@ void motion(int x, int y) {
 
   switch (mouse_mode) {
 
-    case ROTATION:
+    case ROTATION: {
       axis = (cross(up, center - eye));
       axis.normalize();
       eye = geoTool::rotatePoint(eye, center, up, -dx * M_PI);
       eye = geoTool::rotatePoint(eye, center, axis, dy * M_PI);
       up = (geoTool::rotatePoint((center + up), center, axis, dy * M_PI) - center);
       up.normalize();
-      break;
+    } break;
 
-    case ZOOM:
+    case ZOOM: {
       eye = center + (eye - center) * (dy + 1.0);
-      break;
+    } break;
 
-    case PAN:
+    case PAN: {
       length = (eye - center).length() * tan(view_angle * M_PI / 360.0) * 2.0;
       axis = cross(up, center - eye);
       axis.normalize();
       center = center + axis * dx * length * 0.8;
       center = center + up * dy * length;
-      break;
+    } break;
 
     default:
       break;
@@ -603,21 +609,27 @@ void display() {
   if (params["show_traj"].get<int>() == 1) {
     drawTrajectories();
   }
+
   if (params["show_forces"].get<int>() == 1) {
     drawForces();
   }
+
   if (params["show_interFrames"].get<int>() == 1) {
     drawInteractionFrames();
   }
+
   if (params["show_interTypes"].get<int>() == 1) {
     drawInteractionTypes();
   }
+
   if (params["show_obb"].get<int>() == 1) {
     drawOBBs();
   }
+
   if (params["show_particles"].get<int>() == 1) {
     drawParticles();
   }
+
   if (params["show_probe"].get<int>() == 1) {
     drawProbe();
   }
@@ -645,7 +657,9 @@ void computePerspective() {
 
   znear = zf - 0.5 * max_length;
   double close_dst = 0.1 * zf;
-  if (znear < close_dst) znear = close_dst;
+  if (znear < close_dst) {
+    znear = close_dst;
+  }
   zfar = zf + 0.5 * max_length;
 }
 
@@ -789,8 +803,9 @@ void drawParticles() {
       int alpha = (int)floor(params["alpha_fixparticles"].get<GLfloat>() * 255);
       if (selectedParticle >= 0 && i == (size_t)selectedParticle) {
         glColor4ub(234, 255, 0, alpha);
-      } else
+      } else {
         glColor4ub(128, 128, 128, alpha);
+      }
 
       vec3r pos = box.Particles[i].pos;
 
@@ -805,7 +820,9 @@ void drawParticles() {
 }
 
 void drawTrajectories() {
-  if (mouse_mode != NOTHING && releases.size() > 200) return;
+  if (mouse_mode != NOTHING && releases.size() > 200) {
+    return;
+  }
 
   glDisable(GL_LIGHTING);
   glEnable(GL_DEPTH_TEST);
@@ -883,7 +900,7 @@ void drawPeriodicCell() {
   glVertex3d(p7.x, p7.y, p7.z);
   glEnd();
 }
-#endif
+#endif  // end of #ifdef ROCKABLE_ENABLE_PERIODIC
 
 void drawGlobalFrame() {
   glEnable(GL_LIGHTING);
@@ -915,10 +932,13 @@ void drawOBBs() {
     obbi.extent *= box.Particles[i].homothety;
     obbi.center *= box.Particles[i].homothety;
     obbi.center += box.Particles[i].pos;
-    if (params["enlarged_obb"].get<int>() == 1) obbi.enlarge(0.5 * box.DVerlet);
+    if (params["enlarged_obb"].get<int>() == 1) {
+      obbi.enlarge(0.5 * box.DVerlet);
+    }
 
     glColor4ub(255, 0, 0, 255);  // RED
     vec3r corner;
+
     glBegin(GL_LINE_LOOP);
     corner = obbi.center + obbi.extent[0] * obbi.e[0] + obbi.extent[1] * obbi.e[1] + obbi.extent[2] * obbi.e[2];
     glVertex3f(corner.x, corner.y, corner.z);
@@ -931,6 +951,7 @@ void drawOBBs() {
     corner += 2.0 * obbi.extent[2] * obbi.e[2];
     glVertex3f(corner.x, corner.y, corner.z);
     glEnd();
+
     glBegin(GL_LINE_LOOP);
     corner -= 2.0 * obbi.extent[0] * obbi.e[0];
     glVertex3f(corner.x, corner.y, corner.z);
@@ -1014,18 +1035,21 @@ void drawProbe() {
   glEnd();
 
   glColor4ub(0, 255, 0, 255);
+
   glBegin(GL_LINE_LOOP);
   glVertex3f(probe.min.x, probe.min.y, probe.min.z);
   glVertex3f(probe.max.x, probe.min.y, probe.min.z);
   glVertex3f(probe.max.x, probe.max.y, probe.min.z);
   glVertex3f(probe.min.x, probe.max.y, probe.min.z);
   glEnd();
+
   glBegin(GL_LINE_LOOP);
   glVertex3f(probe.min.x, probe.min.y, probe.max.z);
   glVertex3f(probe.max.x, probe.min.y, probe.max.z);
   glVertex3f(probe.max.x, probe.max.y, probe.max.z);
   glVertex3f(probe.min.x, probe.max.y, probe.max.z);
   glEnd();
+
   glBegin(GL_LINES);
   glVertex3f(probe.min.x, probe.min.y, probe.min.z);
   glVertex3f(probe.min.x, probe.min.y, probe.max.z);
@@ -1086,7 +1110,9 @@ void drawProbe() {
 }
 
 void drawInteractionTypes() {
-  if (mouse_mode != NOTHING && box.Particles.size() > 200) return;
+  if (mouse_mode != NOTHING && box.Particles.size() > 200) {
+    return;
+  }
 
   glDisable(GL_LIGHTING);
   glEnable(GL_DEPTH_TEST);
@@ -1125,8 +1151,9 @@ void drawInteractionTypes() {
           dest += box.Particles[j].shape->vertex[box.Particles[j].shape->face[jsub][f]];
         }
         dest /= nf;
-      } else
+      } else {
         continue;
+      }
 
       orig = box.Particles[i].Glob(orig);
       dest = box.Particles[j].Glob(dest);
@@ -1141,7 +1168,9 @@ void drawInteractionTypes() {
 }
 
 void drawInteractionFrames() {
-  if (mouse_mode != NOTHING && box.Particles.size() > 200) return;
+  if (mouse_mode != NOTHING && box.Particles.size() > 200) {
+    return;
+  }
 
   glDisable(GL_LIGHTING);
   glEnable(GL_DEPTH_TEST);
@@ -1155,7 +1184,9 @@ void drawInteractionFrames() {
       i = it->i;
       j = it->j;
 
-      if (it->dn > 0.0 && it->stick == nullptr) continue;
+      if (it->dn > 0.0 && it->stick == nullptr) {
+        continue;
+      }
 
       if (it->type == vvType) {  // ROUGE
         glColor3ub(255, 0, 0);
@@ -1165,8 +1196,9 @@ void drawInteractionFrames() {
         glColor3ub(0, 0, 255);
       } else if (it->type == vfType) {  // ORANGE
         glColor3ub(255, 131, 0);
-      } else
+      } else {
         continue;
+      }
 
       dnorm = it->n * 2.0 * (box.Particles[i].MinskowskiRadius() + box.Particles[j].MinskowskiRadius());
 
@@ -1183,7 +1215,9 @@ void drawInteractionFrames() {
 }
 
 void drawForces() {
-  if (mouse_mode != NOTHING && box.Particles.size() > 200) return;
+  if (mouse_mode != NOTHING && box.Particles.size() > 200) {
+    return;
+  }
 
   glDisable(GL_LIGHTING);
   glEnable(GL_DEPTH_TEST);
@@ -1196,13 +1230,16 @@ void drawForces() {
     for (size_t k = 0; k < box.Interactions.size(); ++k) {
       std::set<Interaction>::iterator it = box.Interactions[k].begin();
       for (; it != box.Interactions[k].end(); ++it) {
-        if (fabs(it->fn) > fnMax) fnMax = fabs(it->fn);
+        if (fabs(it->fn) > fnMax) {
+          fnMax = fabs(it->fn);
+        }
       }
     }
     if (fnMax > 0.0) {
       forceFactor = 0.005 / fnMax;  // 0.005 is the maximum length
-    } else
+    } else {
       return;
+    }
   }
 
   glLineWidth(2.0f);
@@ -1216,10 +1253,11 @@ void drawForces() {
       // i = it->i;
       // j = it->j;
 
-      if (it->fn > 0.0) {  // ROUGE
+      if (it->fn > 0.0) {
         glColor3ub(255, 0, 0);
-      } else
-        glColor3ub(0, 255, 0);  // VERT
+      } else {
+        glColor3ub(0, 255, 0);
+      }
 
       force = it->fn * it->n + it->ft;
       force *= forceFactor;
@@ -1229,7 +1267,9 @@ void drawForces() {
       glVertex3f(it->pos.x + force.x, it->pos.y + force.y, it->pos.z + force.z);
       glEnd();
 
-      if (it->stick != nullptr) glColor3ub(0, 0, 0);  // NOIR
+      if (it->stick != nullptr) {
+        glColor3ub(0, 0, 0);
+      }
 
       glBegin(GL_POINTS);
       glVertex3f(it->pos.x, it->pos.y, it->pos.z);
@@ -1278,7 +1318,9 @@ void drawVelocities() {
 
 void editSelection() {
   using namespace std;
-  if (selectedParticle < 0) return;
+  if (selectedParticle < 0) {
+    return;
+  }
 
   // https://en.wikipedia.org/wiki/Box-drawing_character
   cout << "\u256d\u2500" << endl;
@@ -1298,11 +1340,13 @@ void editSelection() {
       cout << "    new pos = ";
       cin >> box.Particles[selectedParticle].pos;
     } break;
+
     case 2: {
       cout << "current vel = " << box.Particles[selectedParticle].vel << endl;
       cout << "    new vel = ";
       cin >> box.Particles[selectedParticle].vel;
     } break;
+
     case 3: {
       double angle = box.Particles[selectedParticle].Q.get_angle();
       vec3r axis = box.Particles[selectedParticle].Q.get_axis();
@@ -1315,11 +1359,13 @@ void editSelection() {
       cin >> axis;
       box.Particles[selectedParticle].Q.set_axis_angle(axis, angle);
     } break;
+
     case 4: {
       cout << "current vrot = " << box.Particles[selectedParticle].vrot << endl;
       cout << "    new vrot = ";
       cin >> box.Particles[selectedParticle].vrot;
     } break;
+
     default:
       break;
   }
@@ -1345,7 +1391,9 @@ int screenshot(const char* filename) {
   GLubyte* glimage = NULL;
 
   fp = fopen(filename, "wb");
-  if (!fp) return 1;
+  if (!fp) {
+    return 1;
+  }
 
   glimage = (GLubyte*)malloc(width * height * sizeof(GLubyte) * 3);
 
@@ -1353,17 +1401,23 @@ int screenshot(const char* filename) {
   glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)glimage);
 
   rowp = (png_bytep*)malloc(sizeof(png_bytep*) * height);
-  if (!rowp) return 1;
+  if (!rowp) {
+    return 1;
+  }
 
   for (i = 0; i < height; i++) {
     rowp[i] = (png_bytep)&glimage[3 * ((height - i - 1) * width)];
   }
 
   png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-  if (!png_ptr) return 1;
+  if (!png_ptr) {
+    return 1;
+  }
 
   info_ptr = png_create_info_struct(png_ptr);
-  if (!info_ptr) return 1;
+  if (!info_ptr) {
+    return 1;
+  }
 
   png_init_io(png_ptr, fp);
   png_set_IHDR(png_ptr, info_ptr, width, height, 8, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE,
@@ -1399,7 +1453,9 @@ int screenshot(const char* filename) {
   glReadPixels(0, 0, screenStats[2], screenStats[3], GL_BGR, GL_UNSIGNED_BYTE, pixels);
 
   // open the file for writing. If unsucessful, return 1
-  if ((shot = fopen(filename, "wb")) == NULL) return 1;
+  if ((shot = fopen(filename, "wb")) == NULL) {
+    return 1;
+  }
 
   // this is the tga header it must be in the beginning of
   // every (uncompressed) .tga
@@ -1458,7 +1514,8 @@ bool tryToReadConf(int num) {
 
 void readTraj(const char* name) {
   if (!fileTool::fileExists(name)) {
-    return;  // return silently (most of time it is not required to make noise)
+    // return silently (most of time it is not required to make noise)
+    return;
   }
   std::cout << "Read trajectory file: " << name << std::endl;
 
@@ -1486,9 +1543,9 @@ void readTraj(const char* name) {
 
 void menu(int num) {
   switch (num) {
-    case 0:
+    case 0: {
       exit(0);
-      break;
+    } break;
   };
 
   glutPostRedisplay();
@@ -1651,7 +1708,9 @@ int main(int argc, char* argv[]) {
 
   // ==== Enter GLUT event processing cycle
   adjustClippingPlans();
-  if (eye.x == 0.0 && eye.y == 0.0 && eye.z == 1.0) fitView();
+  if (eye.x == 0.0 && eye.y == 0.0 && eye.z == 1.0) {
+    fitView();
+  }
   glutMainLoop();
   return 0;
 }

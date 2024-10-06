@@ -254,40 +254,48 @@ void Rockable::initOutputFiles() {
   kineticEnergyFile.open("kineticEnergy.txt");
 
   std::ofstream gnuplotFile("checkplots.txt");
-  gnuplotFile << "set terminal png size 1000,1000\n";
+  gnuplotFile << "set terminal png size 1000,700\n";
   gnuplotFile << "set output 'checkplots.png'\n";
+  gnuplotFile << "set xtics border nomirror\n";
+  gnuplotFile << "set ytics border nomirror\n";
+  gnuplotFile << "set mytics 1\n";
+  gnuplotFile << "set my2tics 1\n";
   gnuplotFile << "set multiplot\n";
   gnuplotFile << "set origin 0.0, 0.5\n";
   gnuplotFile << "set size 0.5, 0.5\n";
   gnuplotFile << "set xlabel 'Time'\n";
   gnuplotFile << "set y2tics\n";
   gnuplotFile << "set ylabel 'Efficiency'\n";
-  gnuplotFile << "set y2label 'Percent'\n";
-  gnuplotFile << "plot 'perf.txt' u 1:2 w l axes x1y1 lw 2 t 'efficiency', \\\n";
-  gnuplotFile << "'' u 1:3 w lp axes x1y2 lw 2 t 'Neighbor List', \\\n";
-  gnuplotFile << "'' u 1:3 w l axes x1y2 lw 2 t 'Forces'\n";
+  gnuplotFile << "set y2label 'Spent time [%]'\n";
+  gnuplotFile << "plot 'perf.txt' u 1:2 w l axes x1y1 lw 1.5  lc rgb '#000000' t 'efficiency', \\\n";
+  gnuplotFile << "'' u 1:3 w l axes x1y2 lw 1.5 lc rgb '#FF0000' t 'Neighbor List', \\\n";
+  gnuplotFile << "'' u 1:4 w l axes x1y2 lw 1.5 lc rgb '#0000FF' t 'Forces'\n";
   gnuplotFile << "\n";
   gnuplotFile << "set origin 0.5, 0.5\n";
   gnuplotFile << "set size 0.5, 0.5\n";
   gnuplotFile << "set xlabel 'Time'\n";
   gnuplotFile << "set y2tics\n";
-  gnuplotFile << "set ylabel 'E translation'\n";
-  gnuplotFile << "set y2label 'E rotation'\n";
-  gnuplotFile << "plot 'kineticEnergy.txt' u 1:2 w l axes x1y1 lw 2 t 'Etrans', \\\n";
-  gnuplotFile << "'' u 1:3 w l axes x1y2 lw 2 t 'Erot'\n";
+  gnuplotFile << "set ylabel 'E_{translation}'\n";
+  gnuplotFile << "set y2label 'E_{rotation}'\n";
+  gnuplotFile << "set log y\n";
+  gnuplotFile << "set log y2\n";
+  gnuplotFile << "set format y '10^{%L}'\n";
+  gnuplotFile << "set format y2 '10^{%L}'\n";
+  gnuplotFile << "plot 'kineticEnergy.txt' u 1:2 w l axes x1y1 lw 1.5 lc rgb '#FF0000' t 'E_{trans}', \\\n";
+  gnuplotFile << "'' u 1:3 w l axes x1y2 lw 1.5 lc rgb '#0000FF' t 'E_{rot}'\n";
   gnuplotFile << "\n";
   gnuplotFile << "set origin 0.0, 0.0\n";
   gnuplotFile << "set size 1.0, 0.5\n";
   gnuplotFile << "set xlabel 'Time'\n";
   gnuplotFile << "set y2tics\n";
-  gnuplotFile << "set ylabel 'max(F/fnMax)'\n";
-  gnuplotFile << "set y2label 'Fmax/fnMean'\n";
+  gnuplotFile << "set ylabel 'F_{res}^{max} / f_n^{max}'\n";
+  gnuplotFile << "set y2label 'F_{res}^{max} / f_n^{mean}'\n";
   gnuplotFile << "set log y\n";
   gnuplotFile << "set log y2\n";
   gnuplotFile << "set format y '10^{%L}'\n";
   gnuplotFile << "set format y2 '10^{%L}'\n";
-  gnuplotFile << "plot 'staticBalance.txt' u 1:2 w l axes x1y1 lw 2 t '/max', \\\n";
-  gnuplotFile << "'' u 1:3 w l axes x1y2 lw 2 t '/mean'\n";
+  gnuplotFile << "plot 'staticBalance.txt' u 1:2 w l axes x1y1 lw 1.5 lc rgb '#FF0000' t '/max', \\\n";
+  gnuplotFile << "'' u 1:3 w l axes x1y2 lw 1.5 lc rgb '#0000FF'  t '/mean'\n";
   gnuplotFile << "\n";
   gnuplotFile << "unset multiplot\n";
 }
@@ -393,7 +401,11 @@ void Rockable::initialChecks() {
 
   double dtc;
   estimateCriticalTimeStep(dtc);
-  Logger::info("Considering a single contact between two particles, dt_critical / dt = {} (estimated)", dtc / dt);
+  if (dtc > 0.0) {
+    Logger::info("Considering a single contact between two particles, dt_critical / dt = {} (estimated)", dtc / dt);
+  } else {
+    Logger::warn("Considering a single contact between two particles, error = {}", dtc);
+  }
 
   getCriticalTimeStep(dtc);
   if (dtc > 0.0) {
@@ -403,6 +415,8 @@ void Rockable::initialChecks() {
   getCurrentCriticalTimeStep(dtc);
   if (dtc > 0.0) {
     Logger::info("dt_critical / dt = {} (over ACTIVE Interactions)", dtc / dt);
+  } else if (!activeInteractions.empty()) {
+    Logger::warn("dt_critical / dt (over ACTIVE Interactions), error = {}", dtc);
   }
 
   // TODO: ajouter des verifs par rapport aux groupes définies et le nombre de groupes dans properties et dataTable
@@ -444,7 +458,9 @@ void Rockable::saveConf(const char* fname) {
   START_TIMER("saveConf");
 
 #ifdef ROCKABLE_ENABLE_PERIODIC
-  if (usePeriodicCell == 1) reducedToRealKinematics();
+  if (usePeriodicCell == 1) {
+    reducedToRealKinematics();
+  }
 #endif
 
   std::ofstream conf(fname);
@@ -462,7 +478,9 @@ void Rockable::saveConf(const char* fname) {
   conf << "dVerlet " << dVerlet << '\n';
   for (size_t grp = 0; grp < properties.ngroup; grp++) {
     double density = properties.get(idDensity, grp);
-    if (density > 0.0) conf << "density " << grp << " " << density << '\n';
+    if (density > 0.0) {
+      conf << "density " << grp << " " << density << '\n';
+    }
   }
   conf << "gravity " << gravity << '\n';
   if (bodyForce != nullptr) {
@@ -496,7 +514,9 @@ void Rockable::saveConf(const char* fname) {
   conf << "VelocityBarrierExponent " << velocityBarrierExponent << '\n';
   conf << "AngularVelocityBarrierExponent " << angularVelocityBarrierExponent << '\n';
 
-  if (preventCrossingLength > 0.0) conf << "preventCrossingLength " << preventCrossingLength << '\n';
+  if (preventCrossingLength > 0.0) {
+    conf << "preventCrossingLength " << preventCrossingLength << '\n';
+  }
 
   writeLawData(conf, "knContact");
   writeLawData(conf, "en2Contact");
@@ -702,7 +722,9 @@ void Rockable::initParser() {
       Tempos.back().set(command, t1, t2, val1, val2);
       size_t id = dataTable.data_id[parNameStr];
       Tempos.back().plug(&(dataTable.tables[id][g1][g2]));
-      if (g1 != g2) Tempos.back().plug(&(dataTable.tables[id][g2][g1]));
+      if (g1 != g2) {
+        Tempos.back().plug(&(dataTable.tables[id][g2][g1]));
+      }
     } else if (kw == "Body") {
       std::string parNameStr;
       size_t grp;
@@ -812,7 +834,6 @@ void Rockable::initParser() {
     std::string name;
     conf >> name;
     std::string wantedLib = m_path + std::string(name);
-    Logger::info("wantedLib is {}", wantedLib);
     if (wantedLib != shapeFile) {  // it means that the library is not already loaded
       shapeFile = wantedLib;
       loadShapes(shapeFile.c_str());
@@ -829,7 +850,9 @@ void Rockable::initParser() {
   parser.kwMap["glue_with_walls"] = __DO__(conf) {
     std::string YesNo;
     conf >> YesNo;
-    if (YesNo == "yes" || YesNo == "YES" || YesNo == "y" || YesNo == "Y" || YesNo == "1") glue_with_walls = true;
+    if (YesNo == "yes" || YesNo == "YES" || YesNo == "y" || YesNo == "Y" || YesNo == "1") {
+      glue_with_walls = true;
+    }
   };
   parser.kwMap["precision"] = __DO__(conf) {
     int pr;
@@ -874,16 +897,24 @@ void Rockable::initParser() {
 
       Particles.push_back(P);
     }
-    if (Interactions.size() != Particles.size()) Interactions.resize(Particles.size());
-    if (Interfaces.size() != Particles.size()) Interfaces.resize(Particles.size());
+    if (Interactions.size() != Particles.size()) {
+      Interactions.resize(Particles.size());
+    }
+    if (Interfaces.size() != Particles.size()) {
+      Interfaces.resize(Particles.size());
+    }
   };
   parser.kwMap["Interactions"] = __DO__(conf) {
     size_t nb;
     conf >> nb;
     Logger::info("Number of interactions: {}", nb);
 
-    if (Interactions.size() != Particles.size()) Interactions.resize(Particles.size());
-    for (size_t i = 0; i < Particles.size(); ++i) Interactions[i].clear();
+    if (Interactions.size() != Particles.size()) {
+      Interactions.resize(Particles.size());
+    }
+    for (size_t i = 0; i < Particles.size(); ++i) {
+      Interactions[i].clear();
+    }
     activeInteractions.clear();
 
     Interaction I;
@@ -901,8 +932,12 @@ void Rockable::initParser() {
     conf >> nbInterf;
     Logger::info("Number of interfaces: {}", nbInterf);
 
-    if (Interfaces.size() != Particles.size()) Interfaces.resize(Particles.size());
-    for (size_t i = 0; i < Particles.size(); ++i) Interfaces[i].clear();
+    if (Interfaces.size() != Particles.size()) {
+      Interfaces.resize(Particles.size());
+    }
+    for (size_t i = 0; i < Particles.size(); ++i) {
+      Interfaces[i].clear();
+    }
 
     for (size_t k = 0; k < nbInterf; ++k) {
       Interaction ItoFind;
@@ -941,7 +976,9 @@ void Rockable::initParser() {
   };
   parser.kwMap["DataExtractor"] = __DO__(conf) {  // Kept for compatibility (use file dataExtractors.txt instead)
 
-    if (interactiveMode == true) return;  // The dataExtractors are not read in interactive mode
+    if (interactiveMode == true) {
+      return;
+    }  // The dataExtractors are not read in interactive mode
 
     std::string ExtractorName;
     conf >> ExtractorName;
@@ -1077,7 +1114,9 @@ void Rockable::loadConf(const char* a_name) {
  *   exit without making anything.
  */
 void Rockable::readDataExtractors() {
-  if (interactiveMode == true) return;  // The dataExtractors are not read in interactive mode
+  if (interactiveMode == true) {
+    return;
+  }  // The dataExtractors are not read in interactive mode
 
   if (!fileTool::fileExists("dataExtractors.txt")) {
     return;
@@ -1265,7 +1304,9 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
 
   vec3r jPeriodicShift;
 #ifdef ROCKABLE_ENABLE_PERIODIC
-  if (usePeriodicCell == 1) jPeriodicShift = Cell.getBranchCorrection(Particles[i].pos, Particles[j].pos);
+  if (usePeriodicCell == 1) {
+    jPeriodicShift = Cell.getBranchCorrection(Particles[i].pos, Particles[j].pos);
+  }
 #endif
 
   size_t nvi = Particles[i].shape->vertex.size();
@@ -1279,20 +1320,23 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
   double kn = dataTable.get(idKnContact, Particles[i].group, Particles[j].group);
 
   double meff;
-  if (i < nDriven)
+  if (i < nDriven) {
     meff = Particles[j].mass;
-  else if (j < nDriven)
+  } else if (j < nDriven) {
     meff = Particles[i].mass;
-  else
+  } else {
     meff = (Particles[i].mass * Particles[j].mass) / (Particles[i].mass + Particles[j].mass);
+  }
+
   if (en2 > 0.0 && en2 < 1.0) {
     double logen = 0.5 * log(en2);
     double dampRate = -logen / sqrt(logen * logen + Mth::piSqr);
     Damp = dampRate * 2.0 * sqrt(kn * meff);
-  } else if (en2 <= 0.0)
+  } else if (en2 <= 0.0) {
     Damp = 2.0 * sqrt(kn * meff);
-  else
+  } else {
     Damp = 0.0;
+  }
 
   // Remark: we do not put the following 3 loops into omp parallel sections
   //         because the function is called itself from a parallel for loop
@@ -1307,7 +1351,9 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
     OBB obbj = Particles[j].obb;
     obbj.translate(jPeriodicShift);
     obbj.enlarge(dmax);
-    if (!(obbj.intersect(subObbi))) continue;
+    if (!(obbj.intersect(subObbi))) {
+      continue;
+    }
 
     // vertex-vertex (i, vertex isub)->(j, all vertices)
     addOrRemoveSingleInteraction(i, j, isub, vvType, nvj, jPeriodicShift, Particle::VertexIsNearVertex);
@@ -1327,7 +1373,9 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
     subObbj.enlarge(Particles[j].MinskowskiRadius() + dmax);
     OBB obbi = Particles[i].obb;
     obbi.enlarge(dmax);
-    if (!(obbi.intersect(subObbj))) continue;
+    if (!(obbi.intersect(subObbj))) {
+      continue;
+    }
 
     // vertex-edge (j, vertex jsub)->(i, all edges)
     addOrRemoveSingleInteraction(j, i, jsub, veType, nei, -jPeriodicShift, Particle::VertexIsNearEdge);
@@ -1386,7 +1434,9 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
 
   vec3r jPeriodicShift;
 #ifdef ROCKABLE_ENABLE_PERIODIC
-  if (usePeriodicCell) jPeriodicShift = Cell.getBranchCorrection(Particles[i].pos, Particles[j].pos);
+  if (usePeriodicCell) {
+    jPeriodicShift = Cell.getBranchCorrection(Particles[i].pos, Particles[j].pos);
+  }
 #endif
 
   // Precompute the viscous damping parameter
@@ -1394,20 +1444,23 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
   double kn = dataTable.get(idKnContact, Particles[i].group, Particles[j].group);
 
   double meff;
-  if (i < nDriven)
+  if (i < nDriven) {
     meff = Particles[j].mass;
-  else if (j < nDriven)
+  } else if (j < nDriven) {
     meff = Particles[i].mass;
-  else
+  } else {
     meff = (Particles[i].mass * Particles[j].mass) / (Particles[i].mass + Particles[j].mass);
+  }
+
   if (en2 > 0.0 && en2 < 1.0) {
     double logen = 0.5 * log(en2);
     double dampRate = -logen / sqrt(logen * logen + Mth::piSqr);
     Damp = dampRate * 2.0 * sqrt(kn * meff);
-  } else if (en2 <= 0.0)
+  } else if (en2 <= 0.0) {
     Damp = 2.0 * sqrt(kn * meff);
-  else
+  } else {
     Damp = 0.0;
+  }
 
   std::vector<std::pair<subBox, subBox>> intersections;
 
@@ -1484,10 +1537,14 @@ void Rockable::dynamicCheckUpdateNL() {
   for (size_t i = 0; i < deltaPos.size(); ++i) {
     deltaPos[i] += Particles[i].vel * dt;
     double tmp1 = norm2(deltaPos[i]);
-    if (tmp1 > maxDeltaPos * maxDeltaPos) maxDeltaPos = sqrt(tmp1);
+    if (tmp1 > maxDeltaPos * maxDeltaPos) {
+      maxDeltaPos = sqrt(tmp1);
+    }
     deltaQ[i] += ((Particles[i].Q.dot(Particles[i].vrot)) *= dt);
     double tmp2 = deltaQ[i].get_angle();
-    if (tmp2 > maxDeltaRot) maxDeltaRot = tmp2;
+    if (tmp2 > maxDeltaRot) {
+      maxDeltaRot = tmp2;
+    }
   }
 
   if (maxDeltaPos >= dispUpdateNL || maxDeltaRot >= angleUpdateNL) {
@@ -1535,14 +1592,18 @@ void Rockable::UpdateNL_bruteForce() {
 
     size_t jnext = i + 1;
     // Prevent interactions between driven bodies
-    if (jnext < nDriven) jnext = nDriven;
+    if (jnext < nDriven) {
+      jnext = nDriven;
+    }
 
     for (size_t j = jnext; j < Particles.size(); j++) {
       // if interface (i,j) is still 'active' (ie. no bond has been broken),
       // then NO contact will be possible between bodies i and j.
       BI_to_find.j = j;
       std::set<BreakableInterface>::iterator BI_it = (Interfaces[i]).find(BI_to_find);
-      if (BI_it != Interfaces[i].end()) continue;  // Continue the loop (next j) if an interface is found
+      if (BI_it != Interfaces[i].end()) {
+        continue;
+      }  // Continue the loop (next j) if an interface is found
 
       OBB obbj = Particles[j].obb;
       obbj.enlarge(0.5 * DVerlet);
@@ -1610,14 +1671,20 @@ void Rockable::UpdateNL_linkCells() {
 
             for (size_t jcv = 0; jcv < Cv->bodies.size(); ++jcv) {
               size_t j = Cv->bodies[jcv];
-              if (j < nDriven && i < nDriven) continue;
-              if (j <= i) continue;
+              if (j < nDriven && i < nDriven) {
+                continue;
+              }
+              if (j <= i) {
+                continue;
+              }
 
               // if interface (i,j) is still 'active' (ie. no bond has been broken),
               // then NO contact will be possible between bodies i and j.
               BI_to_find.j = j;
               std::set<BreakableInterface>::iterator BI_it = (Interfaces[i]).find(BI_to_find);
-              if (BI_it != Interfaces[i].end()) continue;  // Continue the loop if an interface is found
+              if (BI_it != Interfaces[i].end()) {
+                continue;
+              }  // Continue the loop if an interface is found
 
               OBB obbj = Particles[j].obb;
               obbj.enlarge(0.5 * DVerlet);
@@ -1661,14 +1728,20 @@ void Rockable::UpdateNL_linkCells() {
           for (size_t jcv = 0; jcv < Cv->bodies.size(); ++jcv) {
             size_t j = Cv->bodies[jcv];
 
-            if (j < nDriven && i < nDriven) continue;
-            if (j <= i) continue;
+            if (j < nDriven && i < nDriven) {
+              continue;
+            }
+            if (j <= i) {
+              continue;
+            }
 
             // if interface (i,j) is still 'active' (ie. no bond has been broken),
             // then NO contact will be possible between bodies i and j.
             BI_to_find.j = j;
             std::set<BreakableInterface>::iterator BI_it = (Interfaces[i]).find(BI_to_find);
-            if (BI_it != Interfaces[i].end()) continue;  // Continue the loop if an interface is found
+            if (BI_it != Interfaces[i].end()) {
+              continue;
+            }  // Continue the loop if an interface is found
 
             OBB obbj = Particles[j].obb;
             obbj.enlarge(0.5 * DVerlet);
@@ -1860,7 +1933,9 @@ void Rockable::velocityVerletStep() {
   START_TIMER("Step (velocity-Verlet)");
 
   // If a ServoFunction exists, then it is called
-  if (System.ServoFunction != nullptr) System.ServoFunction(*this);
+  if (System.ServoFunction != nullptr) {
+    System.ServoFunction(*this);
+  }
 
   // Controlled bodies
   velocityControlledDrive();
@@ -1918,7 +1993,9 @@ void Rockable::velocityVerletStep() {
 
 #ifdef ROCKABLE_ENABLE_PERIODIC
     // remember here that we use reduced coordinates here, in case of periodic cell
-    if (usePeriodicCell == 1) Cell.forceToStayInside(Particles[i].pos);
+    if (usePeriodicCell == 1) {
+      Cell.forceToStayInside(Particles[i].pos);
+    }
 #endif
 
     // Rotation: Q(k+1) = Q(k) + dQ(k) * dt + ddQ(k) * dt2/2
@@ -2160,7 +2237,9 @@ void Rockable::RungeKutta4Step() {
   START_TIMER("Step (RK4)");
 
   // If a ServoFunction exists, then it is called
-  if (System.ServoFunction != nullptr) System.ServoFunction(*this);
+  if (System.ServoFunction != nullptr) {
+    System.ServoFunction(*this);
+  }
 
   // velocity-controlled bodies
   velocityControlledDrive();
@@ -2554,7 +2633,9 @@ void Rockable::integrate() {
       // Then, recompute the values imposed if a servoFunction is defined
       // REMARK: maybe a system of signal (SIGHUP) could be designed instead
       System.read(false);
-      if (System.ServoFunction != nullptr) System.ServoFunction(*this);
+      if (System.ServoFunction != nullptr) {
+        System.ServoFunction(*this);
+      }
 
       interConfC = 0.0;
     }
@@ -2575,29 +2656,40 @@ void Rockable::integrate() {
 #endif
 
       timeInUpdateNL += tm.getElapsedTimeSeconds();
-      if (!needUpdate)
+      if (!needUpdate) {
         interVerletC = 0.0;
-      else
+      } else {
         needUpdate = false;
+      }
     }
 
     // For all dataExtractors, we enventually execute some processing,
     // and then we record some data in the files
     for (size_t d = 0; d < dataExtractors.size(); ++d) {
-      if (step % dataExtractors[d]->nstep == 0) dataExtractors[d]->exec();
-      if (step % dataExtractors[d]->nrec == 0) dataExtractors[d]->record();
+      if (step % dataExtractors[d]->nstep == 0) {
+        dataExtractors[d]->exec();
+      }
+      if (step % dataExtractors[d]->nrec == 0) {
+        dataExtractors[d]->record();
+      }
     }
 
     for (size_t p = 0; p < Tempos.size(); p++) {
-      if (Tempos[p].update != nullptr) Tempos[p].update(t);
+      if (Tempos[p].update != nullptr) {
+        Tempos[p].update(t);
+      }
     }
 
-    if (dynamicUpdateNL != 0) dynamicCheckUpdateNL();
+    if (dynamicUpdateNL != 0) {
+      dynamicCheckUpdateNL();
+    }
 
     step++;
   }
 
-  for (size_t d = 0; d < dataExtractors.size(); d++) dataExtractors[d]->end();
+  for (size_t d = 0; d < dataExtractors.size(); d++) {
+    dataExtractors[d]->end();
+  }
 
   return;
 }
@@ -2734,7 +2826,9 @@ void Rockable::initialise_particle_forces_and_moments() {
     Particles[i].stress.reset();
   }
 #ifdef ROCKABLE_ENABLE_PERIODIC
-  if (usePeriodicCell == 1) Cell.Sig.reset();
+  if (usePeriodicCell == 1) {
+    Cell.Sig.reset();
+  }
 #endif
 
 #pragma omp parallel for default(shared)
@@ -2753,27 +2847,27 @@ void Rockable::initialise_particle_forces_and_moments() {
   // Set eventually the imposed forces or moments (no body force for driven-components)
   for (size_t c = 0; c < System.controls.size(); ++c) {
     switch (System.controls[c].type) {
-      case _x_For_:
+      case _x_For_: {
         Particles[System.controls[c].i].force.x = System.controls[c].value;
-        break;
-      case _y_For_:
+      } break;
+      case _y_For_: {
         Particles[System.controls[c].i].force.y = System.controls[c].value;
-        break;
-      case _z_For_:
+      } break;
+      case _z_For_: {
         Particles[System.controls[c].i].force.z = System.controls[c].value;
-        break;
-      case _xrot_Mom_:
+      } break;
+      case _xrot_Mom_: {
         Particles[System.controls[c].i].moment.x = System.controls[c].value;
-        break;
-      case _yrot_Mom_:
+      } break;
+      case _yrot_Mom_: {
         Particles[System.controls[c].i].moment.y = System.controls[c].value;
-        break;
-      case _zrot_Mom_:
+      } break;
+      case _zrot_Mom_: {
         Particles[System.controls[c].i].moment.z = System.controls[c].value;
-        break;
-      case _xyzrot_Mom_:
+      } break;
+      case _xyzrot_Mom_: {
         Particles[System.controls[c].i].moment = System.controls[c].vec_value;
-        break;
+      } break;
     }
   }
 }
@@ -2974,10 +3068,11 @@ void Rockable::breakage_of_interfaces() {
   // In this loop, all the bonds that are identified to be broken will actually be broken now
   for (std::set<BreakableInterface*>::iterator BI = interfacesToBreak.begin(); BI != interfacesToBreak.end(); ++BI) {
     std::string whichBond;
-    if ((*BI)->isInner == 1)
+    if ((*BI)->isInner == 1) {
       whichBond = "Inner";
-    else
+    } else {
       whichBond = "Outer";
+    }
     std::cout << "Sticked (" << whichBond << ") interface between " << (*BI)->i << " and " << (*BI)->j
               << " has broken ";
     std::cout << "(" << (*BI)->concernedBonds.size() << " bonds)\n\n";
@@ -3056,15 +3151,15 @@ void Rockable::compute_accelerations_from_resultants() {
   for (size_t c = 0; c < System.controls.size(); ++c) {
     size_t i = System.controls[c].i;
     switch (System.controls[c].type) {
-      case _x_For_:
+      case _x_For_: {
         Particles[i].acc.x = Particles[i].force.x / Particles[i].mass;
-        break;
-      case _y_For_:
+      } break;
+      case _y_For_: {
         Particles[i].acc.y = Particles[i].force.y / Particles[i].mass;
-        break;
-      case _z_For_:
+      } break;
+      case _z_For_: {
         Particles[i].acc.z = Particles[i].force.z / Particles[i].mass;
-        break;
+      } break;
       case _xrot_Mom_: {
         quat Qinv = Particles[i].Q.get_conjugated();
         vec3r vrotx(Particles[i].vrot.x, 0.0, 0.0);
@@ -3163,7 +3258,9 @@ void Rockable::accelerations() {
 
   // Some weighting relations can be established for the stiffnesses
   // of the cantacts that share the same body pair
-  if (ctcPartnership.update != nullptr) ctcPartnership.update(*this);
+  if (ctcPartnership.update != nullptr) {
+    ctcPartnership.update(*this);
+  }
 
   build_activeInteractions();
 
@@ -3193,13 +3290,19 @@ void Rockable::accelerations() {
 
   timeInForceComputation += tm.getElapsedTimeSeconds();
 
-  if (numericalDampingCoeff > 0.0) numericalDamping();
+  if (numericalDampingCoeff > 0.0) {
+    numericalDamping();
+  }
 
   compute_accelerations_from_resultants();
 
   // damping solutions based on the weighting of accelerations
-  if (velocityBarrier > 0.0) applyVelocityBarrier();
-  if (angularVelocityBarrier > 0.0) applyAngularVelocityBarrier();
+  if (velocityBarrier > 0.0) {
+    applyVelocityBarrier();
+  }
+  if (angularVelocityBarrier > 0.0) {
+    applyAngularVelocityBarrier();
+  }
 }
 
 /**
@@ -3321,7 +3424,9 @@ void Rockable::applyAngularVelocityBarrier() {
  *   @param[in]   last    Largest ID of particles (default value corresponds to the last particle)
  */
 void Rockable::computeAABB(size_t first, size_t last) {
-  if (last == 0) last = Particles.size() - 1;
+  if (last == 0) {
+    last = Particles.size() - 1;
+  }
 
   paabb.clear();
   paabb.resize(Particles.size());
@@ -3369,13 +3474,27 @@ void Rockable::getKineticEnergy(double& Etrans, double& Erot, size_t first, size
  *   Estimate the critical time step according to the stiffness values in dataTable.
  *
  *   @param[out]  dtc  minimum value of square root of meff/kn.
+ *                     dtc = -1.0 means there is no particles
+ *                     dtc = -2.0 means massMin is not correctly computed
+ *                     dtc = -3.0 means knMax is not correctly computed
  */
 void Rockable::estimateCriticalTimeStep(double& dtc) {
+
+  if (Particles.empty()) {
+    dtc = -1.0;
+    return;
+  }
+
   // find the particle with the smallest mass
   // (this particle can also be the driven one)
   double massMin = 1e20;
   for (size_t i = 0; i < Particles.size(); ++i) {
-    if (Particles[i].mass < massMin) massMin = Particles[i].mass;
+    if (Particles[i].mass > 0.0 && Particles[i].mass < massMin) massMin = Particles[i].mass;
+  }
+
+  if (massMin == 1e20) {
+    dtc = -2.0;
+    return;
   }
 
   // find the largest kn within the parameters that have been set
@@ -3395,6 +3514,11 @@ void Rockable::estimateCriticalTimeStep(double& dtc) {
     }
   }
 
+  if (knMax == -1e20) {
+    dtc = -3.0;
+    return;
+  }
+
   dtc = M_PI * sqrt(massMin / knMax);
 }
 
@@ -3403,6 +3527,7 @@ void Rockable::estimateCriticalTimeStep(double& dtc) {
  *   interactions, even those that are not active.
  *
  *   @param[out]  dtc  minimum value of square root of meff/kn.
+ *                dtc = -1.0 is the computation went wrong
  */
 void Rockable::getCriticalTimeStep(double& dtc) {
   dtc = 0.0;
@@ -3422,21 +3547,24 @@ void Rockable::getCriticalTimeStep(double& dtc) {
         continue;
 
       double meff;
-      if (it->i < nDriven)
+      if (it->i < nDriven) {
         meff = Particles[it->j].mass;
-      else if (it->j < nDriven)
+      } else if (it->j < nDriven) {
         meff = Particles[it->i].mass;
-      else
+      } else {
         meff = (Particles[it->i].mass * Particles[it->j].mass) / (Particles[it->i].mass + Particles[it->j].mass);
+      }
 
       double kn;
       if (it->stick != nullptr) {
-        if (Particles[it->i].cluster == Particles[it->j].cluster)
+        if (Particles[it->i].cluster == Particles[it->j].cluster) {
           kn = dataTable.get(idKnInnerBond, Particles[it->i].group, Particles[it->j].group);
-        else
+        } else {
           kn = dataTable.get(idKnOuterBond, Particles[it->i].group, Particles[it->j].group);
-      } else
+        }
+      } else {
         kn = dataTable.get(idKnContact, Particles[it->i].group, Particles[it->j].group);
+      }
       sqrdtc = meff / kn;
 
       if (sqrdtc < sqrdtcMin) {
@@ -3447,16 +3575,18 @@ void Rockable::getCriticalTimeStep(double& dtc) {
   }
 
   // compute the critical time step
-  if (okay)
+  if (okay) {
     dtc = M_PI * sqrt(sqrdtcMin);
-  else
+  } else {
     dtc = -1.0;
+  }
 }
 
 /**
  *   Compute the critical time step by looping over all currently active interactions
  *
  *   @param  dtc  minimum value of square root of meff/kn.
+ *                dtc = -1.0 is activeInteractions is empty
  */
 void Rockable::getCurrentCriticalTimeStep(double& dtc) {
   if (activeInteractions.empty()) {
@@ -3470,24 +3600,29 @@ void Rockable::getCurrentCriticalTimeStep(double& dtc) {
   for (size_t i = 0; i < activeInteractions.size(); i++) {
     Interaction* it = activeInteractions[i];
     double meff;
-    if (it->i < nDriven)
+    if (it->i < nDriven) {
       meff = Particles[it->j].mass;
-    else if (it->j < nDriven)
+    } else if (it->j < nDriven) {
       meff = Particles[it->i].mass;
-    else
+    } else {
       meff = (Particles[it->i].mass * Particles[it->j].mass) / (Particles[it->i].mass + Particles[it->j].mass);
+    }
 
     double kn;
     if (it->stick != nullptr) {
-      if (Particles[it->i].cluster == Particles[it->j].cluster)
+      if (Particles[it->i].cluster == Particles[it->j].cluster) {
         kn = dataTable.get(idKnInnerBond, Particles[it->i].group, Particles[it->j].group);
-      else
+      } else {
         kn = dataTable.get(idKnOuterBond, Particles[it->i].group, Particles[it->j].group);
-    } else
+      }
+    } else {
       kn = dataTable.get(idKnContact, Particles[it->i].group, Particles[it->j].group);
+    }
     double sqrdtc = meff / kn;
 
-    if (sqrdtc < sqrdtcMin) sqrdtcMin = sqrdtc;
+    if (sqrdtc < sqrdtcMin) {
+      sqrdtcMin = sqrdtc;
+    }
   }
 
   // compute the critical time step
@@ -3517,25 +3652,37 @@ void Rockable::getResultantQuickStats(double& Fmax, double& F_fnmax, double& Fme
     nbCtc[i] += 1;
     nbCtc[j] += 1;
     double fn = activeInteractions[k]->fn;
-    if (fnMax[i] < fn) fnMax[i] = fn;
-    if (fnMax[j] < fn) fnMax[j] = fn;
+    if (fnMax[i] < fn) {
+      fnMax[i] = fn;
+    }
+    if (fnMax[j] < fn) {
+      fnMax[j] = fn;
+    }
   }
 
-  if (last == 0) last = Particles.size() - 1;
+  if (last == 0) {
+    last = Particles.size() - 1;
+  }
   double F = norm(Particles[first].force);
   Fmax = F;
   F_fnmax = 0.0;
   Fmean = 0.0;
   size_t n = 0;
   for (size_t i = first; i <= last; i++) {
-    if (nbCtc[i] <= 1) continue;
+    if (nbCtc[i] <= 1) {
+      continue;
+    }
     n += 1;
     F = norm(Particles[i].force);
     Fmean += F;
-    if (F > Fmax) Fmax = F;
+    if (F > Fmax) {
+      Fmax = F;
+    }
     if (fnMax[i] > 0.0) {
       F /= fnMax[i];
-      if (F > F_fnmax) F_fnmax = F;
+      if (F > F_fnmax) {
+        F_fnmax = F;
+      }
     }
   }
 
@@ -3544,7 +3691,9 @@ void Rockable::getResultantQuickStats(double& Fmax, double& F_fnmax, double& Fme
   if (n > 1) {
     Fmean /= (double)n;
     for (size_t i = first; i <= last; i++) {
-      if (nbCtc[i] <= 1) continue;
+      if (nbCtc[i] <= 1) {
+        continue;
+      }
       F = norm(Particles[i].force);
       F = F - Fmean;
       F = F * F;
@@ -3579,8 +3728,12 @@ void Rockable::getInteractionQuickStats(double& fnMin, double& fnMax, double& fn
     n += 1;
     fn = activeInteractions[i]->fn;
     fnMean += fn;
-    if (fn < fnMin) fnMin = fn;
-    if (fn > fnMax) fnMax = fn;
+    if (fn < fnMin) {
+      fnMin = fn;
+    }
+    if (fn > fnMax) {
+      fnMax = fn;
+    }
   }
   if (n > 1) {
     fnMean /= (double)(n - 1);
