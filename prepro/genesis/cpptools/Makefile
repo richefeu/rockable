@@ -1,3 +1,8 @@
+# This c++ application is so simple that it can easily be compiled
+# thanks to this simple Makefile. When using this Makefile, make sure
+# that the toofus folder is in your home directory 
+# (update its content if required)
+
 COMMONPATH = ~/toofus
 CPPTOOLSPATH = .
 
