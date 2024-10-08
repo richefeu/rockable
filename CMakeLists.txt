@@ -39,7 +39,7 @@ option(ROCKABLE_COMPILE_CONF2VTK "Convert conf files to VTK" ON)
 if(NOT DEFINED CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Release)
  	message(STATUS "Build type is set to Release")
- endif()
+endif()
 
 if(ROCKABLE_USE_FT_CORR)
 	add_definitions(-DFT_CORR)
@@ -55,7 +55,7 @@ endif()
 
 # get the git tag of Rockable
 execute_process(
-    COMMAND git describe --abbrev=0 --tags
+    COMMAND git describe --abbrev=0 --tags --always
     OUTPUT_VARIABLE ROCKABLE_GIT_TAG
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
