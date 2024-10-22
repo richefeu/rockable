@@ -17,7 +17,7 @@ struct Center {
   Center() : x(0.0), y(0.0), N(0), isROI(false) {}
 };
 
-std::vector<Center> findCenters(CImg<> &img, size_t nbMax = 10000) {
+std::vector<Center> findCenters(CImg<>& img, size_t nbMax = 10000) {
 
   std::cout << "Compute..." << std::endl;
   std::vector<Center> centers(nbMax);
@@ -49,15 +49,16 @@ std::vector<Center> findCenters(CImg<> &img, size_t nbMax = 10000) {
   return centers;
 }
 
-void getROIs(const char *filename, std::vector<Center> &centers) {
+void getROIs(const char* filename, std::vector<Center>& centers) {
   std::ifstream file(filename);
 
   size_t number;
   int found = 0;
   while (file) {
     file >> number;
-    if (file.eof())
+    if (file.eof()) {
       break;
+    }
     if (number < centers.size()) {
       centers[number].isROI = true;
       found++;
@@ -67,7 +68,7 @@ void getROIs(const char *filename, std::vector<Center> &centers) {
   std::cout << "found = " << found << std::endl;
 }
 
-void wrap(CImg<> &img, GrainShape &G) {
+void wrap(CImg<>& img, GrainShape& G) {
 
   double Rmax = std::max({img.width(), img.height(), img.depth()});
   Rmax /= 2;
@@ -137,7 +138,7 @@ void wrap(CImg<> &img, GrainShape &G) {
   }
 }
 
-int main(int argc, char const *argv[]) {
+int main(int argc, char const* argv[]) {
   CImg<> img("Data/LENGP00/02_Results/01_Label/LENGP00_Label/LENGP00_00.tif");
 
   std::vector<Center> centers = findCenters(img, 10000);
@@ -147,7 +148,7 @@ int main(int argc, char const *argv[]) {
   std::vector<GrainShape> grains;
   for (size_t i = 0 + 1; i < centers.size(); i++) {
     if (centers[i].N > 0) {
-      GrainShape G(1); // 0 = icosaèdre, 1 = 4x plus de facettes, 2 = x16...
+      GrainShape G(1);  // 0 = icosaèdre, 1 = 4x plus de facettes, 2 = x16...
       G.colorId = (int)i;
       G.pos.x = round(centers[i].x);
       G.pos.y = round(centers[i].y);
@@ -165,10 +166,10 @@ int main(int argc, char const *argv[]) {
   std::ofstream sfile("shapes.txt");
   for (size_t i = 0; i < grains.size(); i++) {
 
-    if (grains[i].pos.x < minBox.x || grains[i].pos.x > maxBox.x ||
-        grains[i].pos.y < minBox.y || grains[i].pos.y > maxBox.y ||
-        grains[i].pos.z < minBox.z || grains[i].pos.z > maxBox.z)
+    if (grains[i].pos.x < minBox.x || grains[i].pos.x > maxBox.x || grains[i].pos.y < minBox.y ||
+        grains[i].pos.y > maxBox.y || grains[i].pos.z < minBox.z || grains[i].pos.z > maxBox.z) {
       continue;
+    }
 
     std::cout << "Building Grains " << grains[i].colorId << std::endl;
     wrap(img, grains[i]);

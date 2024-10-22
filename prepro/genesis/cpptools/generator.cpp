@@ -61,6 +61,7 @@ std::streampos Np_pos = std::streampos(0);
 #include "generatePacking_wallBox.hpp"
 #include "generateShape_cube.hpp"
 #include "generateShape_cuboid.hpp"
+#include "generateShape_thinCylinder.hpp"
 #include "generateShape_cuboid_container.hpp"
 #include "generateShape_rectangle.hpp"
 #include "generateShape_rhombicuboctahedron.hpp"
@@ -235,6 +236,15 @@ void readCommands(const char* name) {
     com >> name >> radius >> sideSize;
     generateShape_cuboid(*outputStream, name.c_str(), radius, sideSize);
     std::cerr << "A cuboid shape has been generated\n";
+  };
+  
+  parser.kwMap["generateShape:thin_cylinder"] = __DO__(com) {
+    std::string name;
+    double Rin, Rout, H;
+    int nbSectors;
+    com >> name >> Rin >> Rout >> H >> nbSectors;
+    generateShape_thinCylinder(*outputStream, name.c_str(), Rin, Rout, H, nbSectors);
+    std::cerr << "A thin cylinder shape has been generated\n";
   };
 
   parser.kwMap["generateShape:cuboid_container"] = __DO__(com) {

@@ -1,12 +1,12 @@
 Rockable 29-11-2018
 t 0
-tmax 2
+tmax 0.1
 dt 1e-7
 interVerlet 0.0005
 dynamicUpdateNL 1
 dispUpdateNL 1e-3
 angleUpdateNL 1
-interConf 0.001
+interConf 0.0005
 
 DVerlet 0.004
 dVerlet 0.001

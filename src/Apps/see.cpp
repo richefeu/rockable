@@ -1457,19 +1457,15 @@ int screenshot(const char* filename) {
     return 1;
   }
 
-  // this is the tga header it must be in the beginning of
-  // every (uncompressed) .tga
+  // this is the tga header it must be in the beginning of every (uncompressed) TARGA
   unsigned char TGAheader[12] = {0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  // the header that is used to get the dimensions of the .tga
-  // header[1]*256+header[0] - width
-  // header[3]*256+header[2] - height
-  // header[4] - bits per pixel
-  // header[5] - ?
+  
+  // the header that is used to get the dimensions of the TARGA
   unsigned char header[6] = {((unsigned char)(screenStats[2] % 256)),
                              ((unsigned char)(screenStats[2] / 256)),
                              ((unsigned char)(screenStats[3] % 256)),
                              ((unsigned char)(screenStats[3] / 256)),
-                             24,
+                             24, // 3 bytes
                              0};
 
   // write out the TGA header

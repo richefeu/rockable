@@ -1,1 +1,7 @@
-generateShape:xyz_walls   0.25 0.25 0.25   0.0005
+
+
+#generateShape:xyz_walls   0.25 0.25 0.25   0.0005
+
+open shapes.txt
+generateShape:thin_cylinder CYL  112e-3 137e-3 603e-3 8
+close

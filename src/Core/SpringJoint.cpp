@@ -43,12 +43,7 @@ SpringJoint::~SpringJoint() {}
 void SpringJoint::init(std::vector<Particle>& particles, double stiffness) {
   vec3r ipos = particles[ibody].pos + particles[ibody].Q * ipos0;
   vec3r jpos = particles[jbody].pos + particles[jbody].Q * jpos0;
-  // std::cout << "ipos0 = " << ipos0 << '\n';
-  // std::cout << "jpos0 = " << jpos0 << '\n';
-  // std::cout << "ipos = " << ipos << '\n';
-  // std::cout << "jpos = " << jpos << '\n';
   l0 = (jpos - ipos).normalize();
-  // std::cout << "l0 = " << l0 << '\n';
   K = fabs(stiffness);
 }
 
