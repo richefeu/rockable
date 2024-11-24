@@ -1,24 +1,24 @@
 //  Copyright or © or Copr. Rockable
-//  
+//
 //  vincent.richefeu@3sr-grenoble.fr
-//  
-//  This software is a computer program whose purpose is 
+//
+//  This software is a computer program whose purpose is
 //    (i)  to hold sphero-polyhedral shapes,
-//    (ii) to manage breakable interfaces. 
+//    (ii) to manage breakable interfaces.
 //  It is developed for an ACADEMIC USAGE
-//  
+//
 //  This software is governed by the CeCILL-B license under French law and
-//  abiding by the rules of distribution of free software.  You can  use, 
+//  abiding by the rules of distribution of free software.  You can  use,
 //  modify and/ or redistribute the software under the terms of the CeCILL-B
 //  license as circulated by CEA, CNRS and INRIA at the following URL
-//  "http://www.cecill.info". 
-//  
+//  "http://www.cecill.info".
+//
 //  As a counterpart to the access to the source code and  rights to copy,
 //  modify and redistribute granted by the license, users are provided only
 //  with a limited warranty  and the software's author,  the holder of the
 //  economic rights,  and the successive licensors  have only  limited
-//  liability. 
-//  
+//  liability.
+//
 //  In this respect, the user's attention is drawn to the risks associated
 //  with loading,  using,  modifying and/or developing or reproducing the
 //  software by the user in light of its specific status of free software,
@@ -26,10 +26,10 @@
 //  therefore means  that it is reserved for developers  and  experienced
 //  professionals having in-depth computer knowledge. Users are therefore
 //  encouraged to load and test the software's suitability as regards their
-//  requirements in conditions enabling the security of their systems and/or 
-//  data to be ensured and,  more generally, to use and operate it in the 
-//  same conditions as regards security. 
-//  
+//  requirements in conditions enabling the security of their systems and/or
+//  data to be ensured and,  more generally, to use and operate it in the
+//  same conditions as regards security.
+//
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
@@ -38,7 +38,7 @@
 #include "Core/Rockable.hpp"
 #include "ForceLaw_Avalanche.hpp"
 
-Avalanche::Avalanche() { }
+Avalanche::Avalanche() {}
 
 void Avalanche::init() {
   box->idKnContact = box->dataTable.add("knContact");
@@ -79,13 +79,20 @@ bool Avalanche::computeInteraction(Interaction& I) {
   }
 
   // === Normal force
-  if (I.prev_dn > 0.0) I.prev_dn = 0.0;
+  if (I.prev_dn > 0.0) {
+    I.prev_dn = 0.0;
+  }
+
   double delta_Dn = I.dn - I.prev_dn;
-  if (delta_Dn > 0.0)
-    I.fn = -kn * en2 * I.dn;  // Unloading
-  else if (delta_Dn < 0.0)
-    I.fn += -kn * delta_Dn;  // Loading
-  if (I.fn < 0.0) I.fn = 0.0;
+  if (delta_Dn > 0.0) {  // Unloading
+    I.fn = -kn * en2 * I.dn;
+  } else if (delta_Dn < 0.0) {  // Loading
+    I.fn += -kn * delta_Dn;
+  }
+
+  if (I.fn < 0.0) {
+    I.fn = 0.0;
+  }
 
   // === Tangential force (friction)
   vec3r vt = I.vel - (I.vel * I.n) * I.n;
@@ -99,9 +106,11 @@ bool Avalanche::computeInteraction(Interaction& I) {
 #endif
   double threshold_ft = fabs(mu * I.fn);  // even without fabs the value should be positive
   double ft_square = I.ft * I.ft;
-  if (ft_square > 0.0 && ft_square > threshold_ft * threshold_ft) I.ft *= threshold_ft / sqrt(ft_square);
-  // Remark: in fact, the test (ft * ft > 0.0) means that ft_square is NOT null,
-  // because ft * ft >= 0 by definition.
+  if (ft_square > 0.0 && ft_square > threshold_ft * threshold_ft) {
+    I.ft *= threshold_ft / sqrt(ft_square);
+    // Remark: in fact, the test (ft * ft > 0.0) means that ft_square is NOT null,
+    // because ft * ft >= 0 by definition.
+  }
 
   // === Resistant moment
   I.mom += kr * (box->Particles[I.j].vrot - box->Particles[I.i].vrot) * box->dt;
@@ -118,7 +127,9 @@ bool Avalanche::computeInteraction(Interaction& I) {
   double threshold_mom = fabs(mur * norm(branch) * I.fn);  // even without fabs, the value should
                                                            // be positive
   double mom_square = I.mom * I.mom;
-  if (mom_square > 0.0 && mom_square > threshold_mom * threshold_mom) I.mom *= threshold_mom / sqrt(mom_square);
+  if (mom_square > 0.0 && mom_square > threshold_mom * threshold_mom) {
+    I.mom *= threshold_mom / sqrt(mom_square);
+  }
 
   return true;
 }

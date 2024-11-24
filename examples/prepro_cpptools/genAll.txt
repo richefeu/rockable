@@ -1,0 +1,66 @@
+# -------------------
+open shapes.txt
+generateShape:cube Cube 0.0005 0.01
+generateShape:xyz_walls   0.25 0.25 0.25   0.0005
+close
+
+# -------------------
+
+open input.txt
+print Rockable 21-08-2022
+print #### time #############################
+print t 0
+print tmax 2.0
+print dt 5e-6
+print interVerlet 0.001
+print interConf 0.01
+print 
+print #### options ##########################
+print forceLaw Default
+print Integrator Beeman
+print 
+print #### proximity of the particles #######
+print DVerlet 0.005
+print dVerlet 0.0025
+print 
+print #### properties for particles #########
+print density 0 2700
+print density 1 2700
+print 
+print #### interaction parameters ###########
+print knContact 0 1 1e6
+print en2Contact 0 1 0.02
+print ktContact 0 1 1e6
+print muContact 0 1 0.6
+print krContact 0 1 0.0
+print murContact 0 1 0.0
+print 
+print knContact 0 0 1e6
+print en2Contact 0 0 0.02
+print ktContact 0 0 1e6
+print muContact 0 0 0.6
+print krContact 0 0 0.0
+print murContact 0 0 0.0
+print 
+print #### the system #######################
+print iconf 0
+print shapeFile shapes.txt
+print nDriven 6
+print Particles 3381
+
+generatePacking:wallBox
+1
+0.25 0.25 0.25
+0.0005
+
+generatePacking:grid
+Cube
+0 0 0
+0.25 0.25 0.25
+15 15 15
+0
+0
+1.0
+1
+close
+

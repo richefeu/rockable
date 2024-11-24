@@ -4,6 +4,8 @@
 #include <MATools.hxx>
 #endif /* ROCKABLE_ENABLE_PROFILING */
 
+#include <string>
+
 namespace RockableProfiler {
 /* brief This function initializes timers if the ROCKABLE_ENABLE_PROFILING is set to on otherwise do nothing */
 void Initialize();

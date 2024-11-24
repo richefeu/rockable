@@ -33,31 +33,79 @@
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
-#ifndef GENERATESHAPE_SPHERE_HPP
-#define GENERATESHAPE_SPHERE_HPP
+#ifndef GENERATESHAPE_CUBOID_CONTAINER_HPP
+#define GENERATESHAPE_CUBOID_CONTAINER_HPP
 
 #include <iostream>
-#include <cmath>
 
-void generateShape_sphere(std::ostream& os, const char* name, double radius) {
-  double vol = (4.0 / 3.0) * M_PI * radius * radius * radius;
-  double I_m = (2.0 / 5.0) * radius * radius;
+#include "vec3.hpp"
+
+// sideSize = external sizes of the cuboid block (it includes the radius)
+void generateShape_cuboid_container(std::ostream& os, const char* name, double radius, vec3r& sideSize,
+                                    bool hasTop = false, bool hasBottom = true) {
+  // using namespace std;
+  double lx = 0.5 * sideSize.x - radius;
+  double ly = 0.5 * sideSize.y - radius;
+  double lz = 0.5 * sideSize.z - radius;
+
   os << "<" << '\n';
   os << "name " << name << '\n';
   os << "radius " << radius << '\n';
   os << "preCompDone y" << '\n';
-  os << "nv 1" << '\n';
-  os << "0 0 0" << '\n';
-  os << "ne 0" << '\n';
-  os << "nf 0" << '\n';
-  os << "obb.extent 1 1 1" << '\n';
+  os << "nv 8" << '\n';
+
+  os << lx << " " << ly << " " << -lz << '\n';
+  os << -lx << " " << ly << " " << -lz << '\n';
+  os << -lx << " " << -ly << " " << -lz << '\n';
+  os << lx << " " << -ly << " " << -lz << '\n';
+
+  os << lx << " " << ly << " " << lz << '\n';
+  os << -lx << " " << ly << " " << lz << '\n';
+  os << -lx << " " << -ly << " " << lz << '\n';
+  os << lx << " " << -ly << " " << lz << '\n';
+
+  os << "ne 12" << '\n';
+  os << "0 1" << '\n';
+  os << "1 2" << '\n';
+  os << "2 3" << '\n';
+  os << "3 0" << '\n';
+  os << "4 5" << '\n';
+  os << "5 6" << '\n';
+  os << "6 7" << '\n';
+  os << "7 4" << '\n';
+  os << "0 4" << '\n';
+  os << "1 5" << '\n';
+  os << "2 6" << '\n';
+  os << "3 7" << '\n';
+
+  int nbf = 4;
+  if (hasTop == true) {
+    nbf += 1;
+  }
+  if (hasBottom == true) {
+    nbf += 1;
+  }
+  os << "nf " << nbf << '\n';
+  if (hasBottom == true) {
+    os << "4 0 1 2 3" << '\n';
+  }
+  if (hasTop == true) {
+    os << "4 4 5 6 7" << '\n';
+  }
+  os << "4 0 1 5 4" << '\n';
+  os << "4 2 3 7 6" << '\n';
+  os << "4 1 2 6 5" << '\n';
+  os << "4 0 4 7 3" << '\n';
+  os << "obb.extent " << 0.5 * sideSize.x << ' ' << 0.5 * sideSize.y << ' ' << 0.5 * sideSize.z << '\n';
   os << "obb.e1 1 0 0" << '\n';
   os << "obb.e2 0 1 0" << '\n';
   os << "obb.e3 0 0 1" << '\n';
   os << "obb.center 0 0 0" << '\n';
-  os << "volume " << vol << '\n';
-  os << "I/m " << I_m << ' ' << I_m << ' ' << I_m << '\n';
-  os << ">" << std::endl;
+  os << "volume 1.0\n";
+  os << "I/m 1.0 1.0 1.0\n";
+  os << ">" << '\n';
+  os << std::flush;
 }
 
-#endif /* end of include guard: GENERATESHAPE_SPHERE_HPP */
+#endif /* end of include guard: GENERATESHAPE_CUBOID_CONTAINER_HPP */
+

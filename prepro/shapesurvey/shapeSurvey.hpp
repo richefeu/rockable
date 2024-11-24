@@ -1,6 +1,10 @@
 #ifndef SEE_HPP
 #define SEE_HPP
 
+#ifndef GL_SILENCE_DEPRECATION
+#define GL_SILENCE_DEPRECATION
+#endif
+
 #include <GL/freeglut.h>
 
 #include "Core/Shape.hpp"

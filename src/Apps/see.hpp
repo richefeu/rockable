@@ -37,6 +37,10 @@
 #define SEE_HPP
 #include <tclap/CmdLine.h>
 
+#ifndef GL_SILENCE_DEPRECATION
+#define GL_SILENCE_DEPRECATION
+#endif
+
 #include <GL/freeglut.h>
 
 #ifdef PNG_H
@@ -66,7 +70,7 @@ nlohmann::json params = {{"colorMode", 0},
                          {"rescaleColorRange", 1},
                          {"colorRangeMin", 0.0},
                          {"colorRangeMax", 1.0},
-                         {"show_background", 1},
+                         {"show_background", 0},
                          {"show_particles", 1},
                          {"show_driven", 1},
                          {"show_velocities", 0},
@@ -81,8 +85,8 @@ nlohmann::json params = {{"colorMode", 0},
                          {"show_periodicBox", 1},
                          {"ParticleColor", {207, 174, 85}},
                          {"alpha_particles", 1.0f},
-                         {"alpha_fixparticles", 0.2f},
-                         {"window", {{"width", 700}, {"height", 700}}},
+                         {"alpha_fixparticles", 0.15f},
+                         {"window", {{"width", 768}, {"height", 768}}},
                          {"camera",
                           {{"view_angle", 45.0f},
                            {"znear", 0.01f},
@@ -129,7 +133,7 @@ vec3r eye;
 vec3r center;
 vec3r up;
 
-void drawShape(Shape* s, double homothety = 1.0, const mat9r & T = mat9r::unit());
+void drawShape(Shape* s, double homothety = 1.0, const mat9r& T = mat9r::unit());
 void drawForces();
 void drawVelocities();
 void drawParticles();

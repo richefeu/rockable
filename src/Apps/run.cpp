@@ -144,7 +144,7 @@ int main(int argc, char const* argv[]) {
 
   try {
 
-    TCLAP::CmdLine cmd("This is the command line interface for Rockable", ' ', GIT_TAG);
+    TCLAP::CmdLine cmd("This is the command line interface for Rockable", ' ', ROCKABLE_GIT_TAG);
     TCLAP::UnlabeledValueArg<std::string> nameArg("input", "Name of the conf-file", false, "conf0", "conf-file");
     TCLAP::ValueArg<int> nbThreadsArg("j", "nbThreads", "Number of threads to be used", false, 1, "int");
     TCLAP::ValueArg<int> verboseArg(

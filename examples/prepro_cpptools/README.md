@@ -95,13 +95,14 @@ Cube
 0.25 0.25 0.25
 15 15 15
 0
+0
 1.0
 1
 ```
 
-The first command place the 6 walls that form the box, where group is 1, size is $25^3$ cm$^3$, and half-thickness is 5 mm (this latter value needs to be consistent with the one used to generate the wall shapes).
+The first command place the 6 walls that form the box, where group is 1, size is 25^3 cm^3, and half-thickness is 5 mm (this latter value needs to be consistent with the one used to generate the wall shapes).
 
-The second command place $15^3$ particles of shape named `Cube` inside a box ($25\times25\times25$ cm$^2$), from origin point (0, 0, 0). The group of the added particles is 0, the size factor (homothety) is 1.0, and the last value says that the cubes will have random orientations.
+The second command place 15^3 particles of shape named `Cube` inside a box (25x25x25 cm^2), from origin point (0, 0, 0). The group of the added particles is 0, the size factor (homothety) is 1.0, and the last value says that the cubes will have random orientations.
 
 The generator is invoked that way:
 

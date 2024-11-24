@@ -1,6 +1,7 @@
 #pragma once
 
-#include <MATools.hxx>
+#include "ProfilingTools.hpp"
+#include <cassert>
 #include <linkCells.hpp>
 #include <mutex>
 

@@ -57,7 +57,7 @@ UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
 
   # The compiler and linker to be used
-  CXX = g++-13
+  CXX = g++-14
   LINK = $(CXX)
 	
   # The list of flags passed to the compiler

@@ -2,7 +2,7 @@
 <img src="./sphinxdoc/source/images/RockableRocks.png" width="50%"/>
 </p>
 
-## What is `Rockable`?  
+## What is `Rockable`?   
 
 Rockable is a DEM code written in C++, initiated by <vincent.richefeu@3sr-grenoble.fr>. The two main specificities of the code are (_i_) to hold sphero-polyhedral shapes, (_ii_) to manage breakable interfaces. It is developed for an **academic usage**. This means that the code is not intended to be a tool for all purposes. It can easily be used to do what it is designed for, but to extend it, it is necessary to master both the model (DEM, complex shapes and interaction laws) and its implementation (data structure). The benefit of a good understanding is to avoid a "hacking" that would eventually limit the developed possibilities. In other words, the design of the code (neither too specific nor too general) is intended to avoid any tendency towards a single thought.
 
@@ -50,13 +50,13 @@ Here is the non-exhaustive list of involved persons with their main mission:
 
 * **Particle Shapes:** the code uses only one 3D shape: sphero-polyhedra or R-shapes. These shapes can be non-convex (with holes if necessary) and have rounded edges and corners (uniform radius per shape).
 
-  > [!NOTE]
-  > Some other shapes are currently considered for special boundary shapes (sphere, cylinder...) and specifique loadings.
+> [!NOTE]
+> Some other shapes are currently considered for special boundary shapes (sphere, cylinder...) and specifique loadings.
 	
 * **Boundary Conditions**: any rigid element can be used to apply boundary conditions. It is possible to impose velocity, force, or moment component by component. Some predefined systems with servo-control are also available for complex loading conditions (e.g., loading cycles or controlled pressure).
 
-  > [!NOTE]
-  > The possibility of applying tri-periodic loading to an assembly is implemented and currently in the testing phase.
+> [!NOTE]
+> The possibility of applying tri-periodic loading to an assembly is implemented and currently in the testing phase.
 
 * **Parallel Computation**: currently, an OpenMP optimization using compilation flags has been implemented. However, the computational speedup is relatively low. Typically, 8 cores are needed to halve the simulation time (for a dense system with a large number of elements).
 

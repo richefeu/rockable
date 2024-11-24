@@ -39,10 +39,12 @@
 #include <unistd.h>
 #include <sstream>
 
-#ifdef __APPLE__
+#ifndef GL_SILENCE_DEPRECATION
 #define GL_SILENCE_DEPRECATION
 #endif
 
+//#define GLFW_INCLUDE_GLCOREARB
+//#define GLFW_INCLUDE_NONE
 #define GLFW_INCLUDE_GLU
 #include <GLFW/glfw3.h>
 

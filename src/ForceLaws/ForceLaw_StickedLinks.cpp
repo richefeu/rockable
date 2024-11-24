@@ -180,7 +180,9 @@ bool StickedLinks::computeInteraction(Interaction& I) {
     double fne = -kn * I.dn;
     double fnv = damp * vn;
     I.fn = fne + fnv;
-    if (I.fn < 0.0) I.fn = 0.0;  // Because viscous damping can make the normal force negative
+    if (I.fn < 0.0) {
+      I.fn = 0.0;  // Because viscous damping can make the normal force negative
+    }
 
     // === Tangential force (friction)
     vec3r vt = I.vel - vn * I.n;
@@ -195,15 +197,19 @@ bool StickedLinks::computeInteraction(Interaction& I) {
 
     double threshold = fabs(mu * I.fn);
     double ft_square = I.ft * I.ft;
-    if (ft_square > 0.0 && ft_square >= threshold * threshold) I.ft *= threshold / sqrt(ft_square);
-    // Remark: in fact, the test (ft_square > 0.0) means that ft_square is not
-    // zero, because ft_square >= 0 by definition.
+    if (ft_square > 0.0 && ft_square >= threshold * threshold) {
+      I.ft *= threshold / sqrt(ft_square);
+      // Remark: in fact, the test (ft_square > 0.0) means that ft_square is not
+      // zero, because ft_square >= 0 by definition.
+    }
 
     // === Resistant moment
     I.mom += kr * (box->Particles[I.j].vrot - box->Particles[I.i].vrot) * box->dt;
     double threshold_mom = fabs(mur * I.fn);  // in this case mur is a *length*
     double mom_square = I.mom * I.mom;
-    if (mom_square > 0.0 && mom_square >= threshold_mom * threshold_mom) I.mom *= threshold_mom / sqrt(mom_square);
+    if (mom_square > 0.0 && mom_square >= threshold_mom * threshold_mom) {
+      I.mom *= threshold_mom / sqrt(mom_square);
+    }
   }
   return true;
 }

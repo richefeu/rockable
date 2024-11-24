@@ -211,16 +211,10 @@ void Rockable::ExplicitRegistrations() {
  */
 void Rockable::setVerboseLevel(int v) {
   std::string levelNames[] = {"off", "critical", "err", "warn", "info", "debug", "trace"};
-      
-  std::unordered_map<int, LogLevel> levelMap = {
-      {0, LogLevel::off},  
-      {1, LogLevel::critical}, 
-      {2, LogLevel::error},  
-      {3, LogLevel::warn},
-      {4, LogLevel::info}, 
-      {5, LogLevel::debug},
-      {6, LogLevel::trace}
-  };
+
+  std::unordered_map<int, LogLevel> levelMap = {{0, LogLevel::off},  {1, LogLevel::critical}, {2, LogLevel::error},
+                                                {3, LogLevel::warn}, {4, LogLevel::info},     {5, LogLevel::debug},
+                                                {6, LogLevel::trace}};
 
   if (levelMap.count(v) > 0) {
     Logger::setLevel(levelMap[v]);
@@ -237,7 +231,7 @@ void Rockable::setVerboseLevel(int v) {
  *   @param levelName Name of the verbose level
  */
 void Rockable::setVerboseLevel(const std::string& levelName) {
-  std::unordered_map<std::string, int> levelMap = {{"off", 0},  {"critical", 1}, {"error", 2},  {"warn", 3},
+  std::unordered_map<std::string, int> levelMap = {{"off", 0},  {"critical", 1}, {"error", 2}, {"warn", 3},
                                                    {"info", 4}, {"debug", 5},    {"trace", 6}};
 
   if (levelMap.count(levelName) > 0) {
@@ -251,10 +245,59 @@ void Rockable::setVerboseLevel(const std::string& levelName) {
  *   It opens some files (only if interactiveMode is false)
  */
 void Rockable::initOutputFiles() {
-  if (interactiveMode == true) return;
+  if (interactiveMode == true) {
+    return;
+  }
+
   perfFile.open("perf.txt");
   staticBalanceFile.open("staticBalance.txt");
   kineticEnergyFile.open("kineticEnergy.txt");
+
+  std::ofstream gnuplotFile("checkplots.txt");
+  gnuplotFile << "set terminal png size 1000,700\n";
+  gnuplotFile << "set output 'checkplots.png'\n";
+  gnuplotFile << "set xtics border nomirror\n";
+  gnuplotFile << "set ytics border nomirror\n";
+  gnuplotFile << "set mytics 1\n";
+  gnuplotFile << "set my2tics 1\n";
+  gnuplotFile << "set multiplot\n";
+  gnuplotFile << "set origin 0.0, 0.5\n";
+  gnuplotFile << "set size 0.5, 0.5\n";
+  gnuplotFile << "set xlabel 'Time'\n";
+  gnuplotFile << "set y2tics\n";
+  gnuplotFile << "set ylabel 'Efficiency'\n";
+  gnuplotFile << "set y2label 'Spent time [%]'\n";
+  gnuplotFile << "plot 'perf.txt' u 1:2 w l axes x1y1 lw 1.5  lc rgb '#000000' t 'efficiency', \\\n";
+  gnuplotFile << "'' u 1:3 w l axes x1y2 lw 1.5 lc rgb '#FF0000' t 'Neighbor List', \\\n";
+  gnuplotFile << "'' u 1:4 w l axes x1y2 lw 1.5 lc rgb '#0000FF' t 'Forces'\n";
+  gnuplotFile << "\n";
+  gnuplotFile << "set origin 0.5, 0.5\n";
+  gnuplotFile << "set size 0.5, 0.5\n";
+  gnuplotFile << "set xlabel 'Time'\n";
+  gnuplotFile << "set y2tics\n";
+  gnuplotFile << "set ylabel 'E_{translation}'\n";
+  gnuplotFile << "set y2label 'E_{rotation}'\n";
+  gnuplotFile << "set log y\n";
+  gnuplotFile << "set log y2\n";
+  gnuplotFile << "set format y '10^{%L}'\n";
+  gnuplotFile << "set format y2 '10^{%L}'\n";
+  gnuplotFile << "plot 'kineticEnergy.txt' u 1:2 w l axes x1y1 lw 1.5 lc rgb '#FF0000' t 'E_{trans}', \\\n";
+  gnuplotFile << "'' u 1:3 w l axes x1y2 lw 1.5 lc rgb '#0000FF' t 'E_{rot}'\n";
+  gnuplotFile << "\n";
+  gnuplotFile << "set origin 0.0, 0.0\n";
+  gnuplotFile << "set size 1.0, 0.5\n";
+  gnuplotFile << "set xlabel 'Time'\n";
+  gnuplotFile << "set y2tics\n";
+  gnuplotFile << "set ylabel 'F_{res}^{max} / f_n^{max}'\n";
+  gnuplotFile << "set y2label 'F_{res}^{max} / f_n^{mean}'\n";
+  gnuplotFile << "set log y\n";
+  gnuplotFile << "set log y2\n";
+  gnuplotFile << "set format y '10^{%L}'\n";
+  gnuplotFile << "set format y2 '10^{%L}'\n";
+  gnuplotFile << "plot 'staticBalance.txt' u 1:2 w l axes x1y1 lw 1.5 lc rgb '#FF0000' t '/max', \\\n";
+  gnuplotFile << "'' u 1:3 w l axes x1y2 lw 1.5 lc rgb '#0000FF'  t '/mean'\n";
+  gnuplotFile << "\n";
+  gnuplotFile << "unset multiplot\n";
 }
 
 /**
@@ -278,7 +321,7 @@ bool Rockable::isInteractive() const { return interactiveMode; }
 void Rockable::showBanner() {
   std::cout << "\n\n";
   std::cout << msg::bold() << msg::fg_lightBlue() << "   Rockable" << msg::fg_default() << msg::normal()
-            << "  Copyright (C) 2016-2023  <vincent.richefeu@univ-grenoble-alpes.fr>\n";
+            << "  Copyright (C) 2016-2024  <vincent.richefeu@univ-grenoble-alpes.fr>\n";
   std::cout << "   This program comes with ABSOLUTELY NO WARRANTY.\n";
   std::cout << "   " << msg::bold() << msg::fg_lightBlue() << "This is academic software" << msg::fg_default()
             << msg::normal() << "\n\n";
@@ -358,7 +401,11 @@ void Rockable::initialChecks() {
 
   double dtc;
   estimateCriticalTimeStep(dtc);
-  Logger::info("Considering a single contact between two particles, dt_critical / dt = {} (estimated)", dtc / dt);
+  if (dtc > 0.0) {
+    Logger::info("Considering a single contact between two particles, dt_critical / dt = {} (estimated)", dtc / dt);
+  } else {
+    Logger::warn("Considering a single contact between two particles, error = {}", dtc);
+  }
 
   getCriticalTimeStep(dtc);
   if (dtc > 0.0) {
@@ -368,6 +415,8 @@ void Rockable::initialChecks() {
   getCurrentCriticalTimeStep(dtc);
   if (dtc > 0.0) {
     Logger::info("dt_critical / dt = {} (over ACTIVE Interactions)", dtc / dt);
+  } else if (!activeInteractions.empty()) {
+    Logger::warn("dt_critical / dt (over ACTIVE Interactions), error = {}", dtc);
   }
 
   // TODO: ajouter des verifs par rapport aux groupes définies et le nombre de groupes dans properties et dataTable
@@ -409,7 +458,9 @@ void Rockable::saveConf(const char* fname) {
   START_TIMER("saveConf");
 
 #ifdef ROCKABLE_ENABLE_PERIODIC
-  if (usePeriodicCell == 1) reducedToRealKinematics();
+  if (usePeriodicCell == 1) {
+    reducedToRealKinematics();
+  }
 #endif
 
   std::ofstream conf(fname);
@@ -427,7 +478,9 @@ void Rockable::saveConf(const char* fname) {
   conf << "dVerlet " << dVerlet << '\n';
   for (size_t grp = 0; grp < properties.ngroup; grp++) {
     double density = properties.get(idDensity, grp);
-    if (density > 0.0) conf << "density " << grp << " " << density << '\n';
+    if (density > 0.0) {
+      conf << "density " << grp << " " << density << '\n';
+    }
   }
   conf << "gravity " << gravity << '\n';
   if (bodyForce != nullptr) {
@@ -461,7 +514,9 @@ void Rockable::saveConf(const char* fname) {
   conf << "VelocityBarrierExponent " << velocityBarrierExponent << '\n';
   conf << "AngularVelocityBarrierExponent " << angularVelocityBarrierExponent << '\n';
 
-  if (preventCrossingLength > 0.0) conf << "preventCrossingLength " << preventCrossingLength << '\n';
+  if (preventCrossingLength > 0.0) {
+    conf << "preventCrossingLength " << preventCrossingLength << '\n';
+  }
 
   writeLawData(conf, "knContact");
   writeLawData(conf, "en2Contact");
@@ -667,7 +722,9 @@ void Rockable::initParser() {
       Tempos.back().set(command, t1, t2, val1, val2);
       size_t id = dataTable.data_id[parNameStr];
       Tempos.back().plug(&(dataTable.tables[id][g1][g2]));
-      if (g1 != g2) Tempos.back().plug(&(dataTable.tables[id][g2][g1]));
+      if (g1 != g2) {
+        Tempos.back().plug(&(dataTable.tables[id][g2][g1]));
+      }
     } else if (kw == "Body") {
       std::string parNameStr;
       size_t grp;
@@ -777,7 +834,6 @@ void Rockable::initParser() {
     std::string name;
     conf >> name;
     std::string wantedLib = m_path + std::string(name);
-    Logger::info("wantedLib is {}", wantedLib);
     if (wantedLib != shapeFile) {  // it means that the library is not already loaded
       shapeFile = wantedLib;
       loadShapes(shapeFile.c_str());
@@ -794,7 +850,9 @@ void Rockable::initParser() {
   parser.kwMap["glue_with_walls"] = __DO__(conf) {
     std::string YesNo;
     conf >> YesNo;
-    if (YesNo == "yes" || YesNo == "YES" || YesNo == "y" || YesNo == "Y" || YesNo == "1") glue_with_walls = true;
+    if (YesNo == "yes" || YesNo == "YES" || YesNo == "y" || YesNo == "Y" || YesNo == "1") {
+      glue_with_walls = true;
+    }
   };
   parser.kwMap["precision"] = __DO__(conf) {
     int pr;
@@ -839,16 +897,24 @@ void Rockable::initParser() {
 
       Particles.push_back(P);
     }
-    if (Interactions.size() != Particles.size()) Interactions.resize(Particles.size());
-    if (Interfaces.size() != Particles.size()) Interfaces.resize(Particles.size());
+    if (Interactions.size() != Particles.size()) {
+      Interactions.resize(Particles.size());
+    }
+    if (Interfaces.size() != Particles.size()) {
+      Interfaces.resize(Particles.size());
+    }
   };
   parser.kwMap["Interactions"] = __DO__(conf) {
     size_t nb;
     conf >> nb;
     Logger::info("Number of interactions: {}", nb);
 
-    if (Interactions.size() != Particles.size()) Interactions.resize(Particles.size());
-    for (size_t i = 0; i < Particles.size(); ++i) Interactions[i].clear();
+    if (Interactions.size() != Particles.size()) {
+      Interactions.resize(Particles.size());
+    }
+    for (size_t i = 0; i < Particles.size(); ++i) {
+      Interactions[i].clear();
+    }
     activeInteractions.clear();
 
     Interaction I;
@@ -866,8 +932,12 @@ void Rockable::initParser() {
     conf >> nbInterf;
     Logger::info("Number of interfaces: {}", nbInterf);
 
-    if (Interfaces.size() != Particles.size()) Interfaces.resize(Particles.size());
-    for (size_t i = 0; i < Particles.size(); ++i) Interfaces[i].clear();
+    if (Interfaces.size() != Particles.size()) {
+      Interfaces.resize(Particles.size());
+    }
+    for (size_t i = 0; i < Particles.size(); ++i) {
+      Interfaces[i].clear();
+    }
 
     for (size_t k = 0; k < nbInterf; ++k) {
       Interaction ItoFind;
@@ -890,8 +960,8 @@ void Rockable::initParser() {
           BI.concernedBonds[u] = const_cast<Interaction*>(std::addressof(*it));
         } else {
           missed = true;
-          Logger::warn("Cannot find interaction: i={} j={} type={} isub={} jsub={}", ItoFind.i, ItoFind.j,
-                        ItoFind.type, ItoFind.isub, ItoFind.jsub);
+          Logger::warn("Cannot find interaction: i={} j={} type={} isub={} jsub={}", ItoFind.i, ItoFind.j, ItoFind.type,
+                       ItoFind.isub, ItoFind.jsub);
         }
       }
       // Connection of the BreakableInterface with the Interactions
@@ -906,7 +976,9 @@ void Rockable::initParser() {
   };
   parser.kwMap["DataExtractor"] = __DO__(conf) {  // Kept for compatibility (use file dataExtractors.txt instead)
 
-    if (interactiveMode == true) return;  // The dataExtractors are not read in interactive mode
+    if (interactiveMode == true) {
+      return;
+    }  // The dataExtractors are not read in interactive mode
 
     std::string ExtractorName;
     conf >> ExtractorName;
@@ -1009,7 +1081,7 @@ void Rockable::loadConf(const char* a_name) {
   conf >> date;
   if (date != CONF_VERSION_DATE) {
     Logger::warn("@Rockable::loadConf, the version-date should be '{}'\n(in most cases, this should not be a problem)",
-                  CONF_VERSION_DATE);
+                 CONF_VERSION_DATE);
   }
 
   // This single line actually parses the file
@@ -1042,7 +1114,9 @@ void Rockable::loadConf(const char* a_name) {
  *   exit without making anything.
  */
 void Rockable::readDataExtractors() {
-  if (interactiveMode == true) return;  // The dataExtractors are not read in interactive mode
+  if (interactiveMode == true) {
+    return;
+  }  // The dataExtractors are not read in interactive mode
 
   if (!fileTool::fileExists("dataExtractors.txt")) {
     return;
@@ -1187,7 +1261,7 @@ void Rockable::setAddOrRemoveInteractions(std::string& Name) {
   } else {
 
     Logger::warn("AddOrRemoveInteractions {} is unknown, Option remains: AddOrRemoveInteractions = {}", Name,
-                  optionNames["AddOrRemoveInteractions"]);
+                 optionNames["AddOrRemoveInteractions"]);
   }
 }
 
@@ -1230,7 +1304,9 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
 
   vec3r jPeriodicShift;
 #ifdef ROCKABLE_ENABLE_PERIODIC
-  if (usePeriodicCell == 1) jPeriodicShift = Cell.getBranchCorrection(Particles[i].pos, Particles[j].pos);
+  if (usePeriodicCell == 1) {
+    jPeriodicShift = Cell.getBranchCorrection(Particles[i].pos, Particles[j].pos);
+  }
 #endif
 
   size_t nvi = Particles[i].shape->vertex.size();
@@ -1244,20 +1320,23 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
   double kn = dataTable.get(idKnContact, Particles[i].group, Particles[j].group);
 
   double meff;
-  if (i < nDriven)
+  if (i < nDriven) {
     meff = Particles[j].mass;
-  else if (j < nDriven)
+  } else if (j < nDriven) {
     meff = Particles[i].mass;
-  else
+  } else {
     meff = (Particles[i].mass * Particles[j].mass) / (Particles[i].mass + Particles[j].mass);
+  }
+
   if (en2 > 0.0 && en2 < 1.0) {
     double logen = 0.5 * log(en2);
     double dampRate = -logen / sqrt(logen * logen + Mth::piSqr);
     Damp = dampRate * 2.0 * sqrt(kn * meff);
-  } else if (en2 <= 0.0)
+  } else if (en2 <= 0.0) {
     Damp = 2.0 * sqrt(kn * meff);
-  else
+  } else {
     Damp = 0.0;
+  }
 
   // Remark: we do not put the following 3 loops into omp parallel sections
   //         because the function is called itself from a parallel for loop
@@ -1272,7 +1351,9 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
     OBB obbj = Particles[j].obb;
     obbj.translate(jPeriodicShift);
     obbj.enlarge(dmax);
-    if (!(obbj.intersect(subObbi))) continue;
+    if (!(obbj.intersect(subObbi))) {
+      continue;
+    }
 
     // vertex-vertex (i, vertex isub)->(j, all vertices)
     addOrRemoveSingleInteraction(i, j, isub, vvType, nvj, jPeriodicShift, Particle::VertexIsNearVertex);
@@ -1292,7 +1373,9 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
     subObbj.enlarge(Particles[j].MinskowskiRadius() + dmax);
     OBB obbi = Particles[i].obb;
     obbi.enlarge(dmax);
-    if (!(obbi.intersect(subObbj))) continue;
+    if (!(obbi.intersect(subObbj))) {
+      continue;
+    }
 
     // vertex-edge (j, vertex jsub)->(i, all edges)
     addOrRemoveSingleInteraction(j, i, jsub, veType, nei, -jPeriodicShift, Particle::VertexIsNearEdge);
@@ -1351,7 +1434,9 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
 
   vec3r jPeriodicShift;
 #ifdef ROCKABLE_ENABLE_PERIODIC
-  if (usePeriodicCell) jPeriodicShift = Cell.getBranchCorrection(Particles[i].pos, Particles[j].pos);
+  if (usePeriodicCell) {
+    jPeriodicShift = Cell.getBranchCorrection(Particles[i].pos, Particles[j].pos);
+  }
 #endif
 
   // Precompute the viscous damping parameter
@@ -1359,20 +1444,23 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
   double kn = dataTable.get(idKnContact, Particles[i].group, Particles[j].group);
 
   double meff;
-  if (i < nDriven)
+  if (i < nDriven) {
     meff = Particles[j].mass;
-  else if (j < nDriven)
+  } else if (j < nDriven) {
     meff = Particles[i].mass;
-  else
+  } else {
     meff = (Particles[i].mass * Particles[j].mass) / (Particles[i].mass + Particles[j].mass);
+  }
+
   if (en2 > 0.0 && en2 < 1.0) {
     double logen = 0.5 * log(en2);
     double dampRate = -logen / sqrt(logen * logen + Mth::piSqr);
     Damp = dampRate * 2.0 * sqrt(kn * meff);
-  } else if (en2 <= 0.0)
+  } else if (en2 <= 0.0) {
     Damp = 2.0 * sqrt(kn * meff);
-  else
+  } else {
     Damp = 0.0;
+  }
 
   std::vector<std::pair<subBox, subBox>> intersections;
 
@@ -1449,10 +1537,14 @@ void Rockable::dynamicCheckUpdateNL() {
   for (size_t i = 0; i < deltaPos.size(); ++i) {
     deltaPos[i] += Particles[i].vel * dt;
     double tmp1 = norm2(deltaPos[i]);
-    if (tmp1 > maxDeltaPos * maxDeltaPos) maxDeltaPos = sqrt(tmp1);
+    if (tmp1 > maxDeltaPos * maxDeltaPos) {
+      maxDeltaPos = sqrt(tmp1);
+    }
     deltaQ[i] += ((Particles[i].Q.dot(Particles[i].vrot)) *= dt);
     double tmp2 = deltaQ[i].get_angle();
-    if (tmp2 > maxDeltaRot) maxDeltaRot = tmp2;
+    if (tmp2 > maxDeltaRot) {
+      maxDeltaRot = tmp2;
+    }
   }
 
   if (maxDeltaPos >= dispUpdateNL || maxDeltaRot >= angleUpdateNL) {
@@ -1500,14 +1592,18 @@ void Rockable::UpdateNL_bruteForce() {
 
     size_t jnext = i + 1;
     // Prevent interactions between driven bodies
-    if (jnext < nDriven) jnext = nDriven;
+    if (jnext < nDriven) {
+      jnext = nDriven;
+    }
 
     for (size_t j = jnext; j < Particles.size(); j++) {
       // if interface (i,j) is still 'active' (ie. no bond has been broken),
       // then NO contact will be possible between bodies i and j.
       BI_to_find.j = j;
       std::set<BreakableInterface>::iterator BI_it = (Interfaces[i]).find(BI_to_find);
-      if (BI_it != Interfaces[i].end()) continue;  // Continue the loop (next j) if an interface is found
+      if (BI_it != Interfaces[i].end()) {
+        continue;
+      }  // Continue the loop (next j) if an interface is found
 
       OBB obbj = Particles[j].obb;
       obbj.enlarge(0.5 * DVerlet);
@@ -1561,108 +1657,115 @@ void Rockable::UpdateNL_linkCells() {
   }
 	{
 		START_TIMER("main");	
-	#pragma omp parallel for collapse(3) schedule(static)
-  for (size_t ix = 0; ix < m_linkCells.N.x; ++ix) {
-    for (size_t iy = 0; iy < m_linkCells.N.y; ++iy) {
-      for (size_t iz = 0; iz < m_linkCells.N.z; ++iz) {
-				AABB_Cell *Cc, *Cv;
-				Cc = &(m_linkCells.cells[ix][iy][iz]);
+	  #pragma omp parallel for collapse(3) schedule(static)
+    for (size_t ix = 0; ix < m_linkCells.N.x; ++ix) {
+      for (size_t iy = 0; iy < m_linkCells.N.y; ++iy) {
+        for (size_t iz = 0; iz < m_linkCells.N.z; ++iz) {
+				  AABB_Cell *Cc, *Cv;
+				  Cc = &(m_linkCells.cells[ix][iy][iz]);
 
-				for (size_t c = 0; c < Cc->pcells.size(); ++c) {
+				  for (size_t c = 0; c < Cc->pcells.size(); ++c) {
 
-					Cv = Cc->pcells[c];  // The neighbor cells (including itself)
-					for (size_t icc = 0; icc < Cc->bodies.size(); ++icc) {
+				  	Cv = Cc->pcells[c];  // The neighbor cells (including itself)
+				  	for (size_t icc = 0; icc < Cc->bodies.size(); ++icc) {
 
-						size_t i = Cc->bodies[icc];
+					  	size_t i = Cc->bodies[icc];
 
-						BreakableInterface BI_to_find;
-						BI_to_find.i = i;
+						  BreakableInterface BI_to_find;
+						  BI_to_find.i = i;
 
-						OBB obbi = Particles[i].obb;
-						obbi.enlarge(0.5 * DVerlet);
+						  OBB obbi = Particles[i].obb;
+						  obbi.enlarge(0.5 * DVerlet);
 
-						for (size_t jcv = 0; jcv < Cv->bodies.size(); ++jcv) {
-							size_t j = Cv->bodies[jcv];
-							if (j < nDriven && i < nDriven) continue;
-							if (j <= i) continue;
+              for (size_t jcv = 0; jcv < Cv->bodies.size(); ++jcv) {
+                size_t j = Cv->bodies[jcv];
+                if (j < nDriven && i < nDriven) {
+                  continue;
+                }
+                if (j <= i) {
+                  continue;
+                }
 
-							// if interface (i,j) is still 'active' (ie. no bond has been broken),
-							// then NO contact will be possible between bodies i and j.
-							BI_to_find.j = j;
-							std::set<BreakableInterface>::iterator BI_it = (Interfaces[i]).find(BI_to_find);
-							if (BI_it != Interfaces[i].end()) continue;  // Continue the loop if an interface is found
+                // if interface (i,j) is still 'active' (ie. no bond has been broken),
+                // then NO contact will be possible between bodies i and j.
+                BI_to_find.j = j;
+                std::set<BreakableInterface>::iterator BI_it = (Interfaces[i]).find(BI_to_find);
+                if (BI_it != Interfaces[i].end()) {
+                  continue;
+                }  // Continue the loop if an interface is found
 
-							OBB obbj = Particles[j].obb;
-							obbj.enlarge(0.5 * DVerlet);
+                OBB obbj = Particles[j].obb;
+                obbj.enlarge(0.5 * DVerlet);
 #ifdef ROCKABLE_ENABLE_PERIODIC
-							if (usePeriodicCell) {
-								obbj.center += Cell.getBranchCorrection(obbi.center, obbj.center);
-							}
+							  if (usePeriodicCell) {
+								  obbj.center += Cell.getBranchCorrection(obbi.center, obbj.center);
+							  }
 #endif
 
-							// Check intersection
-							if (obbi.intersect(obbj)) {
-								AddOrRemoveInteractions(i, j, dVerlet);
-							}
-
-						}  // jcv
-					}    // icc
-
-				}  // c (neighbor cells)
-
-			}  // iz
-		}    // iy
-	}      // ix
-}
+							  // Check intersection
+							  if (obbi.intersect(obbj)) {
+								  AddOrRemoveInteractions(i, j, dVerlet);
+						  	}
+              }  // jcv
+            }  // icc
+				  }  // c (neighbor cells)
+        }  // iz
+      }  // iy
+    }  // ix
+  }
 	AABB_Cell *Cc; //, *Cv;
 	// Now we test if a too large bodies can collide another body in the
 	Cc = &(m_linkCells.oversized_bodies);
 
 	{
 		START_TIMER("not-main");	
-	#pragma omp parallel for collapse(3) 
-	for (size_t ix = 0; ix < m_linkCells.N.x; ++ix) {
-		for (size_t iy = 0; iy < m_linkCells.N.y; ++iy) {
-			for (size_t iz = 0; iz < m_linkCells.N.z; ++iz) {
-				AABB_Cell*Cv = &(m_linkCells.cells[ix][iy][iz]);
+  	#pragma omp parallel for collapse(3) 
+	  for (size_t ix = 0; ix < m_linkCells.N.x; ++ix) {
+		  for (size_t iy = 0; iy < m_linkCells.N.y; ++iy) {
+			  for (size_t iz = 0; iz < m_linkCells.N.z; ++iz) {
+				  AABB_Cell*Cv = &(m_linkCells.cells[ix][iy][iz]);
 
-				for (size_t icc = 0; icc < Cc->bodies.size(); ++icc) {
+				  for (size_t icc = 0; icc < Cc->bodies.size(); ++icc) {
 
-					size_t i = Cc->bodies[icc];
+				  	size_t i = Cc->bodies[icc];
 
-					BreakableInterface BI_to_find;
-					BI_to_find.i = i;
+				   	BreakableInterface BI_to_find;
+				  	BI_to_find.i = i;
 
-					OBB obbi = Particles[i].obb;
-					obbi.enlarge(0.5 * DVerlet);
+					  OBB obbi = Particles[i].obb;
+					  obbi.enlarge(0.5 * DVerlet);
 
-					for (size_t jcv = 0; jcv < Cv->bodies.size(); ++jcv) {
-						size_t j = Cv->bodies[jcv];
+					  for (size_t jcv = 0; jcv < Cv->bodies.size(); ++jcv) {
+					  	size_t j = Cv->bodies[jcv];
 
-						if (j < nDriven && i < nDriven) continue;
-						if (j <= i) continue;
+              if (j < nDriven && i < nDriven) {
+               continue;
+              } 
+              if (j <= i) {
+                continue;
+              }
 
-						// if interface (i,j) is still 'active' (ie. no bond has been broken),
-						// then NO contact will be possible between bodies i and j.
-						BI_to_find.j = j;
-						std::set<BreakableInterface>::iterator BI_it = (Interfaces[i]).find(BI_to_find);
-						if (BI_it != Interfaces[i].end()) continue;  // Continue the loop if an interface is found
+              // if interface (i,j) is still 'active' (ie. no bond has been broken),
+              // then NO contact will be possible between bodies i and j.
+              BI_to_find.j = j;
+              std::set<BreakableInterface>::iterator BI_it = (Interfaces[i]).find(BI_to_find);
+              if (BI_it != Interfaces[i].end()) {
+                continue;
+              }  // Continue the loop if an interface is found
 
-						OBB obbj = Particles[j].obb;
-						obbj.enlarge(0.5 * DVerlet);
+						  OBB obbj = Particles[j].obb;
+						  obbj.enlarge(0.5 * DVerlet);
 
-						// Check intersection
-						if (obbi.intersect(obbj)) {
-							AddOrRemoveInteractions(i, j, dVerlet);
-						}
-
-					}  // jcv
-				}    // icc
-
-			}  // iz
-		}    // iy
-	}      // ix
-}
+						  // Check intersection
+						  if (obbi.intersect(obbj)) {
+						  	AddOrRemoveInteractions(i, j, dVerlet);
+						  }
+					  }  // jcv
+				  }    // icc
+			  }  // iz
+		  }    // iy
+	  }      // ix
+  }
 	Interactions_from_set_to_vec();
 	m_traversals.setMutexSize(Particles.size());
 	m_traversals.buildTraversal(m_linkCells);
@@ -1839,8 +1942,10 @@ void Rockable::EulerStep() {
 void Rockable::velocityVerletStep() {
 	START_TIMER("Step (velocity-Verlet)");
 
-	// If a ServoFunction exists, then it is called
-	if (System.ServoFunction != nullptr) System.ServoFunction(*this);
+  // If a ServoFunction exists, then it is called
+  if (System.ServoFunction != nullptr) {
+    System.ServoFunction(*this);
+  }
 
 	// Controlled bodies
 	velocityControlledDrive();
@@ -1897,8 +2002,10 @@ void Rockable::velocityVerletStep() {
 		Particles[i].vel += dt_2 * Particles[i].acc;
 
 #ifdef ROCKABLE_ENABLE_PERIODIC
-		// remember here that we use reduced coordinates here, in case of periodic cell
-		if (usePeriodicCell == 1) Cell.forceToStayInside(Particles[i].pos);
+    // remember here that we use reduced coordinates here, in case of periodic cell
+    if (usePeriodicCell == 1) {
+      Cell.forceToStayInside(Particles[i].pos);
+    }
 #endif
 
 		// Rotation: Q(k+1) = Q(k) + dQ(k) * dt + ddQ(k) * dt2/2
@@ -2139,176 +2246,181 @@ void Rockable::BeemanStep() {
 void Rockable::RungeKutta4Step() {
 	START_TIMER("Step (RK4)");
 
-	// If a ServoFunction exists, then it is called
-	if (System.ServoFunction != nullptr) System.ServoFunction(*this);
+  // If a ServoFunction exists, then it is called
+  if (System.ServoFunction != nullptr) {
+    System.ServoFunction(*this);
+  }
 
 	// velocity-controlled bodies
 	velocityControlledDrive();
 
 	// Bodies that are free to move
-
-	// k1 ........
-	for (size_t c = 0; c < System.controls.size(); ++c) {
-		switch (System.controls[c].type) {
-			case _x_For_: {
-											size_t i = System.controls[c].i;
-											Particles[i].RK4Data->pos0.x = Particles[i].pos.x;
-											Particles[i].RK4Data->vel0.x = Particles[i].vel.x;
-										} break;
-			case _y_For_: {
-											size_t i = System.controls[c].i;
-											Particles[i].RK4Data->pos0.y = Particles[i].pos.y;
-											Particles[i].RK4Data->vel0.y = Particles[i].vel.y;
-										} break;
-			case _z_For_: {
-											size_t i = System.controls[c].i;
-											Particles[i].RK4Data->pos0.z = Particles[i].pos.z;
-											Particles[i].RK4Data->vel0.z = Particles[i].vel.z;
-										} break;
-										// TODO imposed moments with RK4 scheme
-			default:
-										break;
-		}
-	}
+  for (size_t c = 0; c < System.controls.size(); ++c) {
+    switch (System.controls[c].type) {
+      case _x_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].RK4Data->pos0.x = Particles[i].pos.x;
+        Particles[i].RK4Data->vel0.x = Particles[i].vel.x;
+      } break;
+      case _y_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].RK4Data->pos0.y = Particles[i].pos.y;
+        Particles[i].RK4Data->vel0.y = Particles[i].vel.y;
+      } break;
+      case _z_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].RK4Data->pos0.z = Particles[i].pos.z;
+        Particles[i].RK4Data->vel0.z = Particles[i].vel.z;
+      } break;
+      // TODO imposed moments with RK4 scheme
+      default:
+        break;
+    }
+  }
 #pragma omp parallel for default(shared)
-	for (size_t i = nDriven; i < Particles.size(); ++i) {
-		Particles[i].RK4Data->pos0 = Particles[i].pos;
-		Particles[i].RK4Data->Q0 = Particles[i].Q;
-		Particles[i].RK4Data->vel0 = Particles[i].vel;
-		Particles[i].RK4Data->vrot0 = Particles[i].vrot;
-	}
-	accelerations();
+  for (size_t i = nDriven; i < Particles.size(); ++i) {
+    Particles[i].RK4Data->pos0 = Particles[i].pos;
+    Particles[i].RK4Data->Q0 = Particles[i].Q;
+    Particles[i].RK4Data->vel0 = Particles[i].vel;
+    Particles[i].RK4Data->vrot0 = Particles[i].vrot;
+  }
+
+  // k1 ........
+  accelerations();
 #pragma omp parallel for default(shared)
 	for (size_t i = 0; i < Particles.size(); ++i) {
 		Particles[i].RK4Data->k1acc = Particles[i].acc;
 		Particles[i].RK4Data->k1arot = Particles[i].arot;
 	}
 
-	// k2 ........
-	for (size_t c = 0; c < System.controls.size(); ++c) {
-		switch (System.controls[c].type) {
-			case _x_For_: {
-											size_t i = System.controls[c].i;
-											Particles[i].pos.x =
-												Particles[i].RK4Data->pos0.x + dt_2 * Particles[i].RK4Data->vel0.x + dt2_8 * Particles[i].RK4Data->k1acc.x;
-											Particles[i].vel.x = Particles[i].RK4Data->vel0.x + dt_2 * Particles[i].RK4Data->k1acc.x;
-										} break;
-			case _y_For_: {
-											size_t i = System.controls[c].i;
-											Particles[i].pos.y =
-												Particles[i].RK4Data->pos0.y + dt_2 * Particles[i].RK4Data->vel0.y + dt2_8 * Particles[i].RK4Data->k1acc.y;
-											Particles[i].vel.y = Particles[i].RK4Data->vel0.y + dt_2 * Particles[i].RK4Data->k1acc.y;
-										} break;
-			case _z_For_: {
-											size_t i = System.controls[c].i;
-											Particles[i].pos.z =
-												Particles[i].RK4Data->pos0.z + dt_2 * Particles[i].RK4Data->vel0.z + dt2_8 * Particles[i].RK4Data->k1acc.z;
-											Particles[i].vel.z = Particles[i].RK4Data->vel0.z + dt_2 * Particles[i].RK4Data->k1acc.z;
-										} break;
-										// TODO imposed moments with RK4 scheme
-			default:
-										break;
-		}
-	}
+  for (size_t c = 0; c < System.controls.size(); ++c) {
+    switch (System.controls[c].type) {
+      case _x_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].pos.x =
+            Particles[i].RK4Data->pos0.x + dt_2 * Particles[i].RK4Data->vel0.x + dt2_8 * Particles[i].RK4Data->k1acc.x;
+        Particles[i].vel.x = Particles[i].RK4Data->vel0.x + dt_2 * Particles[i].RK4Data->k1acc.x;
+      } break;
+      case _y_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].pos.y =
+            Particles[i].RK4Data->pos0.y + dt_2 * Particles[i].RK4Data->vel0.y + dt2_8 * Particles[i].RK4Data->k1acc.y;
+        Particles[i].vel.y = Particles[i].RK4Data->vel0.y + dt_2 * Particles[i].RK4Data->k1acc.y;
+      } break;
+      case _z_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].pos.z =
+            Particles[i].RK4Data->pos0.z + dt_2 * Particles[i].RK4Data->vel0.z + dt2_8 * Particles[i].RK4Data->k1acc.z;
+        Particles[i].vel.z = Particles[i].RK4Data->vel0.z + dt_2 * Particles[i].RK4Data->k1acc.z;
+      } break;
+      // TODO imposed moments with RK4 scheme
+      default:
+        break;
+    }
+  }
 #pragma omp parallel for default(shared)
-	for (size_t i = nDriven; i < Particles.size(); ++i) {
-		// pos0 + h_2 * vel0 + h2_8 * k1acc
-		Particles[i].pos =
-			Particles[i].RK4Data->pos0 + dt_2 * Particles[i].RK4Data->vel0 + dt2_8 * Particles[i].RK4Data->k1acc;
-		// Q0 + h_2 * dot(Q0,vrot0) + h2_8 * ddot(Q0,vrot0,k1arot)
-		Particles[i].Q = Particles[i].RK4Data->Q0;
-		Particles[i].Q += (Particles[i].RK4Data->Q0.dot(Particles[i].RK4Data->vrot0) *= dt_2);
-		Particles[i].Q +=
-			(Particles[i].RK4Data->Q0.ddot(Particles[i].RK4Data->vrot0, Particles[i].RK4Data->k1arot) *= dt2_8);
-		// vel0 + h_2 * k1acc
-		Particles[i].vel = Particles[i].RK4Data->vel0 + dt_2 * Particles[i].RK4Data->k1acc;
-		// vrot0 + h_2 * k1arot
-		Particles[i].vrot = Particles[i].RK4Data->vrot0 + dt_2 * Particles[i].RK4Data->k1arot;
-	}
-	accelerations();
+  for (size_t i = nDriven; i < Particles.size(); ++i) {
+    // pos0 + h_2 * vel0 + h2_8 * k1acc
+    Particles[i].pos =
+        Particles[i].RK4Data->pos0 + dt_2 * Particles[i].RK4Data->vel0 + dt2_8 * Particles[i].RK4Data->k1acc;
+    // Q0 + h_2 * dot(Q0,vrot0) + h2_8 * ddot(Q0,vrot0,k1arot)
+    Particles[i].Q = Particles[i].RK4Data->Q0;
+    Particles[i].Q += (Particles[i].RK4Data->Q0.dot(Particles[i].RK4Data->vrot0) *= dt_2);
+    Particles[i].Q +=
+        (Particles[i].RK4Data->Q0.ddot(Particles[i].RK4Data->vrot0, Particles[i].RK4Data->k1arot) *= dt2_8);
+    // vel0 + h_2 * k1acc
+    Particles[i].vel = Particles[i].RK4Data->vel0 + dt_2 * Particles[i].RK4Data->k1acc;
+    // vrot0 + h_2 * k1arot
+    Particles[i].vrot = Particles[i].RK4Data->vrot0 + dt_2 * Particles[i].RK4Data->k1arot;
+  }
+
+  // k2 ........
+  accelerations();
 #pragma omp parallel for default(shared)
 	for (size_t i = 0; i < Particles.size(); ++i) {
 		Particles[i].RK4Data->k2acc = Particles[i].acc;
 		Particles[i].RK4Data->k2arot = Particles[i].arot;
 	}
 
-	// k3 ........
-	for (size_t c = 0; c < System.controls.size(); ++c) {
-		switch (System.controls[c].type) {
-			case _x_For_: {
-											size_t i = System.controls[c].i;
-											Particles[i].vel.x = Particles[i].RK4Data->vel0.x + dt_2 * Particles[i].RK4Data->k2acc.x;
-										} break;
-			case _y_For_: {
-											size_t i = System.controls[c].i;
-											Particles[i].vel.y = Particles[i].RK4Data->vel0.y + dt_2 * Particles[i].RK4Data->k2acc.y;
-										} break;
-			case _z_For_: {
-											size_t i = System.controls[c].i;
-											Particles[i].vel.z = Particles[i].RK4Data->vel0.z + dt_2 * Particles[i].RK4Data->k2acc.z;
-										} break;
-										// TODO imposed moments with RK4 scheme
-			default:
-										break;
-		}
-	}
+  for (size_t c = 0; c < System.controls.size(); ++c) {
+    switch (System.controls[c].type) {
+      case _x_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].vel.x = Particles[i].RK4Data->vel0.x + dt_2 * Particles[i].RK4Data->k2acc.x;
+      } break;
+      case _y_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].vel.y = Particles[i].RK4Data->vel0.y + dt_2 * Particles[i].RK4Data->k2acc.y;
+      } break;
+      case _z_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].vel.z = Particles[i].RK4Data->vel0.z + dt_2 * Particles[i].RK4Data->k2acc.z;
+      } break;
+      // TODO imposed moments with RK4 scheme
+      default:
+        break;
+    }
+  }
 #pragma omp parallel for default(shared)
-	for (size_t i = nDriven; i < Particles.size(); ++i) {
-		// pos and Q not changed
-		// vel0 + h_2 * k2acc
-		Particles[i].vel = Particles[i].RK4Data->vel0 + dt_2 * Particles[i].RK4Data->k2acc;
-		// vrot0 + h_2 * k2arot
-		Particles[i].vrot = Particles[i].RK4Data->vrot0 + dt_2 * Particles[i].RK4Data->k2arot;
-	}
-	accelerations();
+  for (size_t i = nDriven; i < Particles.size(); ++i) {
+    // pos and Q not changed
+    // vel0 + h_2 * k2acc
+    Particles[i].vel = Particles[i].RK4Data->vel0 + dt_2 * Particles[i].RK4Data->k2acc;
+    // vrot0 + h_2 * k2arot
+    Particles[i].vrot = Particles[i].RK4Data->vrot0 + dt_2 * Particles[i].RK4Data->k2arot;
+  }
+
+  // k3 ........
+  accelerations();
 #pragma omp parallel for default(shared)
 	for (size_t i = 0; i < Particles.size(); ++i) {
 		Particles[i].RK4Data->k3acc = Particles[i].acc;
 		Particles[i].RK4Data->k3arot = Particles[i].arot;
 	}
 
-	// k4 ........
-	for (size_t c = 0; c < System.controls.size(); ++c) {
-		switch (System.controls[c].type) {
-			case _x_For_: {
-											size_t i = System.controls[c].i;
-											Particles[i].pos.x =
-												Particles[i].RK4Data->pos0.x + dt * Particles[i].RK4Data->vel0.x + dt2_2 * Particles[i].RK4Data->k3acc.x;
-											Particles[i].vel.x = Particles[i].RK4Data->vel0.x + dt * Particles[i].RK4Data->k3acc.x;
-										} break;
-			case _y_For_: {
-											size_t i = System.controls[c].i;
-											Particles[i].pos.y =
-												Particles[i].RK4Data->pos0.y + dt * Particles[i].RK4Data->vel0.y + dt2_2 * Particles[i].RK4Data->k3acc.y;
-											Particles[i].vel.y = Particles[i].RK4Data->vel0.y + dt * Particles[i].RK4Data->k3acc.y;
-										} break;
-			case _z_For_: {
-											size_t i = System.controls[c].i;
-											Particles[i].pos.z =
-												Particles[i].RK4Data->pos0.z + dt * Particles[i].RK4Data->vel0.z + dt2_2 * Particles[i].RK4Data->k3acc.z;
-											Particles[i].vel.z = Particles[i].RK4Data->vel0.z + dt * Particles[i].RK4Data->k3acc.z;
-										} break;
-										// TODO imposed moments with RK4 scheme
-			default:
-										break;
-		}
-	}
+  for (size_t c = 0; c < System.controls.size(); ++c) {
+    switch (System.controls[c].type) {
+      case _x_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].pos.x =
+            Particles[i].RK4Data->pos0.x + dt * Particles[i].RK4Data->vel0.x + dt2_2 * Particles[i].RK4Data->k3acc.x;
+        Particles[i].vel.x = Particles[i].RK4Data->vel0.x + dt * Particles[i].RK4Data->k3acc.x;
+      } break;
+      case _y_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].pos.y =
+            Particles[i].RK4Data->pos0.y + dt * Particles[i].RK4Data->vel0.y + dt2_2 * Particles[i].RK4Data->k3acc.y;
+        Particles[i].vel.y = Particles[i].RK4Data->vel0.y + dt * Particles[i].RK4Data->k3acc.y;
+      } break;
+      case _z_For_: {
+        size_t i = System.controls[c].i;
+        Particles[i].pos.z =
+            Particles[i].RK4Data->pos0.z + dt * Particles[i].RK4Data->vel0.z + dt2_2 * Particles[i].RK4Data->k3acc.z;
+        Particles[i].vel.z = Particles[i].RK4Data->vel0.z + dt * Particles[i].RK4Data->k3acc.z;
+      } break;
+      // TODO imposed moments with RK4 scheme
+      default:
+        break;
+    }
+  }
 #pragma omp parallel for default(shared)
-	for (size_t i = nDriven; i < Particles.size(); ++i) {
-		// pos0 + h * vel0 + h2_2 * k3acc
-		Particles[i].pos =
-			Particles[i].RK4Data->pos0 + dt * Particles[i].RK4Data->vel0 + dt2_2 * Particles[i].RK4Data->k3acc;
-		// Q0 + h * dot(Q0,vrot0) + h2_2 * ddot(Q0,vrot0,k3arot)
-		Particles[i].Q = Particles[i].RK4Data->Q0;
-		Particles[i].Q += (Particles[i].RK4Data->Q0.dot(Particles[i].RK4Data->vrot0) *= dt);
-		Particles[i].Q +=
-			(Particles[i].RK4Data->Q0.ddot(Particles[i].RK4Data->vrot0, Particles[i].RK4Data->k3arot) *= dt2_2);
-		// vel0 + h * k3acc
-		Particles[i].vel = Particles[i].RK4Data->vel0 + dt * Particles[i].RK4Data->k3acc;
-		// vrot0 + h * k3arot
-		Particles[i].vrot = Particles[i].RK4Data->vrot0 + dt * Particles[i].RK4Data->k3arot;
-	}
-	accelerations();
+  for (size_t i = nDriven; i < Particles.size(); ++i) {
+    // pos0 + h * vel0 + h2_2 * k3acc
+    Particles[i].pos =
+        Particles[i].RK4Data->pos0 + dt * Particles[i].RK4Data->vel0 + dt2_2 * Particles[i].RK4Data->k3acc;
+    // Q0 + h * dot(Q0,vrot0) + h2_2 * ddot(Q0,vrot0,k3arot)
+    Particles[i].Q = Particles[i].RK4Data->Q0;
+    Particles[i].Q += (Particles[i].RK4Data->Q0.dot(Particles[i].RK4Data->vrot0) *= dt);
+    Particles[i].Q +=
+        (Particles[i].RK4Data->Q0.ddot(Particles[i].RK4Data->vrot0, Particles[i].RK4Data->k3arot) *= dt2_2);
+    // vel0 + h * k3acc
+    Particles[i].vel = Particles[i].RK4Data->vel0 + dt * Particles[i].RK4Data->k3acc;
+    // vrot0 + h * k3arot
+    Particles[i].vrot = Particles[i].RK4Data->vrot0 + dt * Particles[i].RK4Data->k3arot;
+  }
+
+  // k4 ........
+  accelerations();
 #pragma omp parallel for default(shared)
 	for (size_t i = 0; i < Particles.size(); ++i) {
 		Particles[i].RK4Data->k4acc = Particles[i].acc;
@@ -2526,11 +2638,13 @@ void Rockable::integrate() {
 
 			saveConf(iconf);
 
-			// re-read the file "drivingSystem.txt" without warning if the file does not exist.
-			// Then, recompute the values imposed if a servoFunction is defined
-			// REMARK: maybe a system of signal (SIGHUP) could be designed instead
-			System.read(false);
-			if (System.ServoFunction != nullptr) System.ServoFunction(*this);
+      // re-read the file "drivingSystem.txt" without warning if the file does not exist.
+      // Then, recompute the values imposed if a servoFunction is defined
+      // REMARK: maybe a system of signal (SIGHUP) could be designed instead
+      System.read(false);
+      if (System.ServoFunction != nullptr) {
+        System.ServoFunction(*this);
+      }
 
 			interConfC = 0.0;
 		}
@@ -2549,31 +2663,41 @@ void Rockable::integrate() {
 #else
 			UpdateNL();
 #endif
+      timeInUpdateNL += tm.getElapsedTimeSeconds();
+      if (!needUpdate) {
+        interVerletC = 0.0;
+      } else {
+        needUpdate = false;
+      }
+    }
 
-			timeInUpdateNL += tm.getElapsedTimeSeconds();
-			if (!needUpdate)
-				interVerletC = 0.0;
-			else
-				needUpdate = false;
-		}
+    // For all dataExtractors, we enventually execute some processing,
+    // and then we record some data in the files
+    for (size_t d = 0; d < dataExtractors.size(); ++d) {
+      if (step % dataExtractors[d]->nstep == 0) {
+        dataExtractors[d]->exec();
+      }
+      if (step % dataExtractors[d]->nrec == 0) {
+        dataExtractors[d]->record();
+      }
+    }
 
-		// For all dataExtractors, we enventually execute some processing,
-		// and then we record some data in the files
-		for (size_t d = 0; d < dataExtractors.size(); ++d) {
-			if (step % dataExtractors[d]->nstep == 0) dataExtractors[d]->exec();
-			if (step % dataExtractors[d]->nrec == 0) dataExtractors[d]->record();
-		}
+    for (size_t p = 0; p < Tempos.size(); p++) {
+      if (Tempos[p].update != nullptr) {
+        Tempos[p].update(t);
+      }
+    }
 
-		for (size_t p = 0; p < Tempos.size(); p++) {
-			if (Tempos[p].update != nullptr) Tempos[p].update(t);
-		}
-
-		if (dynamicUpdateNL != 0) dynamicCheckUpdateNL();
+    if (dynamicUpdateNL != 0) {
+      dynamicCheckUpdateNL();
+    }
 
 		step++;
 	}
 
-	for (size_t d = 0; d < dataExtractors.size(); d++) dataExtractors[d]->end();
+  for (size_t d = 0; d < dataExtractors.size(); d++) {
+    dataExtractors[d]->end();
+  }
 
 	return;
 }
@@ -2710,7 +2834,9 @@ void Rockable::initialise_particle_forces_and_moments() {
 		Particles[i].stress.reset();
 	}
 #ifdef ROCKABLE_ENABLE_PERIODIC
-	if (usePeriodicCell == 1) Cell.Sig.reset();
+  if (usePeriodicCell == 1) {
+    Cell.Sig.reset();
+  }
 #endif
 
 #pragma omp parallel for default(shared)
@@ -2726,32 +2852,32 @@ void Rockable::initialise_particle_forces_and_moments() {
 		}
 	}
 
-	// Set eventually the imposed forces or moments (no body force for driven-components)
-	for (size_t c = 0; c < System.controls.size(); ++c) {
-		switch (System.controls[c].type) {
-			case _x_For_:
-				Particles[System.controls[c].i].force.x = System.controls[c].value;
-				break;
-			case _y_For_:
-				Particles[System.controls[c].i].force.y = System.controls[c].value;
-				break;
-			case _z_For_:
-				Particles[System.controls[c].i].force.z = System.controls[c].value;
-				break;
-			case _xrot_Mom_:
-				Particles[System.controls[c].i].moment.x = System.controls[c].value;
-				break;
-			case _yrot_Mom_:
-				Particles[System.controls[c].i].moment.y = System.controls[c].value;
-				break;
-			case _zrot_Mom_:
-				Particles[System.controls[c].i].moment.z = System.controls[c].value;
-				break;
-			case _xyzrot_Mom_:
-				Particles[System.controls[c].i].moment = System.controls[c].vec_value;
-				break;
-		}
-	}
+  // Set eventually the imposed forces or moments (no body force for driven-components)
+  for (size_t c = 0; c < System.controls.size(); ++c) {
+    switch (System.controls[c].type) {
+      case _x_For_: {
+        Particles[System.controls[c].i].force.x = System.controls[c].value;
+      } break;
+      case _y_For_: {
+        Particles[System.controls[c].i].force.y = System.controls[c].value;
+      } break;
+      case _z_For_: {
+        Particles[System.controls[c].i].force.z = System.controls[c].value;
+      } break;
+      case _xrot_Mom_: {
+        Particles[System.controls[c].i].moment.x = System.controls[c].value;
+      } break;
+      case _yrot_Mom_: {
+        Particles[System.controls[c].i].moment.y = System.controls[c].value;
+      } break;
+      case _zrot_Mom_: {
+        Particles[System.controls[c].i].moment.z = System.controls[c].value;
+      } break;
+      case _xyzrot_Mom_: {
+        Particles[System.controls[c].i].moment = System.controls[c].vec_value;
+      } break;
+    }
+  }
 }
 
 /**
@@ -3113,16 +3239,17 @@ void Rockable::compute_SpringJoints() {
 void Rockable::breakage_of_interfaces() {
 	START_TIMER("breakage_of_interfaces");
 
-	// In this loop, all the bonds that are identified to be broken will actually be broken now
-	for (std::set<BreakableInterface*>::iterator BI = interfacesToBreak.begin(); BI != interfacesToBreak.end(); ++BI) {
-		std::string whichBond;
-		if ((*BI)->isInner == 1)
-			whichBond = "Inner";
-		else
-			whichBond = "Outer";
-		std::cout << "Sticked (" << whichBond << ") interface between " << (*BI)->i << " and " << (*BI)->j
-			<< " has broken ";
-		std::cout << "(" << (*BI)->concernedBonds.size() << " bonds)\n\n";
+  // In this loop, all the bonds that are identified to be broken will actually be broken now
+  for (std::set<BreakableInterface*>::iterator BI = interfacesToBreak.begin(); BI != interfacesToBreak.end(); ++BI) {
+    std::string whichBond;
+    if ((*BI)->isInner == 1) {
+      whichBond = "Inner";
+    } else {
+      whichBond = "Outer";
+    }
+    std::cout << "Sticked (" << whichBond << ") interface between " << (*BI)->i << " and " << (*BI)->j
+              << " has broken ";
+    std::cout << "(" << (*BI)->concernedBonds.size() << " bonds)\n\n";
 
 		int g1 = Particles[(*BI)->i].group;
 		int g2 = Particles[(*BI)->j].group;
@@ -3194,72 +3321,72 @@ void Rockable::compute_accelerations_from_resultants() {
 	}
 #endif
 
-	// Acceleration of controlled bodies
-	for (size_t c = 0; c < System.controls.size(); ++c) {
-		size_t i = System.controls[c].i;
-		switch (System.controls[c].type) {
-			case _x_For_:
-				Particles[i].acc.x = Particles[i].force.x / Particles[i].mass;
-				break;
-			case _y_For_:
-				Particles[i].acc.y = Particles[i].force.y / Particles[i].mass;
-				break;
-			case _z_For_:
-				Particles[i].acc.z = Particles[i].force.z / Particles[i].mass;
-				break;
-			case _xrot_Mom_: {
-												 quat Qinv = Particles[i].Q.get_conjugated();
-												 vec3r vrotx(Particles[i].vrot.x, 0.0, 0.0);
-												 vec3r omega = Qinv * vrotx;            // Express omega in the body framework
-												 vec3r M = Qinv * Particles[i].moment;  // Express torque in the body framework
-												 vec3r domega((M[0] - (Particles[i].inertia[2] - Particles[i].inertia[1]) * omega[1] * omega[2]) /
-														 Particles[i].inertia[0],
-														 (M[1] - (Particles[i].inertia[0] - Particles[i].inertia[2]) * omega[2] * omega[0]) /
-														 Particles[i].inertia[1],
-														 (M[2] - (Particles[i].inertia[1] - Particles[i].inertia[0]) * omega[0] * omega[1]) /
-														 Particles[i].inertia[2]);
-												 Particles[i].arot.x = (Particles[i].Q * domega).x;  // Express arot in the global framework
-											 } break;
-			case _yrot_Mom_: {
-												 quat Qinv = Particles[i].Q.get_conjugated();
-												 vec3r vroty(0.0, Particles[i].vrot.y, 0.0);
-												 vec3r omega = Qinv * vroty;            // Express omega in the body framework
-												 vec3r M = Qinv * Particles[i].moment;  // Express torque in the body framework
-												 vec3r domega((M[0] - (Particles[i].inertia[2] - Particles[i].inertia[1]) * omega[1] * omega[2]) /
-														 Particles[i].inertia[0],
-														 (M[1] - (Particles[i].inertia[0] - Particles[i].inertia[2]) * omega[2] * omega[0]) /
-														 Particles[i].inertia[1],
-														 (M[2] - (Particles[i].inertia[1] - Particles[i].inertia[0]) * omega[0] * omega[1]) /
-														 Particles[i].inertia[2]);
-												 Particles[i].arot.y = (Particles[i].Q * domega).y;  // Express arot in the global framework
-											 } break;
-			case _zrot_Mom_: {
-												 quat Qinv = Particles[i].Q.get_conjugated();
-												 vec3r vrotz(0.0, 0.0, Particles[i].vrot.z);
-												 vec3r omega = Qinv * vrotz;            // Express omega in the body framework
-												 vec3r M = Qinv * Particles[i].moment;  // Express torque in the body framework
-												 vec3r domega((M[0] - (Particles[i].inertia[2] - Particles[i].inertia[1]) * omega[1] * omega[2]) /
-														 Particles[i].inertia[0],
-														 (M[1] - (Particles[i].inertia[0] - Particles[i].inertia[2]) * omega[2] * omega[0]) /
-														 Particles[i].inertia[1],
-														 (M[2] - (Particles[i].inertia[1] - Particles[i].inertia[0]) * omega[0] * omega[1]) /
-														 Particles[i].inertia[2]);
-												 Particles[i].arot.z = (Particles[i].Q * domega).z;  // Express arot in the global framework
-											 } break;
-			case _xyzrot_Mom_: {
-													 quat Qinv = Particles[i].Q.get_conjugated();
-													 vec3r omega = Qinv * Particles[i].vrot;  // Express omega in the body framework
-													 vec3r M = Qinv * Particles[i].moment;    // Express torque in the body framework
-													 vec3r domega((M[0] - (Particles[i].inertia[2] - Particles[i].inertia[1]) * omega[1] * omega[2]) /
-															 Particles[i].inertia[0],
-															 (M[1] - (Particles[i].inertia[0] - Particles[i].inertia[2]) * omega[2] * omega[0]) /
-															 Particles[i].inertia[1],
-															 (M[2] - (Particles[i].inertia[1] - Particles[i].inertia[0]) * omega[0] * omega[1]) /
-															 Particles[i].inertia[2]);
-													 Particles[i].arot = (Particles[i].Q * domega);  // Express arot in the global framework
-												 } break;
-		}
-	}
+  // Acceleration of controlled bodies
+  for (size_t c = 0; c < System.controls.size(); ++c) {
+    size_t i = System.controls[c].i;
+    switch (System.controls[c].type) {
+      case _x_For_: {
+        Particles[i].acc.x = Particles[i].force.x / Particles[i].mass;
+      } break;
+      case _y_For_: {
+        Particles[i].acc.y = Particles[i].force.y / Particles[i].mass;
+      } break;
+      case _z_For_: {
+        Particles[i].acc.z = Particles[i].force.z / Particles[i].mass;
+      } break;
+      case _xrot_Mom_: {
+        quat Qinv = Particles[i].Q.get_conjugated();
+        vec3r vrotx(Particles[i].vrot.x, 0.0, 0.0);
+        vec3r omega = Qinv * vrotx;            // Express omega in the body framework
+        vec3r M = Qinv * Particles[i].moment;  // Express torque in the body framework
+        vec3r domega((M[0] - (Particles[i].inertia[2] - Particles[i].inertia[1]) * omega[1] * omega[2]) /
+                         Particles[i].inertia[0],
+                     (M[1] - (Particles[i].inertia[0] - Particles[i].inertia[2]) * omega[2] * omega[0]) /
+                         Particles[i].inertia[1],
+                     (M[2] - (Particles[i].inertia[1] - Particles[i].inertia[0]) * omega[0] * omega[1]) /
+                         Particles[i].inertia[2]);
+        Particles[i].arot.x = (Particles[i].Q * domega).x;  // Express arot in the global framework
+      } break;
+      case _yrot_Mom_: {
+        quat Qinv = Particles[i].Q.get_conjugated();
+        vec3r vroty(0.0, Particles[i].vrot.y, 0.0);
+        vec3r omega = Qinv * vroty;            // Express omega in the body framework
+        vec3r M = Qinv * Particles[i].moment;  // Express torque in the body framework
+        vec3r domega((M[0] - (Particles[i].inertia[2] - Particles[i].inertia[1]) * omega[1] * omega[2]) /
+                         Particles[i].inertia[0],
+                     (M[1] - (Particles[i].inertia[0] - Particles[i].inertia[2]) * omega[2] * omega[0]) /
+                         Particles[i].inertia[1],
+                     (M[2] - (Particles[i].inertia[1] - Particles[i].inertia[0]) * omega[0] * omega[1]) /
+                         Particles[i].inertia[2]);
+        Particles[i].arot.y = (Particles[i].Q * domega).y;  // Express arot in the global framework
+      } break;
+      case _zrot_Mom_: {
+        quat Qinv = Particles[i].Q.get_conjugated();
+        vec3r vrotz(0.0, 0.0, Particles[i].vrot.z);
+        vec3r omega = Qinv * vrotz;            // Express omega in the body framework
+        vec3r M = Qinv * Particles[i].moment;  // Express torque in the body framework
+        vec3r domega((M[0] - (Particles[i].inertia[2] - Particles[i].inertia[1]) * omega[1] * omega[2]) /
+                         Particles[i].inertia[0],
+                     (M[1] - (Particles[i].inertia[0] - Particles[i].inertia[2]) * omega[2] * omega[0]) /
+                         Particles[i].inertia[1],
+                     (M[2] - (Particles[i].inertia[1] - Particles[i].inertia[0]) * omega[0] * omega[1]) /
+                         Particles[i].inertia[2]);
+        Particles[i].arot.z = (Particles[i].Q * domega).z;  // Express arot in the global framework
+      } break;
+      case _xyzrot_Mom_: {
+        quat Qinv = Particles[i].Q.get_conjugated();
+        vec3r omega = Qinv * Particles[i].vrot;  // Express omega in the body framework
+        vec3r M = Qinv * Particles[i].moment;    // Express torque in the body framework
+        vec3r domega((M[0] - (Particles[i].inertia[2] - Particles[i].inertia[1]) * omega[1] * omega[2]) /
+                         Particles[i].inertia[0],
+                     (M[1] - (Particles[i].inertia[0] - Particles[i].inertia[2]) * omega[2] * omega[0]) /
+                         Particles[i].inertia[1],
+                     (M[2] - (Particles[i].inertia[1] - Particles[i].inertia[0]) * omega[0] * omega[1]) /
+                         Particles[i].inertia[2]);
+        Particles[i].arot = (Particles[i].Q * domega);  // Express arot in the global framework
+      } break;
+    }
+  }
 
 	// Finally compute the accelerations (translation and rotation) of the particles
 #pragma omp parallel for default(shared)
@@ -3294,6 +3421,12 @@ void Rockable::accelerations() {
 	START_TIMER("Accelerations");
 
 	constexpr int mode = 0;
+
+  // Some weighting relations can be established for the stiffnesses
+  // of the cantacts that share the same body pair
+  if (ctcPartnership.update != nullptr) {
+    ctcPartnership.update(*this);
+  }
 
 	// define lambda functions 
   auto apply_forces_mutexes = [&](Interaction& I, std::mutex* mutexes) {
@@ -3414,13 +3547,19 @@ void Rockable::accelerations() {
 
 	timeInForceComputation += tm.getElapsedTimeSeconds();
 
-	if (numericalDampingCoeff > 0.0) numericalDamping();
+  if (numericalDampingCoeff > 0.0) {
+    numericalDamping();
+  }
 
-	// damping solutions based on the weighting of accelerations
-	if (velocityBarrier > 0.0) applyVelocityBarrier();
-	if (angularVelocityBarrier > 0.0) applyAngularVelocityBarrier();
+  compute_accelerations_from_resultants();
 
-	compute_accelerations_from_resultants();
+  // damping solutions based on the weighting of accelerations
+  if (velocityBarrier > 0.0) {
+    applyVelocityBarrier();
+  }
+  if (angularVelocityBarrier > 0.0) {
+    applyAngularVelocityBarrier();
+  }
 }
 
 /**
@@ -3542,7 +3681,9 @@ void Rockable::applyAngularVelocityBarrier() {
  *   @param[in]   last    Largest ID of particles (default value corresponds to the last particle)
  */
 void Rockable::computeAABB(size_t first, size_t last) {
-	if (last == 0) last = Particles.size() - 1;
+  if (last == 0) {
+    last = Particles.size() - 1;
+  }
 
 	paabb.clear();
 	paabb.resize(Particles.size());
@@ -3590,14 +3731,28 @@ void Rockable::getKineticEnergy(double& Etrans, double& Erot, size_t first, size
  *   Estimate the critical time step according to the stiffness values in dataTable.
  *
  *   @param[out]  dtc  minimum value of square root of meff/kn.
+ *                     dtc = -1.0 means there is no particles
+ *                     dtc = -2.0 means massMin is not correctly computed
+ *                     dtc = -3.0 means knMax is not correctly computed
  */
 void Rockable::estimateCriticalTimeStep(double& dtc) {
-	// find the particle with the smallest mass
-	// (this particle can also be the driven one)
-	double massMin = 1e20;
-	for (size_t i = 0; i < Particles.size(); ++i) {
-		if (Particles[i].mass < massMin) massMin = Particles[i].mass;
-	}
+
+  if (Particles.empty()) {
+    dtc = -1.0;
+    return;
+  }
+
+  // find the particle with the smallest mass
+  // (this particle can also be the driven one)
+  double massMin = 1e20;
+  for (size_t i = 0; i < Particles.size(); ++i) {
+    if (Particles[i].mass > 0.0 && Particles[i].mass < massMin) massMin = Particles[i].mass;
+  }
+
+  if (massMin == 1e20) {
+    dtc = -2.0;
+    return;
+  }
 
 	// find the largest kn within the parameters that have been set
 	// by the user.
@@ -3616,7 +3771,12 @@ void Rockable::estimateCriticalTimeStep(double& dtc) {
 		}
 	}
 
-	dtc = M_PI * sqrt(massMin / knMax);
+  if (knMax == -1e20) {
+    dtc = -3.0;
+    return;
+  }
+
+  dtc = M_PI * sqrt(massMin / knMax);
 }
 
 /**
@@ -3624,6 +3784,7 @@ void Rockable::estimateCriticalTimeStep(double& dtc) {
  *   interactions, even those that are not active.
  *
  *   @param[out]  dtc  minimum value of square root of meff/kn.
+ *                dtc = -1.0 is the computation went wrong
  */
 void Rockable::getCriticalTimeStep(double& dtc) {
 	dtc = 0.0;
@@ -3642,23 +3803,26 @@ void Rockable::getCriticalTimeStep(double& dtc) {
 						dataTable.isDefined(idKnOuterBond, igrp, jgrp)))
 				continue;
 
-			double meff;
-			if (it->i < nDriven)
-				meff = Particles[it->j].mass;
-			else if (it->j < nDriven)
-				meff = Particles[it->i].mass;
-			else
-				meff = (Particles[it->i].mass * Particles[it->j].mass) / (Particles[it->i].mass + Particles[it->j].mass);
+      double meff;
+      if (it->i < nDriven) {
+        meff = Particles[it->j].mass;
+      } else if (it->j < nDriven) {
+        meff = Particles[it->i].mass;
+      } else {
+        meff = (Particles[it->i].mass * Particles[it->j].mass) / (Particles[it->i].mass + Particles[it->j].mass);
+      }
 
-			double kn;
-			if (it->stick != nullptr) {
-				if (Particles[it->i].cluster == Particles[it->j].cluster)
-					kn = dataTable.get(idKnInnerBond, Particles[it->i].group, Particles[it->j].group);
-				else
-					kn = dataTable.get(idKnOuterBond, Particles[it->i].group, Particles[it->j].group);
-			} else
-				kn = dataTable.get(idKnContact, Particles[it->i].group, Particles[it->j].group);
-			sqrdtc = meff / kn;
+      double kn;
+      if (it->stick != nullptr) {
+        if (Particles[it->i].cluster == Particles[it->j].cluster) {
+          kn = dataTable.get(idKnInnerBond, Particles[it->i].group, Particles[it->j].group);
+        } else {
+          kn = dataTable.get(idKnOuterBond, Particles[it->i].group, Particles[it->j].group);
+        }
+      } else {
+        kn = dataTable.get(idKnContact, Particles[it->i].group, Particles[it->j].group);
+      }
+      sqrdtc = meff / kn;
 
 			if (sqrdtc < sqrdtcMin) {
 				sqrdtcMin = sqrdtc;
@@ -3667,17 +3831,19 @@ void Rockable::getCriticalTimeStep(double& dtc) {
 		}
 	}
 
-	// compute the critical time step
-	if (okay)
-		dtc = M_PI * sqrt(sqrdtcMin);
-	else
-		dtc = -1.0;
+  // compute the critical time step
+  if (okay) {
+    dtc = M_PI * sqrt(sqrdtcMin);
+  } else {
+    dtc = -1.0;
+  }
 }
 
 /**
  *   Compute the critical time step by looping over all currently active interactions
  *
  *   @param  dtc  minimum value of square root of meff/kn.
+ *                dtc = -1.0 is activeInteractions is empty
  */
 void Rockable::getCurrentCriticalTimeStep(double& dtc) {
 	if (activeInteractions.empty()) {
@@ -3688,28 +3854,33 @@ void Rockable::getCurrentCriticalTimeStep(double& dtc) {
 	dtc = 0.0;
 	double sqrdtcMin = 1.0e20;
 
-	for (size_t i = 0; i < activeInteractions.size(); i++) {
-		Interaction* it = activeInteractions[i];
-		double meff;
-		if (it->i < nDriven)
-			meff = Particles[it->j].mass;
-		else if (it->j < nDriven)
-			meff = Particles[it->i].mass;
-		else
-			meff = (Particles[it->i].mass * Particles[it->j].mass) / (Particles[it->i].mass + Particles[it->j].mass);
+  for (size_t i = 0; i < activeInteractions.size(); i++) {
+    Interaction* it = activeInteractions[i];
+    double meff;
+    if (it->i < nDriven) {
+      meff = Particles[it->j].mass;
+    } else if (it->j < nDriven) {
+      meff = Particles[it->i].mass;
+    } else {
+      meff = (Particles[it->i].mass * Particles[it->j].mass) / (Particles[it->i].mass + Particles[it->j].mass);
+    }
 
-		double kn;
-		if (it->stick != nullptr) {
-			if (Particles[it->i].cluster == Particles[it->j].cluster)
-				kn = dataTable.get(idKnInnerBond, Particles[it->i].group, Particles[it->j].group);
-			else
-				kn = dataTable.get(idKnOuterBond, Particles[it->i].group, Particles[it->j].group);
-		} else
-			kn = dataTable.get(idKnContact, Particles[it->i].group, Particles[it->j].group);
-		double sqrdtc = meff / kn;
+    double kn;
+    if (it->stick != nullptr) {
+      if (Particles[it->i].cluster == Particles[it->j].cluster) {
+        kn = dataTable.get(idKnInnerBond, Particles[it->i].group, Particles[it->j].group);
+      } else {
+        kn = dataTable.get(idKnOuterBond, Particles[it->i].group, Particles[it->j].group);
+      }
+    } else {
+      kn = dataTable.get(idKnContact, Particles[it->i].group, Particles[it->j].group);
+    }
+    double sqrdtc = meff / kn;
 
-		if (sqrdtc < sqrdtcMin) sqrdtcMin = sqrdtc;
-	}
+    if (sqrdtc < sqrdtcMin) {
+      sqrdtcMin = sqrdtc;
+    }
+  }
 
 	// compute the critical time step
 	dtc = M_PI * sqrt(sqrdtcMin);
@@ -3729,51 +3900,65 @@ void Rockable::getCurrentCriticalTimeStep(double& dtc) {
  * @throws None
  */
 void Rockable::getResultantQuickStats(double& Fmax, double& F_fnmax, double& Fmean, double& Fstddev, size_t first,
-		size_t last) {
-	std::vector<double> fnMax(Particles.size(), 0.0);
-	std::vector<size_t> nbCtc(Particles.size(), 0);
-	for (size_t k = 0; k < activeInteractions.size(); k++) {
-		size_t i = activeInteractions[k]->i;
-		size_t j = activeInteractions[k]->j;
-		nbCtc[i] += 1;
-		nbCtc[j] += 1;
-		double fn = activeInteractions[k]->fn;
-		if (fnMax[i] < fn) fnMax[i] = fn;
-		if (fnMax[j] < fn) fnMax[j] = fn;
-	}
+                                      size_t last) {
+  std::vector<double> fnMax(Particles.size(), 0.0);
+  std::vector<size_t> nbCtc(Particles.size(), 0);
+  for (size_t k = 0; k < activeInteractions.size(); k++) {
+    size_t i = activeInteractions[k]->i;
+    size_t j = activeInteractions[k]->j;
+    nbCtc[i] += 1;
+    nbCtc[j] += 1;
+    double fn = activeInteractions[k]->fn;
+    if (fnMax[i] < fn) {
+      fnMax[i] = fn;
+    }
+    if (fnMax[j] < fn) {
+      fnMax[j] = fn;
+    }
+  }
 
-	if (last == 0) last = Particles.size() - 1;
-	double F = norm(Particles[first].force);
-	Fmax = F;
-	F_fnmax = 0.0;
-	Fmean = 0.0;
-	size_t n = 0;
-	for (size_t i = first; i <= last; i++) {
-		if (nbCtc[i] <= 1) continue;
-		n += 1;
-		F = norm(Particles[i].force);
-		Fmean += F;
-		if (F > Fmax) Fmax = F;
-		if (fnMax[i] > 0.0) {
-			F /= fnMax[i];
-			if (F > F_fnmax) F_fnmax = F;
-		}
-	}
+  if (last == 0) {
+    last = Particles.size() - 1;
+  }
+  double F = norm(Particles[first].force);
+  Fmax = F;
+  F_fnmax = 0.0;
+  Fmean = 0.0;
+  size_t n = 0;
+  for (size_t i = first; i <= last; i++) {
+    if (nbCtc[i] <= 1) {
+      continue;
+    }
+    n += 1;
+    F = norm(Particles[i].force);
+    Fmean += F;
+    if (F > Fmax) {
+      Fmax = F;
+    }
+    if (fnMax[i] > 0.0) {
+      F /= fnMax[i];
+      if (F > F_fnmax) {
+        F_fnmax = F;
+      }
+    }
+  }
 
-	// Computation of the standard deviation of resultant forces
-	Fstddev = 0.0;
-	if (n > 1) {
-		Fmean /= (double)n;
-		for (size_t i = first; i <= last; i++) {
-			if (nbCtc[i] <= 1) continue;
-			F = norm(Particles[i].force);
-			F = F - Fmean;
-			F = F * F;
-			Fstddev += F;
-		}
-		Fstddev /= (double)(n - 1);  // remark: done only if (n >= 2)
-		Fstddev = sqrt(Fstddev);
-	}
+  // Computation of the standard deviation of resultant forces
+  Fstddev = 0.0;
+  if (n > 1) {
+    Fmean /= (double)n;
+    for (size_t i = first; i <= last; i++) {
+      if (nbCtc[i] <= 1) {
+        continue;
+      }
+      F = norm(Particles[i].force);
+      F = F - Fmean;
+      F = F * F;
+      Fstddev += F;
+    }
+    Fstddev /= (double)(n - 1);  // remark: done only if (n >= 2)
+    Fstddev = sqrt(Fstddev);
+  }
 }
 
 /**
@@ -3792,20 +3977,24 @@ void Rockable::getInteractionQuickStats(double& fnMin, double& fnMax, double& fn
 		return;
 	}
 
-	double fn = activeInteractions[0]->fn;
-	fnMax = fnMin = fn;
-	fnMean = 0.0;
-	size_t n = 1;
-	for (size_t i = 1; i < activeInteractions.size(); i++) {
-		n += 1;
-		fn = activeInteractions[i]->fn;
-		fnMean += fn;
-		if (fn < fnMin) fnMin = fn;
-		if (fn > fnMax) fnMax = fn;
-	}
-	if (n > 1) {
-		fnMean /= (double)(n - 1);
-	}
+  double fn = activeInteractions[0]->fn;
+  fnMax = fnMin = fn;
+  fnMean = 0.0;
+  size_t n = 1;
+  for (size_t i = 1; i < activeInteractions.size(); i++) {
+    n += 1;
+    fn = activeInteractions[i]->fn;
+    fnMean += fn;
+    if (fn < fnMin) {
+      fnMin = fn;
+    }
+    if (fn > fnMax) {
+      fnMax = fn;
+    }
+  }
+  if (n > 1) {
+    fnMean /= (double)(n - 1);
+  }
 
 	fnStddev = 0.0;
 	if (n >= 2) {

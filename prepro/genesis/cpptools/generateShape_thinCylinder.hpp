@@ -33,92 +33,89 @@
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
-#ifndef GENERATESHAPE_CYLINDRICALMOLD_HPP
-#define GENERATESHAPE_CYLINDRICALMOLD_HPP
+#ifndef GENERATESHAPE_THIN_CYLINDER_HPP
+#define GENERATESHAPE_THIN_CYLINDER_HPP
 
 #include <cmath>
 #include <iostream>
 
-// radius = Minskowski radius
-// height = internal height
-// Rin = internal radius
-// The origin coordinate is at the bottom inside
-// I/m is fake
-void generateShape_cylindricalMold(std::ostream& os, const char* name, double radius, double height, int nbSectors,
-                                   double Rin) {
-  using namespace std;
+void generateShape_thinCylinder(std::ostream& os, const char* name, double Rin, double Rout, double H, int nbSectors) {
 
+  double radius = 0.5 * (Rout - Rin);
   double angle = 2.0 * M_PI / nbSectors;
 
-  os << "<" << endl;
-  os << "name " << name << endl;
-  os << "radius " << radius << endl;
-  os << "isSurface" << endl;
-  os << "preCompDone y" << endl;
-  os << "nv " << 2 * nbSectors << endl;
+  os << "<" << std::endl;
+  os << "name " << name << std::endl;
+  os << "radius " << radius << std::endl;
+  os << "isSurface" << std::endl;
+  os << "preCompDone y" << std::endl;
+  os << "nv " << 2 * nbSectors << std::endl;
 
   // VERTICES
   double R = Rin + radius;
   for (int i = 0; i < nbSectors; i++) {
-    double z = R * cos(i * angle);
-    double x = R * sin(i * angle);
-    os << x << " " << height + radius << " " << z << endl;
+    double x = -0.5 * H + radius;
+    double y = R * cos(i * angle);
+    double z = R * sin(i * angle);
+    os << x << " " << y << " " << z << std::endl;
   }
   for (int i = 0; i < nbSectors; i++) {
-    double z = R * cos(i * angle);
-    double x = R * sin(i * angle);
-    os << x << " " << -radius << " " << z << endl;
+    double x = 0.5 * H - radius;
+    double y = R * cos(i * angle);
+    double z = R * sin(i * angle);
+    os << x << " " << y << " " << z << std::endl;
   }
-  os << endl;
 
   // EDGES
-  os << "ne " << 3 * nbSectors << endl;
+  os << "ne " << 3 * nbSectors << std::endl;
   for (int i = 0; i < nbSectors; i++) {
     int j = i + 1;
-    if (j == nbSectors) j = 0;
-    os << i << " " << j << endl;
+    if (j == nbSectors) {
+      j = 0;
+    }
+    os << i << " " << j << std::endl;
   }
   for (int i = 0; i < nbSectors; i++) {
     int j = nbSectors + i + 1;
-    if (j == 2 * nbSectors) j = nbSectors;
-    os << nbSectors + i << " " << j << endl;
+    if (j == 2 * nbSectors) {
+      j = nbSectors;
+    }
+    os << nbSectors + i << " " << j << std::endl;
   }
 
   for (int i = 0; i < nbSectors; i++) {
     int j = nbSectors + i;
-    os << i << " " << j << endl;
+    os << i << " " << j << std::endl;
   }
-  os << endl;
 
   // FACES
-  os << "nf " << nbSectors + 1 << endl;
+  os << "nf " << nbSectors << std::endl;
 
   for (int n = 0; n < nbSectors; n++) {
     int i = n;
     int j = i + 1;
-    if (j == nbSectors) j = 0;
+    if (j == nbSectors) {
+      j = 0;
+    }
     int k = i + nbSectors + 1;
-    if (k == 2 * nbSectors) k = nbSectors;
+    if (k == 2 * nbSectors) {
+      k = nbSectors;
+    }
     int l = i + nbSectors;
 
-    os << "4 " << i << " " << j << " " << k << " " << l << endl;
+    os << "4 " << i << " " << j << " " << k << " " << l << std::endl;
   }
 
-  os << nbSectors;
-  for (int n = 0; n < nbSectors; n++) {
-    os << " " << nbSectors + n;
-  }
-  os << endl;
+  os << "obb.extent " << H / 2 << " " << Rout << " " << Rout << std::endl;
+  os << "obb.e1 1 0 0" << std::endl;
+  os << "obb.e2 0 1 0" << std::endl;
+  os << "obb.e3 0 0 1" << std::endl;
+  os << "obb.center 0 0 0" << std::endl;
+  os << "volume " << (2.0 * radius) * 2.0 * M_PI * H << std::endl;
+  double I2 = (3.0 * (Rin * Rin + Rout * Rout) + H * H) / 12.0;
+  os << "I/m " << 0.5 * (Rin * Rin + Rout * Rout) << " " << I2 << " " << I2 << std::endl;
 
-  os << "obb.extent " << Rin + 2 * radius << " " << 0.5 * height + 2 * radius << " " << Rin + 2 * radius << endl;
-  os << "obb.e1 1 0 0" << endl;
-  os << "obb.e2 0 1 0" << endl;
-  os << "obb.e3 0 0 1" << endl;
-  os << "obb.center 0 " << height * 0.5 << " 0" << endl;
-  os << "volume " << (2 * Rin * radius + radius * radius) * M_PI * height << endl;
-  os << "I/m 1.0 1.0 1.0" << endl;
-
-  os << ">" << endl;
+  os << ">" << std::endl;
 }
 
-#endif /* end of include guard: GENERATESHAPE_CYLINDRICALMOLD_HPP */
+#endif /* end of include guard: GENERATESHAPE_THIN_CYLINDER_HPP */
