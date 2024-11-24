@@ -93,6 +93,7 @@
 #include "SpringJoint.hpp"
 #include "clusterParticles.hpp"
 
+#include "MutexVector.hpp"
 #include "Traversals.hpp"
 #include "preComputeUpdate.hpp"
 #ifdef ROCKABLE_ENABLE_BOUNDARY
@@ -236,7 +237,8 @@ class Rockable {
   void computeForcesAndMoments();
   void updateForcesAndMoments();
 	std::vector<std::vector<Interaction*>> testInter;
-	preComputeUpdate m_reorg;                    ///< Some stuff to update in parallel forces and moments in OpenMP
+  MutexVector InteractionsMutex;                    ///< mutex to synchornize concurrent writes to Interactions in AddOrRemoveInteractions
+	preComputeUpdate m_reorg;                         ///< Some stuff to update in parallel forces and moments in OpenMP
 
  public:
   // Core CD method (TODO)

@@ -899,6 +899,7 @@ void Rockable::initParser() {
     }
     if (Interactions.size() != Particles.size()) {
       Interactions.resize(Particles.size());
+      InteractionsMutex.resize(Particles.size());
     }
     if (Interfaces.size() != Particles.size()) {
       Interfaces.resize(Particles.size());
@@ -912,6 +913,7 @@ void Rockable::initParser() {
     if (Interactions.size() != Particles.size()) {
       Interactions.resize(Particles.size());
     }
+    InteractionsMutex.resize(Interactions.size());
     for (size_t i = 0; i < Particles.size(); ++i) {
       Interactions[i].clear();
     }
@@ -1280,6 +1282,7 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
   auto addOrRemoveSingleInteraction =
       [&](size_t i_, size_t j_, size_t isub, size_t type, size_t nbj, const vec3r& jPeriodicShift,
           std::function<bool(Particle&, Particle&, size_t, size_t, double, const vec3r&)> func) {
+        std::scoped_lock lock{InteractionsMutex[i]};
         Interaction to_find;
         to_find.i = i_;
         to_find.j = j_;
@@ -1401,7 +1404,6 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
  *   REMARK: obbi and obbj need to be already placed BEFORE calling this method
  */
 int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
-//  START_TIMER("AddOrRemoveInteractions_OBBtree");
 
   static Interaction to_find;
   static std::set<Interaction>::iterator exist_it;
@@ -1413,6 +1415,7 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
   auto addOrRemoveSingleInteraction =
       [&](size_t i_, size_t j_, size_t isub, size_t type, size_t jsub, const vec3r& jPeriodicShift,
           std::function<bool(Particle&, Particle&, size_t, size_t, double, const vec3r&)> func) {
+        std::scoped_lock lock{InteractionsMutex[i]};
         to_find.i = i_;
         to_find.j = j_;
         to_find.type = type;
