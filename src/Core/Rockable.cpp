@@ -3423,7 +3423,7 @@ void Rockable::compute_accelerations_from_resultants() {
 void Rockable::accelerations() {
 	START_TIMER("Accelerations");
 
-	constexpr int mode = 0;
+	constexpr int mode = 1;
 
   // Some weighting relations can be established for the stiffnesses
   // of the cantacts that share the same body pair
