@@ -141,7 +141,7 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
     // -----------------------------------------------------------
     // ------ UpdateVertexVertex
     [](Interaction& I, Particle& Pi, Particle& Pj) -> bool {
-      START_TIMER("UpdateVertexVertex");
+      //START_TIMER("UpdateVertexVertex");
       vec3r posi = Pi.GlobVertex(I.isub);
       vec3r posj = Pj.GlobVertex(I.jsub);
       double Ri = Pi.MinskowskiRadius();
@@ -163,7 +163,7 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
     // -----------------------------------------------------------
     // ------ UpdateVertexEdge
     [](Interaction& I, Particle& Pi, Particle& Pj) -> bool {
-			START_TIMER("UpdateVertexEdge");
+			//START_TIMER("UpdateVertexEdge");
       size_t v1 = Pj.shape->edge[I.jsub].first;
       size_t v2 = Pj.shape->edge[I.jsub].second;
       vec3r posj1 = Pj.GlobVertex(v1);
@@ -196,7 +196,7 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
     // -----------------------------------------------------------
     // ------ UpdateVertexFace
     [](Interaction& I, Particle& Pi, Particle& Pj) -> bool {
-			START_TIMER("UpdateVertexFace");
+			//START_TIMER("UpdateVertexFace");
       // First, we project the node position onto the face plane.
       vec3r P;
       size_t nb_vertices = Pj.shape->face[I.jsub].size();
@@ -269,7 +269,7 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
     // -----------------------------------------------------------
     // ------ UpdateEdgeEdge
     [](Interaction& I, Particle& Pi, Particle& Pj) -> bool {
-			START_TIMER("UpdateEdgeEdge");
+			//START_TIMER("UpdateEdgeEdge");
 #define _EPSILON_VALUE_ 1.0e-12
       // Be carreful about this small value because, if it is not
       // sufficiently small, some edges (tubes) may not see them each other.
