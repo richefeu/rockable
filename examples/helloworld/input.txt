@@ -23,7 +23,6 @@ density 1 2700
 
 #useSoftParticles 1e6 0.0
 
-
 #### interaction model ################
 forceLaw Default
 

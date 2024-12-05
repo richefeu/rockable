@@ -195,21 +195,27 @@ void Shape::fitObb() {
     ext0_max = ext1_max = ext2_max = -1.0e20;
     for (size_t v = 0; v < vertex.size(); ++v) {
       Vtest = vertex[v] - P0;
+      
       ext_test = Vtest * e0;
-      if (ext_test < ext0_min)
+      if (ext_test < ext0_min) {
         ext0_min = ext_test;
-      else if (ext_test > ext0_max)
+      } else if (ext_test > ext0_max) {
         ext0_max = ext_test;
+      }
+      
       ext_test = Vtest * e1;
-      if (ext_test < ext1_min)
+      if (ext_test < ext1_min) {
         ext1_min = ext_test;
-      else if (ext_test > ext1_max)
+      } else if (ext_test > ext1_max) {
         ext1_max = ext_test;
+      }
+      
       ext_test = Vtest * e2;
-      if (ext_test < ext2_min)
+      if (ext_test < ext2_min) {
         ext2_min = ext_test;
-      else if (ext_test > ext2_max)
+      } else if (ext_test > ext2_max) {
         ext2_max = ext_test;
+      }
     }
     double area = (ext0_max - ext0_min) * (ext1_max - ext1_min) * (ext2_max - ext2_min);
     if (area < minArea) {
@@ -227,7 +233,7 @@ void Shape::fitObb() {
 
 // Say whether a point is inside the shape
 bool Shape::inside(const vec3r& point) {
-	
+
   // === inside POLYHEDRON ===
   if (!isSurface) {
     vec3r v1, v2, v3;

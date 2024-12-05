@@ -36,7 +36,7 @@ void printHelp() {
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[q]      Quit");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[s]      Save the shape library");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[t]      Compute the OBB-tree of the current shape");
-	glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[W][w]   Rotate arround the view axis");
+  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[W][w]   Rotate arround the view axis");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[+][-]   Navigate through the shapes");
   glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[*]      reset preCompDone to 'n'");
 #undef _nextLine_
@@ -47,27 +47,29 @@ void printHelp() {
 void keyboard(unsigned char Key, int /*x*/, int /*y*/) {
   switch (Key) {
 
-    case 'A':
+    case 'A': {
       if (alpha < 1.0f) {
         alpha += 0.05f;
-        if (alpha > 1.0f) alpha = 1.0f;
+        if (alpha > 1.0f) {
+          alpha = 1.0f;
+        }
       }
-      break;
-    case 'a':
+    } break;
+    case 'a': {
       if (alpha >= 0.1f) alpha -= 0.05f;
-      break;
+    } break;
 
-    case 'b':
+    case 'b': {
       show_background = 1 - show_background;
-      break;
+    } break;
 
-    case 'c':
+    case 'c': {
       if (Shapes[ishape].preCompDone == 'n') {
         Shapes[ishape].massProperties();
         Shapes[ishape].preCompDone = 'y';
         fit_view();
       }
-      break;
+    } break;
 
     case 'C': {
       for (size_t i = 0; i < Shapes.size(); i++) {
@@ -90,43 +92,43 @@ void keyboard(unsigned char Key, int /*x*/, int /*y*/) {
                 << Shapes[ishape].obb.extent[2] << std::endl;
     } break;
 
-    case 'h':
+    case 'h': {
       show_help = 1 - show_help;
-      break;
+    } break;
 
-    case 'K':
+    case 'K': {
       if (maxOBBLevel < /*Shapes[ishape].OBBtreeLevel*/ 10) {
         maxOBBLevel += 1;
       }
-      break;
-    case 'k':
+    } break;
+    case 'k': {
       if (maxOBBLevel > 0) {
         maxOBBLevel -= 1;
       }
-      break;
-      
-    case 'N':  // The max is 10,000,000
+    } break;
+
+    case 'N': {
       if (Shapes[ishape].MCnstep < 100000000) {
         Shapes[ishape].MCnstep *= 10;
       }
-      break;
-    case 'n':
+    } break;
+    case 'n': {
       if (Shapes[ishape].MCnstep > 1000) {
         Shapes[ishape].MCnstep = (size_t)floor(Shapes[ishape].MCnstep * 0.1);
       }
-      break;
+    } break;
 
-    case 'p':
+    case 'p': {
       exportSample();
-      break;
+    } break;
 
-    case 'q':
+    case 'q': {
       exit(0);
-      break;
+    } break;
 
-    case 's':
+    case 's': {
       saveShapeLib(shapeFileName.c_str());
-      break;
+    } break;
 
     case 't': {
       maxOBBLevel = 0;
@@ -140,7 +142,7 @@ void keyboard(unsigned char Key, int /*x*/, int /*y*/) {
       up = rotatePoint(up, eye, axis, -0.005 * M_PI);
       up.normalize();
     } break;
-		
+
     case 'W': {
       vec3r axis = center - eye;
       axis.normalize();
@@ -178,15 +180,16 @@ void mouse(int button, int state, int x, int y) {
     mouse_start[0] = x;
     mouse_start[1] = y;
     switch (button) {
-      case GLUT_LEFT_BUTTON:
-        if (glutGetModifiers() == GLUT_ACTIVE_SHIFT)
+      case GLUT_LEFT_BUTTON: {
+        if (glutGetModifiers() == GLUT_ACTIVE_SHIFT) {
           mouse_mode = PAN;
-        else
+        } else {
           mouse_mode = ROTATION;
-        break;
-      case GLUT_MIDDLE_BUTTON:
+        }
+      } break;
+      case GLUT_MIDDLE_BUTTON: {
         mouse_mode = ZOOM;
-        break;
+      } break;
     }
   }
 }
@@ -204,7 +207,9 @@ vec3r rotatePoint(vec3r const& p, vec3r const& center_, vec3r const& axis, doubl
 }
 
 void motion(int x, int y) {
-  if (mouse_mode == NOTHING) return;
+  if (mouse_mode == NOTHING) {
+    return;
+  }
 
   double dx = (double)(x - mouse_start[0]) / (double)width;
   double dy = (double)(y - mouse_start[1]) / (double)height;
@@ -213,26 +218,26 @@ void motion(int x, int y) {
 
   switch (mouse_mode) {
 
-    case ROTATION:
+    case ROTATION: {
       axis = (cross(up, center - eye));
       axis.normalize();
       eye = rotatePoint(eye, center, up, -dx * M_PI);
       eye = rotatePoint(eye, center, axis, dy * M_PI);
       up = (rotatePoint((center + up), center, axis, dy * M_PI) - center);
       up.normalize();
-      break;
+    } break;
 
-    case ZOOM:
+    case ZOOM: {
       eye = center + (eye - center) * (dy + 1.0);
-      break;
+    } break;
 
-    case PAN:
+    case PAN: {
       length = (eye - center).length() * tan(view_angle * M_PI / 360.0) * 2.0;
       axis = cross(up, center - eye);
       axis.normalize();
       center = center + axis * dx * length * 0.8;
       center = center + up * dy * length;
-      break;
+    } break;
 
     default:
       break;
@@ -289,7 +294,9 @@ void display() {
   drawObbLevel(ishape, maxOBBLevel);
 
   drawInfo();
-  if (show_help) printHelp();
+  if (show_help) {
+    printHelp();
+  }
 
   glFlush();
   glutSwapBuffers();
@@ -335,7 +342,9 @@ void recursiveDrawOBB(OBBnode<subBox>* node, int wantedLevel, int level) {
     return;
   }
 
-  if (level == wantedLevel) glutShape::drawObb(node->boundary);
+  if (level == wantedLevel) {
+    glutShape::drawObb(node->boundary);
+  }
 
   if (node->first != nullptr) {
     recursiveDrawOBB(node->first, wantedLevel, level + 1);
@@ -367,12 +376,16 @@ void drawFrame() {
 }
 
 void drawShape(size_t ishp) {
-  if (ishp >= Shapes.size()) return;
-  if (mouse_mode != NOTHING) return;
+  if (ishp >= Shapes.size()) {
+    return;
+  }
+  if (mouse_mode != NOTHING) {
+    return;
+  }
 
   double R = Shapes[ishp].radius;
-  //glColor4f(0.666f, 0.729f, 0.09f, alpha); // yellow
-	glColor4f(.761f, .733f, .976f, alpha);
+  // glColor4f(0.666f, 0.729f, 0.09f, alpha); // yellow
+  glColor4f(.761f, .733f, .976f, alpha);
 
   size_t nv = Shapes[ishp].vertex.size();
   for (size_t v = 0; v < nv; ++v) {
@@ -394,7 +407,9 @@ void drawShape(size_t ishp) {
 
   size_t nf = Shapes[ishp].face.size();
   for (size_t f = 0; f < nf; ++f) {
-    if (Shapes[ishp].face[f].size() < 3) continue;  // At least 3 pts!
+    if (Shapes[ishp].face[f].size() < 3) {
+      continue;
+    }  // At least 3 pts!
     vec3r N = cross(Shapes[ishp].vertex[Shapes[ishp].face[f][1]] - Shapes[ishp].vertex[Shapes[ishp].face[f][0]],
                     Shapes[ishp].vertex[Shapes[ishp].face[f][2]] - Shapes[ishp].vertex[Shapes[ishp].face[f][0]]);
     N.normalize();
@@ -442,7 +457,9 @@ int readShapeLib(const char* fileName) {
   std::cout << "Number of Shapes found: " << Shapes.size() << std::endl;
 
   ishape = 0;
-  if (Shapes[ishape].preCompDone == 'n') Shapes[ishape].fitObb();
+  if (Shapes[ishape].preCompDone == 'n') {
+    Shapes[ishape].fitObb();
+  }
   OBB& obb = Shapes[ishape].obb;
   center.set(obb.center.x, obb.center.y, obb.center.y);  // where we look at
   eye.set(obb.center.x + obb.extent.x, obb.center.y,
@@ -503,7 +520,6 @@ void exportSample() {
 
 void menu(int num) {
   switch (num) {
-
     case 0:
       exit(0);
       break;

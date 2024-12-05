@@ -61,11 +61,12 @@ std::streampos Np_pos = std::streampos(0);
 #include "generatePacking_wallBox.hpp"
 #include "generateShape_cube.hpp"
 #include "generateShape_cuboid.hpp"
-#include "generateShape_thinCylinder.hpp"
 #include "generateShape_cuboid_container.hpp"
+#include "generateShape_pyramid3.hpp"
 #include "generateShape_rectangle.hpp"
 #include "generateShape_rhombicuboctahedron.hpp"
 #include "generateShape_sphere.hpp"
+#include "generateShape_thinCylinder.hpp"
 #include "generateShape_xyz_walls.hpp"
 
 std::ostream* outputStream = &std::cout;
@@ -191,10 +192,8 @@ void readCommands(const char* name) {
     individualParticleRotation.reset();
   };
 
-  parser.kwMap["tranformation:reset_translation"] = __DO__() {
-    globalTransformation.reset_translation();
-  };
-  
+  parser.kwMap["tranformation:reset_translation"] = __DO__() { globalTransformation.reset_translation(); };
+
   parser.kwMap["tranformation:reset_rotation"] = __DO__() {
     globalTransformation.reset_rotation();
     individualParticleRotation.reset();
@@ -237,7 +236,16 @@ void readCommands(const char* name) {
     generateShape_cuboid(*outputStream, name.c_str(), radius, sideSize);
     std::cerr << "A cuboid shape has been generated\n";
   };
-  
+
+  parser.kwMap["generateShape:pyramid3"] = __DO__(com) {
+    std::string name;
+    double radius;
+    double sideSize;
+    com >> name >> radius >> sideSize;
+    generateShape_pyramid3(*outputStream, name.c_str(), radius, sideSize);
+    std::cerr << "A pyramid3 shape has been generated\n";
+  };
+
   parser.kwMap["generateShape:thin_cylinder"] = __DO__(com) {
     std::string name;
     double Rin, Rout, H;

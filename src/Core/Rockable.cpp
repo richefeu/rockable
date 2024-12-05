@@ -3007,8 +3007,8 @@ void Rockable::compute_forces_and_moments() {
 inline bool Rockable::computeInterArray()  // TODO change name
 {
   START_TIMER("build_active_interactions");
-  ulong part_size = 0;
-  ulong offsets[Interactions.size()];
+  unsigned long part_size = 0;
+  unsigned long offsets[Interactions.size()];
   testInter.resize(m_vecInteractions.size());
 
 // copy interactions ptr for, m_vecInterations to testInter if dn < 0.0 and stick exists
