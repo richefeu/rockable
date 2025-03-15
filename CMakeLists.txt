@@ -304,7 +304,9 @@ add_executable(see ${CMAKE_SOURCE_DIR}/Apps/see.cpp)
 if(PNG_FOUND)
   # Pour le moment on compile sans libpng car il y a un problème sur mac
   # Les screenshots seront sauvegardés en tga
-  # target_compile_options(see PRIVATE -DPNG_H)
+  if (NOT ${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
+    target_compile_options(see PRIVATE -DPNG_H)
+  endif()
 endif()
 
 target_include_directories(see PRIVATE 

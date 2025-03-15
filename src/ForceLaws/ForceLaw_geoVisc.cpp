@@ -67,7 +67,7 @@ bool GeoVisc::computeInteraction(Interaction& I) {
   int g1 = box->Particles[I.i].group;
   int g2 = box->Particles[I.j].group;
   double kn = box->dataTable.get(box->idKnContact, g1, g2);
-  double kt = box->dataTable.get(box->idKtContact, g1, g2);
+  double viscT = box->dataTable.get(box->idViscTContact, g1, g2);
   double mu = box->dataTable.get(box->idMuContact, g1, g2);
   double kr = box->dataTable.get(box->idKrContact, g1, g2);
   double mur = box->dataTable.get(box->idMurContact, g1, g2);
@@ -76,7 +76,7 @@ bool GeoVisc::computeInteraction(Interaction& I) {
   if (box->ctcPartnership.getWeight != nullptr) {
     double w = box->ctcPartnership.getWeight(I);
     kn *= w;
-    kt *= w;
+    //kt *= w;
     kr *= w;
     damp *= sqrt(w);
   }
@@ -99,7 +99,7 @@ bool GeoVisc::computeInteraction(Interaction& I) {
 
   // === Tangential force (viscuous friction)
   vec3r vt = I.vel - vn * I.n;
-  I.ft = kt * vt;
+  I.ft = viscT * vt;
 
 #ifdef ALLOW_NEGATIVE_THRESHOLDS
   double threshold = fabs(mu * I.fn);
