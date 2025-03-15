@@ -51,10 +51,10 @@
 #include <utility>
 #include <vector>
 
-//#define SPGLOG_HEADER_ONLY
-//#define FMT_HEADER_ONLY
-//#include <spdlog/sinks/stdout_color_sinks.h>
-//#include <spdlog/spdlog.h>
+// #define SPGLOG_HEADER_ONLY
+// #define FMT_HEADER_ONLY
+// #include <spdlog/sinks/stdout_color_sinks.h>
+// #include <spdlog/spdlog.h>
 
 #define FMT_HEADER_ONLY
 #include "fmtLogger.hpp"
@@ -79,7 +79,6 @@
 #include "message.hpp"
 
 // local headers
-#include "ProfilingTools.hpp"
 #include "BodyForces/BodyForce.hpp"
 #include "BreakableInterface.hpp"
 #include "ContactPartnership.hpp"
@@ -90,6 +89,7 @@
 #include "Particle.hpp"
 #include "PeriodicCell.hpp"
 #include "PreproCommands/PreproCommand.hpp"
+#include "ProfilingTools.hpp"
 #include "SpringJoint.hpp"
 #include "clusterParticles.hpp"
 
@@ -102,10 +102,10 @@
 
 class Rockable {
  public:
-  std::vector<Particle> Particles;                            ///< The particles
-  std::vector<std::set<Interaction> > Interactions;           ///< The interactions (contacts and potential contacts)
-  std::vector<std::set<BreakableInterface> > Interfaces;      ///< The interfaces
-  std::vector<std::vector<Interaction*> > m_vecInteractions;  ///< Vector of interaction pointers
+  std::vector<Particle> Particles;                           ///< The particles
+  std::vector<std::set<Interaction>> Interactions;           ///< The interactions (contacts and potential contacts)
+  std::vector<std::set<BreakableInterface>> Interfaces;      ///< The interfaces
+  std::vector<std::vector<Interaction*>> m_vecInteractions;  ///< Vector of interaction pointers
   std::vector<Interaction*> activeInteractions;  ///< Hold a pointer to the contact interactions that are active
   std::vector<SpringJoint> joints;               ///< The spring joints
 
@@ -117,7 +117,7 @@ class Rockable {
 
   std::vector<DataExtractor*> dataExtractors;  ///< Some data to be saved in files according to given processings
 
-  std::vector<Tempo<double> > Tempos;  ///< Useful for force ramps for example
+  std::vector<Tempo<double>> Tempos;  ///< Useful for force ramps for example
 
   BodyForce* bodyForce;  ///< We can add body-forces and body-moments in addition to gravity
 
@@ -179,9 +179,9 @@ class Rockable {
   std::map<std::string, std::string> optionNames;  ///< All the options refered to as a string and set
                                                    ///< as a string also
 
-  ForceLaw* forceLaw;  ///< User defined force law
-  linkCells m_linkCells; ///< Used to dectect contact by using the linkCell method
-	Traversals m_traversals;  ///< Used to store different cell traversal.
+  ForceLaw* forceLaw;       ///< User defined force law
+  linkCells m_linkCells;    ///< Used to dectect contact by using the linkCell method
+  Traversals m_traversals;  ///< Used to store different cell traversal.
 
   double preventCrossingLength;  ///< The length used to prevent crossing
 
@@ -212,8 +212,8 @@ class Rockable {
   void incrementResultants(Interaction&);  ///< Project force and moment on the interacting particles
 #ifdef ROCKABLE_ENABLE_PERIODIC
   void incrementPeriodicCellTensorialMoment(Interaction&);  ///< Update the tensorial moment of interacting particles
-  void realToReducedKinematics();         ///< Go from real coordinates to reduced ones for positions and velocities
-  void reducedToRealKinematics();         ///< Go from reduced coordinates to real ones for positions and velocities
+  void realToReducedKinematics();  ///< Go from real coordinates to reduced ones for positions and velocities
+  void reducedToRealKinematics();  ///< Go from reduced coordinates to real ones for positions and velocities
 #endif
   std::function<void()> integrationStep;  ///< Pointer function for  tion
   void setIntegrator(std::string& Name);  ///< Select the time-integration scheme
@@ -230,15 +230,15 @@ class Rockable {
   void breakage_of_interfaces();                  ///< Break the interfaces
   void compute_accelerations_from_resultants();   ///< Compute accelerations
 
-	bool computeInterArray();
+  bool computeInterArray();
   void applyForces();
   void buildPreComputeUpdate();
-//  void updateDispatcher();
+  //  void updateDispatcher();
   void computeForcesAndMoments();
   void updateForcesAndMoments();
-	std::vector<std::vector<Interaction*>> testInter;
-  MutexVector InteractionsMutex;                    ///< mutex to synchornize concurrent writes to Interactions in AddOrRemoveInteractions
-	preComputeUpdate m_reorg;                         ///< Some stuff to update in parallel forces and moments in OpenMP
+  std::vector<std::vector<Interaction*>> testInter;
+  MutexVector InteractionsMutex;  ///< mutex to synchornize concurrent writes to Interactions in AddOrRemoveInteractions
+  preComputeUpdate m_reorg;       ///< Some stuff to update in parallel forces and moments in OpenMP
 
  public:
   // Core CD method (TODO)
@@ -266,7 +266,7 @@ class Rockable {
 
 #ifdef ROCKABLE_ENABLE_BOUNDARY
   Boundary* boundary{nullptr};
-  std::vector<std::set<InteractionBoundary*> > InteractionsBoundary;
+  std::vector<std::set<InteractionBoundary*>> InteractionsBoundary;
   std::vector<InteractionCylinder*> activeInteractionsBoundary;
   std::function<bool(InteractionCylinder&)> forceLawCylinderPtr;
   // void incrementResultantsPiCylinder(InteractionCylinder&);
@@ -310,12 +310,13 @@ class Rockable {
   // Some predefined identifiers to get (quickly) data from input tables
   size_t idDensity;  ///< Identifier of the density parameter
 
-  size_t idKnContact;   ///< Identifier of normal stiffness for contact
-  size_t idEn2Contact;  ///< Identifier of normal energy-restitution coefficient
-  size_t idKtContact;   ///< Identifier of tangential stiffness for contact
-  size_t idMuContact;   ///< Identifier of friction coefficient for contact
-  size_t idKrContact;   ///< Identifier of angular stiffness for contact
-  size_t idMurContact;  ///< Identifier of rolling-friction coefficient for contact
+  size_t idKnContact;     ///< Identifier of normal stiffness for contact
+  size_t idEn2Contact;    ///< Identifier of normal energy-restitution coefficient
+  size_t idKtContact;     ///< Identifier of tangential stiffness for contact
+  size_t idMuContact;     ///< Identifier of friction coefficient for contact
+  size_t idKrContact;     ///< Identifier of angular stiffness for contact
+  size_t idMurContact;    ///< Identifier of rolling-friction coefficient for contact
+  size_t idViscTContact;  ///< Identifier of tangential viscuous parameter for contact
 
   size_t idKnInnerBond;    ///< Identifier of normal stiffness for inner-bonds
   size_t idKtInnerBond;    ///< Identifier of tangential stiffness for inner-bonds
@@ -360,9 +361,9 @@ class Rockable {
   double dt2;    ///< Double of time-step
   double dt2_8;  ///< Squared time-step divided by 8
   double dt2_6;  ///< Squared time-step divided by 6
-  
+
   // input files
-  std::string m_path = std::string(); ///< Default path to load our input files is the current directory
+  std::string m_path = std::string();  ///< Default path to load our input files is the current directory
 
   // output files
   std::ofstream perfFile;           ///< to store performance data in the course of a computation

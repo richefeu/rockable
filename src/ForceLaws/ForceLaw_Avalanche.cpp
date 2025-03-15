@@ -50,7 +50,8 @@ void Avalanche::init() {
 }
 
 /**
-    @brief   Force-law used for rock avalanches at Laboratoire 3SR
+    @brief   Force-law used for rock avalanches at Laboratoire 3SR.
+             It is historically the very first law that has been used in the code, but note that it is very specific.
     @return  Return true if the interaction is active (ie. with a non-zero force)
 */
 bool Avalanche::computeInteraction(Interaction& I) {

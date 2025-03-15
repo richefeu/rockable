@@ -22,12 +22,12 @@ void PeriodicCell::precomputeInverse() { hinv = h.get_inverse(); }
 vec3r PeriodicCell::getBranchCorrection(const vec3r& ipos, const vec3r& jpos) {
   vec3r rij = ipos - jpos;  // the branch vector from i to j
   vec3r sij = hinv * rij;   // same vector in reduced coordinates
-  
+
   sij.x = std::round(sij.x);
   sij.y = std::round(sij.y);
   sij.z = std::round(sij.z);
-  
-  return (h * sij); // back to real coordinates
+
+  return (h * sij);  // back to real coordinates
 }
 
 /**

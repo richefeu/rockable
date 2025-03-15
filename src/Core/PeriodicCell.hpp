@@ -5,11 +5,11 @@
 
 class PeriodicCell {
  public:
-  mat9r h;     ///< Matrix that hold the cell geometry (each column is a vector that defines a side)
-  mat9r hinv;  ///< inverse of matrix h (recomputed each time h is updated)
-  mat9r vh;    ///< Velocities of the collective DoF
-  mat9r ah;    ///< Acceleration of the collective DoF
-  mat9r Sig;   ///< Mean stress matrix over the cell 
+  mat9r h;      ///< Matrix that hold the cell geometry (each column is a vector that defines a side)
+  mat9r hinv;   ///< inverse of matrix h (recomputed each time h is updated)
+  mat9r vh;     ///< Velocities of the collective DoF
+  mat9r ah;     ///< Acceleration of the collective DoF
+  mat9r Sig;    ///< Mean stress matrix over the cell
   double mass;  ///< Mass of the periodic cell (a somehow fictive data)
 
   PeriodicCell();

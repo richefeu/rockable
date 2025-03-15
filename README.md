@@ -28,10 +28,11 @@ The code was initially developed by *Vincent Richefeu*, at Laboratoire 3SR, to m
 
 Then, the breakable interfaces have been implemented during the PhD work of *Marta Stasiak*. A number of improvements have been added at that time thanks to intensive review with *Gael Combe*, Laboratoire 3SR.
 
-New functionalities are being studied thanks to new collaborations of people from CEA, IATE and CNRS. For example,
-*Lhassan Amarsid* (CEA) is working on the introduction of periodic boundary conditions, and multi-processor 
-computing with domain decomposition. *Farhang Radjai* and students, may introduce new breakable interfaces 
-with energy-based criteria. 
+New functionalities are being studied thanks to new collaborations of people from CEA, INRA*e* and CNRS, particularly in the context of a scientific interest group (Groupement d'Interêt Scientifique, GIS, in French).
+For example, *Lhassan Amarsid* (CEA) is working on the introduction of periodic boundary conditions, and multi-processor 
+computing with domain decomposition. *Farhang Radjai* and students, are introducing new breakable interfaces with energy-based criteria, and also many other novel features.
+
+Thanks to *Raphael PRAT* (and many others), software functionalities, mainly concerning the management of intricate geometries, have been added to [ExaDEM](https://collab4exanbody.github.io/doc_exaDEM/) (MPI+GPUs), developed within the exaNBody framework.
 
 Here is the non-exhaustive list of involved persons with their main mission: 
 
@@ -48,7 +49,7 @@ Here is the non-exhaustive list of involved persons with their main mission:
 
 ## Features
 
-* **Particle Shapes:** the code uses only one 3D shape: sphero-polyhedra or R-shapes. These shapes can be non-convex (with holes if necessary) and have rounded edges and corners (uniform radius per shape).
+* **Particle Shapes:** the code uses only one 3D shape: sphero-polyhedra or *R*-shapes. These shapes can be non-convex (with cavities if needed) and have rounded edges and corners (uniform radius per shape).
 
 > [!NOTE]
 > Some other shapes are currently considered for special boundary shapes (sphere, cylinder...) and specifique loadings.
