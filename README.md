@@ -32,7 +32,7 @@ New functionalities are being studied thanks to new collaborations of people fro
 For example, *Lhassan Amarsid* (CEA) is working on the introduction of periodic boundary conditions, and multi-processor 
 computing with domain decomposition. *Farhang Radjai* and students, are introducing new breakable interfaces with energy-based criteria, and also many other novel features.
 
-Thanks to *Raphael PRAT* (and many others), software functionalities, mainly concerning the management of intricate geometries, have been added to [ExaDEM](https://collab4exanbody.github.io/doc_exaDEM/) (MPI+GPUs), developed within the exaNBody framework.
+Thanks to *Raphael PRAT* (and many others), software functionalities, mainly concerning the management of intricate geometries, have been added to [ExaDEM](https://github.com/Collab4exaNBody/exaDEM) (MPI+GPUs), developed within the exaNBody framework.
 
 Here is the non-exhaustive list of involved persons with their main mission: 
 
