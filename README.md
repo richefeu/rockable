@@ -32,14 +32,14 @@ New functionalities are being studied thanks to new collaborations of people fro
 For example, *Lhassan Amarsid* (CEA) is working on the introduction of periodic boundary conditions, and multi-processor 
 computing with domain decomposition. *Farhang Radjai* and students, are introducing new breakable interfaces with energy-based criteria, and also many other novel features.
 
-Thanks to *Raphael PRAT* (and many others), software functionalities, mainly concerning the management of intricate geometries, have been added to [ExaDEM](https://github.com/Collab4exaNBody/exaDEM) (MPI+GPUs), developed within the exaNBody framework.
+Thanks to *Raphaël PRAT* (and many others), software functionalities, mainly concerning the management of intricate geometries, have been added to [ExaDEM](https://github.com/Collab4exaNBody/exaDEM) (MPI+GPUs), developed within the exaNBody framework.
 
 Here is the non-exhaustive list of involved persons with their main mission: 
 
 * **Vincent Richefeu** <vincent.richefeu@univ-grenoble-alpes.fr> (Laboratoire 3SR, UGA): initiated the project
 * **Gael Combe** <gael.combe@univ-grenoble-alpes.fr> (Laboratoire 3SR, G-INP): mechanical modelling 
 * **Lhassan Amarsid** <lhassan.amarsid@cea.fr> (CEA): mechanical modelling, parallel computing
-* **Raphael Prat** <raphael.prat@cea.fr> (CEA): parallel computing
+* **Raphaël Prat** <raphael.prat@cea.fr> (CEA): parallel computing
 * **Jean-Mathieu Vanson** <jean-mathieu.vanson@cea.fr> (CEA): mechanical modelling
 * **Farhang Radjai** <franck.radjai@umontpellier.fr> (LMGC, CNRS): mechanical/physical Mentor
 * **Jean-Yves Delenne** <jean-yves.delenne@inrae.fr> (IATE, INRAE): mechanical/biological modelling
