@@ -21,7 +21,8 @@ jobs:
     - uses: actions/checkout@v3
     - name: Install Glut
       run: sudo apt-get install -y freeglut3-dev
-
+    - name: Install PNG
+      run: sudo apt-get install -y libpng-dev
     - name: Configure CMake
       run: cmake -DCMAKE_CXX_FLAGS="--coverage -g" -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
