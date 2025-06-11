@@ -400,8 +400,12 @@ void mouse(GLFWwindow* window, int button, int action, int mods) {
 }
 
 void motion(GLFWwindow* /*window*/, double x, double y) {
-  if (ImGui_window_focused == true) return;
-  if (mouse_mode == NOTHING) return;
+  if (ImGui_window_focused == true) {
+    return;
+  }
+  if (mouse_mode == NOTHING) {
+    return;
+  }
 
   double dx = (double)(x - mouse_start[0]) / (double)width;
   double dy = (double)(y - mouse_start[1]) / (double)height;
@@ -410,26 +414,26 @@ void motion(GLFWwindow* /*window*/, double x, double y) {
 
   switch (mouse_mode) {
 
-    case ROTATION:
+    case ROTATION: {
       axis = (cross(up, center - eye));
       axis.normalize();
       eye = geoTool::rotatePoint(eye, center, up, -dx * M_PI);
       eye = geoTool::rotatePoint(eye, center, axis, dy * M_PI);
       up = (geoTool::rotatePoint((center + up), center, axis, dy * M_PI) - center);
       up.normalize();
-      break;
+    } break;
 
-    case ZOOM:
+    case ZOOM: {
       eye = center + (eye - center) * (dy + 1.0);
-      break;
+    } break;
 
-    case PAN:
+    case PAN: {
       length = (eye - center).length() * tan(view_angle * M_PI / 360.0) * 2.0;
       axis = cross(up, center - eye);
       axis.normalize();
       center = center + axis * dx * length * 0.8;
       center = center + up * dy * length;
-      break;
+    } break;
 
     default:
       break;
@@ -453,16 +457,34 @@ void display() {
   glShadeModel(GL_SMOOTH);
   glEnable(GL_DEPTH_TEST);
 
-  if (show_globalFrame) drawGlobalFrame();
-  if (show_traj) drawTrajectories();
-  if (show_forces) drawForces();
-  if (show_interFrames) drawInteractionFrames();
-  if (show_interTypes) drawInteractionTypes();
-  if (show_obb) drawOBBs();
-  if (show_particles) drawParticles();
-  if (show_probe) drawProbe();
+  if (show_globalFrame) {
+    drawGlobalFrame();
+  }
+  if (show_traj) {
+    drawTrajectories();
+  }
+  if (show_forces) {
+    drawForces();
+  }
+  if (show_interFrames) {
+    drawInteractionFrames();
+  }
+  if (show_interTypes) {
+    drawInteractionTypes();
+  }
+  if (show_obb) {
+    drawOBBs();
+  }
+  if (show_particles) {
+    drawParticles();
+  }
+  if (show_probe) {
+    drawProbe();
+  }
 
-  if (show_keybinds) showKeybinds();
+  if (show_keybinds) {
+    showKeybinds();
+  }
   textZone.draw();
   glFlush();
 }
@@ -475,7 +497,9 @@ void computePerspective() {
 
   znear = zf - 0.5 * max_length;
   double close_dst = 0.1 * zf;
-  if (znear < close_dst) znear = close_dst;
+  if (znear < close_dst) {
+    znear = close_dst;
+  }
   zfar = zf + 0.5 * max_length;
 }
 
@@ -534,7 +558,9 @@ void drawShape(Shape* s, double homothety) {
 
   // faces (3D polygones)
   for (size_t f = 0; f < s->face.size(); ++f) {
-    if (s->face[f].size() < 3) continue;  // At least 3 pts!
+    if (s->face[f].size() < 3) {  // At least 3 pts!
+      continue;
+    }
     vec3r N =
         cross(s->vertex[s->face[f][1]] - s->vertex[s->face[f][0]], s->vertex[s->face[f][2]] - s->vertex[s->face[f][0]]);
     N.normalize();
@@ -606,7 +632,9 @@ void drawParticles() {
 }
 
 void drawTrajectories() {
-  if (mouse_mode != NOTHING && releases.size() > 200) return;
+  if (mouse_mode != NOTHING && releases.size() > 200) {
+    return;
+  }
 
   glDisable(GL_LIGHTING);
   glEnable(GL_DEPTH_TEST);
@@ -777,7 +805,9 @@ void drawProbe() {
 }
 
 void drawInteractionTypes() {
-  if (mouse_mode != NOTHING && box.Particles.size() > 200) return;
+  if (mouse_mode != NOTHING && box.Particles.size() > 200) {
+    return;
+  }
 
   glDisable(GL_LIGHTING);
   glEnable(GL_DEPTH_TEST);
@@ -816,8 +846,9 @@ void drawInteractionTypes() {
           dest += box.Particles[j].shape->vertex[box.Particles[j].shape->face[jsub][f]];
         }
         dest /= nf;
-      } else
+      } else {
         continue;
+      }
 
       orig = box.Particles[i].Glob(orig);
       dest = box.Particles[j].Glob(dest);
@@ -832,7 +863,9 @@ void drawInteractionTypes() {
 }
 
 void drawInteractionFrames() {
-  if (mouse_mode != NOTHING && box.Particles.size() > 200) return;
+  if (mouse_mode != NOTHING && box.Particles.size() > 200) {
+    return;
+  }
 
   glDisable(GL_LIGHTING);
   glEnable(GL_DEPTH_TEST);
@@ -846,7 +879,9 @@ void drawInteractionFrames() {
       i = it->i;
       j = it->j;
 
-      if (it->dn > 0.0 && it->stick == nullptr) continue;
+      if (it->dn > 0.0 && it->stick == nullptr) {
+        continue;
+      }
 
       if (it->type == vvType) {  // ROUGE
         glColor3ub(255, 0, 0);
@@ -856,8 +891,9 @@ void drawInteractionFrames() {
         glColor3ub(0, 0, 255);
       } else if (it->type == vfType) {  // ORANGE
         glColor3ub(255, 131, 0);
-      } else
+      } else {
         continue;
+      }
 
       dnorm = it->n * 2.0 * (box.Particles[i].MinskowskiRadius() + box.Particles[j].MinskowskiRadius());
 
@@ -886,13 +922,16 @@ void drawForces() {
     for (size_t k = 0; k < box.Interactions.size(); ++k) {
       std::set<Interaction>::iterator it = box.Interactions[k].begin();
       for (; it != box.Interactions[k].end(); ++it) {
-        if (fabs(it->fn) > fnMax) fnMax = fabs(it->fn);
+        if (fabs(it->fn) > fnMax) {
+          fnMax = fabs(it->fn);
+        }
       }
     }
     if (fnMax > 0.0) {
       forceFactor = 0.005 / fnMax;  // 0.005 is the maximum length
-    } else
+    } else {
       return;
+    }
   }
 
   glLineWidth(2.0f);
@@ -905,8 +944,9 @@ void drawForces() {
 
       if (it->fn > 0.0) {  // ROUGE
         glColor3ub(255, 0, 0);
-      } else
-        glColor3ub(0, 255, 0);  // VERT
+      } else {  // VERT
+        glColor3ub(0, 255, 0);
+      }
 
       force = it->fn * it->n + it->ft;
       force *= forceFactor;
@@ -916,7 +956,9 @@ void drawForces() {
       glVertex3f(it->pos.x + force.x, it->pos.y + force.y, it->pos.z + force.z);
       glEnd();
 
-      if (it->stick != nullptr) glColor3ub(0, 0, 0);  // NOIR
+      if (it->stick != nullptr) {  // NOIR
+        glColor3ub(0, 0, 0);
+      }
 
       glBegin(GL_POINTS);
       glVertex3f(it->pos.x, it->pos.y, it->pos.z);
@@ -960,7 +1002,9 @@ void drawVelocities() {
 
 void editSelection() {
   using namespace std;
-  if (selectedParticle < 0) return;
+  if (selectedParticle < 0) {
+    return;
+  }
 
   // https://en.wikipedia.org/wiki/Box-drawing_character
   cout << "\u256d\u2500" << endl;
@@ -975,16 +1019,19 @@ void editSelection() {
   cin >> ans;
 
   switch (ans) {
+
     case 1: {
       cout << "current pos = " << box.Particles[selectedParticle].pos << endl;
       cout << "    new pos = ";
       cin >> box.Particles[selectedParticle].pos;
     } break;
+
     case 2: {
       cout << "current vel = " << box.Particles[selectedParticle].vel << endl;
       cout << "    new vel = ";
       cin >> box.Particles[selectedParticle].vel;
     } break;
+
     case 3: {
       double angle = box.Particles[selectedParticle].Q.get_angle();
       vec3r axis = box.Particles[selectedParticle].Q.get_axis();
@@ -997,11 +1044,13 @@ void editSelection() {
       cin >> axis;
       box.Particles[selectedParticle].Q.set_axis_angle(axis, angle);
     } break;
+
     case 4: {
       cout << "current vrot = " << box.Particles[selectedParticle].vrot << endl;
       cout << "    new vrot = ";
       cin >> box.Particles[selectedParticle].vrot;
     } break;
+
     default:
       break;
   }
@@ -1631,8 +1680,8 @@ void main_imgui_menu() {
 // =====================================================================
 
 int main(int argc, char* argv[]) {
-	RockableProfiler::ProfilerManager prof;
-	
+  RockableProfiler::ProfilerManager prof;
+
   box.setInteractive(true);
 
   std::string confFileName;

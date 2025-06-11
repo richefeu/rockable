@@ -227,6 +227,7 @@ class Rockable {
   void compute_forces_and_moments();              ///< Compute forces and moments
   void compute_resultants();                      ///< Compute the resulting forces and moments
   void compute_SpringJoints();                    ///< Compute the spring joints
+  void check_breakage_of_interfaces();            ///< ____
   void breakage_of_interfaces();                  ///< Break the interfaces
   void compute_accelerations_from_resultants();   ///< Compute accelerations
 
@@ -335,6 +336,9 @@ class Rockable {
   size_t idFt0OuterBond;   ///< Identifier of tangential threshold force for outer-bonds
   size_t idMom0OuterBond;  ///< Identifier of threshold bendind-moment for outer-bonds
   size_t idPowOuterBond;   ///< Identifier of power in yield function for outer-bonds
+  
+  size_t idGcInnerBond;
+  size_t idGcOuterBond;
 
   // Postponed breakage of BreakableInterfaces
   std::set<BreakableInterface*> interfacesToBreak;  ///< Pointers to interfaces to be broken

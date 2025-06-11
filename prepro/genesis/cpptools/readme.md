@@ -11,7 +11,78 @@ Use the following command to run the program:
 ```
 generator <prepro-command-file>
 ```
-   
+
+As an example, here is a command script:
+
+```
+# -------------------
+open shapes.txt
+generateShape:cuboid Cuboid 0.0005 0.03 0.01 0.01
+generateShape:xyz_walls   0.25 0.25 0.25   0.0005
+close
+
+# -------------------
+open input.txt
+print Rockable 21-08-2022
+print #### time #############################
+print t 0
+print tmax 2.0
+print dt 5e-6
+print interVerlet 0.001
+print interConf 0.01
+print 
+print #### options ##########################
+print forceLaw Default
+print Integrator Beeman
+print 
+print #### proximity of the particles #######
+print DVerlet 0.005
+print dVerlet 0.0025
+print 
+print #### properties for particles #########
+print density 0 2700
+print density 1 2700
+print 
+print #### interaction parameters ###########
+print knContact 0 1 1e6
+print en2Contact 0 1 0.02
+print ktContact 0 1 1e6
+print muContact 0 1 0.6
+print krContact 0 1 0.0
+print murContact 0 1 0.0
+print 
+print knContact 0 0 1e6
+print en2Contact 0 0 0.02
+print ktContact 0 0 1e6
+print muContact 0 0 0.6
+print krContact 0 0 0.0
+print murContact 0 0 0.0
+print 
+print #### the system #######################
+print iconf 0
+print shapeFile shapes.txt
+print nDriven 0
+#incrementNoParticles 1
+Particles:placeHolder
+
+
+generatePacking:RandomClosePacking
+Cuboid
+CUBOID Y
+0.2 0.2 0.3
+0.03 0.01 0.01
+1.0 1.0
+2000
+0.9
+0
+0
+
+close
+```
+
+
+Remember to leave at least one blank line at the end of the file to avoid issues with interpreting the command file. This issue may be fixed someday :)
+
 
 ### Available general commands
 
@@ -19,7 +90,7 @@ The program currently supports the following commands:
 
 - `open [string:filename]`
   
-  Opens the file specified by `filename` (without space) for output.
+  Opens the file specified by `filename` (without space) for output. If no file is open, the output will be directed to the console.
 
 - `close` 
 
@@ -29,31 +100,54 @@ The program currently supports the following commands:
 
   Prints the specified `text` to the currently open output file or to the console if no file is open. The spaces at the beginning and at the end of the text are trimmed. After printing, a cariage return is added (next print will star at the next line).
   
+  This feature is particularly useful for printing raw data into shape-files or configuration files.
+  
 - `print> [text up to the line end]` 
 
-  Similar to `print` but without cariage return at the end. Next Print will follow at the end.
+  Similar to `print`, but without adding a carriage return at the end. The next print statement will continue on the same line.
 
-- `<compute`
 
-  Blabla
   
-- `compute`
+- `compute [text before the result] [operation]` 
 
-- `transformation:rotate`
+  This command functions similarly to the print command but includes the ability to parse a simple mathematical expression. Note that the parser is quite basic.
 
-  Blabla
+  Example of use: `compute Particles 5^3 + 6` will ouput `Particles 131`
+   
+- `<compute [operation]`
 
-- `transformation:translate`
+  Similar to `compute` but without text before the operation. Example of use:
   
-  Blabla
+  ```
+  print> knContact 0 0
+  <compute 500000 * 2
+  ```
+  
+  Thiswill generate `knContact 0 0 1000000`
+
+- `Particles:placeHolder`
+
+  When this command is added, the keyword `Particles` followed by the tracked number of particles will be printed when the file is closed. The particle count is updated each time a command that adds particles is used. Additionally, the number of particles can be increased using the command `incrementNoParticles.
+
+- `incrementNoParticles [number]`
+
+  Increases the tracked number of particles by `number` (integer). This command is useful for manually updating the particle count, which will be printed when the file is closed if the `Particles:placeHolder command is used.
+
+
+
+When executing the script sequentially, a global transformation is maintained and utilized by most of the packing commands. The transformation manipulations are performed by the following commands:
+
+- `transformation:add_translation`
+  
+  This command adds a translation component to the current transformation, allowing you to shift the position of the object in space.
+
+- `transformation:add_rotation`
+
+  This command adds a rotation component to the current transformation, enabling you to rotate the object around a specified axis.
 
 - `transformation:reset`
   
-  Blabla
-  
-- `addParticle [string:name] [int:group] [int:cluster] [double:homothety] [double:position_x] [double:position_y] [double:position_z] [double:angularQuaternion_s] [double:angularQuaternion_x] [double:angularQuaternion_y] [double:angularQuaternion_z]` 
-
-  Adds a new particle with the specified parameters.
+  This command resets the transformation to its initial state, effectively removing any translations or rotations that have been applied. It is also possible to reset only translation or rotation using respectively `tranformation:reset_translation` or `tranformation:reset_rotation`
 
 
 ### Commands for generating a shape 
@@ -84,6 +178,11 @@ The program currently supports the following commands:
 
 
 ### Commands for generating a packing
+
+
+- `addParticle [string:name] [int:group] [int:cluster] [double:homothety] [double:position_x] [double:position_y] [double:position_z] [double:angularQuaternion_s] [double:angularQuaternion_x] [double:angularQuaternion_y] [double:angularQuaternion_z]` 
+
+  Adds a new particle with the specified parameters.
 
 
 - `generatePacking:wallBox [group] [double:LX] [double:LY] [double:LZ] [double:Rw]`

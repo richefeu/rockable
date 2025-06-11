@@ -68,19 +68,21 @@ class Interaction {
   vec3r prev_n;  ///< Normal unit vector at the previous step
   vec3r n;       ///< Normal unit vector (from j to i)
 
-  double dn;       ///< Normal distance (overlap = negative distance)
-  double prev_dn;  ///< Backup of dn at the previous time step
+  double dn{0.0};       ///< Normal distance (overlap = negative distance)
+  double prev_dn{0.0};  ///< Backup of dn at the previous time step
+
+  vec3r ds;
 
   vec3r pos;             ///< Contact position
   vec3r vel;             ///< Relative velocity (j relative to i)
   vec3r jPeriodicShift;  ///< In case of periodic cell, this the shifting of particle j
 
-  double fn;  ///< Normal force (scalar value)
-  vec3r ft;   ///< Tangential force (vector)
-  vec3r mom;  ///< Moment at the contact point
+  double fn{0.0};  ///< Normal force (scalar value)
+  vec3r ft;        ///< Tangential force (vector)
+  vec3r mom;       ///< Moment at the contact point
 
-  double damp;                ///< Precomputed vicuous damping coefficient
-  BreakableInterface* stick;  ///< The breakable interface (if there's no interface, then stick = nullptr)
+  double damp{0.0};           ///< Precomputed vicuous damping coefficient
+  BreakableInterface* stick{nullptr};  ///< The breakable interface (if there's no interface, then stick = nullptr)
 
   Interaction();                      // Ctor
   Interaction(const Interaction& I);  // copy Ctor
@@ -103,10 +105,18 @@ namespace std {
 template <>
 struct less<Interaction> {
   bool operator()(const Interaction& lhs, const Interaction& rhs) const {
-    if (lhs.i != rhs.i) return lhs.i < rhs.i;
-    if (lhs.j != rhs.j) return lhs.j < rhs.j;
-    if (lhs.type != rhs.type) return lhs.type < rhs.type;
-    if (lhs.isub != rhs.isub) return lhs.isub < rhs.isub;
+    if (lhs.i != rhs.i) {
+      return lhs.i < rhs.i;
+    }
+    if (lhs.j != rhs.j) {
+      return lhs.j < rhs.j;
+    }
+    if (lhs.type != rhs.type) {
+      return lhs.type < rhs.type;
+    }
+    if (lhs.isub != rhs.isub) {
+      return lhs.isub < rhs.isub;
+    }
     return lhs.jsub < rhs.jsub;
   }
 };
@@ -114,10 +124,18 @@ struct less<Interaction> {
 template <>
 struct less<Interaction*> {
   bool operator()(const Interaction* lhs, const Interaction* rhs) const {
-    if (lhs->i != rhs->i) return lhs->i < rhs->i;
-    if (lhs->j != rhs->j) return lhs->j < rhs->j;
-    if (lhs->type != rhs->type) return lhs->type < rhs->type;
-    if (lhs->isub != rhs->isub) return lhs->isub < rhs->isub;
+    if (lhs->i != rhs->i) {
+      return lhs->i < rhs->i;
+    }
+    if (lhs->j != rhs->j) {
+      return lhs->j < rhs->j;
+    }
+    if (lhs->type != rhs->type) {
+      return lhs->type < rhs->type;
+    }
+    if (lhs->isub != rhs->isub) {
+      return lhs->isub < rhs->isub;
+    }
     return lhs->jsub < rhs->jsub;
   }
 };

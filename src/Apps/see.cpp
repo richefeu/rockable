@@ -590,7 +590,8 @@ void motion(int x, int y) {
   mouse_start[0] = x;
   mouse_start[1] = y;
 
-  display();
+  //display();
+  glutPostRedisplay();
 }
 
 void display() {
@@ -1621,7 +1622,7 @@ int main(int argc, char* argv[]) {
   // ==== Init GLUT and create window
   glutInit(&argc, argv);
   glutSetOption(GLUT_MULTISAMPLE, 8);
-  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DOUBLE | GLUT_ALPHA | GLUT_DEPTH | GLUT_MULTISAMPLE);
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA | GLUT_DEPTH | GLUT_MULTISAMPLE);
   glutInitWindowPosition(50, 50);
   glutInitWindowSize(width, height);
   main_window = glutCreateWindow("Rockable visualiser");

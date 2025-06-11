@@ -1,6 +1,7 @@
 #include "shapeSurvey.hpp"
-#include <fileTool.hpp>
-#include <glutTools.hpp>
+
+#include "fileTool.hpp"
+#include "glutTools.hpp"
 
 void printHelp() {
   switch2D::go(width, height);
@@ -544,9 +545,13 @@ int main(int argc, char* argv[]) {
   StackTracer::initSignals();
 
   if (argc == 1) {
-    if (readShapeLib("shapes") == 0) return 0;
+    if (readShapeLib("shapes") == 0) {
+      return 0;
+    }
   } else if (argc == 2) {
-    if (readShapeLib(argv[1]) == 0) return 0;
+    if (readShapeLib(argv[1]) == 0) {
+      return 0;
+    }
   }
 
   // ==== Init GLUT and create window

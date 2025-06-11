@@ -46,6 +46,7 @@ Interaction::Interaction()
       n(),
       dn(0.0),
       prev_dn(0.0),
+      ds(),
       pos(),
       vel(),
 			jPeriodicShift(),
@@ -65,6 +66,7 @@ Interaction::Interaction(const Interaction& I)
       n(I.n),
       dn(I.dn),
       prev_dn(I.prev_dn),
+      ds(),
       pos(I.pos),
       vel(I.vel),
 			jPeriodicShift(I.jPeriodicShift),
@@ -84,6 +86,7 @@ Interaction::Interaction(size_t I, size_t J, int Type, size_t Isub, size_t Jsub,
       n(),
       dn(0.0),
       prev_dn(0.0),
+      ds(),
       pos(),
       vel(),
 			jPeriodicShift(),
@@ -104,6 +107,7 @@ Interaction& Interaction::operator=(const Interaction& other) {
     n = other.n;
     dn = other.dn;
     prev_dn = other.prev_dn;
+    ds = other.ds;
     pos = other.pos;
     vel = other.vel;
 		jPeriodicShift = other.jPeriodicShift;

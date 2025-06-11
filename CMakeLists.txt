@@ -1,9 +1,9 @@
-cmake_minimum_required(VERSION 3.23)
+cmake_minimum_required(VERSION 3.5)
 
 if (${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
   set(CMAKE_OSX_COMPILER_ID "GNU")
 	set(CMAKE_CXX_COMPILER "g++-14")
-	message(STATUS "On apple computers, you need to install the last g++ compiler (g++-14)")
+  message(STATUS "On apple computers, you need to install the last g++ compiler (g++-14)")
 endif()
 
 project(Rockable LANGUAGES CXX)
@@ -73,7 +73,7 @@ set(FETCHCONTENT_BASE_DIR ${CMAKE_SOURCE_DIR}/deps)
 #include(ExternalProject)
 
 ######################################################################
-##### Fetching TOOFUS
+##### Fetching ToOfUs
 FetchContent_Declare (
 	toofus
   GIT_REPOSITORY https://github.com/richefeu/toofus.git
@@ -134,7 +134,7 @@ endif()
 FetchContent_Declare (
 	nlohmann-json
   GIT_REPOSITORY https://github.com/nlohmann/json.git
-  GIT_TAG        v3.11.2
+  GIT_TAG        v3.12.0
 )
 FetchContent_GetProperties(nlohmann-json)
 if(NOT nlohmann-json_POPULATED)
@@ -199,8 +199,28 @@ endif()
 if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
 	
   # here, we do not uses find_package(glut) so that the version installed by apple is NOT used
-  find_package(PkgConfig REQUIRED)
+  if(NOT PkgConfig_FOUND)
+    find_package(PkgConfig REQUIRED)
+  endif()
+  
+  pkg_check_modules(GL REQUIRED gl)
+  pkg_check_modules(GLU REQUIRED glu)
   pkg_check_modules(GLUT REQUIRED glut>=3.4.0)
+  
+  if(GL_FOUND)
+    message(STATUS "GL as been found with PkgConfig")		
+		message(STATUS "GL_LIBRARY_DIRS = " ${GL_LIBRARY_DIRS})
+    message(STATUS "GL_INCLUDE_DIRS = " ${GL_INCLUDE_DIRS})
+		message(STATUS "GL_LIBRARIES = " ${GL_LIBRARIES})
+  endif()
+  
+  if(GLU_FOUND)
+    message(STATUS "GLU as been found with PkgConfig")		
+		message(STATUS "GLU_LIBRARY_DIRS = " ${GLU_LIBRARY_DIRS})
+    message(STATUS "GLU_INCLUDE_DIRS = " ${GLU_INCLUDE_DIRS})
+		message(STATUS "GLU_LIBRARIES = " ${GLU_LIBRARIES})
+  endif()
+  
   if(GLUT_FOUND)
     message(STATUS "GLUT as been found with PkgConfig")		
 		message(STATUS "GLUT_LIBRARY_DIRS = " ${GLUT_LIBRARY_DIRS})
@@ -221,24 +241,40 @@ endif()
 ######################################################################
 #### glfw
 if(ROCKABLE_COMPILE_SEE2 OR ROCKABLE_COMPILE_SEE3)
+
+  if(NOT PkgConfig_FOUND)
+    find_package(PkgConfig REQUIRED)
+  endif()
+  
+  pkg_check_modules(GLFW REQUIRED glfw3)
+  
+  if(GLFW_FOUND)
+    message(STATUS "GLFW as been found with PkgConfig")		
+		message(STATUS "GLFW_LIBRARY_DIRS = " ${GLFW_LIBRARY_DIRS})
+    message(STATUS "GLFW_INCLUDE_DIRS = " ${GLFW_INCLUDE_DIRS})
+		message(STATUS "GLFW_LIBRARIES = " ${GLFW_LIBRARIES})
+  endif()
+
+
   #find_package(glfw3 CONFIG REQUIRED)  
   
-  FetchContent_Declare(
-          glfw
-          GIT_REPOSITORY https://github.com/glfw/glfw
-  )
+  #FetchContent_Declare(
+  #        glfw
+  #        GIT_REPOSITORY https://github.com/glfw/glfw
+  #        GIT_TAG        3.4
+  #)
 
-  FetchContent_GetProperties(glfw)
-  if(NOT glfw_POPULATED)
-      FetchContent_MakeAvailable(glfw)
+  #FetchContent_GetProperties(glfw)
+  #if(NOT glfw_POPULATED)
+  #    FetchContent_MakeAvailable(glfw)
 
-      set(GLFW_BUILD_EXAMPLES OFF CACHE INTERNAL "Build the GLFW example programs")
-      set(GLFW_BUILD_TESTS OFF CACHE INTERNAL "Build the GLFW test programs")
-      set(GLFW_BUILD_DOCS OFF CACHE INTERNAL "Build the GLFW documentation")
-      set(GLFW_INSTALL OFF CACHE INTERNAL "Generate installation target")
+  #    set(GLFW_BUILD_EXAMPLES OFF CACHE INTERNAL "Build the GLFW example programs")
+  #    set(GLFW_BUILD_TESTS OFF CACHE INTERNAL "Build the GLFW test programs")
+  #    set(GLFW_BUILD_DOCS OFF CACHE INTERNAL "Build the GLFW documentation")
+  #    set(GLFW_INSTALL OFF CACHE INTERNAL "Generate installation target")
 
-      add_subdirectory(${glfw_SOURCE_DIR} ${glfw_BINARY_DIR})
-  endif()
+      #add_subdirectory(${glfw_SOURCE_DIR} ${glfw_BINARY_DIR})
+  #endif()
   
 endif()
 
@@ -279,7 +315,8 @@ endif()
 ##### rockable executable (to run simulations from the console)
 add_executable(rockable ${CMAKE_SOURCE_DIR}/Apps/run.cpp)
 target_link_libraries(rockable PUBLIC Rockable_core)
-install(TARGETS rockable DESTINATION ./)
+#install(TARGETS rockable DESTINATION ./)
+install(TARGETS rockable)
 
 ######################################################################
 ##### postpro
@@ -309,25 +346,44 @@ if(PNG_FOUND)
   endif()
 endif()
 
-target_include_directories(see PRIVATE 
-	${OPENGL_INCLUDE_DIR}
-	${GLUT_INCLUDE_DIRS}
-	${nlohmann-json_SOURCE_DIR}/include
-  ${PNG_INCLUDE_DIRS}
-)
-
-target_link_directories(see PRIVATE 
-  ${GLUT_LIBRARY_DIRS} 
-  ${PNG_LIBRARY}
-)
-
 if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
+
+  target_include_directories(see PRIVATE 
+  	${OPENGL_INCLUDE_DIR}
+    ${GLU_INCLUDE_DIRS}
+  	${GLUT_INCLUDE_DIRS}
+  	${nlohmann-json_SOURCE_DIR}/include
+    ${PNG_INCLUDE_DIRS}
+  )
+
+  target_link_directories(see PRIVATE 
+    ${GLUT_LIBRARY_DIRS} 
+    ${PNG_LIBRARY}
+  )
+
   target_link_libraries (see PUBLIC OpenGL::GL OpenGL::GLU ${GLUT_LIBRARIES} Rockable_core PNG::PNG)
+  
 else()
-  target_link_libraries (see PUBLIC OpenGL::GL OpenGL::GLU ${GLUT_LIBRARIES} Rockable_core PNG::PNG)
+
+  target_include_directories(see PRIVATE 
+    ${GL_INCLUDE_DIRS}
+    ${GLU_INCLUDE_DIRS}
+  	${GLUT_INCLUDE_DIRS}
+  	${nlohmann-json_SOURCE_DIR}/include
+  )
+
+  target_link_directories(see PRIVATE
+    ${GL_LIBRARY_DIRS}
+    ${GLU_LIBRARY_DIRS}
+    ${GLUT_LIBRARY_DIRS} 
+  )
+  
+  target_link_libraries (see PUBLIC ${GL_LIBRARIES} ${GLU_LIBRARIES} ${GLUT_LIBRARIES} Rockable_core)
+
 endif()
 
-install(TARGETS see DESTINATION ./)
+#install(TARGETS see DESTINATION ./)
+install(TARGETS see)
 
 endif()
 
@@ -340,7 +396,7 @@ if(ROCKABLE_COMPILE_SEE3)
 set(see3_files
   ${CMAKE_SOURCE_DIR}/Apps/see3.cpp
   ${imgui_SOURCE_DIR}/imgui.cpp
-  ${imgui_SOURCE_DIR}/imgui_demo.cpp
+  #${imgui_SOURCE_DIR}/imgui_demo.cpp
   ${imgui_SOURCE_DIR}/imgui_draw.cpp
   ${imgui_SOURCE_DIR}/imgui_tables.cpp
   ${imgui_SOURCE_DIR}/imgui_widgets.cpp
@@ -349,17 +405,36 @@ set(see3_files
 )
 
 add_executable(see3 ${see3_files})
-target_include_directories(see3 PUBLIC
-	${OPENGL_INCLUDE_DIR}
-	${imgui_SOURCE_DIR}
-	${imgui_SOURCE_DIR}/backends
-  ${nlohmann-json_SOURCE_DIR}/include
-)
 
 if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
+
+  target_include_directories(see3 PUBLIC
+  	${OPENGL_INCLUDE_DIR}
+  	${imgui_SOURCE_DIR}
+  	${imgui_SOURCE_DIR}/backends
+    ${nlohmann-json_SOURCE_DIR}/include
+  )
+  
   target_link_libraries (see3 PUBLIC glfw OpenGL::GL OpenGL::GLU Rockable_core)
+
 else()
-  target_link_libraries (see3 PUBLIC glfw OpenGL::GL OpenGL::GLU Rockable_core)
+
+  target_include_directories(see3 PUBLIC
+  	${GL_INCLUDE_DIRS}
+    ${GLU_INCLUDE_DIRS}
+    ${GLFW_INCLUDE_DIRS}
+  	${imgui_SOURCE_DIR}
+  	${imgui_SOURCE_DIR}/backends
+    ${nlohmann-json_SOURCE_DIR}/include
+  )
+  target_link_directories(see3 PUBLIC
+    ${GL_LIBRARY_DIRS}
+    ${GLU_LIBRARY_DIRS}
+    ${GLFW_LIBRARY_DIRS}
+  )
+
+  target_link_libraries (see3 PUBLIC ${GL_LIBRARIES} ${GLU_LIBRARIES} ${GLFW_LIBRARIES} Rockable_core)
+
 endif()
 
 install(TARGETS see3 DESTINATION ./)
@@ -371,7 +446,8 @@ endif() # end of ROCKABLE_COMPILE_SEE3
 if(ROCKABLE_COMPILE_CONF2VTK)
   add_executable(conftovtk ${CMAKE_SOURCE_DIR}/Apps/conftovtk.cpp)
   target_link_libraries (conftovtk Rockable_core)
-  install(TARGETS conftovtk DESTINATION ./)
+  #install(TARGETS conftovtk DESTINATION ./)
+  install(TARGETS conftovtk)
 endif()
 
 ######################################################################

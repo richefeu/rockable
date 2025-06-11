@@ -48,6 +48,7 @@
 #include "DataExtractors/DataExtractor_dnStat.hpp"
 
 #include "ForceLaws/ForceLaw_Avalanche.hpp"
+#include "ForceLaws/ForceLaw_BCM.hpp"
 #include "ForceLaws/ForceLaw_Default.hpp"
 #include "ForceLaws/ForceLaw_StickedLinks.hpp"
 #include "ForceLaws/ForceLaw_geoVisc.hpp"
@@ -60,6 +61,7 @@
 #include "PreproCommands/PreproCommand_setAllVelocities.hpp"
 #include "PreproCommands/PreproCommand_setStiffnessRatioInterfaces.hpp"
 #include "PreproCommands/PreproCommand_setVariableStickParams.hpp"
+#include "PreproCommands/PreproCommand_stickBCM.hpp"
 #include "PreproCommands/PreproCommand_stickClusters.hpp"
 #include "PreproCommands/PreproCommand_stickVerticesInClusters.hpp"
 #include "PreproCommands/PreproCommand_stickVerticesInClustersMoments.hpp"
@@ -154,6 +156,9 @@ Rockable::Rockable() : m_linkCells(aabb, cellMinSizes) {
   idMom0OuterBond = dataTable.add("mom0OuterBond");
   idPowOuterBond = dataTable.add("powOuterBond");
 
+  idGcInnerBond = dataTable.add("gcInnerBond");
+  idGcOuterBond = dataTable.add("gcOuterBond");
+
   needUpdate = false;
   interactiveMode = false;
   glue_with_walls = false;
@@ -189,6 +194,7 @@ void Rockable::ExplicitRegistrations() {
   REGISTRER_BASE_DERIVED(ForceLaw, Default);
   REGISTRER_BASE_DERIVED(ForceLaw, Avalanche);
   REGISTRER_BASE_DERIVED(ForceLaw, StickedLinks);
+  REGISTRER_BASE_DERIVED(ForceLaw, BCM);
   REGISTRER_BASE_DERIVED(ForceLaw, GeoVisc);
 
   // PreproCommands
@@ -203,6 +209,7 @@ void Rockable::ExplicitRegistrations() {
   REGISTRER_BASE_DERIVED(PreproCommand, stickClusters);
   REGISTRER_BASE_DERIVED(PreproCommand, stickVerticesInClusters);
   REGISTRER_BASE_DERIVED(PreproCommand, stickVerticesInClustersMoments);
+  REGISTRER_BASE_DERIVED(PreproCommand, stickBCM);
 
   // registerUnsharedModules();
 }
@@ -546,6 +553,9 @@ void Rockable::saveConf(const char* fname) {
   writeLawData(conf, "mom0OuterBond");
   writeLawData(conf, "powOuterBond");
   writeLawData(conf, "en2OuterBond");
+  
+  writeLawData(conf, "gcInnerBond");
+  writeLawData(conf, "gcOuterBond");
 
   conf << "ContactPartnership " << ctcPartnership.name << '\n';
   conf << "cellMinSizes " << cellMinSizes << '\n';
@@ -594,14 +604,14 @@ void Rockable::saveConf(const char* fname) {
   for (size_t i = 0; i < Interfaces.size(); i++) {
     nbInterfaces += Interfaces[i].size();
   }
-  conf << "Interfaces " << nbInterfaces << std::fixed << std::setprecision(2) << '\n';
+  conf << "Interfaces " << nbInterfaces << std::fixed << std::setprecision(6) << '\n';
   for (size_t i = 0; i < Interfaces.size(); i++) {
     std::set<BreakableInterface>::iterator it = Interfaces[i].begin();
     for (; it != Interfaces[i].end(); ++it) {
       conf << it->i << ' ' << it->j << "  " << it->concernedBonds.size() << ' ' << it->dn0;
       if (paramsInInterfaces == 1) {
         conf << ' ' << it->kn << ' ' << it->kt << ' ' << it->kr << ' ' << it->fn0 << ' ' << it->ft0 << ' ' << it->mom0
-             << ' ' << it->power << ' ';
+             << ' ' << it->power << ' ' << it->Gc << ' ';
       }
       for (size_t b = 0; b < it->concernedBonds.size(); ++b) {
         conf << "  " << it->concernedBonds[b]->type << ' ' << it->concernedBonds[b]->isub << ' '
@@ -834,6 +844,9 @@ void Rockable::initParser() {
   parser.kwMap["mom0OuterBond"] = __DO__(conf) { readLawData(conf, idMom0OuterBond); };
   parser.kwMap["powOuterBond"] = __DO__(conf) { readLawData(conf, idPowOuterBond); };
   parser.kwMap["en2OuterBond"] = __DO__(conf) { readLawData(conf, idEn2OuterBond); };
+  
+  parser.kwMap["gcInnerBond"] = __DO__(conf) { readLawData(conf, idGcInnerBond); };
+  parser.kwMap["gcOuterBond"] = __DO__(conf) { readLawData(conf, idGcOuterBond); };
 
   parser.kwMap["iconf"] = __GET__(conf, iconf);
   parser.kwMap["nDriven"] = __GET__(conf, nDriven);
@@ -958,7 +971,7 @@ void Rockable::initParser() {
       BI.concernedBonds.resize(nbBonds);
 
       if (paramsInInterfaces == 1) {
-        conf >> BI.kn >> BI.kt >> BI.kr >> BI.fn0 >> BI.ft0 >> BI.mom0 >> BI.power;
+        conf >> BI.kn >> BI.kt >> BI.kr >> BI.fn0 >> BI.ft0 >> BI.mom0 >> BI.power >> BI.Gc;
       }
 
       bool missed = false;
@@ -1026,7 +1039,7 @@ void Rockable::initParser() {
   //          They are generally put at the end of the input file
   //          so that they apply on a system already set
 
-  const std::string commands[] = {"stickVerticesInClusters",
+  const std::string commands[] = {"stickBCM", "stickVerticesInClusters",
                                   "stickVerticesInClustersMoments",
                                   "stickClusters",
                                   "randomlyOrientedVelocities",
@@ -3240,6 +3253,48 @@ void Rockable::compute_SpringJoints() {
   }
 }
 
+void Rockable::check_breakage_of_interfaces() {
+  START_TIMER("check_breakage_of_interfaces");
+  
+  for (std::set<BreakableInterface*>::iterator BI = interfacesToBreak.begin(); BI != interfacesToBreak.end(); ++BI) {
+
+    if ((*BI)->breakModel == breakModel_Gc) {  // ========================================================
+
+      double kn = 0.0;
+      double kt = 0.0;
+      double Gc = 0.0;
+
+      int g1 = Particles[(*BI)->i].group;
+      int g2 = Particles[(*BI)->j].group;
+
+      if ((*BI)->isInner == true) {
+        kn = dataTable.get(idKnInnerBond, g1, g2);
+        kt = dataTable.get(idKtInnerBond, g1, g2);
+        Gc = dataTable.get(idGcInnerBond, g1, g2);
+      } else {  // Outer
+        kn = dataTable.get(idKnOuterBond, g1, g2);
+        kt = dataTable.get(idKtOuterBond, g1, g2);
+        Gc = dataTable.get(idGcOuterBond, g1, g2);
+      }
+
+      (*BI)->En = 0.0;
+      (*BI)->Et = 0.0;
+      for (size_t b = 0; b < (*BI)->concernedBonds.size(); ++b) {
+        Interaction* I = (*BI)->concernedBonds[b];
+        
+        if (I->dn > (*BI)->dn0) {
+          (*BI)->En += 0.5 * kn * (I->dn - (*BI)->dn0) * (I->dn - (*BI)->dn0);
+        }
+        (*BI)->Et += 0.5 * kt * norm2(I->ds);
+      }
+
+      if (((*BI)->En + (*BI)->Et) > 2.0 * (*BI)->area * Gc) {
+        interfacesToBreak.insert(*BI);
+      }
+    }
+  }
+}
+
 /**
  * Breaks the identified bonds in the interfaces.
  *
@@ -3261,6 +3316,7 @@ void Rockable::breakage_of_interfaces() {
 
     int g1 = Particles[(*BI)->i].group;
     int g2 = Particles[(*BI)->j].group;
+
     for (size_t b = 0; b < (*BI)->concernedBonds.size(); ++b) {  // concernedBonds includes the current bond
       (*BI)->concernedBonds[b]->stick = nullptr;                 // it unplugs the interface from the interaction
       if ((*BI)->concernedBonds[b]->dn >= 0.0) {
@@ -3288,12 +3344,14 @@ void Rockable::breakage_of_interfaces() {
       BI_it = (Interfaces[BIj]).find(*(*BI));
       if (BI_it != Interfaces[BIj].end()) {  // if it has been found
         Interfaces[BIj].erase(BI_it);
-      } else
+      } else {
         __shouldNeverHappen;
+      }
     }
 
     needUpdate = true;
-  }
+
+  }  // Loop BI
 }
 
 /**
@@ -3562,6 +3620,8 @@ void Rockable::accelerations() {
     }
   }
 #endif
+
+  check_breakage_of_interfaces();
 
   breakage_of_interfaces();
 

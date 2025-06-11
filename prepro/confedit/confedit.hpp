@@ -31,6 +31,10 @@
 #include <FL/fl_ask.H>
 #include <FL/x.H>  // for fl_open_callback
 
+#include "quat.hpp"
+#include "transformation.hpp"
+Transformation<double> globalTransformation;
+quat individualParticleRotation;
 #include "addParticle.hpp"
 
 const int with0 = 1000;

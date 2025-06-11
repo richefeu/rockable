@@ -59,6 +59,7 @@ std::streampos Np_pos = std::streampos(0);
 #include "addParticle.hpp"
 #include "generatePacking_grid.hpp"
 #include "generatePacking_wallBox.hpp"
+
 #include "generateShape_cube.hpp"
 #include "generateShape_cuboid.hpp"
 #include "generateShape_cuboid_container.hpp"
@@ -116,6 +117,7 @@ void readCommands(const char* name) {
     std::string line;
     getline(com, line);
     inplace_trim(line);
+    std::cout << "fileStream closed" << std::endl;
     *outputStream << line << '\n';
   };
 

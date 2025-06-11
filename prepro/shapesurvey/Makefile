@@ -7,8 +7,8 @@ UNAME_S := $(shell uname -s)
 # The compiler to be used
 ifeq ($(UNAME_S),Darwin)
   CXX = g++-14
-  GLUTFLAGS = `pkg-config --cflags glut`
-  GLLINK = `pkg-config --libs glut` -framework OpenGL
+  GLUTFLAGS = `pkg-config --cflags gl glu glut`
+  GLLINK = `pkg-config --libs gl glu glut` 
 else
   CXX = g++
 	GLLINK = -lGLU -lGL -L/usr/X11R6/lib -lglut -lXmu -lXext -lX11 -lXi

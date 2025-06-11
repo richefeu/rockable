@@ -122,12 +122,24 @@ struct mesh {
     box.min.set(1e20, 1e20, 1e20);
     box.max.set(-1e20, -1e20, -1e20);
     for (size_t i = 0; i < points.size(); i++) {
-      if (points[i].x < box.min.x) box.min.x = points[i].x;
-      if (points[i].y < box.min.y) box.min.y = points[i].y;
-      if (points[i].z < box.min.z) box.min.z = points[i].z;
-      if (points[i].x > box.max.x) box.max.x = points[i].x;
-      if (points[i].y > box.max.y) box.max.y = points[i].y;
-      if (points[i].z > box.max.z) box.max.z = points[i].z;
+      if (points[i].x < box.min.x) {
+        box.min.x = points[i].x;
+      }
+      if (points[i].y < box.min.y) {
+        box.min.y = points[i].y;
+      }
+      if (points[i].z < box.min.z) {
+        box.min.z = points[i].z;
+      }
+      if (points[i].x > box.max.x) {
+        box.max.x = points[i].x;
+      }
+      if (points[i].y > box.max.y) {
+        box.max.y = points[i].y;
+      }
+      if (points[i].z > box.max.z) {
+        box.max.z = points[i].z;
+      }
     }
     box.enlarge(radius);
   }

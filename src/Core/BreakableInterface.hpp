@@ -42,6 +42,9 @@
 
 class Interaction;
 
+const int breakModel_YieldSurface = 0;
+const int breakModel_Gc = 1;
+
 class BreakableInterface {
  public:
   size_t i;  ///< ID-number of the first particle
@@ -50,21 +53,34 @@ class BreakableInterface {
   // Be careful not to change the order of the following parameters
   // because they are accessed in Rockable::setVariableStickParams
   // with a shift relative to 'kn'
-  double kn;     ///< Embeded kn
-  double kt;     ///< Embeded kt
-  double kr;     ///< Embeded kr
-  double fn0;    ///< Embeded fn0
-  double ft0;    ///< Embeded ft0
-  double mom0;   ///< Embeded mom0
-  double power;  ///< Embeded power
+  double kn{0.0};     ///< Embeded kn
+  double kt{0.0};     ///< Embeded kt
+  double kr{0.0};     ///< Embeded kr
+  double fn0{0.0};    ///< Embeded fn0
+  double ft0{0.0};    ///< Embeded ft0
+  double mom0{0.0};   ///< Embeded mom0
+  double power{0.0};  ///< Embeded power
 
-  double dn0;  ///< distance for which fn = 0
+  // double cn{0.0};  ///< Embeded ???
+  // double ct{0.0};  ///< Embeded ???
+
+  double Gc{0.0};  ///< Embeded ???
+  // double gt{0.0};  ///< Embeded ???
+
+  int breakModel{breakModel_Gc};
+
+  double dn0{0.0};   ///< distance for which fn = 0
+  double area{0.0};  ///< ___
+  double En{0.0};    ///< ___
+  double Et{0.0};    ///< ___
 
   int isInner;  ///< Equals 1 if the interface is inside a cluster, 0 if it is in-between two different clusters
   std::vector<Interaction*> concernedBonds;  ///< Links to the connected points
 
   BreakableInterface();  // Ctor
   BreakableInterface(size_t I, size_t J);
+
+  // void computeAreaFromConcernedInnerBonds();
 };
 
 namespace std {
@@ -72,8 +88,12 @@ namespace std {
 template <>
 struct less<BreakableInterface> {
   bool operator()(const BreakableInterface& lhs, const BreakableInterface& rhs) const {
-    if (lhs.i < rhs.i) return true;
-    if (lhs.i == rhs.i && lhs.j < rhs.j) return true;
+    if (lhs.i < rhs.i) {
+      return true;
+    }
+    if (lhs.i == rhs.i && lhs.j < rhs.j) {
+      return true;
+    }
     return false;
   }
 };
@@ -81,8 +101,12 @@ struct less<BreakableInterface> {
 template <>
 struct less<BreakableInterface*> {
   bool operator()(const BreakableInterface* lhs, const BreakableInterface* rhs) const {
-    if (lhs->i < rhs->i) return true;
-    if (lhs->i == rhs->i && lhs->j < rhs->j) return true;
+    if (lhs->i < rhs->i) {
+      return true;
+    }
+    if (lhs->i == rhs->i && lhs->j < rhs->j) {
+      return true;
+    }
     return false;
   }
 };
