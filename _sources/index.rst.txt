@@ -33,9 +33,9 @@ Here is the non-exhaustive list of involved people with their main mission:
 
 - `Vincent Richefeu <vincent.richefeu@univ-grenoble-alpes.fr>`_ (Laboratoire 3SR, UGA): initiated the project
 - `Gael Combe <gael.combe@univ-grenoble-alpes.fr>`_ (Laboratoire 3SR, G-INP): mechanical modelling 
-- `Lhassan Amarsid <Lhassan.AMARSID@cea.fr>`_ (CEA): mechanical modelling, parallel computing
-- `Raphael Prat <Raphael.PRAT@cea.fr>`_ (CEA): parallel computing
-- `Jean-Mathieu Vanson <Jean-Mathieu.VANSON@cea.fr>`_ (CEA): mechanical modelling
+- `Lhassan Amarsid <lhassan.amarsid@cea.fr>`_ (CEA): mechanical modelling, parallel computing
+- `Raphael Prat <raphael.prat@cea.fr>`_ (CEA): parallel computing
+- `Jean-Mathieu Vanson <jean-mathieu.vanson@cea.fr>`_ (CEA): mechanical modelling
 - `Farhang Radjai <franck.radjai@umontpellier.fr>`_ (LMGC, CNRS): mechanical/physical Mentor
 - `Jean-Yves Delenne <jean-yves.delenne@inrae.fr>`_ (IATE, INRAE): mechanical/biological modelling
 - `Saeid Nezamabadi <saeid.nezamabadi@umontpellier.fr>`_ (LMGC, UM2): Non Smooth Discrete Element Method (NS-DEM)
@@ -74,3 +74,4 @@ Features
    integrationSchemes
    servoControllers
    preProcessing
+   fileOrganisation

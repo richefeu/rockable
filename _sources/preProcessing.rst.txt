@@ -12,7 +12,7 @@ Pre-processing commands
   Bonds are added when the distance is less than **Epsilon**.
   
 * ``setAllVelocities`` (*vec3r*) **velocity**
-  Set the velocity vector of all particles (that are not driven) to the prescribed value **velocity**.
+  Set the velocity vector of all particles (that are not driven) to the prescribed vector **velocity**.
 
 
 
