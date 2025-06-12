@@ -342,7 +342,7 @@ if(PNG_FOUND)
   # Pour le moment on compile sans libpng car il y a un problème sur mac
   # Les screenshots seront sauvegardés en tga
   if (NOT ${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
-    target_compile_options(see PRIVATE -DPNG_H)
+    #target_compile_options(see PRIVATE -DPNG_H)
   endif()
 endif()
 
