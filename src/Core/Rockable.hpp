@@ -343,6 +343,9 @@ class Rockable {
   // Postponed breakage of BreakableInterfaces
   std::set<BreakableInterface*> interfacesToBreak;  ///< Pointers to interfaces to be broken
 
+  std::set<BreakableInterface*> breakableInterfaces;
+  double totalBrokenArea = 0.0; // for tracking area of interface liberated during breakage
+
   // dynamic update of the Neighbor-List (NL)
   bool needUpdate;              ///< when true, an updateNL will be done at the next time increment
   double maxDeltaPos;           ///< Overall maximum displacement since the last updateNL

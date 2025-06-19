@@ -120,6 +120,9 @@ void stickBCM::exec() {
               std::pair<std::set<BreakableInterface>::iterator, bool> ret;
               ret = box->Interfaces[i].insert(BI_toInsert);
               BreakableInterface* BI = const_cast<BreakableInterface*>(std::addressof(*(ret.first)));
+
+              box->breakableInterfaces.insert(BI); // Add to global list for checking breakage
+
               Interaction I(i, j, vvType, iv, jv, Damp, BI);
               Interaction::UpdateDispatcher[vvType](I, box->Particles[i], box->Particles[j]);
               Interaction* Iptr = const_cast<Interaction*>(std::addressof(*((box->Interactions[i].insert(I)).first)));
