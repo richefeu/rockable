@@ -46,6 +46,7 @@
 #include "DataExtractors/DataExtractor_TrackBody.hpp"
 #include "DataExtractors/DataExtractor_TrackRockfall.hpp"
 #include "DataExtractors/DataExtractor_dnStat.hpp"
+#include "DataExtractors/DataExtractor_TrackDamage.hpp"
 
 #include "ForceLaws/ForceLaw_Avalanche.hpp"
 #include "ForceLaws/ForceLaw_BCM.hpp"
@@ -189,6 +190,7 @@ void Rockable::ExplicitRegistrations() {
   REGISTRER_BASE_DERIVED(DataExtractor, MeanVelocity);
   REGISTRER_BASE_DERIVED(DataExtractor, TrackBody);
   REGISTRER_BASE_DERIVED(DataExtractor, TrackRockfall);
+  REGISTRER_BASE_DERIVED(DataExtractor, TrackDamage);
 
   // ForceLaws
   REGISTRER_BASE_DERIVED(ForceLaw, Default);
@@ -3255,19 +3257,19 @@ void Rockable::compute_SpringJoints() {
 
 void Rockable::check_breakage_of_interfaces() {
   START_TIMER("check_breakage_of_interfaces");
-  
-  for (std::set<BreakableInterface*>::iterator BI = interfacesToBreak.begin(); BI != interfacesToBreak.end(); ++BI) {
 
-    if ((*BI)->breakModel == breakModel_Gc) {  // ========================================================
+  for (BreakableInterface* BI : breakableInterfaces) {  
+
+    if (BI->breakModel == breakModel_Gc) {  // ========================================================
 
       double kn = 0.0;
       double kt = 0.0;
       double Gc = 0.0;
 
-      int g1 = Particles[(*BI)->i].group;
-      int g2 = Particles[(*BI)->j].group;
+      int g1 = Particles[BI->i].group;
+      int g2 = Particles[BI->j].group;
 
-      if ((*BI)->isInner == true) {
+      if (BI->isInner == true) {
         kn = dataTable.get(idKnInnerBond, g1, g2);
         kt = dataTable.get(idKtInnerBond, g1, g2);
         Gc = dataTable.get(idGcInnerBond, g1, g2);
@@ -3277,19 +3279,19 @@ void Rockable::check_breakage_of_interfaces() {
         Gc = dataTable.get(idGcOuterBond, g1, g2);
       }
 
-      (*BI)->En = 0.0;
-      (*BI)->Et = 0.0;
-      for (size_t b = 0; b < (*BI)->concernedBonds.size(); ++b) {
-        Interaction* I = (*BI)->concernedBonds[b];
+      BI->En = 0.0;
+      BI->Et = 0.0;
+      for (size_t b = 0; b < BI->concernedBonds.size(); ++b) {
+        Interaction* I = BI->concernedBonds[b];
         
-        if (I->dn > (*BI)->dn0) {
-          (*BI)->En += 0.5 * kn * (I->dn - (*BI)->dn0) * (I->dn - (*BI)->dn0);
+        if (I->dn > BI->dn0) {
+          BI->En += 0.5 * kn * (I->dn - BI->dn0) * (I->dn - BI->dn0);
         }
-        (*BI)->Et += 0.5 * kt * norm2(I->ds);
+        BI->Et += 0.5 * kt * norm2(I->ds);
       }
 
-      if (((*BI)->En + (*BI)->Et) > 2.0 * (*BI)->area * Gc) {
-        interfacesToBreak.insert(*BI);
+      if ((BI->En + BI->Et) > 2.0 * BI->area * Gc) {
+        interfacesToBreak.insert(BI);
       }
     }
   }
@@ -3335,6 +3337,16 @@ void Rockable::breakage_of_interfaces() {
     }
 
     // Remove the interface
+
+    // Add interface area to liberated total before erasing
+    totalBrokenArea += (*BI)->area;
+
+    // First remove the pointer from the global list (avoid dangling)
+    auto it_bi_global = std::find(breakableInterfaces.begin(), breakableInterfaces.end(), *BI);
+    if (it_bi_global != breakableInterfaces.end()) {     
+      breakableInterfaces.erase(it_bi_global);  // safe to remove before deletion
+    }
+
     size_t BIi = (*BI)->i;
     std::set<BreakableInterface>::iterator BI_it = (Interfaces[BIi]).find(*(*BI));
     if (BI_it != Interfaces[BIi].end()) {  // if it has been found
