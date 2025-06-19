@@ -3256,6 +3256,9 @@ void Rockable::compute_SpringJoints() {
 void Rockable::check_breakage_of_interfaces() {
   START_TIMER("check_breakage_of_interfaces");
   
+  // problème : il faut looper sur les interfaces pas les interfaces à casser !!!!!!!
+  
+  
   for (std::set<BreakableInterface*>::iterator BI = interfacesToBreak.begin(); BI != interfacesToBreak.end(); ++BI) {
 
     if ((*BI)->breakModel == breakModel_Gc) {  // ========================================================
