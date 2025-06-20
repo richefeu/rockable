@@ -1,0 +1,67 @@
+open shapes.txt
+generateShape:cube c 0.1 1.0
+generateShape:rectangle_xz Platen 1e-2 5.0 5.0
+close
+
+open input.txt
+print Rockable 21-08-2022
+print 
+print #### time #############################
+print t 0
+print tmax 1
+print dt 1e-7
+print interVerlet 5e-4
+print interConf 0.02
+print 
+print #### proximity of the particles #######
+print DVerlet 0.004
+print dVerlet 0.001
+print 
+print #### properties for particles #########
+print density 0 6000
+print density 1 6000
+print 
+print #### interaction model ################
+print numericalDampingCoeff 0.0
+print gravity 0 0 0
+print forceLaw StickedLinks
+print 
+print #### interaction parameters ###########
+print knContact 0 1 1e8
+print en2Contact 0 1 0.001
+print ktContact 0 1 8e7
+print muContact 0 1 0.3
+print krContact 0 1 8e7
+print murContact 0 1 0.0
+print
+print knContact 0 0 1e8
+print en2Contact 0 0 0.001
+print ktContact 0 0 8e7
+print muContact 0 0 0.3
+print krContact 0 0 8e7
+print murContact 0 0 0.0
+print 
+print knInnerBond 0 0 1e7
+print en2InnerBond 0 0 0.999
+print ktInnerBond 0 0 0.8e7
+print fn0InnerBond 0 0 30e4
+print ft0InnerBond 0 0 30e4
+print powInnerBond 0 0 2.0
+print
+print #### the system #######################
+print iconf 0
+print nDriven 1
+print shapeFile shapes.txt
+print Particles 3
+
+
+print Platen 1 1 1    0 -2 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
+
+print c 0 0 1    0 0 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
+print c 0 0 1    0 1 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
+
+  
+print setAllVelocities 0 0 0
+print stickVerticesInClusters 0.02
+
+close

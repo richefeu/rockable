@@ -1,0 +1,57 @@
+Rockable 21-08-2022
+
+#### time #############################
+t 0
+tmax 0.16
+dt 1e-7
+interVerlet 5e-4
+interConf 0.02
+
+#### proximity of the particles #######
+DVerlet 0.004
+dVerlet 0.001
+
+#### properties for particles #########
+density 0 6000
+density 1 6000
+
+#### interaction model ################
+numericalDampingCoeff 0.0
+gravity 0 0 0
+forceLaw BCM
+
+#### interaction parameters ###########
+knContact 0 1 1e8
+en2Contact 0 1 0.001
+ktContact 0 1 8e7
+muContact 0 1 0.3
+krContact 0 1 8e7
+murContact 0 1 0.0
+
+knContact 0 0 1e8
+en2Contact 0 0 0.001
+ktContact 0 0 8e7
+muContact 0 0 0.3
+krContact 0 0 8e7
+murContact 0 0 0.0
+
+knInnerBond 0 0 1e7
+en2InnerBond 0 0 0.999
+ktInnerBond 0 0 0.8e7
+fn0InnerBond 0 0 30e4
+ft0InnerBond 0 0 30e4
+powInnerBond 0 0 2.0
+gcInnerBond 0 0 0.2
+
+#### the system #######################
+iconf 0
+nDriven 1
+shapeFile shapes.txt
+Particles 3
+Platen 1 1 1    0 -1 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
+c 0 0 1    0 0 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
+c 0 0 1    0 1 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
+#c 0 0 1    0.8 2 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
+setAllVelocities 0 -10 0
+#stickVerticesInClusters 0.1
+stickBCM 0.1

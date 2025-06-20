@@ -61,11 +61,7 @@ class BreakableInterface {
   double mom0{0.0};   ///< Embeded mom0
   double power{0.0};  ///< Embeded power
 
-  // double cn{0.0};  ///< Embeded ???
-  // double ct{0.0};  ///< Embeded ???
-
   double Gc{0.0};  ///< Embeded ???
-  // double gt{0.0};  ///< Embeded ???
 
   int breakModel{breakModel_Gc};
 

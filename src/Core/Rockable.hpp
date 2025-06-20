@@ -337,11 +337,14 @@ class Rockable {
   size_t idMom0OuterBond;  ///< Identifier of threshold bendind-moment for outer-bonds
   size_t idPowOuterBond;   ///< Identifier of power in yield function for outer-bonds
   
-  size_t idGcInnerBond;
-  size_t idGcOuterBond;
+  size_t idGcInnerBond;    ///< ____
+  size_t idGcOuterBond;    ///< ____
 
   // Postponed breakage of BreakableInterfaces
   std::set<BreakableInterface*> interfacesToBreak;  ///< Pointers to interfaces to be broken
+
+  std::set<BreakableInterface*> breakableInterfaces;
+  double totalBrokenArea = 0.0; // for tracking area of interface liberated during breakage
 
   // dynamic update of the Neighbor-List (NL)
   bool needUpdate;              ///< when true, an updateNL will be done at the next time increment
