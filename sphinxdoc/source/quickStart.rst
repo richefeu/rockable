@@ -80,6 +80,52 @@ It is sometimes necessary to remove all object files (.o) together with the comp
 
    make clean
 
+Compilation with spack
+----------------------
+
+
+This external library is available here: https://github.com/richefeu/rockable, this installation does not require direct download of `Rockable`.
+
+Installation of `Rockable` via `spack`:
+
+.. code-block:: bash
+  
+  git clone git clone --depth=2 --branch=v0.23.0 https://github.com/spack/spack.git
+  source spack/share/spack/setup-env.sh
+  git clone https://github.com/Collab4exaNBody/spack-repos.git
+  spack repo add spack-repos
+  spack external find opengl
+  spack install rockable+see
+
+
+Use `Rockable`:
+
+.. code-block:: bash
+
+  spack load rockable
+  rockable file.conf -j 10
+  see conf0
+
+Available options:
+
+.. code-block:: bash
+
+    conftovtk [true]            false, true
+        Convert conf files to VTK
+    postpro [false]             false, true
+        Compile the application to run post-processing commands
+    prepro [true]               false, true
+        Compile the preprocessing tools
+    see [true]                  false, true
+        Compile the glut application to visualize the conf-files
+    see2 [false]                false, true
+        Compile the glfw application to visualize the conf-files
+    see3 [false]                false, true
+        Compile the application to edit graphically the input files
+
+.. warning::
+
+  * Not all option combinations are tested continuously. 
 
 Running a simulation
 --------------------
