@@ -52,6 +52,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#what-is-rockable">What is Rockable?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#compilation-with-cmake">Compilation with cmake</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#compilation-with-makefile">Compilation with <cite>Makefile</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#compilation-with-spack">Compilation with spack</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#running-a-simulation">Running a simulation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#visualising-the-simulations">Visualising the simulations</a></li>
 </ul>
@@ -153,6 +154,46 @@ Finally, the applications run and see can be compiled with the following command
 <p>It is sometimes necessary to remove all object files (.o) together with the compiled applications. this can be made with:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>clean
 </pre></div>
+</div>
+</section>
+<section id="compilation-with-spack">
+<h2>Compilation with spack<a class="headerlink" href="#compilation-with-spack" title="Permalink to this heading"></a></h2>
+<p>This external library is available here: <a class="reference external" href="https://github.com/richefeu/rockable">https://github.com/richefeu/rockable</a>, this installation does not require direct download of <cite>Rockable</cite>.</p>
+<p>Installation of <cite>Rockable</cite> via <cite>spack</cite>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>--depth<span class="o">=</span><span class="m">2</span><span class="w"> </span>--branch<span class="o">=</span>v0.23.0<span class="w"> </span>https://github.com/spack/spack.git
+<span class="nb">source</span><span class="w"> </span>spack/share/spack/setup-env.sh
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Collab4exaNBody/spack-repos.git
+spack<span class="w"> </span>repo<span class="w"> </span>add<span class="w"> </span>spack-repos
+spack<span class="w"> </span>external<span class="w"> </span>find<span class="w"> </span>opengl
+spack<span class="w"> </span>install<span class="w"> </span>rockable+see
+</pre></div>
+</div>
+<p>Use <cite>Rockable</cite>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>spack<span class="w"> </span>load<span class="w"> </span>rockable
+rockable<span class="w"> </span>file.conf<span class="w"> </span>-j<span class="w"> </span><span class="m">10</span>
+see<span class="w"> </span>conf0
+</pre></div>
+</div>
+<p>Available options:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conftovtk<span class="w"> </span><span class="o">[</span>true<span class="o">]</span><span class="w">            </span>false,<span class="w"> </span><span class="nb">true</span>
+<span class="w">    </span>Convert<span class="w"> </span>conf<span class="w"> </span>files<span class="w"> </span>to<span class="w"> </span>VTK
+postpro<span class="w"> </span><span class="o">[</span>false<span class="o">]</span><span class="w">             </span>false,<span class="w"> </span><span class="nb">true</span>
+<span class="w">    </span>Compile<span class="w"> </span>the<span class="w"> </span>application<span class="w"> </span>to<span class="w"> </span>run<span class="w"> </span>post-processing<span class="w"> </span>commands
+prepro<span class="w"> </span><span class="o">[</span>true<span class="o">]</span><span class="w">               </span>false,<span class="w"> </span><span class="nb">true</span>
+<span class="w">    </span>Compile<span class="w"> </span>the<span class="w"> </span>preprocessing<span class="w"> </span>tools
+see<span class="w"> </span><span class="o">[</span>true<span class="o">]</span><span class="w">                  </span>false,<span class="w"> </span><span class="nb">true</span>
+<span class="w">    </span>Compile<span class="w"> </span>the<span class="w"> </span>glut<span class="w"> </span>application<span class="w"> </span>to<span class="w"> </span>visualize<span class="w"> </span>the<span class="w"> </span>conf-files
+see2<span class="w"> </span><span class="o">[</span>false<span class="o">]</span><span class="w">                </span>false,<span class="w"> </span><span class="nb">true</span>
+<span class="w">    </span>Compile<span class="w"> </span>the<span class="w"> </span>glfw<span class="w"> </span>application<span class="w"> </span>to<span class="w"> </span>visualize<span class="w"> </span>the<span class="w"> </span>conf-files
+see3<span class="w"> </span><span class="o">[</span>false<span class="o">]</span><span class="w">                </span>false,<span class="w"> </span><span class="nb">true</span>
+<span class="w">    </span>Compile<span class="w"> </span>the<span class="w"> </span>application<span class="w"> </span>to<span class="w"> </span>edit<span class="w"> </span>graphically<span class="w"> </span>the<span class="w"> </span>input<span class="w"> </span>files
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<ul class="simple">
+<li><p>Not all option combinations are tested continuously.</p></li>
+</ul>
 </div>
 </section>
 <section id="running-a-simulation">
