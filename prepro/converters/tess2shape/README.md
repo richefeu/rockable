@@ -14,7 +14,7 @@ Here are the step-by-step commands
 cd src
 mkdir build
 cd build
-cmake .. -DCMAKE_CXX_COMPILER=g++-10 -DCMAKE_C_COMPILER=gcc-10
+cmake .. -DCMAKE_CXX_COMPILER=g++-14 -DCMAKE_C_COMPILER=gcc-14
 make
 make install
 ``` 
@@ -27,11 +27,8 @@ make install
 
 
 ```sh
-neper -T -n 100 -domain "sphere(1,1000)" -morpho graingrowth 
-neper -V n100-id1.tess -datacellcol id -datacelltrs 0.5 -cameraangle 12 -imagesize 600:600 -showedge "polynb>1" -cameraangle 9 -print preview
+neper -T -n from_morpho -domain "sphere(1,500)" -morpho "graingrowth(0.2)" -morphooptistop "val<0.01||iter>=2000" -o tessel
+neper -V tessel.tess -datacellcol id -datacelltrs 0.5 -imagesize 600:600 -showedge "polynb>1" -cameraangle 9 -print preview
+open preview.png
 ```
 
-
-```
-neper -T -n 100 -domain "sphere(1,1000)" -format stl:bycell
-```

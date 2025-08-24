@@ -30,5 +30,4 @@ else()
   
 endif()
 
-#install(TARGETS shapeSurvey DESTINATION ./)
 install(TARGETS shapeSurvey)

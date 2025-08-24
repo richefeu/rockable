@@ -243,5 +243,5 @@ Visualising the simulations
 ---------------------------
 
 Normally, the application ``see`` has been built as the same time than ``rockable``. 
-The application ``see`` needs ``freeglut``, the simplest way to use openMP and display 3D things.
-
+The application ``see`` needs ``freeglut``, the simplest way to use openGL and display 3D things.
+For more details, see :ref:`Visualisation`.

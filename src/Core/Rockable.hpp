@@ -51,16 +51,15 @@
 #include <utility>
 #include <vector>
 
-// #define SPGLOG_HEADER_ONLY
-// #define FMT_HEADER_ONLY
-// #include <spdlog/sinks/stdout_color_sinks.h>
-// #include <spdlog/spdlog.h>
-
 #define FMT_HEADER_ONLY
 #include "fmtLogger.hpp"
 
 #ifdef _OPENMP
 #include <omp.h>
+#endif
+
+#ifndef ROCKABLE_GIT_TAG
+#define ROCKABLE_GIT_TAG "unknown"
 #endif
 
 // toofus headers
@@ -336,15 +335,15 @@ class Rockable {
   size_t idFt0OuterBond;   ///< Identifier of tangential threshold force for outer-bonds
   size_t idMom0OuterBond;  ///< Identifier of threshold bendind-moment for outer-bonds
   size_t idPowOuterBond;   ///< Identifier of power in yield function for outer-bonds
-  
-  size_t idGcInnerBond;    ///< ____
-  size_t idGcOuterBond;    ///< ____
+
+  size_t idGcInnerBond;  ///< Identifier of ____
+  size_t idGcOuterBond;  ///< Identifier of ____
 
   // Postponed breakage of BreakableInterfaces
   std::set<BreakableInterface*> interfacesToBreak;  ///< Pointers to interfaces to be broken
 
   std::set<BreakableInterface*> breakableInterfaces;
-  double totalBrokenArea = 0.0; // for tracking area of interface liberated during breakage
+  double totalBrokenArea{0.0};  // for tracking area of interface liberated during breakage
 
   // dynamic update of the Neighbor-List (NL)
   bool needUpdate;              ///< when true, an updateNL will be done at the next time increment

@@ -366,6 +366,7 @@ void init_keywords() {
 void init_types() {
   // code_types.insert(std::string("____"));
 
+  // yes/no
   code_types.insert(std::string("y"));
   code_types.insert(std::string("n"));
 
@@ -433,7 +434,9 @@ void init_types() {
 
 void style_parse(const char* text, char* style, int length) {
   for (int i = 0; i < length; i++) {
-    if (text[i] != '\n') style[i] = 'A';
+    if (text[i] != '\n') {
+      style[i] = 'A';
+    }
   }
   std::istringstream is((char*)text);
 
@@ -447,7 +450,9 @@ void style_parse(const char* text, char* style, int length) {
       from -= token.size();
       getline(is, token);  // ignore the rest of the current line
       int to = is.tellg();
-      for (int pos = from; pos < to; pos++) style[pos] = 'B';
+      for (int pos = from; pos < to; pos++) {
+        style[pos] = 'B';
+      }
       is >> token;  // next token before continuing
       continue;
     } else {
@@ -455,13 +460,17 @@ void style_parse(const char* text, char* style, int length) {
       if (it != code_keywords.end()) {
         int to = is.tellg();
         int from = to - token.size();
-        for (int pos = from; pos < to; pos++) style[pos] = 'D';
+        for (int pos = from; pos < to; pos++) {
+          style[pos] = 'D';
+        }
       } else {
         std::set<std::string>::iterator ittype = code_types.find(token);
         if (ittype != code_types.end()) {
           int to = is.tellg();
           int from = to - token.size();
-          for (int pos = from; pos < to; pos++) style[pos] = 'C';
+          for (int pos = from; pos < to; pos++) {
+            style[pos] = 'C';
+          }
         }
       }
     }
@@ -477,7 +486,9 @@ void style_init(void) {
   memset(style, 'A', textbuf->length());
   style[textbuf->length()] = '\0';
 
-  if (!stylebuf) stylebuf = new Fl_Text_Buffer(textbuf->length());
+  if (!stylebuf) {
+    stylebuf = new Fl_Text_Buffer(textbuf->length());
+  }
 
   style_parse(text, style, textbuf->length());
 
@@ -534,10 +545,11 @@ void style_update(int pos,                      // I - Position of update
   end = textbuf->line_end(pos + nInserted);
   text = textbuf->text_range(start, end);
   style = stylebuf->text_range(start, end);
-  if (start == end)
+  if (start == end) {
     last = 0;
-  else
+  } else {
     last = style[end - start - 1];
+  }
 
   style_parse(text, style, end - start);
 
@@ -687,26 +699,31 @@ void load_file(const char* newfile, int ipos) {
   loading = 1;
   int insert = (ipos != -1);
   changed = insert;
-  if (!insert) strcpy(filename, "");
+  if (!insert) {
+    strcpy(filename, "");
+  }
   int r;
-  if (!insert)
+  if (!insert) {
     r = textbuf->loadfile(newfile);
-  else
+  } else {
     r = textbuf->insertfile(newfile, ipos);
+  }
   changed = changed || textbuf->input_file_was_transcoded;
-  if (r)
+  if (r) {
     fl_alert("Error reading from file \'%s\':\n%s.", newfile, strerror(errno));
-  else if (!insert)
+  } else if (!insert) {
     strcpy(filename, newfile);
+  }
   loading = 0;
   textbuf->call_modify_callbacks();
 }
 
 void save_file(const char* newfile) {
-  if (textbuf->savefile(newfile))
+  if (textbuf->savefile(newfile)) {
     fl_alert("Error writing to file \'%s\':\n%s.", newfile, strerror(errno));
-  else
+  } else {
     strcpy(filename, newfile);
+  }
   changed = 0;
   textbuf->call_modify_callbacks();
 }
@@ -741,10 +758,11 @@ void wordwrap_cb(Fl_Widget* w, void* v) {
   EditorWindow* e = (EditorWindow*)v;
   Fl_Menu_Bar* m = (Fl_Menu_Bar*)w;
   const Fl_Menu_Item* i = m->mvalue();
-  if (i->value())
+  if (i->value()) {
     e->editor->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
-  else
+  } else {
     e->editor->wrap_mode(Fl_Text_Display::WRAP_NONE, 0);
+  }
   e->wrap_mode = (i->value() ? 1 : 0);
   e->redraw();
 }
@@ -776,39 +794,51 @@ void find2_cb(Fl_Widget* w, void* v) {
     textbuf->select(pos, pos + strlen(e->search));
     e->editor->insert_position(pos + strlen(e->search));
     e->editor->show_insert_position();
-  } else
+  } else {
     fl_alert("No occurrences of \'%s\' found!", e->search);
+  }
 }
 
 void set_title(Fl_Window* w) {
-  if (filename[0] == '\0')
+  if (filename[0] == '\0') {
     strcpy(title, "Untitled");
-  else {
+  } else {
     char* slash;
     slash = strrchr(filename, '/');
 #ifdef WIN32
-    if (slash == NULL) slash = strrchr(filename, '\\');
+    if (slash == NULL) {
+      slash = strrchr(filename, '\\');
+    }
 #endif
-    if (slash != NULL)
+    if (slash != NULL) {
       strcpy(title, slash + 1);
-    else
+    } else {
       strcpy(title, filename);
+    }
   }
 
-  if (changed) strcat(title, " (modified)");
+  if (changed) {
+    strcat(title, " (modified)");
+  }
 
   w->label(title);
 }
 
 void changed_cb(int, int nInserted, int nDeleted, int, const char*, void* v) {
-  if ((nInserted || nDeleted) && !loading) changed = 1;
+  if ((nInserted || nDeleted) && !loading) {
+    changed = 1;
+  }
   EditorWindow* w = (EditorWindow*)v;
   set_title(w);
-  if (loading) w->editor->show_insert_position();
+  if (loading) {
+    w->editor->show_insert_position();
+  }
 }
 
 void new_cb(Fl_Widget*, void*) {
-  if (!check_save()) return;
+  if (!check_save()) {
+    return;
+  }
 
   filename[0] = '\0';
   textbuf->select(0, textbuf->length());
@@ -818,11 +848,15 @@ void new_cb(Fl_Widget*, void*) {
 }
 
 void open_cb(Fl_Widget*, void*) {
-  if (!check_save()) return;
+  if (!check_save()) {
+    return;
+  }
   Fl_Native_File_Chooser fnfc;
   fnfc.title("Open file");
   fnfc.type(Fl_Native_File_Chooser::BROWSE_FILE);
-  if (fnfc.show()) return;
+  if (fnfc.show()) {
+    return;
+  }
   load_file(fnfc.filename(), -1);
 }
 
@@ -830,7 +864,9 @@ void insert_cb(Fl_Widget*, void* v) {
   Fl_Native_File_Chooser fnfc;
   fnfc.title("Insert file");
   fnfc.type(Fl_Native_File_Chooser::BROWSE_FILE);
-  if (fnfc.show()) return;
+  if (fnfc.show()) {
+    return;
+  }
   EditorWindow* w = (EditorWindow*)v;
   load_file(fnfc.filename(), w->editor->insert_position());
 }
@@ -844,7 +880,9 @@ void close_cb(Fl_Widget*, void* v) {
   EditorWindow* w = (EditorWindow*)v;
 
   if (num_windows == 1) {
-    if (!check_save()) return;
+    if (!check_save()) {
+      return;
+    }
   }
 
   w->hide();
@@ -854,11 +892,15 @@ void close_cb(Fl_Widget*, void* v) {
   Fl::delete_widget(w);
 
   num_windows--;
-  if (!num_windows) exit(0);
+  if (!num_windows) {
+    exit(0);
+  }
 }
 
 void quit_cb(Fl_Widget*, void*) {
-  if (changed && !check_save()) return;
+  if (changed && !check_save()) {
+    return;
+  }
 
   exit(0);
 }
@@ -897,8 +939,9 @@ void replace2_cb(Fl_Widget*, void* v) {
     textbuf->select(pos, pos + strlen(replace));
     e->editor->insert_position(pos + strlen(replace));
     e->editor->show_insert_position();
-  } else
+  } else {
     fl_alert("No occurrences of \'%s\' found!", find);
+  }
 }
 
 void replall_cb(Fl_Widget*, void* v) {
@@ -934,10 +977,11 @@ void replall_cb(Fl_Widget*, void* v) {
     }
   }
 
-  if (times)
+  if (times) {
     fl_message("Replaced %d occurrences.", times);
-  else
+  } else {
     fl_alert("No occurrences of \'%s\' found!", find);
+  }
 }
 
 void replcan_cb(Fl_Widget*, void* v) {
@@ -964,15 +1008,18 @@ void save_cb() {
     // No filename - get one!
     saveas_cb();
     return;
-  } else
+  } else {
     save_file(filename);
+  }
 }
 
 void saveas_cb() {
   Fl_Native_File_Chooser fnfc;
   fnfc.title("Save File As?");
   fnfc.type(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
-  if (fnfc.show()) return;
+  if (fnfc.show()) {
+    return;
+  }
   save_file(fnfc.filename());
 }
 
@@ -1027,11 +1074,11 @@ int main(int argc, char** argv) {
 
   window->show(1, argv);
 
-  //#ifndef __APPLE__
+  // #ifndef __APPLE__
   if (argc > 1) {
     load_file(argv[1], -1);
   }
-  //#endif
+  // #endif
 
   return Fl::run();
 }

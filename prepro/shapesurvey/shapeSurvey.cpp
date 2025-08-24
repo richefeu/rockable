@@ -1,7 +1,7 @@
 #include "shapeSurvey.hpp"
 
 #include "fileTool.hpp"
-#include "glutTools.hpp"
+#include "glTools.hpp"
 
 void printHelp() {
   switch2D::go(width, height);
@@ -20,26 +20,26 @@ void printHelp() {
   int dhline = -15;
   int hline = height;
 #define _nextLine_ (hline += dhline)
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[A][a]   Tune alpha (transparency)");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[b]      Background (color gradient) on/off");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_,
+  glText::print(15, _nextLine_, "[A][a]   Tune alpha (transparency)");
+  glText::print(15, _nextLine_, "[b]      Background (color gradient) on/off");
+  glText::print(15, _nextLine_,
                 "[c]      Compute mass properties of the current shape (only "
                 "if preCompDone = n)");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_,
+  glText::print( 15, _nextLine_,
                 "[C]      Compute mass properties of ALL shapes (only if "
                 "preCompDone = n)");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[d]      delete duplicated edges in all shapes");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[e]      print extents of the current shape");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[h]      Show this help");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[K][k]   Tune the level of displayed OBB-tree");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[N][n]   Tune number of Monte-Carlo steps");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[p]      Export as particles (Rockable sample)");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[q]      Quit");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[s]      Save the shape library");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[t]      Compute the OBB-tree of the current shape");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[W][w]   Rotate arround the view axis");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[+][-]   Navigate through the shapes");
-  glText::print(GLUT_BITMAP_8_BY_13, 15, _nextLine_, "[*]      reset preCompDone to 'n'");
+  glText::print(15, _nextLine_, "[d]      delete duplicated edges in all shapes");
+  glText::print(15, _nextLine_, "[e]      print extents of the current shape");
+  glText::print(15, _nextLine_, "[h]      Show this help");
+  glText::print(15, _nextLine_, "[K][k]   Tune the level of displayed OBB-tree");
+  glText::print(15, _nextLine_, "[N][n]   Tune number of Monte-Carlo steps");
+  glText::print(15, _nextLine_, "[p]      Export as particles (Rockable sample)");
+  glText::print(15, _nextLine_, "[q]      Quit");
+  glText::print(15, _nextLine_, "[s]      Save the shape library");
+  glText::print(15, _nextLine_, "[t]      Compute the OBB-tree of the current shape");
+  glText::print(15, _nextLine_, "[W][w]   Rotate arround the view axis");
+  glText::print(15, _nextLine_, "[+][-]   Navigate through the shapes");
+  glText::print(15, _nextLine_, "[*]      reset preCompDone to 'n'");
 #undef _nextLine_
 
   switch2D::back();
@@ -176,7 +176,8 @@ void keyboard(unsigned char Key, int /*x*/, int /*y*/) {
 void mouse(int button, int state, int x, int y) {
   if (state == GLUT_UP) {
     mouse_mode = NOTHING;
-    display();
+    //display();
+    glutPostRedisplay();
   } else if (state == GLUT_DOWN) {
     mouse_start[0] = x;
     mouse_start[1] = y;
@@ -246,35 +247,36 @@ void motion(int x, int y) {
   mouse_start[0] = x;
   mouse_start[1] = y;
 
-  display();
+  //display();
+  glutPostRedisplay();
 }
 
 void drawInfo() {
   switch2D::go(width, height);
   glColor3f(1.0f, 0.388f, 0.278f);  // dark-orange
 
-  glText::print(GLUT_BITMAP_9_BY_15, 10, 10, "Shape %lu/%lu, named %s", ishape + 1, Shapes.size(),
+  glText::print(10, 10, "Shape %lu/%lu, named %s", ishape + 1, Shapes.size(),
                 Shapes[ishape].name.c_str());
-  glText::print(GLUT_BITMAP_9_BY_15, 10, 25, "Radius = %g, OBBtreeLevel = %d", Shapes[ishape].radius, maxOBBLevel);
-  glText::print(GLUT_BITMAP_9_BY_15, 10, 40, "nb vertex = %lu, nb edge = %lu, nb face = %lu",
+  glText::print(10, 25, "Radius = %g, OBBtreeLevel = %d", Shapes[ishape].radius, maxOBBLevel);
+  glText::print(10, 40, "nb vertex = %lu, nb edge = %lu, nb face = %lu",
                 Shapes[ishape].vertex.size(), Shapes[ishape].edge.size(), Shapes[ishape].face.size());
-  glText::print(GLUT_BITMAP_9_BY_15, 10, 55, "preCompDone %c", Shapes[ishape].preCompDone);
+  glText::print(10, 55, "preCompDone %c", Shapes[ishape].preCompDone);
 
   if (Shapes[ishape].preCompDone == 'y') glColor3f(0.153f, 0.486f, 0.22f);  // green
 
-  glText::print(GLUT_BITMAP_9_BY_15, 10, 70, "MCnstep = %lu, Volume = %g", Shapes[ishape].MCnstep,
+  glText::print(10, 70, "MCnstep = %lu, Volume = %g", Shapes[ishape].MCnstep,
                 Shapes[ishape].volume);
   std::string v = "Solid";
   if (Shapes[ishape].isSurface) v = "Surface";
 
-  glText::print(GLUT_BITMAP_9_BY_15, 10, 85, "I/m %g %g %g (%s)", Shapes[ishape].inertia_mass[0],
+  glText::print(10, 85, "I/m %g %g %g (%s)", Shapes[ishape].inertia_mass[0],
                 Shapes[ishape].inertia_mass[1], Shapes[ishape].inertia_mass[2], v.c_str());
 
   switch2D::back();
 }
 
 void display() {
-  glutTools::clearBackground(show_background);
+  glTools::clearBackground(show_background);
   adjust_clipping_plans();
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
@@ -290,7 +292,7 @@ void display() {
   drawShape(ishape);
 
   glColor3f(0.8f, 0.11f, 0.78f);
-  glutShape::drawObb(Shapes[ishape].obb);
+  glShape::obb(Shapes[ishape].obb);
 
   drawObbLevel(ishape, maxOBBLevel);
 
@@ -344,7 +346,7 @@ void recursiveDrawOBB(OBBnode<subBox>* node, int wantedLevel, int level) {
   }
 
   if (level == wantedLevel) {
-    glutShape::drawObb(node->boundary);
+    glShape::obb(node->boundary);
   }
 
   if (node->first != nullptr) {
@@ -369,11 +371,11 @@ void drawFrame() {
   double len = diag.length() * 0.333;
 
   glColor3f(1.0f, 0.0f, 0.0f);
-  glutShape::drawArrow(vec3r::zero(), len * vec3r::unit_x());
+  glShape::arrow(vec3r::zero(), len * vec3r::unit_x());
   glColor3f(0.0f, 1.0f, 0.0f);
-  glutShape::drawArrow(vec3r::zero(), len * vec3r::unit_y());
+  glShape::arrow(vec3r::zero(), len * vec3r::unit_y());
   glColor3f(0.0f, 0.0f, 1.0f);
-  glutShape::drawArrow(vec3r::zero(), len * vec3r::unit_z());
+  glShape::arrow(vec3r::zero(), len * vec3r::unit_z());
 }
 
 void drawShape(size_t ishp) {
@@ -393,7 +395,7 @@ void drawShape(size_t ishp) {
     vec3r pos = Shapes[ishp].vertex[v];
     glPushMatrix();
     glTranslatef(pos.x, pos.y, pos.z);
-    glutShape::sphere(R, 3);
+    glShape::sphere(R, 3);
     glPopMatrix();
   }
 
@@ -403,7 +405,7 @@ void drawShape(size_t ishp) {
     size_t iend = Shapes[ishp].edge[e].second;
     vec3r orig = Shapes[ishp].vertex[ideb];
     vec3r arrow = Shapes[ishp].vertex[iend] - orig;
-    glutShape::drawTube(orig, arrow, 2.0 * R);
+    glShape::tube(orig, arrow, 2.0 * R);
   }
 
   size_t nf = Shapes[ishp].face.size();
@@ -573,6 +575,8 @@ int main(int argc, char* argv[]) {
   // ==== Menu
   buildMenu();
   glutAttachMenu(GLUT_RIGHT_BUTTON);
+
+  glText::init();
 
   // ==== Init the visualizer
   center.set(0.0, 0.0, 0.0);  // where we look at

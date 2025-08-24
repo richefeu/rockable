@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Rockable'
-copyright = '2020-2023, Vincent Richefeu'
+copyright = '2020-2025, Vincent Richefeu'
 author = 'Vincent Richefeu'
 
 # The full version, including alpha/beta/rc tags

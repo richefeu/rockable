@@ -333,7 +333,9 @@ bool Rockable::isInteractive() const { return interactiveMode; }
 void Rockable::showBanner() {
   std::cout << "\n\n";
   std::cout << msg::bold() << msg::fg_lightBlue() << "   Rockable" << msg::fg_default() << msg::normal()
-            << "  Copyright (C) 2016-2024  <vincent.richefeu@univ-grenoble-alpes.fr>\n";
+            << "  Copyright (C) 2016-2025  <vincent.richefeu@univ-grenoble-alpes.fr>\n";
+  std::cout << "   GIT TAG = " << ROCKABLE_GIT_TAG << "\n";
+  std::cout << "   LAST COMMIT DATE = " << ROCKABLE_LAST_COMMIT_DATE << "\n";
   std::cout << "   This program comes with ABSOLUTELY NO WARRANTY.\n";
   std::cout << "   " << msg::bold() << msg::fg_lightBlue() << "This is academic software" << msg::fg_default()
             << msg::normal() << "\n\n";
@@ -391,7 +393,7 @@ void Rockable::setOpenMPThreads(int nbThreads) {
   omp_set_num_threads(nbThreads);
   Logger::info("OpenMP acceleration (Number of threads = {})", nbThreads);
 #else
-  Logger::info("No multithreading");
+  Logger::info("No OpenMP multithreading");
 #endif
 }
 

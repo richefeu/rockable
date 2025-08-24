@@ -482,7 +482,7 @@ void Tess2Shape::writeRockableShapeFile() {
 void Tess2Shape::writeRockableParticles(std::ostream& os) {
   for (size_t i = 0; i < Shapes.size(); i++) {
     os << Shapes[i].name << ' ' << ParticlesGroup << ' ' << ParticlesCluster << ' ' << ParticlesHomothety << ' '
-       << Shapes[i].position << ' ' << "0 0 0" << ' ' << "0 0 0" << ' ' << Shapes[i].orientation << ' ' << "0 0 0"
+       << Shapes[i].position * ParticlesHomothety << ' ' << "0 0 0" << ' ' << "0 0 0" << ' ' << Shapes[i].orientation << ' ' << "0 0 0"
        << ' ' << "0 0 0" << '\n';
   }
 }

@@ -74,6 +74,7 @@ nlohmann::json params = {{"colorMode", 0},
                          {"show_particles", 1},
                          {"show_driven", 1},
                          {"show_velocities", 0},
+                         {"show_colorBar", 1},
                          {"show_forces", 0},
                          {"show_obb", 0},
                          {"enlarged_obb", 0},
@@ -144,6 +145,7 @@ void drawGlobalFrame();
 void drawGlobalAABB();
 void drawOBBs();
 void drawProbe();
+void drawColorBar();
 
 #ifdef ROCKABLE_ENABLE_PERIODIC
 void drawPeriodicCell();
@@ -172,5 +174,6 @@ int screenshot(const char* filename);
 void selection(int x, int y);
 void editSelection();
 void resetColors(int mode, int rescale = 1);
+
 
 #endif /* end of include guard: SEE_HPP */

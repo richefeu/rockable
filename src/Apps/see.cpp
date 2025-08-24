@@ -68,50 +68,58 @@ void json_to_local() {
 }
 
 void showKeybinds() {
-  switch2D::go(width, height);
+  // Declare the static vector inside the function
+  static const std::vector<std::string> keybindLines = {
+      "[+]    load next configuration file",
+      "[-]    load previous configuration file",
+      "[=]    fit the view",
+      "[a][A] decrease/increase alpha (transparence) of driven bodies",
+      "[b]    switch ON/OFF the background color",
+      "[c]    run 5000 steps of computation (used for debugging)",
+      "[e][E] decrease/increase alpha (transparence) of free bodies",
+      "[g]    open another file",
+      "[k]    print this help",
+      "[l]    switch ON/OFF the links (normal vector at contact)",
+      "[m]    switch ON/OFF the links colored by type",
+      "[n]    switch ON/OFF the body displays",
+      "[o]    switch ON/OFF the OBB displays",
+      "[O]    switch ON/OFF the enlargement of OBBs by the Verlet distance",
+      "[w]    set the view so that gravity appears vertical",
+      "[x]    print the space limits of the current scene",
+      "[p]    edit selected body",
+      "[q]    quit",
+      "[y]    make the display faster (and less nice)",
+#ifdef PNG_H
+      "[z]    make a screenshot (oneshot.png)",
+      "[Z]    make a series of screenshots (shotX.png)",
+#else
+      "[z]    make a screenshot (oneshot.tga)",
+      "[Z]    make a series of screenshots (shotX.tga)",
+#endif
+      "[0]    particles with same color",
+      "[1]    particles with cyclic colors",
+      "[2]    particles with velocity magnitude colors",
+      "[3]    particles with name colors"};
 
+  switch2D::go(width, height);
   glColor4f(1.0f, 1.0f, 1.0f, 0.6f);
   glBegin(GL_QUADS);
-  int nbLines = 21;  // !!!!! increment this when a line is added !!!!!  <=====
+  int nbLines = keybindLines.size();
   int by = height - nbLines * 15 - 3;
   glVertex2i(0, height);
   glVertex2i(width, height);
   glVertex2i(width, by);
   glVertex2i(0, by);
   glEnd();
-
   glColor3i(0, 0, 0);
   int dhline = -15;
   int hline = height;
-#define _nextLine_ (hline += dhline)
-  glText::print(15, _nextLine_, "[+]    load next configuration file");
-  glText::print(15, _nextLine_, "[-]    load previous configuration file");
-  glText::print(15, _nextLine_, "[=]    fit the view");
-  glText::print(15, _nextLine_, "[a][A] decrease/increase alpha (transparence) of driven bodies");
-  glText::print(15, _nextLine_, "[b]    switch ON/OFF the background color");
-  glText::print(15, _nextLine_, "[c]    run 5000 steps of computation (used for debugging)");
-  glText::print(15, _nextLine_, "[e][E] decrease/increase alpha (transparence) of free bodies");
-  glText::print(15, _nextLine_, "[g]    open another file");
-  glText::print(15, _nextLine_, "[k]    print this help");
-  glText::print(15, _nextLine_, "[l]    switch ON/OFF the links (normal vector at contact)");
-  glText::print(15, _nextLine_, "[m]    switch ON/OFF the links colored by type");
-  glText::print(15, _nextLine_, "[n]    switch ON/OFF the body displays");
-  glText::print(15, _nextLine_, "[o]    switch ON/OFF the OBB displays");
-  glText::print(15, _nextLine_, "[O]    switch ON/OFF the enlargement of OBBs by the Verlet distance");
-  glText::print(15, _nextLine_, "[w]    set the view so that gravity appears vertical");
-  glText::print(15, _nextLine_, "[x]    print the space limits of the current scene");
-  glText::print(15, _nextLine_, "[p]    edit selected body");
-  glText::print(15, _nextLine_, "[q]    quit");
-  glText::print(15, _nextLine_, "[y]    make the display faster (and less nice)");
-#ifdef PNG_H
-  glText::print(15, _nextLine_, "[z]    make a screenshot (oneshot.png)");
-  glText::print(15, _nextLine_, "[Z]    make a series of screenshots (shotX.png)");
-#else
-  glText::print(15, _nextLine_, "[z]    make a screenshot (oneshot.tga)");
-  glText::print(15, _nextLine_, "[Z]    make a series of screenshots (shotX.tga)");
-#endif
 
-#undef _nextLine_
+  for (const auto& line : keybindLines) {
+    hline += dhline;
+    glText::print(15, hline, line.c_str());
+  }
+
   switch2D::back();
 }
 
@@ -159,6 +167,14 @@ void keyboard(unsigned char Key, int x, int y) {
       selection(x, y);
     } break;
 
+    case '%': {  // compute a few steps (for debugging)
+      box.UpdateNL();
+      for (int i = 0; i < 5000; i++) {
+        box.velocityVerletStep();
+      }
+      textZone.addLine("5000 time steps have been done.");
+    } break;
+
     case 'a': {
       if (params["alpha_fixparticles"].get<GLfloat>() > 0.0f) {
         params["alpha_fixparticles"] = std::max(0.0f, params["alpha_fixparticles"].get<GLfloat>() - 0.05f);
@@ -174,10 +190,8 @@ void keyboard(unsigned char Key, int x, int y) {
       params["show_background"] = 1 - params["show_background"].get<int>();
     } break;
 
-    case 'c': {  // compute a few steps (for debugging)
-      box.UpdateNL();
-      for (int i = 0; i < 5000; i++) box.velocityVerletStep();
-      textZone.addLine("5000 time steps have been done.");
+    case 'c': {
+      params["show_colorBar"] = 1 - params["show_colorBar"].get<int>();
     } break;
 
     case 'd': {
@@ -403,6 +417,11 @@ void keyboard(unsigned char Key, int x, int y) {
       params["colorMode"] = 2;
       resetColors(params["colorMode"].get<int>(), 1);
     } break;
+
+    case '3': {
+      params["colorMode"] = 3;
+      resetColors(params["colorMode"].get<int>(), 1);
+    } break;
   };
 
   glutPostRedisplay();
@@ -410,6 +429,7 @@ void keyboard(unsigned char Key, int x, int y) {
 
 void resetColors(int mode, int rescale) {
   switch (mode) {
+
     case 2: {  // velocity magnitude
       if (rescale == 1) {
         double colorRangeMin = 0.0;
@@ -425,12 +445,36 @@ void resetColors(int mode, int rescale) {
       }
 
       CT.setTableID(MATLAB_HOT);
+      CT.setSize(128);
       CT.setMinMax(params["colorRangeMin"].get<float>(), params["colorRangeMax"].get<float>());
       CT.Rebuild();
       pcolors.clear();
       colorRGBA col;
       for (size_t i = 0; i < box.Particles.size(); ++i) {
         double v = norm(box.Particles[i].vel);
+        CT.getRGB(v, &col);
+        pcolors.push_back(col);
+      }
+    } break;
+
+    case 3: {  // particle shape name
+
+      params["colorRangeMin"] = 0.0;
+      params["colorRangeMax"] = box.Shapes.size() - 1;
+      std::cout << "colorRangeMin = " << params["colorRangeMin"] << '\n';
+      std::cout << "colorRangeMax = " << params["colorRangeMax"] << '\n';
+
+      CT.setTableID(RANDOM);
+      CT.setSize(box.Shapes.size());
+      CT.setMinMax(params["colorRangeMin"].get<float>(), params["colorRangeMax"].get<float>());
+      CT.Rebuild(23450);
+      pcolors.clear();
+      colorRGBA col;
+      for (size_t i = 0; i < box.Particles.size(); ++i) {
+        std::string pname = box.Particles[i].shape->name;
+        size_t id = box.shapeId[pname];
+
+        double v = static_cast<double>(id);
         CT.getRGB(v, &col);
         pcolors.push_back(col);
       }
@@ -523,7 +567,8 @@ void selection(int x, int y) {
 void mouse(int button, int state, int x, int y) {
   if (state == GLUT_UP) {
     mouse_mode = NOTHING;
-    display();
+    //display();
+    glutPostRedisplay();
   } else if (state == GLUT_DOWN) {
 
     mouse_start[0] = x;
@@ -590,7 +635,7 @@ void motion(int x, int y) {
   mouse_start[0] = x;
   mouse_start[1] = y;
 
-  //display();
+  // display();
   glutPostRedisplay();
 }
 
@@ -629,6 +674,10 @@ void display() {
 
   if (params["show_particles"].get<int>() == 1) {
     drawParticles();
+  }
+
+  if (params["show_colorBar"].get<int>() == 1) {
+    drawColorBar();
   }
 
   if (params["show_probe"].get<int>() == 1) {
@@ -757,6 +806,41 @@ void drawShape(Shape* s, double homothety, const mat9r& T) {
       }
       glEnd();
     }
+  }
+}
+
+void drawColorBar() {
+  int mode = params["colorMode"].get<int>();
+  switch (mode) {
+    case 2: {
+      glColorBar CB;
+      CB.setPos(15, 30);
+      CB.setSize(20, 150);
+      CB.setTitle("Velocity");
+      CB.show(width, height, CT);
+    } break;
+
+    case 3: {
+      glColorBar CB;
+      CB.setPos(15, 30);
+      CB.setSize(20, 150);
+      CB.setTitle("Shape names");
+
+      size_t step = 1;
+      if (box.Shapes.size() > 8) {
+        step = box.Shapes.size() / 8;
+        int hh = 15 * box.Shapes.size();
+        if (hh > 450) {
+          hh = 450;
+        }
+        CB.setSize(20, hh);
+      }
+
+      for (size_t i = 0; i < box.Shapes.size(); i += step) {
+        CB.addLabel(i, box.Shapes[i].name, CT);
+      }
+      CB.show(width, height, CT);
+    } break;
   }
 }
 
@@ -1460,13 +1544,13 @@ int screenshot(const char* filename) {
 
   // this is the tga header it must be in the beginning of every (uncompressed) TARGA
   unsigned char TGAheader[12] = {0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  
+
   // the header that is used to get the dimensions of the TARGA
   unsigned char header[6] = {((unsigned char)(screenStats[2] % 256)),
                              ((unsigned char)(screenStats[2] / 256)),
                              ((unsigned char)(screenStats[3] % 256)),
                              ((unsigned char)(screenStats[3] / 256)),
-                             24, // 3 bytes
+                             24,  // 3 bytes
                              0};
 
   // write out the TGA header

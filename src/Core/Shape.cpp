@@ -359,8 +359,7 @@ void Shape::massProperties() {
   std::cout << std::endl;
   std::cout << "Computation of mass properties (volume, mass-center, inertia "
                "and body-frame) for shape "
-            << name << std::endl
-            << std::flush;
+            << name << std::endl;
 
   // 1- Get the bounding volume
   AABB box(vertex);

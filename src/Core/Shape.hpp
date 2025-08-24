@@ -87,8 +87,8 @@ class Shape {
   void read(std::istream& is);
   void write(std::ostream& os);
 
-  void fitObb();
   void getAABB(AABB& aabb);
+  void fitObb();
   bool inside(const vec3r& point);
   void massProperties();
   void clean();
