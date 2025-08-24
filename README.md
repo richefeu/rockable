@@ -116,7 +116,7 @@ The options available are listed below:
 ## How to run a simulation
 
 <p align="center">
-<img src="./gif-doc/run-rockable.gif" width="90%"/>
+<img src="./gif-doc/run-hello.gif" width="90%"/>
 </p>
 
 Before runing rockable you will need to source rockable environnement to add the INSTALL directory to your standard binaries PATH:
