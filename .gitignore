@@ -14,6 +14,9 @@ src/lib
 deps
 common/*
 /examples/**/conf*
+/examples/**/*.png
+/examples/**/*.tga
+/examples/**/*.mp4
 !imconfig.h
 *kineticEnergy.txt
 *perf.txt
