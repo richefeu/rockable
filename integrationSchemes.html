@@ -50,8 +50,10 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="quickStart.html">Quick-start guid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fileOrganisation.html">Organisation of the files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="syntaxConf.html">Format of configuration files (conf-file)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="syntaxShapes.html">Format of shape-files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a></li>
 <li class="toctree-l1"><a class="reference internal" href="forceLaws.html">Force laws</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Integration schemes</a><ul>
@@ -62,7 +64,6 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a></li>
 </ul>
 
         </div>
@@ -111,14 +112,14 @@ and the driven bodies with velocity imposed (translation or rotation) are update
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{cases}
 \underline{x}_{t+\Delta t} &amp;= \underline{x}_t + \underline{v}_t \Delta t \\
-      \mathbf{Q}_{t+\Delta t} &amp;= \mathbf{Q}_t + \mathbf{\dot{Q}}(\underline{\omega}_{t}) \Delta t
+      \mathbf{Q}_{t+\Delta t}    &amp;= \mathbf{Q}_t + \mathbf{\dot{Q}}(\underline{\omega}_{t}) \Delta t
       \end{cases}\end{split}\]</div>
 <p>where <span class="math notranslate nohighlight">\(\Delta t\)</span> is the time step size, which is a user-defined parameter.</p>
 <p><strong>Velocity update</strong></p>
 <p>The new velocity of a particle, <span class="math notranslate nohighlight">\(\underline{v}_{t+\Delta t}\)</span> and <span class="math notranslate nohighlight">\(\underline{\omega}_{t+\Delta t}\)</span>, at the next time step (<span class="math notranslate nohighlight">\(t+\Delta t\)</span>) is obtained from its current velocity, <span class="math notranslate nohighlight">\(\underline{v}_t\)</span> and <span class="math notranslate nohighlight">\(\underline{\omega}_t\)</span>, and the acceleration, <span class="math notranslate nohighlight">\(\underline{a}_t\)</span> and <span class="math notranslate nohighlight">\(\underline{\dot{\omega}}_t\)</span>, at the current time step (<span class="math notranslate nohighlight">\(t\)</span>). The velocity update equation is given by:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{cases}
-\underline{v}_{t+\Delta t}     &amp;= \underline{v}_t + \underline{a}_t \Delta t \\
+\underline{v}_{t+\Delta t}      &amp;= \underline{v}_t + \underline{a}_t \Delta t \\
       \underline{\omega}_{t+\Delta t} &amp;= \underline{\omega}_t + \underline{\dot{\omega}}_t \Delta t
       \end{cases}\end{split}\]</div>
 <p>where <span class="math notranslate nohighlight">\(\underline{a}_t\)</span> (and <span class="math notranslate nohighlight">\(\underline{\dot{\omega}}_t\)</span>) is the acceleration calculated from the forces (and moments) acting on the particle at time step <span class="math notranslate nohighlight">\(t\)</span>.</p>
@@ -136,7 +137,7 @@ and the driven bodies with velocity imposed (translation or rotation) are update
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{cases}
 \underline{x}_{t+\Delta t} &amp;= \underline{x}_t + \underline{v}_t \Delta t + \frac{1}{2}\underline{a}_t \Delta t^2\\
-      \mathbf{Q}_{t+\Delta t} &amp;= \mathbf{Q}(t) + \mathbf{\dot{Q}}\left(\underline{\omega}_t\right) \Delta t + \frac{1}{2} \mathbf{\ddot{Q}}\left(\underline{\omega}_t,\underline{\dot{\omega}}_t\right) \Delta t^2 \\
+      \mathbf{Q}_{t+\Delta t}    &amp;= \mathbf{Q}(t) + \mathbf{\dot{Q}}\left(\underline{\omega}_t\right) \Delta t + \frac{1}{2} \mathbf{\ddot{Q}}\left(\underline{\omega}_t,\underline{\dot{\omega}}_t\right) \Delta t^2 \\
 \end{cases}\end{split}\]</div>
 <p>where <span class="math notranslate nohighlight">\(\Delta t\)</span> is the time step size, which is a user-defined parameter.</p>
 <p><strong>Velocity update</strong></p>
@@ -150,35 +151,37 @@ and the driven bodies with velocity imposed (translation or rotation) are update
 </section>
 <section id="beeman-scheme-keyword-beeman">
 <h2>Beeman scheme (keyword <code class="docutils literal notranslate"><span class="pre">Beeman</span></code>)<a class="headerlink" href="#beeman-scheme-keyword-beeman" title="Permalink to this heading"></a></h2>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>REDACTION EN COURS</p>
-</div>
 <p>The Beeman method is a second-order accurate integration technique, which means it provides better accuracy compared to the first-order explicit Euler (or Velocity Verlet) method. This leads to more accurate and reliable simulations of particle dynamics in DEM. Additionally, the Beeman method is relatively easy to implement and computationally efficient compared to some higher-order methods.</p>
 <p>For a discrete particle in DEM, the equations used to update its position and velocity using the Beeman method are as follows:</p>
 <p><strong>Position update</strong></p>
-<p>The new position of a particle, <span class="math notranslate nohighlight">\(\underline{x}_{t+1}\)</span>, at the next time step (<span class="math notranslate nohighlight">\(t+1\)</span>) is calculated using the current position, <span class="math notranslate nohighlight">\(\underline{x}_t\)</span>, current velocity, <span class="math notranslate nohighlight">\(\underline{v}_t\)</span>, and current acceleration, <span class="math notranslate nohighlight">\(\underline{a}_t\)</span>. The position update equation for particle ‘i’ is given by:</p>
+<p>The new position of a particle, <span class="math notranslate nohighlight">\(\underline{x}_{t+\Delta t}\)</span>, at the next time step (<span class="math notranslate nohighlight">\(t+\Delta t\)</span>) is calculated using the current position, <span class="math notranslate nohighlight">\(\underline{x}_t\)</span>, current velocity, <span class="math notranslate nohighlight">\(\underline{v}_t\)</span>, and current acceleration, <span class="math notranslate nohighlight">\(\underline{a}_t\)</span>. The position update equation for particle ‘i’ is given by:</p>
 <div class="math notranslate nohighlight">
-\[\underline{x}_{t+1} = \underline{x}_t + \Delta t \cdot \underline{v}_t + \frac{1}{6} \Delta t^2 \left( 5 \underline{a}_t - \underline{a}_{t-1} \right)\]</div>
-<p>where <span class="math notranslate nohighlight">\(\Delta t\)</span> is the time step size, and <span class="math notranslate nohighlight">\(\underline{a}_{t-1}\)</span> represents the acceleration at the previous time step (<span class="math notranslate nohighlight">\(t-1\)</span>).</p>
+\[\begin{split}\begin{cases}
+\underline{x}_{t+\Delta t} &amp;= \underline{x}_t + \Delta t \underline{v}_t + \frac{1}{6} \Delta t^2 \left( 5 \underline{a}_t - \underline{a}_{t-\Delta t} \right) \\
+\mathbf{Q}_{t+\Delta t} &amp;= \mathbf{Q}_t + \Delta t \mathbf{\dot{Q}}\left(\underline{\omega}_t\right) + \frac{1}{6} \Delta t^2 \left( 5  \mathbf{\ddot{Q}}\left(\underline{\omega}_t,\underline{\dot{\omega}}_t\right)  - \mathbf{\ddot{Q}}\left(\underline{\omega}_{t-\Delta t},\underline{\dot{\omega}}_{t-\Delta t} \right)  \right)
+\end{cases}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Delta t\)</span> is the time step size, and <span class="math notranslate nohighlight">\(\underline{a}_{t-\Delta t}\)</span> represents the acceleration at the previous time step.</p>
 <p><strong>Velocity update</strong></p>
-<p>The new velocity of a particle, <span class="math notranslate nohighlight">\(\underline{v}_{t+1}\)</span>, at the next time step (<span class="math notranslate nohighlight">\(t+1\)</span>) is calculated using the current velocity, <span class="math notranslate nohighlight">\(\underline{v}_t\)</span>, current acceleration, <span class="math notranslate nohighlight">\(\underline{a}_t\)</span>, and the acceleration, <span class="math notranslate nohighlight">\(\underline{a}_{t+1}\)</span>, at the next time step (<span class="math notranslate nohighlight">\(t+1\)</span>). The velocity update equation for particle ‘i’ is given by:</p>
+<p>The new velocity of a particle, <span class="math notranslate nohighlight">\(\underline{v}_{t+\Delta t}\)</span>, at the next time step (<span class="math notranslate nohighlight">\(t+\Delta t\)</span>) is calculated using the current velocity, <span class="math notranslate nohighlight">\(\underline{v}_t\)</span>, current acceleration, <span class="math notranslate nohighlight">\(\underline{a}_t\)</span>, and the acceleration, <span class="math notranslate nohighlight">\(\underline{a}_{t+\Delta t}\)</span>, at the next time step (<span class="math notranslate nohighlight">\(t+\Delta t\)</span>). The velocity update equation for particle ‘i’ is given by:</p>
 <div class="math notranslate nohighlight">
-\[\underline{v}_{t+1} = \underline{v}_t + \frac{\Delta t}{6} \left( 2 \underline{a}_{t+1} + 5 \underline{a}_t - \underline{a}_{t-1} \right)\]</div>
-<p>where <span class="math notranslate nohighlight">\(\underline{a}_{t+1}\)</span> represents the acceleration calculated from the forces acting on the particle at time step <span class="math notranslate nohighlight">\(t+1\)</span>.</p>
+\[\begin{split}\begin{cases}
+\underline{v}_{t+\Delta t} &amp;= \underline{v}_t + \frac{\Delta t}{6} \left( 2 \underline{a}_{t+\Delta t} + 5 \underline{a}_t - \underline{a}_{t-\Delta t} \right) \\
+\underline{\omega}_{t+\Delta t} &amp;= \underline{\omega}_t + \frac{\Delta t}{6} \left( 2 \underline{\dot{\omega}}_{t+\Delta t} + 5 \underline{\dot{\omega}}_t - \underline{\dot{\omega}}_{t-\Delta t} \right)
+\end{cases}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\underline{a}_{t+\Delta t}\)</span> represents the acceleration calculated from the forces acting on the particle at the next time step.</p>
 </section>
 <section id="runge-kutta-nystrom-4th-order-scheme-keyword-rungekutta4">
 <h2>Runge-Kutta-Nyström 4th-order scheme (keyword <code class="docutils literal notranslate"><span class="pre">RungeKutta4</span></code>)<a class="headerlink" href="#runge-kutta-nystrom-4th-order-scheme-keyword-rungekutta4" title="Permalink to this heading"></a></h2>
+<p>The Runge-Kutta-Nyström (RKN) 4th-order scheme is a higher-order accurate integration technique, providing better accuracy compared to lower-order methods like the explicit Euler or Velocity Verlet. This can lead to more accurate and reliable simulations of particle dynamics in DEM. Additionally, the RKN 4th-order scheme has good stability properties and can handle stiff systems more effectively than lower-order methods.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>REDACTION EN COURS</p>
+<p>For this scheme, the equations for rotations are not shown but follow the same logic as for other schemes.</p>
 </div>
-<p>The Runge-Kutta-Nyström (RKN) 4th-order scheme is a higher-order accurate integration technique, providing better accuracy compared to lower-order methods like the explicit Euler or Velocity Verlet. This can lead to more accurate and reliable simulations of particle dynamics in DEM. Additionally, the RKN 4th-order scheme has good stability properties and can handle stiff systems more effectively than lower-order methods.</p>
 <p>For a discrete particle in DEM, the equations used to update its position and velocity using the RKN 4th-order scheme are as follows:</p>
 <p><strong>Position update</strong></p>
-<p>The new position of a particle, <span class="math notranslate nohighlight">\(\underline{x}_{t+1}\)</span>, at the next time step (<span class="math notranslate nohighlight">\(t+1\)</span>) is obtained using the current position, <span class="math notranslate nohighlight">\(\underline{x}_t\)</span>, current velocity, <span class="math notranslate nohighlight">\(\underline{v}_t\)</span>, and the calculated intermediate velocities, <span class="math notranslate nohighlight">\(\underline{v}_{1/2}\)</span>, <span class="math notranslate nohighlight">\(\underline{v}_{1}\)</span>, and <span class="math notranslate nohighlight">\(\underline{v}_{2}\)</span>. The position update equation for particle ‘i’ is given by:</p>
+<p>The new position of a particle, <span class="math notranslate nohighlight">\(\underline{x}_{t+\Delta t}\)</span>, at the next time step (<span class="math notranslate nohighlight">\(t+\Delta t\)</span>) is obtained using the current position, <span class="math notranslate nohighlight">\(\underline{x}_t\)</span>, current velocity, <span class="math notranslate nohighlight">\(\underline{v}_t\)</span>, and the calculated intermediate velocities, <span class="math notranslate nohighlight">\(\underline{v}_{1/2}\)</span>, <span class="math notranslate nohighlight">\(\underline{v}_{1}\)</span>, and <span class="math notranslate nohighlight">\(\underline{v}_{2}\)</span>. The position update equation for particle ‘i’ is given by:</p>
 <div class="math notranslate nohighlight">
-\[\underline{x}_{t+1} = \underline{x}_t + \Delta t \left( \underline{v}_{1/2} + 2 \underline{v}_{1} + 2 \underline{v}_{2} + \underline{v}_t \right) \, \frac{\Delta t}{6}\]</div>
+\[\underline{x}_{t+\Delta t} = \underline{x}_t + \Delta t \left( \underline{v}_{1/2} + 2 \underline{v}_{1} + 2 \underline{v}_{2} + \underline{v}_t \right) \, \frac{\Delta t}{6}\]</div>
 <p>where <span class="math notranslate nohighlight">\(\Delta t\)</span> is the time step size, and the intermediate velocities are calculated as follows:</p>
 <div class="math notranslate nohighlight">
 \[ \begin{align}\begin{aligned}\underline{v}_{1/2} &amp;= \underline{v}_t + \frac{\Delta t}{2} \, \underline{a}_t\\\underline{v}_{1}   &amp;= \underline{v}_t + \frac{\Delta t}{2} \, \underline{a}_{1/2}\\\underline{v}_{2}   &amp;= \underline{v}_t + \Delta t \, \underline{a}_{1}\end{aligned}\end{align} \]</div>
@@ -186,9 +189,9 @@ and the driven bodies with velocity imposed (translation or rotation) are update
 <div class="math notranslate nohighlight">
 \[ \begin{align}\begin{aligned}\underline{a}_{1/2} &amp;= \text{accelerations}(\underline{x}_t, \underline{v}_{1/2})\\\underline{a}_{1}   &amp;= \text{accelerations}(\underline{x}_t, \underline{v}_{1})\end{aligned}\end{align} \]</div>
 <p><strong>Velocity update</strong></p>
-<p>The new velocity of a particle, <span class="math notranslate nohighlight">\(\underline{v}_{t+1}\)</span>, at the next time step (<span class="math notranslate nohighlight">\(t+1\)</span>) is obtained using the calculated intermediate accelerations, <span class="math notranslate nohighlight">\(\underline{a}_{1/2}\)</span>, <span class="math notranslate nohighlight">\(\underline{a}_{1}\)</span>, and <span class="math notranslate nohighlight">\(\underline{a}_{2}\)</span>. The velocity update equation for particle ‘i’ is given by:</p>
+<p>The new velocity of a particle, <span class="math notranslate nohighlight">\(\underline{v}_{t+\Delta t}\)</span>, at the next time step (<span class="math notranslate nohighlight">\(t+\Delta t\)</span>) is obtained using the calculated intermediate accelerations, <span class="math notranslate nohighlight">\(\underline{a}_{1/2}\)</span>, <span class="math notranslate nohighlight">\(\underline{a}_{1}\)</span>, and <span class="math notranslate nohighlight">\(\underline{a}_{2}\)</span>. The velocity update equation for particle ‘i’ is given by:</p>
 <div class="math notranslate nohighlight">
-\[\underline{v}_{t+1} = \underline{v}_t + \Delta t \left( \underline{a}_{1/2} + 2 \underline{a}_{1} + 2 \underline{a}_{2} + \underline{a}_t \right) \, \frac{\Delta t}{6}\]</div>
+\[\underline{v}_{t+\Delta t} = \underline{v}_t + \Delta t \left( \underline{a}_{1/2} + 2 \underline{a}_{1} + 2 \underline{a}_{2} + \underline{a}_t \right) \, \frac{\Delta t}{6}\]</div>
 <p>where <span class="math notranslate nohighlight">\(\Delta t\)</span> is the time step size, and the intermediate accelerations are calculated as follows:</p>
 <div class="math notranslate nohighlight">
 \[ \begin{align}\begin{aligned}\underline{a}_{1/2} &amp;= \text{accelerations}(\underline{x}_t, \underline{v}_{1/2})\\\underline{a}_{1}   &amp;= \text{accelerations}(\underline{x}_t, \underline{v}_{1})\\\underline{a}_{2}   &amp;= \text{accelerations}(\underline{x}_{t+1}, \underline{v}_{t+1})\end{aligned}\end{align} \]</div>
@@ -206,7 +209,7 @@ and the driven bodies with velocity imposed (translation or rotation) are update
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2023, Vincent Richefeu.</p>
+    <p>&#169; Copyright 2020-2025, Vincent Richefeu.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

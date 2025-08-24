@@ -48,13 +48,14 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="quickStart.html">Quick-start guid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fileOrganisation.html">Organisation of the files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="syntaxConf.html">Format of configuration files (conf-file)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="syntaxShapes.html">Format of shape-files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a></li>
 <li class="toctree-l1"><a class="reference internal" href="forceLaws.html">Force laws</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a></li>
 </ul>
 
         </div>
@@ -119,10 +120,16 @@ with energy-based criteria.</p>
 <h2>Features<a class="headerlink" href="#features" title="Permalink to this heading"></a></h2>
 <ul>
 <li><p><strong>Particle Shapes</strong>: the code uses only one 3D shape: sphero-polyhedra or R-shapes. These shapes can be non-convex (with holes if necessary) and have rounded edges and corners (uniform radius per shape).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <p>Some other shapes are currently considered for special boundary shapes (sphere, cylinder…) and specifique loadings.</p>
+</div>
 </li>
 <li><p><strong>Boundary Conditions</strong>: any rigid element can be used to apply boundary conditions. It is possible to impose velocity, force, or moment component by component. Some predefined systems with servo-control are also available for complex loading conditions (e.g., loading cycles or controlled pressure).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <p>The possibility of applying tri-periodic loading to an assembly is implemented and currently in the testing phase.</p>
+</div>
 </li>
 <li><p><strong>Parallel Computation</strong>: currently, an OpenMP optimization using compilation flags has been implemented. However, the computational speedup is relatively low. Typically, 8 cores are needed to halve the simulation time (for a dense system with a large number of elements).</p></li>
 <li><p><strong>Documentation</strong>: there is little documentation, although efforts are being made to address this.</p></li>
@@ -137,6 +144,13 @@ with energy-based criteria.</p>
 <li class="toctree-l2"><a class="reference internal" href="quickStart.html#compilation-with-spack">Compilation with spack</a></li>
 <li class="toctree-l2"><a class="reference internal" href="quickStart.html#running-a-simulation">Running a simulation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="quickStart.html#visualising-the-simulations">Visualising the simulations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fileOrganisation.html">Organisation of the files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fileOrganisation.html#examples">📁 <code class="docutils literal notranslate"><span class="pre">examples</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="fileOrganisation.html#prepro">📁 <code class="docutils literal notranslate"><span class="pre">prepro</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="fileOrganisation.html#src">📁 <code class="docutils literal notranslate"><span class="pre">src</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="fileOrganisation.html#test">📁 <code class="docutils literal notranslate"><span class="pre">test</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="syntaxConf.html">Format of configuration files (conf-file)</a><ul>
@@ -163,6 +177,12 @@ with energy-based criteria.</p>
 <li class="toctree-l2"><a class="reference internal" href="syntaxShapes.html#definition-of-a-shape">Definition of a shape</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="preProcessing.html#stickverticesinclusters-double-epsilon"><code class="docutils literal notranslate"><span class="pre">stickVerticesInClusters</span></code> (<em>double</em>) <strong>Epsilon</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="preProcessing.html#stickclusters-double-epsilon"><code class="docutils literal notranslate"><span class="pre">stickClusters</span></code> (<em>double</em>) <strong>Epsilon</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="preProcessing.html#setallvelocities-vec3r-velocity"><code class="docutils literal notranslate"><span class="pre">setAllVelocities</span></code> (<em>vec3r</em>) <strong>velocity</strong></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="forceLaws.html">Force laws</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="forceLaws.html#default-model-keywork-default">Default model (keywork <code class="docutils literal notranslate"><span class="pre">Default</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="forceLaws.html#law-for-rock-avalanches-keywork-avalanche">Law for rock avalanches (keywork <code class="docutils literal notranslate"><span class="pre">Avalanche</span></code>)</a></li>
@@ -187,7 +207,6 @@ with energy-based criteria.</p>
 <li class="toctree-l2"><a class="reference internal" href="servoControllers.html#shakers">shakers</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a></li>
 </ul>
 </div>
 </section>
@@ -203,7 +222,7 @@ with energy-based criteria.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2023, Vincent Richefeu.</p>
+    <p>&#169; Copyright 2020-2025, Vincent Richefeu.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

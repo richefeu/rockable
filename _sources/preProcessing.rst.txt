@@ -3,16 +3,25 @@
 Pre-processing commands
 =======================
 
-* ``stickVerticesInClusters`` (*double*) **Epsilon** 
-  This command will add glued interfaces between bodies having the same cluster identifier. 
-  Only bonds between vertices (spheres) are added when the distance is less than **Epsilon**.
+This pre-processing commands are used, most of the time, at the end of a configuration file.
 
-* ``stickClusters`` (*double*) **Epsilon**  
-  This command will add glued interfaces between bodies having different cluster identifier. 
-  Bonds are added when the distance is less than **Epsilon**.
+
+``stickVerticesInClusters`` (*double*) **Epsilon** 
+--------------------------------------------------
+
+This command will add glued interfaces between bodies having the same cluster identifier. 
+Only bonds between vertices (spheres) are added when the distance is less than **Epsilon**.
+
+``stickClusters`` (*double*) **Epsilon**  
+----------------------------------------
+
+This command will add glued interfaces between bodies having different cluster identifier. 
+Bonds are added when the distance is less than **Epsilon**.
   
-* ``setAllVelocities`` (*vec3r*) **velocity**
-  Set the velocity vector of all particles (that are not driven) to the prescribed vector **velocity**.
+``setAllVelocities`` (*vec3r*) **velocity**
+-------------------------------------------
+
+Set the velocity vector of all particles (that are not driven) to the prescribed vector **velocity**.
 
 
 
