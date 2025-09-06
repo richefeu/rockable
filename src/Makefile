@@ -35,7 +35,7 @@
 #######################################################################################################################
 
 # An option can be disable by adding 'n' before
-OPTIONS = -DnFT_CORR -DnCOMPONENTWISE_NUM_DAMPING -DENABLE_PROFILING
+OPTIONS = -DnFT_CORR -DnCOMPONENTWISE_NUM_DAMPING -DENABLE_PROFILING -DROCKABLE_LAST_COMMIT_DATE="0"
 
 # If you don't want to use libpng in 'see', comment this two lines
 # In this case the screenshots will be TGA (not compressed)
@@ -48,7 +48,7 @@ OPTIONS = -DnFT_CORR -DnCOMPONENTWISE_NUM_DAMPING -DENABLE_PROFILING
 
 # Paths
 TOOFUSPATH = ~/toofus
-IMGUI_DIR = ./imgui
+IMGUI_DIR = ../deps/imgui-src
 SPDLOGPATH = /usr/local/include
 CHAISCRIPTPATH = ~/ChaiScript-6.1.0/include
 LIB = libRockable
@@ -57,7 +57,7 @@ UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
 
   # The compiler and linker to be used
-  CXX = g++-14
+  CXX = g++-15
   LINK = $(CXX)
 	
   # The list of flags passed to the compiler

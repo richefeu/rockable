@@ -3030,7 +3030,8 @@ inline bool Rockable::computeInterArray()  // TODO change name
 {
   START_TIMER("build_active_interactions");
   unsigned long part_size = 0;
-  unsigned long offsets[Interactions.size()];
+  //unsigned long offsets[Interactions.size()]; // vr: Variable Lenght Array is C99
+  std::vector<unsigned long> offsets(Interactions.size());
   testInter.resize(m_vecInteractions.size());
 
 // copy interactions ptr for, m_vecInterations to testInter if dn < 0.0 and stick exists
@@ -3061,7 +3062,7 @@ inline bool Rockable::computeInterArray()  // TODO change name
   for (size_t k = 1; k < testInter.size(); ++k) {
     offsets[k] = testInter[k - 1].size();
   }
-  m_reorg.prefixsum_inplace(offsets, testInter.size());
+  m_reorg.prefixsum_inplace(offsets.data(), testInter.size());
   part_size = offsets[testInter.size() - 1] + testInter[testInter.size() - 1].size();
 
   // copy test_inter values in active interactions

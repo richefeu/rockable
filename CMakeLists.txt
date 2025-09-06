@@ -5,10 +5,9 @@ if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
   execute_process(
     COMMAND
       bash -c
-      "ls /usr/local/bin/g++-* 2>/dev/null | grep -Eo 'g\\+\\+-[0-9]+' | sort -V | tail -1"
+      "ls /usr/local/bin/g++-* /opt/homebrew/bin/g++-* 2>/dev/null | grep -Eo 'g\\+\\+-[0-9]+' | sort -V | tail -1"
     OUTPUT_VARIABLE LATEST_GNU_GPP
     OUTPUT_STRIP_TRAILING_WHITESPACE)
-
   if(LATEST_GNU_GPP)
     set(CMAKE_OSX_COMPILER_ID "GNU")
     set(CMAKE_CXX_COMPILER "${LATEST_GNU_GPP}")
@@ -16,7 +15,7 @@ if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
   else()
     message(
       WARNING
-        "No GNU g++ found in /usr/local/bin/. Falling back to default compiler."
+        "No GNU g++ found in /usr/local/bin/ or /opt/homebrew/bin/. Falling back to default compiler."
     )
   endif()
 endif()

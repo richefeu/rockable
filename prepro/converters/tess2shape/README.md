@@ -14,7 +14,7 @@ Here are the step-by-step commands
 cd src
 mkdir build
 cd build
-cmake .. -DCMAKE_CXX_COMPILER=g++-14 -DCMAKE_C_COMPILER=gcc-14
+cmake .. -DCMAKE_CXX_COMPILER=g++-15 -DCMAKE_C_COMPILER=gcc-15
 make
 make install
 ``` 

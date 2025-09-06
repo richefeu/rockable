@@ -17,9 +17,12 @@ class preComputeUpdate {
 
     int nthreads;
 #pragma omp parallel
-    { nthreads = omp_get_num_threads(); }
+    {
+      nthreads = omp_get_num_threads();
+    }
 
-    size_t suma[nthreads + 1];
+    // size_t suma[nthreads + 1]; // vr: Variable Length Array (VLA), which is a feature borrowed from C99, but not part of standard C++
+    std::vector<size_t> suma(nthreads + 1);
     suma[0] = 0;
 
 #pragma omp parallel
@@ -47,13 +50,19 @@ class preComputeUpdate {
   inline int binarySearch(std::pair<size_t, size_t>* arr, int p, int r, size_t num) {
     if (p <= r) {
       int mid = (p + r) / 2;
-      if (arr[mid].second == num) return mid;
-      if (arr[mid].second > num) return binarySearch(arr, p, mid - 1, num);
-      if (arr[mid].second < num) return binarySearch(arr, mid + 1, r, num);
+      if (arr[mid].second == num) {
+        return mid;
+      }
+      if (arr[mid].second > num) {
+        return binarySearch(arr, p, mid - 1, num);
+      }
+      if (arr[mid].second < num) {
+        return binarySearch(arr, mid + 1, r, num);
+      }
     }
     return -1;
   }
-  
+
   // resize vectors
   void resize(size_t nbOfInteractions, size_t nbOfParticles) {
     Ii.resize(nbOfInteractions);

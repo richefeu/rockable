@@ -6,6 +6,7 @@ UNAME_S := $(shell uname -s)
 # The compiler to be used
 ifeq ($(UNAME_S),Darwin)
   CXX = g++-14
+	
   CXXFLAGS = -O3 -Wall -std=c++11 -I $(TOOFUSPATH) -I $(ROCKABLEPATH)
 else
   CXX = g++
