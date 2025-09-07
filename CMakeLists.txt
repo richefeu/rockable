@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.26)
 
 if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
   # Try to find the latest GNU g++ installed via Homebrew
@@ -81,6 +81,7 @@ execute_process(
 add_definitions(-DROCKABLE_GIT_TAG="${ROCKABLE_GIT_TAG}")
 message(STATUS "ROCKABLE_GIT_TAG = " ${ROCKABLE_GIT_TAG})
 
+# get the date of last git commit
 execute_process(
   COMMAND git log -1 --format=%cd
   OUTPUT_VARIABLE ROCKABLE_LAST_COMMIT_DATE
@@ -129,7 +130,9 @@ if(ROCKABLE_ENABLE_PROFILING)
     matools
     GIT_REPOSITORY https://github.com/rprat-pro/MATools
     GIT_TAG v1.1)
+
   FetchContent_GetProperties(matools)
+
   if(NOT matools_POPULATED)
     message(STATUS "Fetching MATools")
     FetchContent_MakeAvailable(matools)
@@ -146,7 +149,9 @@ FetchContent_Declare(
   tclap
   GIT_REPOSITORY https://github.com/xguerin/tclap.git
   GIT_TAG v1.2.5)
+
 FetchContent_GetProperties(tclap)
+
 if(NOT tclap_POPULATED)
   message(STATUS "Fetching tclap")
   FetchContent_MakeAvailable(tclap)
@@ -158,7 +163,9 @@ FetchContent_Declare(
   nlohmann-json
   GIT_REPOSITORY https://github.com/nlohmann/json.git
   GIT_TAG v3.12.0)
+
 FetchContent_GetProperties(nlohmann-json)
+
 if(NOT nlohmann-json_POPULATED)
   message(STATUS "Fetching nlohmann-json")
   FetchContent_MakeAvailable(nlohmann-json)
@@ -172,7 +179,7 @@ if(ROCKABLE_COMPILE_SEE3 OR ROCKABLE_COMPILE_SEE4)
   FetchContent_Declare(
     imgui
     GIT_REPOSITORY https://github.com/ocornut/imgui.git
-    GIT_TAG v1.89.5)
+    GIT_TAG master)
 
   FetchContent_GetProperties(imgui)
 
@@ -194,15 +201,12 @@ if(OpenMP_CXX_FOUND)
 endif()
 
 # ##############################################################################
-# OpenGL
-find_package(OpenGL REQUIRED)
-if(OPENGL_FOUND)
-  message(STATUS "OPENGL_INCLUDE_DIR = " ${OPENGL_INCLUDE_DIR})
-  message(STATUS "OPENGL_LIBRARIES = " ${OPENGL_LIBRARIES})
-endif()
+# OpenGL find_package(OpenGL REQUIRED) if(OPENGL_FOUND) message(STATUS
+# "OPENGL_INCLUDE_DIR = " ${OPENGL_INCLUDE_DIR}) message(STATUS
+# "OPENGL_LIBRARIES = " ${OPENGL_LIBRARIES}) endif()
 
 # ##############################################################################
-# glut
+# OpenGL and glut
 if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
 
   # here, we do not uses find_package(glut) so that the version installed by
@@ -237,6 +241,12 @@ if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
   endif()
 
 else()
+
+  find_package(OpenGL REQUIRED)
+  if(OPENGL_FOUND)
+    message(STATUS "OPENGL_INCLUDE_DIR = " ${OPENGL_INCLUDE_DIR})
+    message(STATUS "OPENGL_LIBRARIES = " ${OPENGL_LIBRARIES})
+  endif()
 
   find_package(GLUT REQUIRED)
   if(GLUT_FOUND)
@@ -383,17 +393,16 @@ endif()
 # with macosx)
 if(ROCKABLE_COMPILE_SEE3)
 
-  set(see3_files
+  set(SEE3_FILES
       ${CMAKE_SOURCE_DIR}/Apps/see3.cpp
       ${imgui_SOURCE_DIR}/imgui.cpp
-      # ${imgui_SOURCE_DIR}/imgui_demo.cpp
       ${imgui_SOURCE_DIR}/imgui_draw.cpp
       ${imgui_SOURCE_DIR}/imgui_tables.cpp
       ${imgui_SOURCE_DIR}/imgui_widgets.cpp
       ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
       ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp)
 
-  add_executable(see3 ${see3_files})
+  add_executable(see3 ${SEE3_FILES})
 
   if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
 
@@ -407,12 +416,12 @@ if(ROCKABLE_COMPILE_SEE3)
   else() # For APPLE
 
     set(CMAKE_TAPI OFF)
-    
+
     target_include_directories(
       see3
-      PUBLIC ${GL_INCLUDE_DIRS} ${GLU_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS} ${GLFW_LIBRARY_DIRS}
-             ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends
-             ${nlohmann-json_SOURCE_DIR}/include)
+      PUBLIC ${GL_INCLUDE_DIRS} ${GLU_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS}
+             ${GLFW_LIBRARY_DIRS} ${imgui_SOURCE_DIR}
+             ${imgui_SOURCE_DIR}/backends)
 
     target_link_directories(see3 PUBLIC ${GL_LIBRARY_DIRS} ${GLU_LIBRARY_DIRS}
                             ${GLFW_LIBRARY_DIRS})
@@ -432,7 +441,7 @@ endif() # end of ROCKABLE_COMPILE_SEE3
 # with macosx)
 if(ROCKABLE_COMPILE_SEE4)
 
-  set(see4_files
+  set(SEE4_FILES
       ${CMAKE_SOURCE_DIR}/Apps/see4.cpp
       ${imgui_SOURCE_DIR}/imgui.cpp
       ${imgui_SOURCE_DIR}/imgui_demo.cpp
@@ -442,7 +451,7 @@ if(ROCKABLE_COMPILE_SEE4)
       ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl2.cpp
       ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp)
 
-  add_executable(see4 ${see4_files})
+  add_executable(see4 ${SEE4_FILES})
 
   if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
 
