@@ -19,6 +19,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Update APT
+      run: |
+        sudo apt-get update -y
+        sudo apt-get dist-upgrade -y
     - name: Install Glut
       run: sudo apt-get install -y freeglut3-dev
     - name: Install PNG
