@@ -41,7 +41,7 @@ option(ROCKABLE_ENABLE_SOFT_PARTICLES "enable strainning of particles" OFF)
 option(ROCKABLE_ENABLE_PERIODIC "enable full periodic boundary conditions" OFF)
 
 option(ROCKABLE_COMPILE_POSTPRO
-       "Compile the application to run post-processing commands" OFF)
+       "Compile the application to run post-processing commands" ON)
 option(ROCKABLE_COMPILE_SEE
        "Compile the glut application to visualize the conf-files" ON)
 option(ROCKABLE_COMPILE_SEE2
@@ -201,11 +201,6 @@ if(OpenMP_CXX_FOUND)
 endif()
 
 # ##############################################################################
-# OpenGL find_package(OpenGL REQUIRED) if(OPENGL_FOUND) message(STATUS
-# "OPENGL_INCLUDE_DIR = " ${OPENGL_INCLUDE_DIR}) message(STATUS
-# "OPENGL_LIBRARIES = " ${OPENGL_LIBRARIES}) endif()
-
-# ##############################################################################
 # OpenGL and glut
 if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
 
@@ -268,8 +263,8 @@ if(ROCKABLE_COMPILE_SEE2 OR ROCKABLE_COMPILE_SEE3)
 
   if(GLFW_FOUND)
     message(STATUS "GLFW as been found with PkgConfig")
-    message(STATUS "GLFW_LIBRARY_DIRS = " ${GLFW_LIBRARY_DIRS})
     message(STATUS "GLFW_INCLUDE_DIRS = " ${GLFW_INCLUDE_DIRS})
+    message(STATUS "GLFW_LIBRARY_DIRS = " ${GLFW_LIBRARY_DIRS})
     message(STATUS "GLFW_LIBRARIES = " ${GLFW_LIBRARIES})
   endif()
 
@@ -334,30 +329,30 @@ install(TARGETS rockable)
 if(ROCKABLE_COMPILE_POSTPRO)
   add_executable(postpro ${CMAKE_SOURCE_DIR}/Apps/postpro.cpp)
   target_link_libraries(postpro PUBLIC Rockable_core)
+  install(TARGETS postpro)
 endif()
 
 # ##############################################################################
 # visualiser see (it uses freeglut)
 if(ROCKABLE_COMPILE_SEE)
 
-  find_package(PNG REQUIRED)
-  if(PNG_FOUND)
-    message(STATUS "libpng found: ${PNG_INCLUDE_DIRS}")
-  else()
-    message(STATUS "libpng not found")
-  endif()
+  if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux") #=========
 
-  add_executable(see ${CMAKE_SOURCE_DIR}/Apps/see.cpp)
-
-  if(PNG_FOUND)
-    # Pour le moment on compile sans libpng car il y a un problème sur mac Les
-    # screenshots seront sauvegardés en tga
-    if(NOT ${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
-      # target_compile_options(see PRIVATE -DPNG_H)
+    find_package(PNG REQUIRED)
+    if(PNG_FOUND)
+      message(STATUS "libpng found: ${PNG_INCLUDE_DIRS}")
+      message(STATUS "PNG_INCLUDE_DIRS = " ${PNG_INCLUDE_DIRS})
+      message(STATUS "PNG_LIBRARY_DIRS = " ${PNG_LIBRARY_DIRS})
+      message(STATUS "PNG_LIBRARY = " ${PNG_LIBRARY})
+    else()
+      message(STATUS "libpng not found")
     endif()
-  endif()
 
-  if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
+    add_executable(see ${CMAKE_SOURCE_DIR}/Apps/see.cpp)
+
+    if(PNG_FOUND)
+      target_compile_options(see PRIVATE -DPNG_H)
+    endif()
 
     target_include_directories(
       see
@@ -369,26 +364,47 @@ if(ROCKABLE_COMPILE_SEE)
     target_link_libraries(see PUBLIC OpenGL::GL OpenGL::GLU ${GLUT_LIBRARIES}
                                      Rockable_core PNG::PNG)
 
-  else()
+  else() # Darwin =========
+
+    if(NOT PkgConfig_FOUND)
+      find_package(PkgConfig REQUIRED)
+    endif()
+
+    # Check for SDL2 instead of GLFW
+    pkg_check_modules(PNG REQUIRED libpng16)
+
+    if(PNG_FOUND)
+      message(STATUS "PNG has been found with PkgConfig")
+      message(STATUS "PNG_LIBRARY_DIRS = " ${PNG_LIBRARY_DIRS})
+      message(STATUS "PNG_INCLUDE_DIRS = " ${PNG_INCLUDE_DIRS})
+      message(STATUS "PNG_LIBRARIES = " ${PNG_LIBRARIES})
+    endif()
+
+    add_executable(see ${CMAKE_SOURCE_DIR}/Apps/see.cpp)
+
+    if(PNG_FOUND)
+      target_compile_options(see PRIVATE -DWITH_LIBPNG)
+    endif()
 
     target_include_directories(
       see PRIVATE ${GL_INCLUDE_DIRS} ${GLU_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS}
-                  ${nlohmann-json_SOURCE_DIR}/include)
+                  ${nlohmann-json_SOURCE_DIR}/include ${PNG_INCLUDE_DIRS})
 
     target_link_directories(see PRIVATE ${GL_LIBRARY_DIRS} ${GLU_LIBRARY_DIRS}
-                            ${GLUT_LIBRARY_DIRS})
+                            ${GLUT_LIBRARY_DIRS} ${PNG_LIBRARY_DIRS})
 
-    target_link_libraries(see PUBLIC ${GL_LIBRARIES} ${GLU_LIBRARIES}
-                                     ${GLUT_LIBRARIES} Rockable_core)
+    target_link_libraries(
+      see PUBLIC ${GL_LIBRARIES} ${GLU_LIBRARIES} ${GLUT_LIBRARIES}
+                 ${PNG_LIBRARIES} Rockable_core)
 
-  endif()
+  endif() #=========
 
   install(TARGETS see)
 
 endif()
 
 # ##############################################################################
-# interactive preprocessing (TODO see3 -> will be renamed something like 'craft'
+# interactive preprocessing (TODO see3 -> will be renamed something like 'craft' or 'seedit' or 'reveal'
 # or 'look') Before, the use of glfw will be replaced by glut (to avoid issues
 # with macosx)
 if(ROCKABLE_COMPILE_SEE3)
@@ -404,32 +420,30 @@ if(ROCKABLE_COMPILE_SEE3)
 
   add_executable(see3 ${SEE3_FILES})
 
-  if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
+  if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux") # ===========
 
     target_include_directories(
       see3
-      PUBLIC ${OPENGL_INCLUDE_DIR} ${imgui_SOURCE_DIR}
+      PRIVATE ${OPENGL_INCLUDE_DIR} ${imgui_SOURCE_DIR}
              ${imgui_SOURCE_DIR}/backends ${nlohmann-json_SOURCE_DIR}/include)
 
-    target_link_libraries(see3 PUBLIC glfw OpenGL::GL OpenGL::GLU Rockable_core)
+    target_link_libraries(see3 PRIVATE glfw OpenGL::GL OpenGL::GLU Rockable_core)
 
-  else() # For APPLE
-
-    set(CMAKE_TAPI OFF)
+  else() # For APPLE  ===========
 
     target_include_directories(
       see3
-      PUBLIC ${GL_INCLUDE_DIRS} ${GLU_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS}
-             ${GLFW_LIBRARY_DIRS} ${imgui_SOURCE_DIR}
+      PRIVATE ${GL_INCLUDE_DIRS} ${GLU_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS}
+             ${GLFW_INCLUDE_DIRS} ${imgui_SOURCE_DIR}
              ${imgui_SOURCE_DIR}/backends)
 
-    target_link_directories(see3 PUBLIC ${GL_LIBRARY_DIRS} ${GLU_LIBRARY_DIRS}
+    target_link_directories(see3 PRIVATE ${GL_LIBRARY_DIRS} ${GLU_LIBRARY_DIRS}
                             ${GLFW_LIBRARY_DIRS})
 
-    target_link_libraries(see3 PUBLIC ${GL_LIBRARIES} ${GLU_LIBRARIES}
+    target_link_libraries(see3 PRIVATE ${GL_LIBRARIES} ${GLU_LIBRARIES}
                                       ${GLFW_LIBRARIES} Rockable_core)
 
-  endif()
+  endif() # ===========
 
   install(TARGETS see3)
 

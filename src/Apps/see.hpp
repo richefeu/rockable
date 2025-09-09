@@ -43,7 +43,7 @@
 
 #include <GL/freeglut.h>
 
-#ifdef PNG_H
+#ifdef WITH_LIBPNG
 #include <png.h>
 #endif
 
