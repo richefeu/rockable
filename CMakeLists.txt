@@ -351,7 +351,7 @@ if(ROCKABLE_COMPILE_SEE)
     add_executable(see ${CMAKE_SOURCE_DIR}/Apps/see.cpp)
 
     if(PNG_FOUND)
-      target_compile_options(see PRIVATE -DPNG_H)
+      target_compile_options(see PRIVATE -DWITH_LIBPNG)
     endif()
 
     target_include_directories(
@@ -359,9 +359,9 @@ if(ROCKABLE_COMPILE_SEE)
       PRIVATE ${OPENGL_INCLUDE_DIR} ${GLU_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS}
               ${nlohmann-json_SOURCE_DIR}/include ${PNG_INCLUDE_DIRS})
 
-    target_link_directories(see PRIVATE ${GLUT_LIBRARY_DIRS} ${PNG_LIBRARY})
+    target_link_directories(see PRIVATE ${GLUT_LIBRARY_DIRS} ${PNG_LIBRARY_DIRS})
 
-    target_link_libraries(see PUBLIC OpenGL::GL OpenGL::GLU ${GLUT_LIBRARIES}
+    target_link_libraries(see PRIVATE OpenGL::GL OpenGL::GLU ${GLUT_LIBRARIES}
                                      Rockable_core PNG::PNG)
 
   else() # Darwin =========
