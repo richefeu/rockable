@@ -27,6 +27,8 @@ jobs:
       run: sudo apt-get install -y freeglut3-dev
     - name: Install PNG
       run: sudo apt-get install -y libpng-dev libpng16-16
+    - name: Install FLTK
+      run: sudo apt-get install libfltk1.3-dev fluid
     - name: Configure CMake
       run: cmake -DCMAKE_CXX_FLAGS="--coverage -g" -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
