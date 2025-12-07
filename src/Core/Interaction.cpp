@@ -325,6 +325,11 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
 #undef _EPSILON_VALUE_
     }};  // End of dispatching array of lambdas
 
+
+
+
+
+
 // ================================================
 // PERIODIC VERSIONS OF THE LAMBDAS
 // ================================================

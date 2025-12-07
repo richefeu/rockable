@@ -118,6 +118,15 @@ void keyboard(unsigned char Key, int /*x*/, int /*y*/) {
         Shapes[ishape].MCnstep = (size_t)floor(Shapes[ishape].MCnstep * 0.1);
       }
     } break;
+    
+    case 'o': {
+      Shapes[ishape].fibObbOption += 1;
+      if (Shapes[ishape].fibObbOption > 3) { Shapes[ishape].fibObbOption = 0; }
+      if (Shapes[ishape].fibObbOption == 0) {std::cout << "fit OBB strategy = COVARIANCE" << std::endl; }
+      if (Shapes[ishape].fibObbOption == 1) {std::cout << "fit OBB strategy = MIN_VOLUME" << std::endl; }
+      if (Shapes[ishape].fibObbOption == 2) {std::cout << "fit OBB strategy = IS_AABB" << std::endl; }
+      if (Shapes[ishape].fibObbOption == 3) {std::cout << "fit OBB strategy = IMPOSED_AXIS" << std::endl; }
+    } break;
 
     case 'p': {
       exportSample();

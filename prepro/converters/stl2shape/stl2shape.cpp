@@ -183,11 +183,11 @@ struct mesh {
 void readStlBin(const char* name, mesh& Mesh) {
   std::ifstream file(name, std::ifstream::binary | std::ifstream::in);
   if (!file) {
-    std::cerr << "Cannot read " << name << std::endl;
+    std::cout << "Cannot read " << name << std::endl;
     return;
   }
 
-  std::cerr << "Read mesh file (stl BINARY format)... " << std::flush;
+  std::cout << "Read mesh file (stl BINARY format)... " << std::flush;
 
   uint8_t head[80];
   file.read((char*)&head, sizeof(uint8_t) * 80);
@@ -300,9 +300,9 @@ void readStlBin(const char* name, mesh& Mesh) {
   }
 
   std::cout << "done." << std::endl;
-  std::cout << "  Number of vertices  " << Mesh.points.size() << std::endl;
-  std::cout << "  Number of edges     " << Mesh.edges.size() << std::endl;
-  std::cout << "  Number of triangles " << Mesh.triangles.size() << std::endl;
+  std::cout << "> Number of vertices  = " << Mesh.points.size() << std::endl;
+  std::cout << "> Number of edges     = " << Mesh.edges.size() << std::endl;
+  std::cout << "> Number of triangles = " << Mesh.triangles.size() << std::endl;
 }
 
 // Exportation in shp format (for Rockable)
@@ -431,7 +431,7 @@ int main(int argc, char const* argv[]) {
   if (clean == true) {
     std::cout << "Remove duplicated edges\n";
     MESH.clean();
-    std::cout << "  Number of edges     " << MESH.edges.size() << '\n';
+    std::cout << "> Number of edges = " << MESH.edges.size() << '\n';
   }
 
   if (maxLength > 0.0) {

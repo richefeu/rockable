@@ -76,6 +76,7 @@ nlohmann::json params = {{"colorMode", 0},
                          {"show_velocities", 0},
                          {"show_colorBar", 1},
                          {"show_forces", 0},
+                         {"show_normal_forces", 0}, 
                          {"show_obb", 0},
                          {"enlarged_obb", 0},
                          {"show_interFrames", 0},
@@ -136,6 +137,7 @@ vec3r up;
 
 void drawShape(Shape* s, double homothety = 1.0, const mat9r& T = mat9r::unit());
 void drawForces();
+void drawC2CNormalForce();
 void drawVelocities();
 void drawParticles();
 void drawTrajectories();

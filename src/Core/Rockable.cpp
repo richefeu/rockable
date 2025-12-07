@@ -582,9 +582,9 @@ void Rockable::saveConf(const char* fname) {
          << Particles[i].homothety << ' ' << Particles[i].pos << ' ' << Particles[i].vel << ' ' << Particles[i].acc
          << ' ' << Particles[i].Q << ' ' << Particles[i].vrot << ' ' << Particles[i].arot;
     if (useSoftParticles == 1) {
-      conf << ' ' << Particles[i].uniformTransformation << '\n';
+      //conf << ' ' << Particles[i].uniformTransformation << '\n';
     } else {
-      conf << '\n';
+      //conf << '\n';
     }
   }
 
@@ -909,9 +909,9 @@ void Rockable::initParser() {
       }
       conf >> P.group >> P.cluster >> P.homothety >> P.pos >> P.vel >> P.acc >> P.Q >> P.vrot >> P.arot;
       if (useSoftParticles == 1) {
-        conf >> P.uniformTransformation;
+        //conf >> P.uniformTransformation;
       } else {
-        P.uniformTransformation = mat9r::unit();
+        //P.uniformTransformation = mat9r::unit();
       }
 
       P.shape = &(Shapes[shapeId[shpName]]);  // Plug to the shape
@@ -2029,7 +2029,7 @@ void Rockable::velocityVerletStep() {
     Particles[i].vel += dt_2 * Particles[i].acc;
 
 #ifdef ROCKABLE_ENABLE_PERIODIC
-    // remember here that we use reduced coordinates here, in case of periodic cell
+    // remember here that we use reduced coordinates here, in case a periodic cell is used
     if (usePeriodicCell == 1) {
       Cell.forceToStayInside(Particles[i].pos);
     }
@@ -2748,6 +2748,7 @@ void Rockable::incrementResultants(Interaction& I) {
   Particles[I.j].moment += cross(Cj, -f) - I.mom;
 
   if (useSoftParticles == 1) {
+    /*
     Particles[I.i].stress.xx += f.x * Ci.x;
     Particles[I.i].stress.xy += f.x * Ci.y;
     Particles[I.i].stress.xz += f.x * Ci.z;
@@ -2767,6 +2768,7 @@ void Rockable::incrementResultants(Interaction& I) {
     Particles[I.j].stress.zx -= f.z * Cj.x;
     Particles[I.j].stress.zy -= f.z * Cj.y;
     Particles[I.j].stress.zz -= f.z * Cj.z;
+    */
   }
 }
 
@@ -2858,7 +2860,7 @@ void Rockable::initialise_particle_forces_and_moments() {
     Particles[i].acc.reset();
     Particles[i].moment.reset();
     Particles[i].arot.reset();
-    Particles[i].stress.reset();
+    //Particles[i].stress.reset();
   }
 #ifdef ROCKABLE_ENABLE_PERIODIC
   if (usePeriodicCell == 1) {
@@ -3621,12 +3623,13 @@ void Rockable::accelerations() {
   compute_SpringJoints();
 
 #ifdef ROCKABLE_ENABLE_SOFT_PARTICLES
+  /*
   // compute_SoftParticles_transformation();
   if (useSoftParticles == 1) {
     // pour le moment on code en dure la loi. ***** DEVEL
 
     for (size_t i = 0; i < Particles.size(); i++) {
-      double volume = /* Particles[i].uniformTransformation * */ (Particles[i].homothety * Particles[i].homothety *
+      double volume =  (Particles[i].homothety * Particles[i].homothety *
                                                                   Particles[i].homothety * Particles[i].shape->volume);
       Particles[i].stress /= volume;
       Particles[i].stress.symmetrize();
@@ -3634,6 +3637,7 @@ void Rockable::accelerations() {
       Particles[i].uniformTransformation = mat9r::unit();  // + strain;
     }
   }
+  */
 #endif
 
   check_breakage_of_interfaces();

@@ -44,6 +44,11 @@
 #include "OBBtree.hpp"
 #include "quat.hpp"
 
+#define SHAPE_OBB_COVARIANCE 0
+#define SHAPE_OBB_MIN_VOLUME_STRATEGY 1
+#define SHAPE_OBB_IS_AABB 2
+#define SHAPE_OBB_IMPOSED_AXIS 3
+
 struct subBox {
   size_t isub;
   int nbPoints;
@@ -77,6 +82,8 @@ class Shape {
   size_t MCnstep;      ///< Number of steps for Monte Carlo integration
   double Rmax;         ///< Radius of the circumscribed sphere
   double Rswing;       ///< Maximum distance between a vertexe and the center
+  
+  int fibObbOption{SHAPE_OBB_IS_AABB}; ///< The algorithm used for defining the OBB
 
   // Ctor
   Shape();
@@ -88,7 +95,13 @@ class Shape {
   void write(std::ostream& os);
 
   void getAABB(AABB& aabb);
+  
   void fitObb();
+  void fitObb_convex();
+  void fitObb_any();
+  void fitObb_imposed_axis();
+  mat9r getCovarianceMatrix();
+  
   bool inside(const vec3r& point);
   void massProperties();
   void clean();

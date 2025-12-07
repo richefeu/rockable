@@ -212,6 +212,9 @@ void keyboard(unsigned char Key, int x, int y) {
     case 'f': {
       params["show_forces"] = 1 - params["show_forces"].get<int>();
     } break;
+    case 'F': {
+      params["show_normal_forces"] = 1 - params["show_normal_forces"].get<int>();
+    } break;
 
     case 'h': {
       textZone.addLine("");
@@ -567,7 +570,7 @@ void selection(int x, int y) {
 void mouse(int button, int state, int x, int y) {
   if (state == GLUT_UP) {
     mouse_mode = NOTHING;
-    //display();
+    // display();
     glutPostRedisplay();
   } else if (state == GLUT_DOWN) {
 
@@ -658,6 +661,10 @@ void display() {
 
   if (params["show_forces"].get<int>() == 1) {
     drawForces();
+  }
+
+  if (params["show_normal_forces"].get<int>() == 1) {
+    drawC2CNormalForce();
   }
 
   if (params["show_interFrames"].get<int>() == 1) {
@@ -879,7 +886,7 @@ void drawParticles() {
     glTranslatef(pos.x, pos.y, pos.z);
     quat2GLMatrix<GLfloat>(box.Particles[i].Q, Rot_Matrix);
     glMultMatrixf(Rot_Matrix);
-    drawShape(box.Particles[i].shape, box.Particles[i].homothety, box.Particles[i].uniformTransformation);
+    drawShape(box.Particles[i].shape, box.Particles[i].homothety /*, box.Particles[i].uniformTransformation*/);
     glPopMatrix();
   }
 
@@ -898,7 +905,7 @@ void drawParticles() {
       glTranslatef(pos.x, pos.y, pos.z);
       quat2GLMatrix<GLfloat>(box.Particles[i].Q, Rot_Matrix);
       glMultMatrixf(Rot_Matrix);
-      drawShape(box.Particles[i].shape, box.Particles[i].homothety, box.Particles[i].uniformTransformation);
+      drawShape(box.Particles[i].shape, box.Particles[i].homothety /*, box.Particles[i].uniformTransformation*/);
       glPopMatrix();
     }
   }
@@ -1295,6 +1302,73 @@ void drawInteractionFrames() {
       glBegin(GL_POINTS);
       glVertex3f(it->pos.x, it->pos.y, it->pos.z);
       glEnd();
+    }
+  }
+}
+
+void drawC2CNormalForce() {
+  if (mouse_mode != NOTHING && box.Particles.size() > 200) {
+    return;
+  }
+
+  // Build particle-to-particle Fn map
+  std::map<std::pair<size_t, size_t>, double> Fn;
+  for (size_t k = 0; k < box.Interactions.size(); ++k) {
+    std::set<Interaction>::iterator it = box.Interactions[k].begin();
+    for (; it != box.Interactions[k].end(); ++it) {
+      size_t i = it->i;
+      size_t j = it->j;
+      if (i > j) std::swap(i, j);
+      Fn[std::make_pair(i, j)] += it->fn;
+    }
+  }
+
+  if (Fn.empty()) return;
+
+  // Finding fnMax
+  double fnMax = -std::numeric_limits<double>::infinity();
+  auto max_it =
+      std::max_element(Fn.begin(), Fn.end(), [](const auto& a, const auto& b) { return a.second < b.second; });
+  fnMax = max_it->second;
+  if (fabs(fnMax) < 1e-12) return;
+
+  // Finding Dmax
+  double Vtot{0.0};
+  for (size_t i = box.nDriven; i < box.Particles.size(); i++) {
+    double resizeFactor = box.Particles[i].homothety;
+    resizeFactor = resizeFactor * resizeFactor * resizeFactor;
+    Vtot += box.Particles[i].shape->volume * resizeFactor;
+  }
+  double Vmean = Vtot / static_cast<double>(box.Particles.size() - box.nDriven);
+  double Dmax = 0.5 * std::pow(Vmean, 0.33333333);
+
+  // Now start drawing
+  glDisable(GL_LIGHTING);
+  glEnable(GL_DEPTH_TEST);
+
+  for (auto it = Fn.begin(); it != Fn.end(); ++it) {
+    size_t i = it->first.first;
+    size_t j = it->first.second;
+    double fn = it->second;
+
+    if (fn > 0.0) {
+      glColor3ub(255, 0, 0);
+    } else {
+      glColor3ub(0, 0, 255);
+    }
+
+    double D = Dmax * fabs(fn / fnMax);
+
+    if (i > box.nDriven && j > box.nDriven) {
+      vec3r begin = box.Particles[i].pos;
+      vec3r branch = box.Particles[j].pos - begin;
+      glShape::tube(begin, branch, D);
+    } else {
+      if (i <= box.nDriven) {
+        // TODO
+      } else {
+        // TODO
+      }
     }
   }
 }

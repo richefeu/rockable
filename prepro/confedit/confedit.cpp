@@ -1,5 +1,6 @@
 #include "confedit.hpp"
 
+// TODO rename init_snippets()
 void init_completion() {
   // comp["____"] = "____";
 
@@ -17,8 +18,10 @@ void init_completion() {
   comp["Update NL dynamically"] = "dynamicUpdateNL _0/1_\ndispUpdateNL _distance_\nangleUpdateNL _angleDegree_";
   comp["numericalDampingCoeff"] = "_____";
   comp["Velocity barriers"] =
-      "VelocityBarrier _value_\nAngularVelocityBarrier _value_\n"
-      "VelocityBarrierExponent _value_\nAngularVelocityBarrierExponent _value_\n";
+      "VelocityBarrier _value_\n"
+      "AngularVelocityBarrier _value_\n"
+      "VelocityBarrierExponent _value_\n"
+      "AngularVelocityBarrierExponent _value_\n";
 
   comp["Tempo"] = "_____";
 
@@ -67,7 +70,7 @@ void init_documentation() {
       "Maximum time (at the end of a simulation)";
   docu["dt"] =
       "dt [(double) value]\n\n"
-      "Time step";
+      "Time step increment";
   docu["interVerlet"] =
       "interVerlet [(double) duration]\n\n"
       "Elapsed time between each update of the neighbor list (NL)";
@@ -275,10 +278,10 @@ void init_keywords() {
   code_keywords.insert(std::string("dispUpdateNL"));
   code_keywords.insert(std::string("angleUpdateNL"));
   code_keywords.insert(std::string("numericalDampingCoeff"));
-  code_keywords.insert(std::string("velocityBarrier"));
-  code_keywords.insert(std::string("angularVelocityBarrier"));
-  code_keywords.insert(std::string("velocityBarrierExponent"));
-  code_keywords.insert(std::string("angularVelocityBarrierExponent"));
+  code_keywords.insert(std::string("VelocityBarrier"));
+  code_keywords.insert(std::string("AngularVelocityBarrier"));
+  code_keywords.insert(std::string("VelocityBarrierExponent"));
+  code_keywords.insert(std::string("AngularVelocityBarrierExponent"));
   code_keywords.insert(std::string("Tempo"));
   code_keywords.insert(std::string("forceLaw"));
   code_keywords.insert(std::string("AddOrRemoveInteractions"));
@@ -295,6 +298,7 @@ void init_keywords() {
   code_keywords.insert(std::string("muContact"));
   code_keywords.insert(std::string("krContact"));
   code_keywords.insert(std::string("murContact"));
+  code_keywords.insert(std::string("viscTContact"));
 
   code_keywords.insert(std::string("knInnerBond"));
   code_keywords.insert(std::string("en2InnerBond"));
@@ -379,6 +383,7 @@ void init_types() {
   code_types.insert(std::string("Default"));
   code_types.insert(std::string("Avalanches"));
   code_types.insert(std::string("StickedLinks"));
+  code_types.insert(std::string("GeoVisc"));
 
   // add or remove interaction
   code_types.insert(std::string("bruteForce"));

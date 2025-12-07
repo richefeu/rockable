@@ -84,6 +84,7 @@ void Shape::read(std::istream& inputStream) {
   parser.kwMap["orientation"] = __GET__(is, orientation);
   parser.kwMap["isSurface"] = __DO__() { isSurface = true; };
   parser.kwMap["MCnstep"] = __GET__(is, MCnstep);
+  parser.kwMap["fibObbOption"] = __GET__(is, fibObbOption);
   parser.kwMap["nv"] = __DO__(is) {
     size_t nv;
     is >> nv;
@@ -144,6 +145,7 @@ void Shape::write(std::ostream& os) {
   os << "orientation " << orientation << std::endl;
   if (isSurface == true) os << "isSurface" << std::endl;
   os << "MCnstep " << MCnstep << std::endl;
+  os << "fibObbOption " << fibObbOption << std::endl;
 
   os << "nv " << vertex.size() << std::endl;
   for (size_t v = 0; v < vertex.size(); v++) {
@@ -168,9 +170,164 @@ void Shape::write(std::ostream& os) {
   os << ">" << std::endl;
 }
 
+void Shape::fitObb() {
+  if (fibObbOption == SHAPE_OBB_IMPOSED_AXIS) {
+    fitObb_imposed_axis(); // Don't forget to set the axis in Shape.obb before
+  } else if (fibObbOption == SHAPE_OBB_IS_AABB) {
+    AABB aabb;
+    getAABB(aabb);
+    obb.center = 0.5*(aabb.min + aabb.max);
+    obb.e[0].set(1.0, 0.0, 0.0);
+    obb.e[1].set(0.0, 1.0, 0.0);
+    obb.e[2].set(0.0, 0.0, 1.0);
+    obb.extent= 0.5*(aabb.max - aabb.min);
+  } else if (fibObbOption == SHAPE_OBB_MIN_VOLUME_STRATEGY) {
+    fitObb_convex();
+  } else if (fibObbOption == SHAPE_OBB_COVARIANCE) {
+    fitObb_any();
+  }
+}
+
+void Shape::fitObb_imposed_axis(){
+  if (vertex.empty()) {
+    std::cerr << "@Shape::fitObb_any, vertex is empty!!\n";
+  }
+  double invN = 1.0 / (double)vertex.size();
+  
+  // We consider here that the axis set in obb are the ones we want to impose
+  obb.e[0].normalize();
+  obb.e[1].normalize();
+  obb.e[2].normalize();
+
+  // now build the bounding box extents in the rotated frame
+  vec3r minim(1e20, 1e20, 1e20);
+  vec3r maxim(-1e20, -1e20, -1e20);
+  vec3r center;
+  for (size_t p = 0; p < vertex.size(); p++) {
+    center += vertex[p];
+    vec3r p_prime(obb.e[0] * vertex[p], obb.e[1] * vertex[p], obb.e[2] * vertex[p]);
+    if (minim.x > p_prime.x) minim.x = p_prime.x;
+    if (minim.y > p_prime.y) minim.y = p_prime.y;
+    if (minim.z > p_prime.z) minim.z = p_prime.z;
+    if (maxim.x < p_prime.x) maxim.x = p_prime.x;
+    if (maxim.y < p_prime.y) maxim.y = p_prime.y;
+    if (maxim.z < p_prime.z) maxim.z = p_prime.z;
+  }
+
+  obb.center = invN * center;
+  obb.extent = 0.5 * (maxim - minim);
+
+  obb.enlarge(radius);  // Add the Minskowski radius  
+}
+
+mat9r Shape::getCovarianceMatrix() {
+
+  if (vertex.empty()) {
+    std::cout << "@Shape::getCovarianceMatrix, no vertex to compute a covariance matrix!\n";
+    mat9r C0;
+    return C0;
+  }
+
+  vec3r mu;
+  mat9r C;
+
+  // loop over the points to find the mean point location
+  //size_t nbP = vertex.size();
+  double invN = 1.0 / (double)vertex.size();
+
+  for (size_t p = 0; p < vertex.size(); p++) {
+    mu += vertex[p];
+  }
+  mu *= invN;
+
+  // loop over the points again to build the covariance matrix.  Note that we only have
+  // to build terms for the upper trianglular portion since the matrix is symmetric
+  double cxx{0.0}, cxy{0.0}, cxz{0.0};
+  double cyy{0.0}, cyz{0.0}, czz{0.0};
+  for (size_t p = 0; p < vertex.size(); p++) {
+    double dx = vertex[p].x - mu.x;
+    double dy = vertex[p].y - mu.y;
+    double dz = vertex[p].z - mu.z;
+    cxx += dx * dx;
+    cxy += dx * dy;
+    cxz += dx * dz;
+    cyy += dy * dy;
+    cyz += dy * dz;
+    czz += dz * dz;
+  }
+
+  // Average the terms
+  cxx *= invN;
+  cxy *= invN;
+  cxz *= invN;
+  cyy *= invN;
+  cyz *= invN;
+  czz *= invN;
+
+  // now build the covariance matrix
+  C.xx = cxx;
+  C.xy = cxy;
+  C.xz = cxz;
+  C.yx = cxy;
+  C.yy = cyy;
+  C.yz = cyz;
+  C.zx = cxz;
+  C.zy = cyz;
+  C.zz = czz;
+
+  return C;
+}
+
+void Shape::fitObb_any() {
+  if (vertex.empty()) {
+    std::cerr << "@Shape::fitObb_any, vertex is empty!!\n";
+  }
+
+  // compute the covariance matrix
+  mat9r C = getCovarianceMatrix();
+
+  // ==== set the OBB parameters from the covariance matrix
+  // extract the eigenvalues and eigenvectors from C
+  mat9r eigvec;
+  vec3r eigval;
+  C.sym_eigen(eigvec, eigval);
+
+  // find the right, up and forward vectors from the eigenvectors
+  vec3r r(eigvec.xx, eigvec.yx, eigvec.zx);
+  vec3r u(eigvec.xy, eigvec.yy, eigvec.zy);
+  vec3r f(eigvec.xz, eigvec.yz, eigvec.zz);
+  r.normalize();
+  u.normalize(), f.normalize();
+
+  // now build the bounding box extents in the rotated frame
+  vec3r minim(1e20, 1e20, 1e20);
+  vec3r maxim(-1e20, -1e20, -1e20);
+
+  for (size_t p = 0; p < vertex.size(); p++) {
+    vec3r p_prime(r * vertex[p], u * vertex[p], f * vertex[p]);
+    if (minim.x > p_prime.x) minim.x = p_prime.x;
+    if (minim.y > p_prime.y) minim.y = p_prime.y;
+    if (minim.z > p_prime.z) minim.z = p_prime.z;
+    if (maxim.x < p_prime.x) maxim.x = p_prime.x;
+    if (maxim.y < p_prime.y) maxim.y = p_prime.y;
+    if (maxim.z < p_prime.z) maxim.z = p_prime.z;
+  }
+
+  // set the center of the OBB to be the average of the
+  // minimum and maximum, and the extents be half of the
+  // difference between the minimum and maximum
+  obb.center = eigvec * (0.5 * (maxim + minim));
+  obb.e[0] = r;
+  obb.e[1] = u;
+  obb.e[2] = f;
+  obb.extent = 0.5 * (maxim - minim);
+
+  obb.enlarge(radius);  // Add the Minskowski radius
+}
+
 // See pdf document "Minimum-Area Rectangle Containing a Convex Polygon" (@see
 // http://www.geometrictools.com/)
-void Shape::fitObb() {
+void Shape::fitObb_convex() {
   if (face.empty()) {
     std::cerr << "No face in this shape. Cannot define the Oriented Bounding Box" << std::endl;
     return;
@@ -195,21 +352,21 @@ void Shape::fitObb() {
     ext0_max = ext1_max = ext2_max = -1.0e20;
     for (size_t v = 0; v < vertex.size(); ++v) {
       Vtest = vertex[v] - P0;
-      
+
       ext_test = Vtest * e0;
       if (ext_test < ext0_min) {
         ext0_min = ext_test;
       } else if (ext_test > ext0_max) {
         ext0_max = ext_test;
       }
-      
+
       ext_test = Vtest * e1;
       if (ext_test < ext1_min) {
         ext1_min = ext_test;
       } else if (ext_test > ext1_max) {
         ext1_max = ext_test;
       }
-      
+
       ext_test = Vtest * e2;
       if (ext_test < ext2_min) {
         ext2_min = ext_test;
