@@ -90,7 +90,7 @@ Installation of `Rockable` via `spack`:
 
 .. code-block:: bash
   
-  git clone git clone --depth=2 --branch=v0.23.0 https://github.com/spack/spack.git
+  git clone git clone --depth=2 --branch=v1.1.0 https://github.com/spack/spack.git
   source spack/share/spack/setup-env.sh
   git clone https://github.com/Collab4exaNBody/spack-repos.git
   spack repo add spack-repos
