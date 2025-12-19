@@ -50,8 +50,8 @@
 #define SHAPE_OBB_IMPOSED_AXIS 3
 
 struct subBox {
-  size_t isub;
-  int nbPoints;
+  size_t isub{0};
+  int nbPoints{0};
 };
 
 /// Shape of a sphero-polyhedron
@@ -64,26 +64,26 @@ class Shape {
   std::vector<std::vector<size_t> > face;        ///< List of faces, each of which is
                                                  ///< defined by a list of vertex local-number
 
-  OBBtree<subBox> tree;  ///< The OBB tree of the model
-  int OBBtreeLevel;      ///< Deepness of the OBB tree
-  bool treeComputed;     ///< Flag to know wether the tree is built
+  OBBtree<subBox> tree;      ///< The OBB tree of the model
+  int OBBtreeLevel{0};       ///< Deepness of the OBB tree
+  bool treeComputed{false};  ///< Flag to know wether the tree is built
 
-  vec3r position;      ///< A saving of OG (after the computation of mass center)
-  quat orientation;    ///< A saving of the rotation of eigen vectors resulting
-                       ///< from the computation of inertia matrix
-  std::string name;    ///< Name of the shape
-  char preCompDone;    ///< Can be 'n' or 'y' to allow or not (resp.) the
-                       ///< numerical computation of mass center, volume and I/m
-  bool isSurface;      ///< If true, the shape is a surface (not a volume formed by a polyedron)
-  double radius;       ///< Minskowski radius
-  double volume;       ///< Volume
-  vec3r inertia_mass;  ///< Diagonal terms of the matrix of inertia/mass (in the principal framework)
-  OBB obb;             ///< Oriented Bounding Box
-  size_t MCnstep;      ///< Number of steps for Monte Carlo integration
-  double Rmax;         ///< Radius of the circumscribed sphere
-  double Rswing;       ///< Maximum distance between a vertexe and the center
-  
-  int fibObbOption{SHAPE_OBB_IS_AABB}; ///< The algorithm used for defining the OBB
+  vec3r position;           ///< A saving of OG (after the computation of mass center)
+  quat orientation;         ///< A saving of the rotation of eigen vectors resulting
+                            ///< from the computation of inertia matrix
+  std::string name;         ///< Name of the shape
+  char preCompDone{'n'};    ///< Can be 'n' or 'y' to allow or not (resp.) the
+                            ///< numerical computation of mass center, volume and I/m
+  bool isSurface{false};    ///< If true, the shape is a surface (not a volume formed by a polyedron)
+  double radius{0.0};       ///< Minskowski radius
+  double volume{0.0};       ///< Volume
+  vec3r inertia_mass{0.0};  ///< Diagonal terms of the matrix of inertia/mass (in the principal framework)
+  OBB obb;                  ///< Oriented Bounding Box
+  size_t MCnstep{10000};    ///< Number of steps for Monte Carlo integration
+  double Rmax{0.0};         ///< Radius of the circumscribed sphere
+  double Rswing{0.0};       ///< Maximum distance between a vertexe and the center
+
+  int fibObbOption{SHAPE_OBB_IS_AABB};  ///< The algorithm used for defining the OBB
 
   // Ctor
   Shape();
@@ -95,13 +95,13 @@ class Shape {
   void write(std::ostream& os);
 
   void getAABB(AABB& aabb);
-  
+
   void fitObb();
   void fitObb_convex();
   void fitObb_any();
   void fitObb_imposed_axis();
   mat9r getCovarianceMatrix();
-  
+
   bool inside(const vec3r& point);
   void massProperties();
   void clean();

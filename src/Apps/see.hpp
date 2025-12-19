@@ -76,7 +76,7 @@ nlohmann::json params = {{"colorMode", 0},
                          {"show_velocities", 0},
                          {"show_colorBar", 1},
                          {"show_forces", 0},
-                         {"show_normal_forces", 0}, 
+                         {"show_normal_forces", 0},
                          {"show_obb", 0},
                          {"enlarged_obb", 0},
                          {"show_interFrames", 0},
@@ -164,6 +164,8 @@ void menu(int num);
 // Helper functions
 void local_to_json();
 void json_to_local();
+void load_see_json();
+void save_see_json();
 void buildMenu();
 vec3r rotatePoint(vec3r const& p, vec3r const& center, vec3r const& axis, double theta);
 void computePerspective();

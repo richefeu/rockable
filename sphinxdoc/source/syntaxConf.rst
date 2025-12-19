@@ -67,7 +67,7 @@ Neighbor List (NL)
 - ``DVerlet`` (*double*) **value**
 
   Distance used to define if two sphero-polyhedra are neighbors. 
-  This length is added to the Object-Bounding Boxes (OBBs) before testing for overlap. 
+  This length is added to the Oriented Bounding Boxes (OBBs) before testing for overlap. 
   In other words, half of this length is added to each side of the OBBs.
 
 - ``dVerlet`` (*double*) **value**
@@ -112,9 +112,7 @@ Computation options
   Choose the method for handling interactions between particles (sphero-polyhedra).
 
   - **Options**: ``bruteForce`` (default) or ``OBBtree``
-  - **Description**: The interactions between particles involve different types of interaction, 
-	such as sphere-sphere, sphere-tube, sphere-polygon, and tube-tube. The best strategy to be used depends 
-	on the complexity of the involved shapes.
+  - **Description**: The interactions between particles involve different types of interaction, such as sphere-sphere, sphere-tube, sphere-polygon, and tube-tube. The best strategy to be used depends on the complexity of the involved shapes.
 
 - ``UpdateNLStrategy`` (*string*) **Option**
 
@@ -123,10 +121,8 @@ Computation options
   - **Options**: ``bruteForce`` (default) or ``linkCells``
   - **Description**: In the case of the ``linkCells`` strategy, the following additional settings need to be configured:
 
-    - ``cellMinSizes`` (*double*) **xmin** (*double*) **ymin** (*double*) **zmin**: Set the minimum size of 
-		a cell in each direction.
-    - ``boxForLinkCellsOpt`` (0 | 1): A flag to determine if the first driven bodies are part of the overall 
-		bounding box, which will be split into cells.
+    - ``cellMinSizes`` (*double*) **xmin** (*double*) **ymin** (*double*) **zmin**: Set the minimum size of a cell in each direction.
+    - ``boxForLinkCellsOpt`` (0 | 1): A flag to determine if the first driven bodies are part of the overall bounding box, which will be split into cells.
 
 - ``Integrator`` (*string*) **Option**
 

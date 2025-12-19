@@ -47,8 +47,8 @@ const int breakModel_Gc = 1;
 
 class BreakableInterface {
  public:
-  size_t i;  ///< ID-number of the first particle
-  size_t j;  ///< ID-number of the second particle
+  size_t i{0};  ///< ID-number of the first particle
+  size_t j{0};  ///< ID-number of the second particle
 
   // Be careful not to change the order of the following parameters
   // because they are accessed in Rockable::setVariableStickParams
@@ -60,8 +60,7 @@ class BreakableInterface {
   double ft0{0.0};    ///< Embeded ft0
   double mom0{0.0};   ///< Embeded mom0
   double power{0.0};  ///< Embeded power
-
-  double Gc{0.0};  ///< Embeded ???
+  double Gc{0.0};  ///< Embeded surface energy
 
   int breakModel{breakModel_Gc};
 
@@ -70,7 +69,7 @@ class BreakableInterface {
   double En{0.0};    ///< ___
   double Et{0.0};    ///< ___
 
-  int isInner;  ///< Equals 1 if the interface is inside a cluster, 0 if it is in-between two different clusters
+  int isInner{-1};  ///< Equals 1 if the interface is inside a cluster, 0 if it is in-between two different clusters
   std::vector<Interaction*> concernedBonds;  ///< Links to the connected points
 
   BreakableInterface();  // Ctor

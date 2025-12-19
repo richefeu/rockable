@@ -76,8 +76,8 @@ struct RK4MoreData {
 /// A particle (which is a sphero-polyhedron)
 class Particle {
  public:
-  int group;    ///< A number that relates to a 'category of bodies'
-  int cluster;  ///< A number that identifies the cluster to which the particle belongs
+  int group{0};    ///< A number that relates to a 'category of bodies'
+  int cluster{0};  ///< A number that identifies the cluster to which the particle belongs
 
   vec3r pos;  ///< Position
   vec3r vel;  ///< Velocity
@@ -97,11 +97,11 @@ class Particle {
 
 #ifdef ROCKABLE_ENABLE_SOFT_PARTICLES
   // FIXME: we may use a pointer to all these dataset
-  SoftParticlePhysics * SPP{nullptr};// when SPP == nullptr, the particle is rigid
-  //mat9r uniformTransformation;
-  //mat9r stress;
+  SoftParticlePhysics* SPP{nullptr};  // when SPP == nullptr, the particle is rigid
+  // mat9r uniformTransformation;
+  // mat9r stress;
 #endif
-  
+
   vec3r force;   ///< Resultant force acting on the particle
   vec3r moment;  ///< Resultant moment acting on the particle
 

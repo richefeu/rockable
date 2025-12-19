@@ -67,18 +67,50 @@ void json_to_local() {
   glutReshapeWindow(width, height);
 }
 
+void load_see_json() {
+  // read the json configuration file 'see.json' if it exists
+  // create the file 'see.json' if it does not exist
+  if (fileTool::fileExists("see.json")) {
+    std::ifstream file("see.json");
+    nlohmann::json patch = nlohmann::json::parse(file);
+    params.merge_patch(patch);
+    json_to_local();
+    textZone.addLine("Configuration file see.json has been loaded");
+  } else {
+    local_to_json();
+    std::ofstream file("see.json");
+    file << std::setw(4) << params;
+    textZone.addLine("Configuration file see.json has been created");
+  }
+}
+
+void save_see_json() {
+  local_to_json();
+  std::ofstream file("see.json");
+  file << std::setw(4) << params;
+  textZone.addLine("Configuration file see.json has been saved");
+}
+
 void showKeybinds() {
   // Declare the static vector inside the function
   static const std::vector<std::string> keybindLines = {
       "[+]    load next configuration file",
       "[-]    load previous configuration file",
+      "[*]    select particle under the mouse",
       "[=]    fit the view",
+      "[%%]    run 5000 steps of computation (used for debugging)",
       "[a][A] decrease/increase alpha (transparence) of driven bodies",
       "[b]    switch ON/OFF the background color",
-      "[c]    run 5000 steps of computation (used for debugging)",
+      "[c]    switch ON/OFF display of color bar",
+      "[d]    switch ON/OFF display of drived particles (rigid boundaries)",
       "[e][E] decrease/increase alpha (transparence) of free bodies",
+      "[f]    switch ON/OFF individual force vectors",
+      "[F]    switch ON/OFF Center-to-Center normal forces",
       "[g]    open another file",
-      "[k]    print this help",
+      "[h]    show mouse usage",
+      "[i]    show scene or selected-body data",
+      "[j][J] load/save see.json file",
+      "[k]    print this help on key bindings",
       "[l]    switch ON/OFF the links (normal vector at contact)",
       "[m]    switch ON/OFF the links colored by type",
       "[n]    switch ON/OFF the body displays",
@@ -102,15 +134,25 @@ void showKeybinds() {
       "[3]    particles with name colors"};
 
   switch2D::go(width, height);
-  glColor4f(1.0f, 1.0f, 1.0f, 0.6f);
-  glBegin(GL_QUADS);
+
   int nbLines = keybindLines.size();
   int by = height - nbLines * 15 - 3;
+
+  glColor4f(1.0f, 1.0f, 1.0f, 0.6f);
+  glBegin(GL_QUADS);
   glVertex2i(0, height);
   glVertex2i(width, height);
   glVertex2i(width, by);
   glVertex2i(0, by);
   glEnd();
+
+  glColor4f(0.0f, 0.0f, 0.0f, 0.6f);
+  glLineWidth(1.0f);
+  glBegin(GL_LINES);
+  glVertex2i(0, by);
+  glVertex2i(width, by);
+  glEnd();
+
   glColor3i(0, 0, 0);
   int dhline = -15;
   int hline = height;
@@ -217,18 +259,20 @@ void keyboard(unsigned char Key, int x, int y) {
     } break;
 
     case 'h': {
-      textZone.addLine("");
-      textZone.addLine("MOUSE:");
+      textZone.set_nbLine(6);
+      // textZone.addLine("");
+      textZone.addLine("MOUSE USAGE:");
       textZone.addLine("        Left button + move = ROTATE");
       textZone.addLine("SHIFT + Left button + move = PAN");
       textZone.addLine("CTRL  + Left button + move = ZOOM (or middle button)");
-      textZone.addLine("ALT   + Left button        = SELECT (or SHIFT + middle button)");
+      textZone.addLine("SHIFT + middle button      = SELECT (or key '*')");
       textZone.addLine("The KEYBOARD shortcuts -> key [k]");
     } break;
 
     case 'i': {
       if (selectedParticle == -1) {  // no particle selected
-        textZone.addLine("");
+        // textZone.addLine("");
+        textZone.set_nbLine(3);
         textZone.addLine("Nb Particles: %d,  t: %g  dt: %g,  tmax: %g", box.Particles.size(), box.t, box.dt, box.tmax);
         textZone.addLine("interVerlet: %g,  DVerlet: %g,  dVerlet: %g", box.interVerlet, box.DVerlet, box.dVerlet);
 
@@ -237,7 +281,8 @@ void keyboard(unsigned char Key, int x, int y) {
         textZone.addLine("dtc/dt: %g", dtc / box.dt);
       } else {
         Particle* P = &(box.Particles[selectedParticle]);
-        textZone.addLine("");
+        // textZone.addLine("");
+        textZone.set_nbLine(7);
         textZone.addLine("Particle#%d,  group#%d,  cluster#%d,  time: %g ", selectedParticle, P->group, P->cluster,
                          box.t);
         textZone.addLine("pos: %g %g %g", P->pos.x, P->pos.y, P->pos.z);
@@ -251,27 +296,11 @@ void keyboard(unsigned char Key, int x, int y) {
     } break;
 
     case 'j': {
-      // read the json configuration file 'see.json' if it exists
-      // create the file 'see.json' if it does not exist
-      if (fileTool::fileExists("see.json")) {
-        std::ifstream file("see.json");
-        nlohmann::json patch = nlohmann::json::parse(file);
-        params.merge_patch(patch);
-        json_to_local();
-        textZone.addLine("Configuration file see.json has been loaded");
-      } else {
-        local_to_json();
-        std::ofstream file("see.json");
-        file << std::setw(4) << params;
-        textZone.addLine("Configuration file see.json has been saved");
-      }
+      load_see_json();
     } break;
 
     case 'J': {  // create the file 'see.json'
-      local_to_json();
-      std::ofstream file("see.json");
-      file << std::setw(4) << params;
-      textZone.addLine("Configuration file see.json has been saved");
+      save_see_json();
     } break;
 
     case 'k': {
@@ -1698,8 +1727,63 @@ void readTraj(const char* name) {
 
 void menu(int num) {
   switch (num) {
+
     case 0: {
       exit(0);
+    } break;
+    case 1: {
+      save_see_json();
+    } break;
+    case 2: {
+      load_see_json();
+    } break;
+
+    case 100: {
+      params["show_particles"] = 1 - params["show_particles"].get<int>();
+    } break;
+    case 101: {
+      params["show_background"] = 1 - params["show_background"].get<int>();
+    } break;
+
+    case 200: {
+      params["colorMode"] = 0;
+      pcolors.clear();
+    } break;
+    case 201: {
+      params["colorMode"] = 1;
+      pcolors.clear();
+      colorRGBA col;
+      for (size_t i = 0; i < box.Particles.size(); ++i) {
+        CT.getCyclicRGB8(&col);
+        pcolors.push_back(col);
+      }
+    } break;
+    case 202: {
+      params["colorMode"] = 2;
+      resetColors(params["colorMode"].get<int>(), 1);
+    } break;
+    case 203: {
+      params["colorMode"] = 3;
+      resetColors(params["colorMode"].get<int>(), 1);
+    } break;
+
+    case 300: {
+      params["show_forces"] = 0;
+      params["show_normal_forces"] = 0;
+      params["show_interFrames"] = 0;
+      params["show_interTypes"] = 0;
+    } break;
+    case 301: {
+      params["show_forces"] = 1 - params["show_forces"].get<int>();
+    } break;
+    case 302: {
+      params["show_normal_forces"] = 1 - params["show_normal_forces"].get<int>();
+    } break;
+    case 303: {
+      params["show_interFrames"] = 1 - params["show_interFrames"].get<int>();
+    } break;
+    case 304: {
+      params["show_interTypes"] = 1 - params["show_interTypes"].get<int>();
     } break;
   };
 
@@ -1707,8 +1791,31 @@ void menu(int num) {
 }
 
 void buildMenu() {
+
+  int submenu100 = glutCreateMenu(menu);
+  glutAddMenuEntry("Show/Hide Particles", 100);
+  glutAddMenuEntry("Show/Hide Background", 101);
+
+  int submenu200 = glutCreateMenu(menu);
+  glutAddMenuEntry("None", 200);
+  glutAddMenuEntry("Random Colors", 201);
+  glutAddMenuEntry("Velocity Magnitude", 202);
+  glutAddMenuEntry("Particle Shape", 203);
+
+  int submenu300 = glutCreateMenu(menu);
+  glutAddMenuEntry("None", 300);
+  glutAddMenuEntry("Show/Hide Force vectors", 301);
+  glutAddMenuEntry("Show/Hide Center-to-Center Normal Forces", 302);
+  glutAddMenuEntry("Show/Hide Frames", 303);
+  glutAddMenuEntry("Show/Hide Types", 304);
+
   // popupm
   glutCreateMenu(menu);  // Main menu
+  glutAddSubMenu("Display Options", submenu100);
+  glutAddSubMenu("Particle Colors", submenu200);
+  glutAddSubMenu("Interaction Displays", submenu300);
+  glutAddMenuEntry("Save see.json", 1);
+  glutAddMenuEntry("Load see.json", 2);
   glutAddMenuEntry("Quit", 0);
 }
 
@@ -1808,19 +1915,9 @@ int main(int argc, char* argv[]) {
     std::ofstream file("see.json");
     file << std::setw(4) << params;
   }
+  resetColors(params["colorMode"].get<int>(), 1);
 
   // ==== Init the visualizer
-  /*
-  center.set(0.0, 0.0, 0.0);  // where we look at
-  eye.set(0.0, 0.0, 1.0);     // from where we look
-  up.set(0.0, 1.0, 0.0);      // direction (normalized)
-
-  mouse_mode = NOTHING;
-  view_angle = 45.0f;
-  znear = 0.01f;
-  zfar = 10.0f;
-  */
-
   glText::init();
 
   glDisable(GL_CULL_FACE);

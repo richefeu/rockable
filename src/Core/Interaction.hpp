@@ -56,14 +56,14 @@ class BreakableInterface;
 /// Data of Interaction
 class Interaction {
  public:
-  size_t i;     ///< ID-number of the first particle
-  size_t j;     ///< ID-number of the second particle
-                // !! BE CAREFUL: there's no explicit assertion that i < j
-  int type;     ///< The type of contact
-  size_t isub;  ///< id of sub-body (that can be vertex, edge or face depending
-                ///< on type) in sphero-polyhedron i
-  size_t jsub;  ///< id of sub-body (that can be vertex, edge or face depending
-                ///< on type) in sphero-polyhedron j
+  size_t i{0};     ///< ID-number of the first particle
+  size_t j{0};     ///< ID-number of the second particle
+                   // !! BE CAREFUL: there's no explicit assertion that i < j
+  int type{0};     ///< The type of contact
+  size_t isub{0};  ///< id of sub-body (that can be vertex, edge or face depending
+                   ///< on type) in sphero-polyhedron i
+  size_t jsub{0};  ///< id of sub-body (that can be vertex, edge or face depending
+                   ///< on type) in sphero-polyhedron j
 
   vec3r prev_n;  ///< Normal unit vector at the previous step
   vec3r n;       ///< Normal unit vector (from j to i)
@@ -81,7 +81,7 @@ class Interaction {
   vec3r ft;        ///< Tangential force (vector)
   vec3r mom;       ///< Moment at the contact point
 
-  double damp{0.0};           ///< Precomputed vicuous damping coefficient
+  double damp{0.0};                    ///< Precomputed vicuous damping coefficient
   BreakableInterface* stick{nullptr};  ///< The breakable interface (if there's no interface, then stick = nullptr)
 
   Interaction();                      // Ctor
