@@ -77,7 +77,7 @@ class Shape {
   bool isSurface{false};    ///< If true, the shape is a surface (not a volume formed by a polyedron)
   double radius{0.0};       ///< Minskowski radius
   double volume{0.0};       ///< Volume
-  vec3r inertia_mass{0.0};  ///< Diagonal terms of the matrix of inertia/mass (in the principal framework)
+  vec3r inertia_mass;       ///< Diagonal terms of the matrix of inertia/mass (in the principal framework)
   OBB obb;                  ///< Oriented Bounding Box
   size_t MCnstep{10000};    ///< Number of steps for Monte Carlo integration
   double Rmax{0.0};         ///< Radius of the circumscribed sphere
