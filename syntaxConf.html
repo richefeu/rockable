@@ -160,7 +160,7 @@ between different versions of the configuration files and the codebase.</p>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">DVerlet</span></code> (<em>double</em>) <strong>value</strong></p>
 <p>Distance used to define if two sphero-polyhedra are neighbors.
-This length is added to the Object-Bounding Boxes (OBBs) before testing for overlap.
+This length is added to the Oriented Bounding Boxes (OBBs) before testing for overlap.
 In other words, half of this length is added to each side of the OBBs.</p>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">dVerlet</span></code> (<em>double</em>) <strong>value</strong></p>
@@ -200,12 +200,7 @@ The format described here can be used as both input and output of a simulation.<
 <p>Choose the method for handling interactions between particles (sphero-polyhedra).</p>
 <ul class="simple">
 <li><p><strong>Options</strong>: <code class="docutils literal notranslate"><span class="pre">bruteForce</span></code> (default) or <code class="docutils literal notranslate"><span class="pre">OBBtree</span></code></p></li>
-<li><dl class="simple">
-<dt><strong>Description</strong>: The interactions between particles involve different types of interaction,</dt><dd><p>such as sphere-sphere, sphere-tube, sphere-polygon, and tube-tube. The best strategy to be used depends
-on the complexity of the involved shapes.</p>
-</dd>
-</dl>
-</li>
+<li><p><strong>Description</strong>: The interactions between particles involve different types of interaction, such as sphere-sphere, sphere-tube, sphere-polygon, and tube-tube. The best strategy to be used depends on the complexity of the involved shapes.</p></li>
 </ul>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">UpdateNLStrategy</span></code> (<em>string</em>) <strong>Option</strong></p>
@@ -214,16 +209,8 @@ on the complexity of the involved shapes.</p>
 <li><p><strong>Options</strong>: <code class="docutils literal notranslate"><span class="pre">bruteForce</span></code> (default) or <code class="docutils literal notranslate"><span class="pre">linkCells</span></code></p></li>
 <li><p><strong>Description</strong>: In the case of the <code class="docutils literal notranslate"><span class="pre">linkCells</span></code> strategy, the following additional settings need to be configured:</p>
 <ul>
-<li><dl class="simple">
-<dt><code class="docutils literal notranslate"><span class="pre">cellMinSizes</span></code> (<em>double</em>) <strong>xmin</strong> (<em>double</em>) <strong>ymin</strong> (<em>double</em>) <strong>zmin</strong>: Set the minimum size of</dt><dd><p>a cell in each direction.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><code class="docutils literal notranslate"><span class="pre">boxForLinkCellsOpt</span></code> (0 | 1): A flag to determine if the first driven bodies are part of the overall</dt><dd><p>bounding box, which will be split into cells.</p>
-</dd>
-</dl>
-</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cellMinSizes</span></code> (<em>double</em>) <strong>xmin</strong> (<em>double</em>) <strong>ymin</strong> (<em>double</em>) <strong>zmin</strong>: Set the minimum size of a cell in each direction.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">boxForLinkCellsOpt</span></code> (0 | 1): A flag to determine if the first driven bodies are part of the overall bounding box, which will be split into cells.</p></li>
 </ul>
 </li>
 </ul>
