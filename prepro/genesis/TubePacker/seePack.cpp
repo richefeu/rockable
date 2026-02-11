@@ -372,7 +372,7 @@ void drawParticles() {
   glColor3f(0.337254901960784, 0.505882352941176, 0.768627450980392);
 
   glEnable(GL_LIGHTING);
-  for (uint i = 0; i < tubes.size(); ++i) {
+  for (size_t i = 0; i < tubes.size(); ++i) {
     glPushMatrix();
     glTranslatef(tubes[i].x0, tubes[i].y0, tubes[i].z0);
     drawsphere(2, tubes[i].r);

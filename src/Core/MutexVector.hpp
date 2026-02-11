@@ -1,4 +1,3 @@
-
 //  Copyright or © or Copr. Rockable
 //
 //  vincent.richefeu@3sr-grenoble.fr
@@ -82,4 +81,3 @@ class MutexVector {
     if (index >= size_) throw std::out_of_range{message.str()};
   }
 };
-

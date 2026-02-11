@@ -8,7 +8,16 @@
 #include <vector>
 #include <algorithm>
 
-#include "addParticle.hpp"
+//#include "addParticle.hpp"
+#include "vec3.hpp"
+#include "quat.hpp"
+void addParticle(std::ostream& os, const char* name, int group, int cluster, double homothety, vec3r& position, quat & Q) {
+  using namespace std;
+
+  os << name << ' ' << group << ' ' << cluster << ' ' << homothety << "  " << position
+     << "  0 0 0  0 0 0   " << Q << "  0 0 0  0 0 0\n";
+}
+
 #include "consoleProgressBar.hpp"
 #include "generateShape_cylindricalMold.hpp"
 #include "generateShape_diskPlate.hpp"

@@ -38,7 +38,7 @@
 #include <regex>
 #include <stdexcept>
 
-#include <tclap/CmdLine.h>
+#include "toofus-gate/tclap/CmdLine.h"
 
 #include "Core/Rockable.hpp"
 #include "stackTracer.hpp"

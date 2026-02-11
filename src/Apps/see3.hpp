@@ -35,7 +35,7 @@
 
 #ifndef SEE3_HPP
 #define SEE3_HPP
-#include <tclap/CmdLine.h>
+#include "toofus-gate/tclap/CmdLine.h"
 #include <unistd.h>
 #include <sstream>
 

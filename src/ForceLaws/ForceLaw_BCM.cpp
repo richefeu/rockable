@@ -51,11 +51,6 @@ void BCM::init() {
   box->idKnInnerBond = box->dataTable.add("knInnerBond");
   box->idKtInnerBond = box->dataTable.add("ktInnerBond");
   box->idKrInnerBond = box->dataTable.add("krInnerBond");
-  //box->idEn2InnerBond = box->dataTable.add("en2InnerBond");
-  //box->idFn0InnerBond = box->dataTable.add("fn0InnerBond");
-  //box->idFt0InnerBond = box->dataTable.add("ft0InnerBond");
-  //box->idMom0InnerBond = box->dataTable.add("mom0InnerBond");
-  //box->idPowInnerBond = box->dataTable.add("powInnerBond");
   box->idGcInnerBond = box->dataTable.add("gcInnerBond");
 }
 
@@ -63,10 +58,9 @@ void BCM::init() {
 bool BCM::computeInteraction(Interaction& I) {
   if (I.stick != nullptr) {  // =========== Cohesive bond
     double kn = 0.0, kt = 0.0;
-    //double fn0 = 1.0, ft0 = 1.0, mom0 = 1.0, power = 1.0;
     double dn0 = I.stick->dn0;
     bool isInner = (box->Particles[I.i].cluster == box->Particles[I.j].cluster);
-
+      
     // First we need to get the parameters
     if (box->paramsInInterfaces == 1) {
       isInner = I.stick->isInner;
@@ -84,6 +78,14 @@ bool BCM::computeInteraction(Interaction& I) {
         kt = box->dataTable.get(box->idKtOuterBond, g1, g2);
       }
     }
+    
+    // en vrai il faudrait précalculer weight dans I.stick->weight au moment où on calcul l'aire
+    if (!I.stick->concernedBonds.empty()) {
+      double weight = 1.0 / static_cast<double>(I.stick->concernedBonds.size());
+      kn *= weight;
+      kt *= weight;
+    }
+    
 
     // === Normal force (elastic contact + viscous damping)
     double vn = I.vel * I.n;

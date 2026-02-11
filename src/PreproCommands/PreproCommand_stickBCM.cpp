@@ -163,7 +163,6 @@ void stickBCM::computeAreaFromConcernedInnerBonds(BreakableInterface* BI) {
 
   std::vector<vec3r> vertices;
   for (size_t b = 0; b < BI->concernedBonds.size(); b++) {
-    //std::cout << BI->concernedBonds[b]->pos << std::endl;
     vertices.push_back(BI->concernedBonds[b]->pos);
   }
 
@@ -181,6 +180,4 @@ void stickBCM::computeAreaFromConcernedInnerBonds(BreakableInterface* BI) {
     size_t j = (i + 1) % n;
     BI->area += 0.5 * norm(cross(vertices[i]-vertices[0], vertices[j]-vertices[0]));
   }
-
-  //std::cout << "computed area = " << BI->area << std::endl;
 }

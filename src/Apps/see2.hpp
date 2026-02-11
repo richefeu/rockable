@@ -35,7 +35,7 @@
 
 #ifndef SEE2_HPP
 #define SEE2_HPP
-#include <tclap/CmdLine.h>
+#include "toofus-gate/tclap/CmdLine.h"
 
 
 #define GLFW_INCLUDE_GLU

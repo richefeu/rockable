@@ -1,11 +1,11 @@
 UNAME_S := $(shell uname -s)
 
-COMMONPATH = /usr/local/include/toofus
+COMMONPATH = ~/toofus
 CPPTOOLSPATH = ../cpptools
 
 # The compiler to be used
 ifeq ($(UNAME_S),Darwin)
-  CXX = clang++
+  CXX = g++-15
   CXXFLAGS = -O3 -Wall -std=c++11 -I $(COMMONPATH) -I $(CPPTOOLSPATH)
   GLFLAGS = `pkg-config --cflags --libs glut` -framework OpenGL 
 else

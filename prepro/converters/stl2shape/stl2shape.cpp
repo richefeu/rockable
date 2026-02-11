@@ -59,7 +59,7 @@ typedef unsigned int uint;
 typedef float real32;
 typedef double real64;
 
-#include "tclap/CmdLine.h"
+#include "toofus-gate/tclap/CmdLine.h"
 
 #include "AABB.hpp"
 #include "message.hpp"

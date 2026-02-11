@@ -60,7 +60,7 @@ class BreakableInterface {
   double ft0{0.0};    ///< Embeded ft0
   double mom0{0.0};   ///< Embeded mom0
   double power{0.0};  ///< Embeded power
-  double Gc{0.0};  ///< Embeded surface energy
+  double Gc{0.0};     ///< Embeded surface energy
 
   int breakModel{breakModel_Gc};
 
@@ -74,8 +74,6 @@ class BreakableInterface {
 
   BreakableInterface();  // Ctor
   BreakableInterface(size_t I, size_t J);
-
-  // void computeAreaFromConcernedInnerBonds();
 };
 
 namespace std {

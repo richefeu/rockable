@@ -145,17 +145,17 @@ endif()
 
 # ##############################################################################
 # tclap
-FetchContent_Declare(
-  tclap
-  GIT_REPOSITORY https://github.com/xguerin/tclap.git
-  GIT_TAG v1.2.5)
+#FetchContent_Declare(
+#  tclap
+#  GIT_REPOSITORY https://github.com/xguerin/tclap.git
+#  GIT_TAG v1.2.5)
 
-FetchContent_GetProperties(tclap)
+#FetchContent_GetProperties(tclap)
 
-if(NOT tclap_POPULATED)
-  message(STATUS "Fetching tclap")
-  FetchContent_MakeAvailable(tclap)
-endif()
+#if(NOT tclap_POPULATED)
+#  message(STATUS "Fetching tclap")
+#  FetchContent_MakeAvailable(tclap)
+#endif()
 
 # ##############################################################################
 # nlohmann-json
@@ -294,8 +294,7 @@ endif()
 # libRockable_core
 set(CMAKE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
 
-include_directories(${CMAKE_SOURCE_DIR} ${toofus_SOURCE_DIR}
-                    ${tclap_SOURCE_DIR}/include ${fmt_SOURCE_DIR}/include)
+include_directories(${CMAKE_SOURCE_DIR} ${toofus_SOURCE_DIR} ${fmt_SOURCE_DIR}/include)
 
 file(
   GLOB
@@ -370,7 +369,6 @@ if(ROCKABLE_COMPILE_SEE)
       find_package(PkgConfig REQUIRED)
     endif()
 
-    # Check for SDL2 instead of GLFW
     pkg_check_modules(PNG REQUIRED libpng16)
 
     if(PNG_FOUND)
@@ -436,7 +434,10 @@ if(ROCKABLE_COMPILE_SEE3)
       PRIVATE ${GL_INCLUDE_DIRS} ${GLU_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS}
              ${GLFW_INCLUDE_DIRS} ${imgui_SOURCE_DIR}
              ${imgui_SOURCE_DIR}/backends)
-
+             
+    #target_compile_options(see3 PRIVATE "-ObjC++")  
+    #target_compile_options(see3 PRIVATE "-isystem")
+    
     target_link_directories(see3 PRIVATE ${GL_LIBRARY_DIRS} ${GLU_LIBRARY_DIRS}
                             ${GLFW_LIBRARY_DIRS})
 

@@ -35,7 +35,8 @@
 
 #ifndef SEE_HPP
 #define SEE_HPP
-#include <tclap/CmdLine.h>
+
+#include "toofus-gate/tclap/CmdLine.h"
 
 #ifndef GL_SILENCE_DEPRECATION
 #define GL_SILENCE_DEPRECATION

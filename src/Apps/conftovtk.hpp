@@ -44,7 +44,7 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#include <tclap/CmdLine.h>
+#include "toofus-gate/tclap/CmdLine.h"
 
 #define PLANx "PLANx"
 #define SPHER "SPHER"
