@@ -107,16 +107,16 @@ void stickVerticesInClusters::exec() {
 
               BreakableInterface BI_toInsert(i, j);
               BI_toInsert.isInner = 1;
-              BI_toInsert.kn = kn; // ????????
+              BI_toInsert.kn = box->dataTable.get(box->idKnInnerBond, box->Particles[i].group, box->Particles[j].group);
               BI_toInsert.kt = box->dataTable.get(box->idKtInnerBond, box->Particles[i].group, box->Particles[j].group);
-              BI_toInsert.kr = 0.0;
-              box->dataTable.set(box->idKrInnerBond, box->Particles[i].group, box->Particles[j].group, 0.0);
+              BI_toInsert.kr = box->dataTable.get(box->idKrInnerBond, box->Particles[i].group, box->Particles[j].group);
+              //box->dataTable.set(box->idKrInnerBond, box->Particles[i].group, box->Particles[j].group, 0.0);
               BI_toInsert.fn0 =
                   box->dataTable.get(box->idFn0InnerBond, box->Particles[i].group, box->Particles[j].group);
               BI_toInsert.ft0 =
                   box->dataTable.get(box->idFt0InnerBond, box->Particles[i].group, box->Particles[j].group);
-              BI_toInsert.mom0 = 1.0e10;
-              box->dataTable.set(box->idMom0InnerBond, box->Particles[i].group, box->Particles[j].group, 1.0e10);
+              BI_toInsert.mom0 = box->dataTable.get(box->idMom0InnerBond, box->Particles[i].group, box->Particles[j].group); //1.0e10;
+              //box->dataTable.set(box->idMom0InnerBond, box->Particles[i].group, box->Particles[j].group, 1.0e10);
               BI_toInsert.power =
                   box->dataTable.get(box->idPowInnerBond, box->Particles[i].group, box->Particles[j].group);
               std::pair<std::set<BreakableInterface>::iterator, bool> ret;

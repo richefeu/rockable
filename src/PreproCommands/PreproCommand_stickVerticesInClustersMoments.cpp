@@ -35,8 +35,8 @@
 
 #include "factory.hpp"
 
-#include "PreproCommand_stickVerticesInClustersMoments.hpp"
 #include "Core/Rockable.hpp"
+#include "PreproCommand_stickVerticesInClustersMoments.hpp"
 
 stickVerticesInClustersMoments::stickVerticesInClustersMoments() {}
 
@@ -98,17 +98,18 @@ void stickVerticesInClustersMoments::exec() {
                 double logen = 0.5 * log(en2);
                 double dampRate = -logen / sqrt(logen * logen + Mth::piSqr);
                 Damp = dampRate * 2.0 * sqrt(kn * meff);
-              } else if (en2 <= 0.0)
+              } else if (en2 <= 0.0) {
                 Damp = 2.0 * sqrt(kn * meff);
-              else
+              } else {
                 Damp = 0.0;
+              }
 
               BreakableInterface BI_toInsert(i, j);
               BI_toInsert.isInner = 1;
               BI_toInsert.kn = kn;
               BI_toInsert.kt = box->dataTable.get(box->idKtInnerBond, box->Particles[i].group, box->Particles[j].group);
               BI_toInsert.kr = box->dataTable.get(box->idKrInnerBond, box->Particles[i].group, box->Particles[j].group);
-              ;
+
               BI_toInsert.fn0 =
                   box->dataTable.get(box->idFn0InnerBond, box->Particles[i].group, box->Particles[j].group);
               BI_toInsert.ft0 =
@@ -117,6 +118,7 @@ void stickVerticesInClustersMoments::exec() {
                   box->dataTable.get(box->idMom0InnerBond, box->Particles[i].group, box->Particles[j].group);
               BI_toInsert.power =
                   box->dataTable.get(box->idPowInnerBond, box->Particles[i].group, box->Particles[j].group);
+
               std::pair<std::set<BreakableInterface>::iterator, bool> ret;
               ret = box->Interfaces[i].insert(BI_toInsert);
               BreakableInterface* BI = const_cast<BreakableInterface*>(std::addressof(*(ret.first)));
@@ -130,8 +132,8 @@ void stickVerticesInClustersMoments::exec() {
         }
 
       }  // if obb intersect
-    }    // j
-  }      // i
+    }  // j
+  }  // i
 
   std::sort(box->activeInteractions.begin(), box->activeInteractions.end(), std::less<Interaction*>());
 }
