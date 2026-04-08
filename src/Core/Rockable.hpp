@@ -128,6 +128,13 @@ class Rockable {
 #ifdef ROCKABLE_ENABLE_PERIODIC
   int usePeriodicCell;  ///< Flag indicating if periodic cell is used
   PeriodicCell Cell;    ///< The periodic cell
+  std::vector<std::pair<std::string, int>> periodicBound;  ///< Deferred behavior state for periodic boundaries
+  double cellMomentumCorrection = 0.0;   ///< Time interval for momentum correction (0 = disabled)
+  double cellMomentumCorrectionC = 0.0;  ///< Counter for momentum correction
+  double cellVelocityCorrection = 0.0;   ///< Time interval for velocity correction (0 = disabled)
+  double cellVelocityCorrectionC = 0.0;  ///< Counter for velocity correction
+  double cellMassRatio = -1.0;           ///< Mass ratio override for the periodic cell (-1 = disabled)
+  bool useKineticStress = true;          ///< Flag indicating if kinetic stress contribution is used
 #endif
 
   int useSoftParticles;  ///< Flag indicating if soft particles are used
@@ -290,6 +297,7 @@ class Rockable {
   // =============================================================================================================
 
   void velocityControlledDrive();      ///< Impose the velocities of driven bodies
+  void applyPeriodicCellDriftCorrection();   ///< Apply momentum/velocity drift correction for periodic cell
   void numericalDamping();             ///< The Cundall damping solution
   void applyVelocityBarrier();         ///< The velocity barrier solution
   void applyAngularVelocityBarrier();  ///< The velocity barrier solution for rotations
