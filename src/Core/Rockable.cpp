@@ -1136,6 +1136,14 @@ void Rockable::loadConf(const char* a_name) {
 
   Interactions_from_set_to_vec();
 
+#ifdef ROCKABLE_ENABLE_PERIODIC
+  // IMPORTANT: updateCellDamping() must be called AFTER Interactions_from_set_to_vec()
+  // because it accesses m_vecInteractions which is populated by that function
+  if (usePeriodicCell == 1) {
+    updateCellDamping();
+  }
+#endif
+
   // This is a kind of fake time-step (the time is not incremented)
   // mainly used to compute resultant forces and moments on the particles.
   // It will also populate the vector 'activeInteractions'.
@@ -2124,17 +2132,21 @@ void Rockable::velocityVerletStep() {
   // Free bodies
 #ifdef ROCKABLE_ENABLE_PERIODIC
   if (usePeriodicCell == 1) {
-    vec3r vmean;
+
+    // =============================================================================
+    // DRIFT CORRECTION FOR PERIODIC CELL
+    // =============================================================================
+    // Standard velocity update for all free particles
+#pragma omp parallel for default(shared)
     for (size_t i = nDriven; i < Particles.size(); i++) {
       Particles[i].vel += dt_2 * Particles[i].acc;
-      vmean += Particles[i].vel;
       Particles[i].vrot += dt_2 * Particles[i].arot;
     }
-    vmean /= (double)(Particles.size());
-    for (size_t i = 0; i < Particles.size(); i++) {
-      Particles[i].vel -= vmean;
-    }
 
+    // Apply optional drift correction (momentum or velocity based)
+    applyPeriodicCellDriftCorrection();
+
+    // Update cell velocity
     for (size_t c = 0; c < 9; c++) {
       if (System.cellControl.Drive[c] == ForceDriven) Cell.vh[c] += dt_2 * Cell.ah[c];
     }
@@ -2693,6 +2705,8 @@ void Rockable::integrate() {
 
     if (needUpdate || interVerletC >= interVerlet - dt_2) {
       PerfTimer tm;
+
+      updateCellDamping();
 
 #ifdef ROCKABLE_ENABLE_PERIODIC
       if (usePeriodicCell == 1) {
@@ -3516,10 +3530,22 @@ void Rockable::compute_accelerations_from_resultants() {
 #ifdef ROCKABLE_ENABLE_PERIODIC
     // If there's a periodic cell, the accelerations are rescaled toward reduced coordinates
     if (usePeriodicCell == 1) {
-      vec3r s = Particles[i].pos;
-      vec3r ds = Particles[i].vel;
-      vec3r d2r = Particles[i].acc;
-      Particles[i].acc = Cell.hinv * (d2r - 2.0 * Cell.vh * ds - Cell.ah * s);
+      // 1. Use the real acceleration computed just above
+      vec3r a_real = Particles[i].acc;
+
+      // 2. Get real position and velocity
+      vec3r r = Particles[i].pos;
+      vec3r v = Particles[i].vel;
+
+      // 3. Recover reduced position and reduced velocity
+      vec3r s = Cell.hinv * r;
+      vec3r s_dot = Cell.hinv * (v - (Cell.vh * s));
+
+      // 4. Inertial correction terms in reduced frame
+      vec3r inertial = (Cell.vh * s_dot) * 2.0 + (Cell.ah * s);
+
+      // 5. Reduced acceleration
+      Particles[i].acc = Cell.hinv * (a_real - inertial);
     }
 #endif
 
@@ -3700,6 +3726,23 @@ void Rockable::accelerations() {
     applyAngularVelocityBarrier();
   }
 }
+
+#ifdef ROCKABLE_ENABLE_PERIODIC
+void Rockable::updateCellDamping() {
+  if (usePeriodicCell != 1) return;
+
+  if (cellMassRatio > 0.0) {
+    double M_total = 0.0;
+#pragma omp parallel for reduction(+ : M_total)
+    for (size_t i = 0; i < Particles.size(); ++i) {
+      M_total += Particles[i].mass;
+    }
+    if (M_total > 0.0) {
+      Cell.mass = cellMassRatio * M_total;
+    }
+  }
+}
+#endif
 
 /**
  * Apply optional periodic-cell drift correction to free-particle velocities.
