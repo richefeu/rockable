@@ -45,7 +45,7 @@ option(ROCKABLE_COMPILE_POSTPRO
 option(ROCKABLE_COMPILE_SEE
        "Compile the glut application to visualize the conf-files" ON)
 option(ROCKABLE_COMPILE_SEE2
-       "Compile the glfw application to visualize the conf-files" OFF)
+       "Compile the glfw application to visualize the conf-files" ON)
 option(ROCKABLE_COMPILE_SEE3
        "Compile the application to edit graphically the input files" OFF)
 option(ROCKABLE_COMPILE_SEE4
