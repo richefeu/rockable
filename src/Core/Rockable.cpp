@@ -44,9 +44,9 @@
 #include "DataExtractors/DataExtractor_DuoBalance.hpp"
 #include "DataExtractors/DataExtractor_MeanVelocity.hpp"
 #include "DataExtractors/DataExtractor_TrackBody.hpp"
+#include "DataExtractors/DataExtractor_TrackDamage.hpp"
 #include "DataExtractors/DataExtractor_TrackRockfall.hpp"
 #include "DataExtractors/DataExtractor_dnStat.hpp"
-#include "DataExtractors/DataExtractor_TrackDamage.hpp"
 
 #include "ForceLaws/ForceLaw_Avalanche.hpp"
 #include "ForceLaws/ForceLaw_BCM.hpp"
@@ -98,6 +98,12 @@ Rockable::Rockable() : m_linkCells(aabb, cellMinSizes) {
 
 #ifdef ROCKABLE_ENABLE_PERIODIC
   usePeriodicCell = 0;
+  cellMomentumCorrection = 0.0;
+  cellMomentumCorrectionC = 0.0;
+  cellVelocityCorrection = 0.0;
+  cellVelocityCorrectionC = 0.0;
+  cellMassRatio = -1.0;
+  useKineticStress = true;
 #endif
 
   useSoftParticles = 0;
@@ -514,7 +520,11 @@ void Rockable::saveConf(const char* fname) {
     conf << "h " << Cell.h << '\n';
     conf << "vh " << Cell.vh << '\n';
     conf << "ah " << Cell.ah << '\n';
-    conf << "mh " << Cell.mass << '\n';
+    conf << "mh " << cellMassRatio << '\n';
+    conf << "dh " << Cell.damping << '\n';
+    conf << "cellMomentumCorrection " << cellMomentumCorrection << '\n';
+    conf << "cellVelocityCorrection " << cellVelocityCorrection << '\n';
+    conf << "useKineticStress " << useKineticStress << '\n';
   } else {
     conf << "usePeriodicCell 0\n";
   }
@@ -557,7 +567,7 @@ void Rockable::saveConf(const char* fname) {
   writeLawData(conf, "mom0OuterBond");
   writeLawData(conf, "powOuterBond");
   writeLawData(conf, "en2OuterBond");
-  
+
   writeLawData(conf, "gcInnerBond");
   writeLawData(conf, "gcOuterBond");
 
@@ -582,9 +592,9 @@ void Rockable::saveConf(const char* fname) {
          << Particles[i].homothety << ' ' << Particles[i].pos << ' ' << Particles[i].vel << ' ' << Particles[i].acc
          << ' ' << Particles[i].Q << ' ' << Particles[i].vrot << ' ' << Particles[i].arot;
     if (useSoftParticles == 1) {
-      //conf << ' ' << Particles[i].uniformTransformation << '\n';
+      // conf << ' ' << Particles[i].uniformTransformation << '\n';
     } else {
-      //conf << '\n';
+      // conf << '\n';
     }
   }
 
@@ -703,7 +713,11 @@ void Rockable::initParser() {
   parser.kwMap["h"] = __GET__(conf, Cell.h);
   parser.kwMap["vh"] = __GET__(conf, Cell.vh);
   parser.kwMap["ah"] = __GET__(conf, Cell.ah);
-  parser.kwMap["mh"] = __GET__(conf, Cell.mass);
+  parser.kwMap["mh"] = __GET__(conf, cellMassRatio);
+  parser.kwMap["dh"] = __GET__(conf, Cell.damping);
+  parser.kwMap["cellMomentumCorrection"] = __GET__(conf, cellMomentumCorrection);
+  parser.kwMap["cellVelocityCorrection"] = __GET__(conf, cellVelocityCorrection);
+  parser.kwMap["useKineticStress"] = __GET__(conf, useKineticStress);
 #endif
 
   parser.kwMap["useSoftParticles"] = __DO__(conf) {
@@ -848,7 +862,7 @@ void Rockable::initParser() {
   parser.kwMap["mom0OuterBond"] = __DO__(conf) { readLawData(conf, idMom0OuterBond); };
   parser.kwMap["powOuterBond"] = __DO__(conf) { readLawData(conf, idPowOuterBond); };
   parser.kwMap["en2OuterBond"] = __DO__(conf) { readLawData(conf, idEn2OuterBond); };
-  
+
   parser.kwMap["gcInnerBond"] = __DO__(conf) { readLawData(conf, idGcInnerBond); };
   parser.kwMap["gcOuterBond"] = __DO__(conf) { readLawData(conf, idGcOuterBond); };
 
@@ -909,9 +923,9 @@ void Rockable::initParser() {
       }
       conf >> P.group >> P.cluster >> P.homothety >> P.pos >> P.vel >> P.acc >> P.Q >> P.vrot >> P.arot;
       if (useSoftParticles == 1) {
-        //conf >> P.uniformTransformation;
+        // conf >> P.uniformTransformation;
       } else {
-        //P.uniformTransformation = mat9r::unit();
+        // P.uniformTransformation = mat9r::unit();
       }
 
       P.shape = &(Shapes[shapeId[shpName]]);  // Plug to the shape
@@ -1043,7 +1057,8 @@ void Rockable::initParser() {
   //          They are generally put at the end of the input file
   //          so that they apply on a system already set
 
-  const std::string commands[] = {"stickBCM", "stickVerticesInClusters",
+  const std::string commands[] = {"stickBCM",
+                                  "stickVerticesInClusters",
                                   "stickVerticesInClustersMoments",
                                   "stickClusters",
                                   "randomlyOrientedVelocities",
@@ -1120,6 +1135,14 @@ void Rockable::loadConf(const char* a_name) {
 #endif
 
   Interactions_from_set_to_vec();
+
+#ifdef ROCKABLE_ENABLE_PERIODIC
+  // IMPORTANT: updateCellDamping() must be called AFTER Interactions_from_set_to_vec()
+  // because it accesses m_vecInteractions which is populated by that function
+  if (usePeriodicCell == 1) {
+    updateCellDamping();
+  }
+#endif
 
   // This is a kind of fake time-step (the time is not incremented)
   // mainly used to compute resultant forces and moments on the particles.
@@ -2109,17 +2132,21 @@ void Rockable::velocityVerletStep() {
   // Free bodies
 #ifdef ROCKABLE_ENABLE_PERIODIC
   if (usePeriodicCell == 1) {
-    vec3r vmean;
+
+    // =============================================================================
+    // DRIFT CORRECTION FOR PERIODIC CELL
+    // =============================================================================
+    // Standard velocity update for all free particles
+#pragma omp parallel for default(shared)
     for (size_t i = nDriven; i < Particles.size(); i++) {
       Particles[i].vel += dt_2 * Particles[i].acc;
-      vmean += Particles[i].vel;
       Particles[i].vrot += dt_2 * Particles[i].arot;
     }
-    vmean /= (double)(Particles.size());
-    for (size_t i = 0; i < Particles.size(); i++) {
-      Particles[i].vel -= vmean;
-    }
 
+    // Apply optional drift correction (momentum or velocity based)
+    applyPeriodicCellDriftCorrection();
+
+    // Update cell velocity
     for (size_t c = 0; c < 9; c++) {
       if (System.cellControl.Drive[c] == ForceDriven) Cell.vh[c] += dt_2 * Cell.ah[c];
     }
@@ -2679,6 +2706,8 @@ void Rockable::integrate() {
     if (needUpdate || interVerletC >= interVerlet - dt_2) {
       PerfTimer tm;
 
+      updateCellDamping();
+
 #ifdef ROCKABLE_ENABLE_PERIODIC
       if (usePeriodicCell == 1) {
         reducedToRealKinematics();
@@ -2860,7 +2889,7 @@ void Rockable::initialise_particle_forces_and_moments() {
     Particles[i].acc.reset();
     Particles[i].moment.reset();
     Particles[i].arot.reset();
-    //Particles[i].stress.reset();
+    // Particles[i].stress.reset();
   }
 #ifdef ROCKABLE_ENABLE_PERIODIC
   if (usePeriodicCell == 1) {
@@ -3032,7 +3061,7 @@ inline bool Rockable::computeInterArray()  // TODO change name
 {
   START_TIMER("build_active_interactions");
   unsigned long part_size = 0;
-  //unsigned long offsets[Interactions.size()]; // vr: Variable Lenght Array is C99
+  // unsigned long offsets[Interactions.size()]; // vr: Variable Lenght Array is C99
   std::vector<unsigned long> offsets(Interactions.size());
   testInter.resize(m_vecInteractions.size());
 
@@ -3211,6 +3240,27 @@ void Rockable::compute_resultants() {
       }
     }
 
+    if (useKineticStress) {
+      for (size_t i = nDriven; i < Particles.size(); ++i) {
+        vec3r s = Cell.hinv * Particles[i].pos;
+        vec3r u = Cell.vh * s;
+        vec3r v = Particles[i].vel - u;
+        double m = Particles[i].mass;
+
+        Cell.Sig.xx += m * v.x * v.x;
+        Cell.Sig.xy += m * v.x * v.y;
+        Cell.Sig.xz += m * v.x * v.z;
+
+        Cell.Sig.yx += m * v.y * v.x;
+        Cell.Sig.yy += m * v.y * v.y;
+        Cell.Sig.yz += m * v.y * v.z;
+
+        Cell.Sig.zx += m * v.z * v.x;
+        Cell.Sig.zy += m * v.z * v.y;
+        Cell.Sig.zz += m * v.z * v.z;
+      }
+    }
+
   } else {
 
     for (size_t i = 0; i < activeInteractions.size(); ++i) {
@@ -3263,7 +3313,7 @@ void Rockable::compute_SpringJoints() {
 void Rockable::check_breakage_of_interfaces() {
   START_TIMER("check_breakage_of_interfaces");
 
-  for (BreakableInterface* BI : breakableInterfaces) {  
+  for (BreakableInterface* BI : breakableInterfaces) {
 
     if (BI->breakModel == breakModel_Gc) {  // ========================================================
 
@@ -3288,8 +3338,8 @@ void Rockable::check_breakage_of_interfaces() {
       BI->Et = 0.0;
       for (size_t b = 0; b < BI->concernedBonds.size(); ++b) {
         Interaction* I = BI->concernedBonds[b];
-        
-        if (I->dn > BI->dn0) { // FIXME: there should be one dn0 per bond BI->dn0[b]
+
+        if (I->dn > BI->dn0) {  // FIXME: there should be one dn0 per bond BI->dn0[b]
           BI->En += 0.5 * kn * (I->dn - BI->dn0) * (I->dn - BI->dn0);
         }
         BI->Et += 0.5 * kt * norm2(I->ds);
@@ -3348,7 +3398,7 @@ void Rockable::breakage_of_interfaces() {
 
     // First remove the pointer from the global list (avoid dangling)
     auto it_bi_global = std::find(breakableInterfaces.begin(), breakableInterfaces.end(), *BI);
-    if (it_bi_global != breakableInterfaces.end()) {     
+    if (it_bi_global != breakableInterfaces.end()) {
       breakableInterfaces.erase(it_bi_global);  // safe to remove before deletion
     }
 
@@ -3386,18 +3436,19 @@ void Rockable::compute_accelerations_from_resultants() {
 
     // Acceleration of the periodic cell
     mat9r Vhinv = Vcell * Cell.hinv;
-    mat9r deltaSig = Cell.Sig - System.cellControl.Sig;
+    mat9r deltaSig = System.cellControl.Sig - Cell.Sig;  // sign convention changed
+    mat9r dampingForce = Cell.vh * Cell.damping;
     double invMass = 1.0 / Cell.mass;
 
     for (size_t row = 0; row < 3; row++) {
       for (size_t col = 0; col < 3; col++) {
         size_t c = 3 * row + col;
         if (System.cellControl.Drive[c] == ForceDriven) {
-          Cell.ah[c] = 0.0;
+          double drivingForce = 0.0;
           for (size_t s = 0; s < 3; s++) {
-            Cell.ah[c] += Vhinv[3 * row + s] * deltaSig[3 * s + col];
+            drivingForce += Vhinv[3 * row + s] * deltaSig[3 * s + col];
           }
-          Cell.ah[c] *= invMass;
+          Cell.ah[c] = (drivingForce - dampingForce[c]) * invMass;
         }
       }
     }
@@ -3479,7 +3530,22 @@ void Rockable::compute_accelerations_from_resultants() {
 #ifdef ROCKABLE_ENABLE_PERIODIC
     // If there's a periodic cell, the accelerations are rescaled toward reduced coordinates
     if (usePeriodicCell == 1) {
-      Particles[i].acc = Cell.hinv * Particles[i].acc;
+      // 1. Use the real acceleration computed just above
+      vec3r a_real = Particles[i].acc;
+
+      // 2. Get real position and velocity
+      vec3r r = Particles[i].pos;
+      vec3r v = Particles[i].vel;
+
+      // 3. Recover reduced position and reduced velocity
+      vec3r s = Cell.hinv * r;
+      vec3r s_dot = Cell.hinv * (v - (Cell.vh * s));
+
+      // 4. Inertial correction terms in reduced frame
+      vec3r inertial = (Cell.vh * s_dot) * 2.0 + (Cell.ah * s);
+
+      // 5. Reduced acceleration
+      Particles[i].acc = Cell.hinv * (a_real - inertial);
     }
 #endif
 
@@ -3661,6 +3727,83 @@ void Rockable::accelerations() {
   }
 }
 
+#ifdef ROCKABLE_ENABLE_PERIODIC
+void Rockable::updateCellDamping() {
+  if (usePeriodicCell != 1) return;
+
+  if (cellMassRatio > 0.0) {
+    double M_total = 0.0;
+#pragma omp parallel for reduction(+ : M_total)
+    for (size_t i = 0; i < Particles.size(); ++i) {
+      M_total += Particles[i].mass;
+    }
+    if (M_total > 0.0) {
+      Cell.mass = cellMassRatio * M_total;
+    }
+  }
+}
+#endif
+
+/**
+ * Apply optional periodic-cell drift correction to free-particle velocities.
+ */
+void Rockable::applyPeriodicCellDriftCorrection() {
+  START_TIMER("applyPeriodicCellDriftCorrection");
+
+  if (cellMomentumCorrection > 0.0) {
+    cellMomentumCorrectionC += dt;
+    if (cellMomentumCorrectionC >= cellMomentumCorrection - dt_2) {
+      cellMomentumCorrectionC = 0.0;
+
+      double Px = 0.0, Py = 0.0, Pz = 0.0;
+      double M_total = 0.0;
+
+#pragma omp parallel for reduction(+ : Px, Py, Pz, M_total)
+      for (size_t i = nDriven; i < Particles.size(); i++) {
+        double m = Particles[i].mass;
+        Px += Particles[i].vel.x * m;
+        Py += Particles[i].vel.y * m;
+        Pz += Particles[i].vel.z * m;
+        M_total += m;
+      }
+
+      if (M_total > 0.0) {
+        vec3r v_drift(Px / M_total, Py / M_total, Pz / M_total);
+#pragma omp parallel for
+        for (size_t i = nDriven; i < Particles.size(); i++) {
+          Particles[i].vel -= v_drift;
+        }
+      }
+    }
+  }
+
+  if (cellVelocityCorrection > 0.0) {
+    cellVelocityCorrectionC += dt;
+    if (cellVelocityCorrectionC >= cellVelocityCorrection - dt_2) {
+      cellVelocityCorrectionC = 0.0;
+
+      double Vx = 0.0, Vy = 0.0, Vz = 0.0;
+      size_t N = Particles.size() - nDriven;
+
+#pragma omp parallel for reduction(+ : Vx, Vy, Vz)
+      for (size_t i = nDriven; i < Particles.size(); i++) {
+        Vx += Particles[i].vel.x;
+        Vy += Particles[i].vel.y;
+        Vz += Particles[i].vel.z;
+      }
+
+      if (N > 0) {
+        double invN = 1.0 / static_cast<double>(N);
+        vec3r v_mean(Vx * invN, Vy * invN, Vz * invN);
+#pragma omp parallel for
+        for (size_t i = nDriven; i < Particles.size(); i++) {
+          Particles[i].vel -= v_mean;
+        }
+      }
+    }
+  }
+}
+
 /**
  *   This is the so-called Cundall damping solution
  *
@@ -3699,6 +3842,13 @@ void Rockable::numericalDamping() {
 
 #pragma omp parallel for default(shared)
   for (size_t i = nDriven; i < Particles.size(); ++i) {
+
+    vec3r vel = Particles[i].vel;
+#ifdef ROCKABLE_ENABLE_PERIODIC
+    if (usePeriodicCell == 1) {
+      vel -= Cell.vhHinv * Particles[i].pos;
+    }
+#endif
 
 #ifdef COMPONENTWISE_NUM_DAMPING
     // Translation

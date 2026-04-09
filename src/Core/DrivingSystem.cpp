@@ -80,9 +80,9 @@ void DrivingSystem::read(bool allow_warn) {
         cellControl.Drive.xz = cellControl.Drive.zx = VelocityDriven;
         cellControl.Drive.yz = cellControl.Drive.zy = VelocityDriven;
 
-        cellControl.Sig.xx = cellControl.Sig.yy = cellControl.Sig.zz = pressure;
+        cellControl.Sig.xx = cellControl.Sig.yy = cellControl.Sig.zz = -pressure;
         cellControl.Sig.xy = cellControl.Sig.yx = 0.0;
-        cellControl.Sig.xz = cellControl.Sig.yz = 0.0;
+        cellControl.Sig.xz = cellControl.Sig.zx = 0.0;
         cellControl.Sig.yz = cellControl.Sig.zy = 0.0;
 
         cellControl.v.xx = cellControl.v.yy = cellControl.v.zz = 0.0;  // free in fact
@@ -91,6 +91,81 @@ void DrivingSystem::read(bool allow_warn) {
         cellControl.v.yz = cellControl.v.zy = 0.0;
 
         ServoFunction = nullptr;
+      } else if (LoadingName == "TriaxialCompression") {
+
+        std::string dirStr;
+        double pressure, strainRate;
+        is >> dirStr >> pressure >> strainRate;
+
+        cellControl.Drive.xx = cellControl.Drive.yy = cellControl.Drive.zz = ForceDriven;
+        cellControl.Sig.xx = cellControl.Sig.yy = cellControl.Sig.zz = -pressure;
+
+        cellControl.Drive.xy = cellControl.Drive.yx = VelocityDriven;
+        cellControl.Drive.xz = cellControl.Drive.zx = VelocityDriven;
+        cellControl.Drive.yz = cellControl.Drive.zy = VelocityDriven;
+        cellControl.v.xy = cellControl.v.yx = 0.0;
+        cellControl.v.xz = cellControl.v.zx = 0.0;
+        cellControl.v.yz = cellControl.v.zy = 0.0;
+
+        size_t activeIdx = 0;
+        if (dirStr == "X")
+          activeIdx = 0;
+        else if (dirStr == "Y")
+          activeIdx = 4;
+        else if (dirStr == "Z")
+          activeIdx = 8;
+        else {
+          std::cerr << "Error: TriaxialCompression direction must be X, Y, or Z." << std::endl;
+        }
+
+        cellControl.Drive[activeIdx] = VelocityDriven;
+        ServoFunction = [activeIdx, strainRate](Rockable& box) -> void {
+          box.System.cellControl.v[activeIdx] = strainRate * box.Cell.h[activeIdx];
+        };
+      } else if (LoadingName == "SimpleShearDeformable") {
+
+        std::string dirStr;
+        double pressure, shearRate;
+        is >> dirStr >> pressure >> shearRate;
+
+        cellControl.Drive.xx = cellControl.Drive.yy = cellControl.Drive.zz = ForceDriven;
+        cellControl.Sig.xx = cellControl.Sig.yy = cellControl.Sig.zz = -pressure;
+
+        cellControl.Drive.xy = cellControl.Drive.xz = VelocityDriven;
+        cellControl.Drive.yx = cellControl.Drive.yz = VelocityDriven;
+        cellControl.Drive.zx = cellControl.Drive.zy = VelocityDriven;
+
+        for (int k = 0; k < 9; ++k)
+          cellControl.v[k] = 0.0;
+
+        size_t shearIdx = 0;
+        size_t normalIdx = 0;
+        if (dirStr == "XY") {
+          shearIdx = 1;
+          normalIdx = 1;
+        } else if (dirStr == "XZ") {
+          shearIdx = 2;
+          normalIdx = 2;
+        } else if (dirStr == "YX") {
+          shearIdx = 3;
+          normalIdx = 0;
+        } else if (dirStr == "YZ") {
+          shearIdx = 5;
+          normalIdx = 2;
+        } else if (dirStr == "ZX") {
+          shearIdx = 6;
+          normalIdx = 0;
+        } else if (dirStr == "ZY") {
+          shearIdx = 7;
+          normalIdx = 1;
+        } else {
+          std::cerr << "Error: Unknown shear direction '" << dirStr << "'." << std::endl;
+        }
+
+        ServoFunction = [shearIdx, normalIdx, shearRate](Rockable& box) -> void {
+          size_t h_idx = normalIdx * 4;
+          box.System.cellControl.v[shearIdx] = shearRate * box.Cell.h[h_idx];
+        };
       }
 
     } else if (token == "Control") {
