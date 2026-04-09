@@ -73,6 +73,10 @@ if(ROCKABLE_ENABLE_BOUNDARY)
   add_compile_options(-DROCKABLE_ENABLE_BOUNDARY)
 endif()
 
+if(ROCKABLE_ENABLE_PERIODIC)
+  add_compile_options(-DROCKABLE_ENABLE_PERIODIC)
+endif()
+
 # get the git tag of Rockable
 execute_process(
   COMMAND git describe --abbrev=0 --tags --always
