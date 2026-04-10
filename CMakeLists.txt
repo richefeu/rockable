@@ -118,7 +118,7 @@ endif()
 FetchContent_Declare(
   fmt
   GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-  GIT_TAG master
+  GIT_TAG main
   GIT_PROGRESS TRUE
   USES_TERMINAL_DOWNLOAD TRUE)
 FetchContent_GetProperties(fmt)

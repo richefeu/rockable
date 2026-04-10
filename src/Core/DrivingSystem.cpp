@@ -67,6 +67,7 @@ void DrivingSystem::read(bool allow_warn) {
       getline(is, token);
     }
 
+#ifdef ROCKABLE_ENABLE_PERIODIC
     else if (token == "PeriodicLoading") {
 
       std::string LoadingName;
@@ -166,9 +167,12 @@ void DrivingSystem::read(bool allow_warn) {
           size_t h_idx = normalIdx * 4;
           box.System.cellControl.v[shearIdx] = shearRate * box.Cell.h[h_idx];
         };
-      }
-
-    } else if (token == "Control") {
+      }      
+    } 
+    
+#endif // ROCKABLE_ENABLE_PERIODIC
+    
+    else if (token == "Control") {
 
       std::string typeStr;
       Control C;

@@ -2706,9 +2706,9 @@ void Rockable::integrate() {
     if (needUpdate || interVerletC >= interVerlet - dt_2) {
       PerfTimer tm;
 
+#ifdef ROCKABLE_ENABLE_PERIODIC      
       updateCellDamping();
-
-#ifdef ROCKABLE_ENABLE_PERIODIC
+      
       if (usePeriodicCell == 1) {
         reducedToRealKinematics();
         UpdateNL();
@@ -3747,6 +3747,7 @@ void Rockable::updateCellDamping() {
 /**
  * Apply optional periodic-cell drift correction to free-particle velocities.
  */
+#ifdef ROCKABLE_ENABLE_PERIODIC
 void Rockable::applyPeriodicCellDriftCorrection() {
   START_TIMER("applyPeriodicCellDriftCorrection");
 
@@ -3803,6 +3804,7 @@ void Rockable::applyPeriodicCellDriftCorrection() {
     }
   }
 }
+#endif
 
 /**
  *   This is the so-called Cundall damping solution

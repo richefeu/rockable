@@ -126,8 +126,8 @@ class Rockable {
   std::map<std::string, size_t> shapeId;  ///< Associate a name of shape with its id in the vector 'Shapes'
 
 #ifdef ROCKABLE_ENABLE_PERIODIC
-  int usePeriodicCell;  ///< Flag indicating if periodic cell is used
-  PeriodicCell Cell;    ///< The periodic cell
+  int usePeriodicCell;                   ///< Flag indicating if periodic cell is used
+  PeriodicCell Cell;                     ///< The periodic cell
   double cellMomentumCorrection = 0.0;   ///< Time interval for momentum correction (0 = disabled)
   double cellMomentumCorrectionC = 0.0;  ///< Counter for momentum correction
   double cellVelocityCorrection = 0.0;   ///< Time interval for velocity correction (0 = disabled)
@@ -295,9 +295,12 @@ class Rockable {
 
   // =============================================================================================================
 
+#ifdef ROCKABLE_ENABLE_PERIODIC
+  void applyPeriodicCellDriftCorrection();  ///< Apply momentum/velocity drift correction for periodic cell  
+  void updateCellDamping();            ///< Update Cell mass based on periodic mass ratio
+#endif
+  
   void velocityControlledDrive();      ///< Impose the velocities of driven bodies
-  void applyPeriodicCellDriftCorrection();   ///< Apply momentum/velocity drift correction for periodic cell
-  void updateCellDamping();                  ///< Update Cell mass based on periodic mass ratio
   void numericalDamping();             ///< The Cundall damping solution
   void applyVelocityBarrier();         ///< The velocity barrier solution
   void applyAngularVelocityBarrier();  ///< The velocity barrier solution for rotations
