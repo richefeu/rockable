@@ -45,7 +45,7 @@ option(ROCKABLE_COMPILE_POSTPRO
 option(ROCKABLE_COMPILE_SEE
        "Compile the glut application to visualize the conf-files" ON)
 option(ROCKABLE_COMPILE_SEE2
-       "Compile the glfw application to visualize the conf-files" ON)
+       "Compile the glfw application to visualize the conf-files" OFF)
 option(ROCKABLE_COMPILE_SEE3
        "Compile the application to edit graphically the input files" OFF)
 option(ROCKABLE_COMPILE_SEE4
@@ -505,7 +505,6 @@ endif() # end of ROCKABLE_COMPILE_SEE4
 if(ROCKABLE_COMPILE_CONF2VTK)
   add_executable(conftovtk ${CMAKE_SOURCE_DIR}/Apps/conftovtk.cpp)
   target_link_libraries(conftovtk Rockable_core)
-  # install(TARGETS conftovtk DESTINATION ./)
   install(TARGETS conftovtk)
 endif()
 
