@@ -31,25 +31,20 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 # ##############################################################################
 # OPTIONS
 
-option(ROCKABLE_USE_FT_CORR "add objectivity correction to tangent forces" OFF)
-option(ROCKABLE_USE_TESTING "add tests" OFF)
+option(ROCKABLE_USE_FT_CORR "Add objectivity correction to tangent forces" OFF)
+option(ROCKABLE_USE_TESTING "Add tests" OFF)
 
-option(ROCKABLE_ENABLE_PROFILING "enable the time profiling" OFF)
-option(ROCKABLE_ENABLE_BOUNDARY
-       "enable the special boundaries like Ball or Cylinder" OFF)
-option(ROCKABLE_ENABLE_SOFT_PARTICLES "enable strainning of particles" OFF)
-option(ROCKABLE_ENABLE_PERIODIC "enable full periodic boundary conditions" OFF)
+option(ROCKABLE_ENABLE_PROFILING "Enable the time profiling" OFF)
+option(ROCKABLE_ENABLE_BOUNDARY "Enable the special boundaries like Ball or Cylinder" OFF)
+option(ROCKABLE_ENABLE_SOFT_PARTICLES "Enable strainning of particles" OFF)
+option(ROCKABLE_ENABLE_PERIODIC "Enable full periodic boundary conditions" OFF)
 
-option(ROCKABLE_COMPILE_POSTPRO
-       "Compile the application to run post-processing commands" ON)
-option(ROCKABLE_COMPILE_SEE
-       "Compile the glut application to visualize the conf-files" ON)
-option(ROCKABLE_COMPILE_SEE2
-       "Compile the glfw application to visualize the conf-files" OFF)
-option(ROCKABLE_COMPILE_SEE3
-       "Compile the application to edit graphically the input files" OFF)
-option(ROCKABLE_COMPILE_SEE4
-       "Compile the application to edit graphically the input files" OFF)
+option(ROCKABLE_COMPILE_POSTPRO "Compile the application to run post-processing commands" ON)
+option(ROCKABLE_COMPILE_SEE "Compile the glut application to visualize the conf-files" OFF)
+option(ROCKABLE_COMPILE_SEE2 "Compile the glfw application to visualize the conf-files" OFF)
+option(ROCKABLE_COMPILE_SEE3 "Compile the application to edit graphically the input files" OFF)
+option(ROCKABLE_COMPILE_SEE4 "Compile the application to edit graphically the input files" OFF)
+option(ROCKABLE_COMPILE_SEER "Compile Dear My Seer" ON)
 option(ROCKABLE_COMPILE_PREPRO "Compile the preprocessing tools" ON)
 option(ROCKABLE_COMPILE_CONF2VTK "Convert conf files to VTK" OFF)
 
@@ -500,8 +495,29 @@ if(ROCKABLE_COMPILE_SEE4)
 
 endif() # end of ROCKABLE_COMPILE_SEE4
 
+
 # ##############################################################################
-#
+# Dear My Seer
+
+if(ROCKABLE_COMPILE_SEER)
+  set(SEER_SOURCE_DIR ${CMAKE_SOURCE_DIR}/Apps/DearMySeer)
+  message(STATUS "Building Dear My Seer: ${SEER_SOURCE_DIR}")
+  
+  # It uses the Makefile that is inside the folder of DearMySeer
+  add_custom_target(
+      seer
+      ALL
+      COMMAND ${CMAKE_MAKE_PROGRAM} -C ${SEER_SOURCE_DIR}
+      COMMAND ${CMAKE_COMMAND} -E copy
+              ${SEER_SOURCE_DIR}/seer
+              ${CMAKE_BINARY_DIR}/seer
+      DEPENDS Rockable_core
+      COMMENT "Building Dear My Seer with its own make"
+  )
+endif() # end of ROCKABLE_COMPILE_SEER
+
+# ##############################################################################
+# conf2vtk
 if(ROCKABLE_COMPILE_CONF2VTK)
   add_executable(conftovtk ${CMAKE_SOURCE_DIR}/Apps/conftovtk.cpp)
   target_link_libraries(conftovtk Rockable_core)
