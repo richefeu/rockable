@@ -507,7 +507,7 @@ if(ROCKABLE_COMPILE_SEER)
   add_custom_target(
       seer
       ALL
-      COMMAND ${CMAKE_MAKE_PROGRAM} -C ${SEER_SOURCE_DIR}
+      COMMAND ${CMAKE_MAKE_PROGRAM} -C ${SEER_SOURCE_DIR} ROCKABLE_LIB=$<TARGET_FILE:Rockable_core>
       COMMAND ${CMAKE_COMMAND} -E copy
               ${SEER_SOURCE_DIR}/seer
               ${CMAKE_BINARY_DIR}/seer

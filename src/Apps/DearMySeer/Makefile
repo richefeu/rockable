@@ -63,7 +63,7 @@ endif
 
 # Fichiers Rockable (librairie déjà compilée)
 ROCKABLE_INCLUDES = ../..
-ROCKABLE_LIB = ../../../BUILD/libRockable_core.a
+ROCKABLE_LIB ?= ../../../BUILD/libRockable_core.a
 
 # Fichiers sources
 SRCS = \
