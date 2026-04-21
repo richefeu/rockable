@@ -29,6 +29,13 @@ jobs:
       run: sudo apt-get install -y libpng-dev libpng16-16
     - name: Install FLTK
       run: sudo apt-get install libfltk1.3-dev fluid
+    - name: Install SDL2
+      run: sudo apt-get install -y libsdl2-dev
+    - name: Install OpenGL and GLEW
+      run: sudo apt-get install -y libgl1-mesa-dev libglew-dev
+    - name: Install GLM
+      run: |
+        git clone https://github.com/g-truc/glm.git ${{github.workspace}}/glm
     - name: Configure CMake
       run: cmake -DCMAKE_CXX_FLAGS="--coverage -g" -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
