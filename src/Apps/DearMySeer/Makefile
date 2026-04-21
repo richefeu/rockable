@@ -37,16 +37,18 @@ ifeq ($(UNAME),Darwin)
 else
     # Configuration pour systèmes Unix-like
     CXX = g++
-    CXXFLAGS = -std=c++17 -Wall -Wextra
+    CXXFLAGS = -std=c++17 -Wall -Wextra -O3 -Wno-unknown-pragmas -Wno-missing-field-initializers
     
+		
     INCLUDE_PATHS = \
-	-I/usr/include/SDL2 \
+	-I `pkg-config --cflags sdl2` \
 	-I../mini-imgui-implot \
 	-I../../../deps/toofus-src
     
     LDFLAGS = \
 	-L/usr/lib \
-	-L/usr/lib/x86_64-linux-gnu
+	-L/usr/lib/x86_64-linux-gnu \
+	-L `pkg-config --libs sdl2`
     
     LIBS = \
 	-lSDL2 \
