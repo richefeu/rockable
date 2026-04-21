@@ -3,13 +3,16 @@
 
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
-#include <functional>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+
+#include "toofus-gate/glm/glm.hpp"
+#include "toofus-gate/glm/gtc/matrix_transform.hpp"
+
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl2.h>
 #include <implot.h>
+
+#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
@@ -29,9 +32,9 @@ class ImGuiSDLApplication {
   Rockable& box();
   int confNum{0};
   int lastConfNumOK{confNum};
-  
+
   bool tryToReadConf(int num);
-  
+
   Scene3D scene3d;
 
   // Empêcher la copie pour éviter les problèmes de gestion des ressources
@@ -39,19 +42,19 @@ class ImGuiSDLApplication {
   ImGuiSDLApplication& operator=(const ImGuiSDLApplication&) = delete;
 
  private:
-  int windowWidth;         
-  int windowHeight;         
-  std::string windowTitle;  
+  int windowWidth;
+  int windowHeight;
+  std::string windowTitle;
 
-  SDL_Window* window{nullptr};      
-  SDL_GLContext glContext{nullptr};  
+  SDL_Window* window{nullptr};
+  SDL_GLContext glContext{nullptr};
 
   bool show_config_panel{false};
   bool show_main_panel{true};
   bool show_window_info{false};
   bool show_screenshot_panel{false};
   bool show_slicing_panel{false};
-  
+
   // screenshots
   bool should_save_screenshot{false};
   bool should_save_screenshot_series{false};
@@ -61,19 +64,19 @@ class ImGuiSDLApplication {
   int screenshot_last{0};
 
   // background
-  ImVec4 clear_color = ImVec4(0.498f, 0.655f, 0.721f, 1.0f);  
+  ImVec4 clear_color = ImVec4(0.498f, 0.655f, 0.721f, 1.0f);
   float clear_bottom_color[3] = {135.0f / 255.0f, 206.0f / 255.0f, 250.0f / 255.0f};
   float clear_top_color[3] = {1.0f, 1.0f, 1.0f};
   void gradBackground();
 
   // Gestion des raccourcis clavier ============
   struct KeyBinding {
-    SDL_Keycode key;               
-    bool ctrl;                     
-    bool shift;                    
-    bool alt;                      
-    std::function<void()> action;  
-    //std::string description;       
+    SDL_Keycode key;
+    bool ctrl;
+    bool shift;
+    bool alt;
+    std::function<void()> action;
+    // std::string description;
   };
 
   std::vector<KeyBinding> keyBindings;  ///< Liste des raccourcis clavier configurés
@@ -89,7 +92,7 @@ class ImGuiSDLApplication {
   bool initializeImGui();
   bool applyStyle();
   void setupScene3D();
-  
+
   // screenshots
   bool SaveScreenshotWithoutImGui(const char* filename, int W, int H);
 
@@ -102,12 +105,12 @@ class ImGuiSDLApplication {
   void Input_Properties(const char* propertyName);
   void Input_LawData(const char* parName);
   void Input_ParticleColorMode();
-  
+
   void ForceLaw_Combo();
   void Integrator_Combo();
   void UpdateNL_Combo();
   void AddOrRemoveInteractions_Combo();
-  
+
   // Panels
   void mainMenu();
   void mainPanel();
@@ -126,18 +129,17 @@ class ImGuiSDLApplication {
   void saveConfigToSeparateFile();
   void loadConfigFromSeparateFile();
 
-  void cleanup(); //Nettoie toutes les ressources
-  
-private:
-  
+  void cleanup();  // Nettoie toutes les ressources
+
+ private:
   // Du graphisme sur les buttons
   void LoadTextureFromMemory(unsigned char data[], unsigned int len, GLuint& textureID);
   void genButtons();
-  
+
   GLuint IDButton_XY;
   GLuint IDButton_XZ;
   GLuint IDButton_YX;
   GLuint IDButton_YZ;
   GLuint IDButton_ZX;
-  GLuint IDButton_ZY; 
+  GLuint IDButton_ZY;
 };

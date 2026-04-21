@@ -4,9 +4,9 @@
 
 #include "Core/Rockable.hpp"
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "toofus-gate/glm/glm.hpp"
+#include "toofus-gate/glm/gtc/matrix_transform.hpp"
+#include "toofus-gate/glm/gtc/type_ptr.hpp"
 
 #include <GL/glew.h>
 #include <SDL2/SDL.h>

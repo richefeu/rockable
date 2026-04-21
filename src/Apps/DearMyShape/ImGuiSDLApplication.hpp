@@ -4,8 +4,8 @@
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
 #include <functional>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include "toofus-gate/glm/glm.hpp"
+#include "toofus-gate/glm/gtc/matrix_transform.hpp"
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl2.h>
