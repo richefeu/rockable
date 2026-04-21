@@ -271,7 +271,7 @@ endif()
 
 # ##############################################################################
 # sdl2
-if(ROCKABLE_COMPILE_SEE4)
+if(ROCKABLE_COMPILE_SEE4) # OR ROCKABLE_COMPILE_SEER)
 
   if(NOT PkgConfig_FOUND)
     find_package(PkgConfig REQUIRED)
@@ -500,20 +500,64 @@ endif() # end of ROCKABLE_COMPILE_SEE4
 # Dear My Seer
 
 if(ROCKABLE_COMPILE_SEER)
-  set(SEER_SOURCE_DIR ${CMAKE_SOURCE_DIR}/Apps/DearMySeer)
-  message(STATUS "Building Dear My Seer: ${SEER_SOURCE_DIR}")
+  #set(SEER_SOURCE_DIR ${CMAKE_SOURCE_DIR}/Apps/DearMySeer)
+  #message(STATUS "Building Dear My Seer: ${SEER_SOURCE_DIR}")
   
   # It uses the Makefile that is inside the folder of DearMySeer
-  add_custom_target(
+  #add_custom_target(
+  #    seer
+  #    ALL
+  #    COMMAND ${CMAKE_MAKE_PROGRAM} -C ${SEER_SOURCE_DIR} ROCKABLE_LIB=$<TARGET_FILE:Rockable_core>
+  #    COMMAND ${CMAKE_COMMAND} -E copy
+  #            ${SEER_SOURCE_DIR}/seer
+  #            ${CMAKE_BINARY_DIR}/seer
+  #    DEPENDS Rockable_core
+  #    COMMENT "Building Dear My Seer with its own make"
+  #)
+  
+  find_package(GLEW REQUIRED)
+  message(STATUS "GLEW_INCLUDE_DIRS = " ${GLEW_INCLUDE_DIRS})
+  message(STATUS "GLEW_LIBRARIES = " ${GLEW_LIBRARIES})
+  
+  find_package(SDL2 REQUIRED)
+  message(STATUS "SDL2_INCLUDE_DIRS = " ${SDL2_INCLUDE_DIRS})
+  message(STATUS "SDL2_LIBRARIES = " ${SDL2_LIBRARIES})
+  
+  find_package(OpenGL REQUIRED)
+  if(OPENGL_FOUND)
+    message(STATUS "OPENGL_INCLUDE_DIR = " ${OPENGL_INCLUDE_DIR})
+    message(STATUS "OPENGL_LIBRARIES = " ${OPENGL_LIBRARIES})
+  endif()
+  
+  
+  set(SEER_FILES
+      ${CMAKE_SOURCE_DIR}/Apps/DearMySeer/seer.cpp
+      ${CMAKE_SOURCE_DIR}/Apps/DearMySeer/ImGuiSDLApplication.cpp
+      ${CMAKE_SOURCE_DIR}/Apps/DearMySeer/Scene3D.cpp
+      ${CMAKE_SOURCE_DIR}/Apps/DearMySeer/ParticleColoring.cpp
+      ${CMAKE_SOURCE_DIR}/Apps/DearMySeer/Slicing.cpp      
+      ${CMAKE_SOURCE_DIR}/Apps/mini-imgui-implot/imgui.cpp
+      ${CMAKE_SOURCE_DIR}/Apps/mini-imgui-implot/imgui_demo.cpp
+      ${CMAKE_SOURCE_DIR}/Apps/mini-imgui-implot/imgui_draw.cpp
+      ${CMAKE_SOURCE_DIR}/Apps/mini-imgui-implot/imgui_tables.cpp
+      ${CMAKE_SOURCE_DIR}/Apps/mini-imgui-implot/imgui_widgets.cpp
+      ${CMAKE_SOURCE_DIR}/Apps/mini-imgui-implot/imgui_impl_sdl2.cpp
+      ${CMAKE_SOURCE_DIR}/Apps/mini-imgui-implot/imgui_impl_opengl3.cpp
+      ${CMAKE_SOURCE_DIR}/Apps/mini-imgui-implot/implot.cpp
+      ${CMAKE_SOURCE_DIR}/Apps/mini-imgui-implot/implot_items.cpp)
+
+  add_executable(seer ${SEER_FILES})
+
+  target_include_directories(
       seer
-      ALL
-      COMMAND ${CMAKE_MAKE_PROGRAM} -C ${SEER_SOURCE_DIR} ROCKABLE_LIB=$<TARGET_FILE:Rockable_core>
-      COMMAND ${CMAKE_COMMAND} -E copy
-              ${SEER_SOURCE_DIR}/seer
-              ${CMAKE_BINARY_DIR}/seer
-      DEPENDS Rockable_core
-      COMMENT "Building Dear My Seer with its own make"
-  )
+      PUBLIC ${OPENGL_INCLUDE_DIR} ${SDL2_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS}
+             ${CMAKE_SOURCE_DIR}/Apps/DearMySeer ${CMAKE_SOURCE_DIR}/Apps/mini-imgui-implot)
+
+  target_link_libraries(seer PUBLIC OpenGL::GL SDL2::SDL2 GLEW::GLEW Rockable_core)
+
+
+  install(TARGETS seer)
+  
 endif() # end of ROCKABLE_COMPILE_SEER
 
 # ##############################################################################
