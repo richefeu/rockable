@@ -43,6 +43,7 @@ else
 	-I/usr/include/SDL2 \
 	-I../mini-imgui-implot \
 	-I../../../deps/toofus-src \
+    -I../../../glm
     
     LDFLAGS = \
 	-L/usr/lib \
