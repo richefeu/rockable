@@ -1,26 +1,23 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Force laws &mdash; Rockable 1.0.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
   
     <link rel="canonical" href="https://richefeu.github.io/rockable/forceLaws.html" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -63,6 +60,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualisation.html">Visualisation tools</a></li>
 </ul>
 
         </div>
@@ -90,7 +88,7 @@
            <div itemprop="articleBody">
              
   <section id="force-laws">
-<span id="id1"></span><h1>Force laws<a class="headerlink" href="#force-laws" title="Permalink to this heading"></a></h1>
+<span id="id1"></span><h1>Force laws<a class="headerlink" href="#force-laws" title="Link to this heading"></a></h1>
 <p>We provide here the interaction models existing in <code class="docutils literal notranslate"><span class="pre">Rockable</span></code>.
 The equations are explained with the associated parameters.
 The parameters <code class="docutils literal notranslate"><span class="pre">[PARAMETER]</span></code> are to be defined in the input conf-file in the following way:</p>
@@ -99,7 +97,7 @@ The parameters <code class="docutils literal notranslate"><span class="pre">[PAR
 </ul>
 <p>For example, to set the value <span class="math notranslate nohighlight">\(10^8\)</span> to the normal stiffness <span class="math notranslate nohighlight">\(k_n\)</span> between the elements that belong to the group number <code class="docutils literal notranslate"><span class="pre">0</span></code> and the elements that belong to the group number <code class="docutils literal notranslate"><span class="pre">2</span></code>, we will write:</p>
 <div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">input.txt</span><a class="headerlink" href="#id2" title="Permalink to this code"></a></div>
+<div class="code-block-caption"><span class="caption-text">input.txt</span><a class="headerlink" href="#id2" title="Link to this code"></a></div>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>      ...
 knContact 0 2 1e8
       ...
@@ -107,7 +105,7 @@ knContact 0 2 1e8
 </div>
 </div>
 <section id="default-model-keywork-default">
-<h2>Default model (keywork <code class="docutils literal notranslate"><span class="pre">Default</span></code>)<a class="headerlink" href="#default-model-keywork-default" title="Permalink to this heading"></a></h2>
+<h2>Default model (keywork <code class="docutils literal notranslate"><span class="pre">Default</span></code>)<a class="headerlink" href="#default-model-keywork-default" title="Link to this heading"></a></h2>
 <p>This is the force law to be used in most cases.
 In short, the model includes elastic linear normal force for contact, normal viscosity force, constant normal cohesion force at contact,
 Coulomb friction tangent force, and rolling resistance moment</p>
@@ -163,7 +161,7 @@ Coulomb friction tangent force, and rolling resistance moment</p>
 </div>
 </section>
 <section id="law-for-rock-avalanches-keywork-avalanche">
-<h2>Law for rock avalanches (keywork <code class="docutils literal notranslate"><span class="pre">Avalanche</span></code>)<a class="headerlink" href="#law-for-rock-avalanches-keywork-avalanche" title="Permalink to this heading"></a></h2>
+<h2>Law for rock avalanches (keywork <code class="docutils literal notranslate"><span class="pre">Avalanche</span></code>)<a class="headerlink" href="#law-for-rock-avalanches-keywork-avalanche" title="Link to this heading"></a></h2>
 <p>This is historically the first law that has been implemented in <code class="docutils literal notranslate"><span class="pre">Rockable</span></code> (actually in <code class="docutils literal notranslate"><span class="pre">DEMbox</span></code>, its ancestor).</p>
 <p>The force-law implemented is specifically designed for simulating rock avalanches at Laboratoire 3SR. It governs the interactions between particles or bodies in a granular material, considering both normal and tangential forces as well as resistant moments due to rotational motion.</p>
 <ol class="arabic">
@@ -187,7 +185,7 @@ Coulomb friction tangent force, and rolling resistance moment</p>
 </div>
 </section>
 <section id="breakable-elastic-solid-bonds-keywork-stickedlinks">
-<h2>Breakable elastic solid bonds (keywork <code class="docutils literal notranslate"><span class="pre">StickedLinks</span></code>)<a class="headerlink" href="#breakable-elastic-solid-bonds-keywork-stickedlinks" title="Permalink to this heading"></a></h2>
+<h2>Breakable elastic solid bonds (keywork <code class="docutils literal notranslate"><span class="pre">StickedLinks</span></code>)<a class="headerlink" href="#breakable-elastic-solid-bonds-keywork-stickedlinks" title="Link to this heading"></a></h2>
 <p>This law has been introduced since the PhD work of <em>Marta Stasiak</em>.</p>
 <p>Two states can exist: cohesive bond and contact.</p>
 <ol class="arabic">
