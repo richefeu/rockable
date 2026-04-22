@@ -1,0 +1,32 @@
+name: Build and Deploy Sphinx to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]  # Déclenche uniquement sur la branche main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.7'  # Même version que dans CircleCI
+
+      - name: Install dependencies
+        run: pip install --upgrade pip && pip install -r sphinxdoc/requirements.txt
+
+      - name: Build Sphinx docs
+        run: cd sphinxdoc && make html  # Génère les fichiers dans sphinxdoc/build/html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./sphinxdoc/build/html  # Dossier généré par Sphinx
+          publish_branch: gh-pages              # Branche cible
+          user_name: richefeu                   # Même nom d'utilisateur que dans CircleCI
+          user_email: richefeu@gmail.com        # Même email que dans CircleCI
