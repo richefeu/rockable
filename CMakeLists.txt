@@ -41,9 +41,9 @@ option(ROCKABLE_ENABLE_PERIODIC "Enable full periodic boundary conditions" OFF)
 
 option(ROCKABLE_COMPILE_POSTPRO "Compile the application to run post-processing commands" ON)
 option(ROCKABLE_COMPILE_SEE "Compile the glut application to visualize the conf-files" OFF)
-option(ROCKABLE_COMPILE_SEE2 "Compile the glfw application to visualize the conf-files" OFF)
-option(ROCKABLE_COMPILE_SEE3 "Compile the application to edit graphically the input files" OFF)
-option(ROCKABLE_COMPILE_SEE4 "Compile the application to edit graphically the input files" OFF)
+#option(ROCKABLE_COMPILE_SEE2 "Compile the glfw application to visualize the conf-files" OFF)
+#option(ROCKABLE_COMPILE_SEE3 "Compile the application to edit graphically the input files" OFF)
+#option(ROCKABLE_COMPILE_SEE4 "Compile the application to edit graphically the input files" OFF)
 option(ROCKABLE_COMPILE_SEER "Compile Dear My Seer" ON)
 option(ROCKABLE_COMPILE_PREPRO "Compile the preprocessing tools" ON)
 option(ROCKABLE_COMPILE_CONF2VTK "Convert conf files to VTK" OFF)
@@ -109,18 +109,18 @@ if(NOT toofus_POPULATED)
 endif()
 
 # ##############################################################################
-# Fetching fmt
-FetchContent_Declare(
-  fmt
-  GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-  GIT_TAG main
-  GIT_PROGRESS TRUE
-  USES_TERMINAL_DOWNLOAD TRUE)
-FetchContent_GetProperties(fmt)
-if(NOT fmt_POPULATED)
-  message(STATUS "Fetching fmt")
-  FetchContent_MakeAvailable(fmt)
-endif()
+# Fetching fmt (A REMPLACER PAR celui de toofus-gate)
+#FetchContent_Declare(
+#  fmt
+#  GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+#  GIT_TAG main
+#  GIT_PROGRESS TRUE
+#  USES_TERMINAL_DOWNLOAD TRUE)
+#FetchContent_GetProperties(fmt)
+#if(NOT fmt_POPULATED)
+#  message(STATUS "Fetching fmt")
+#  FetchContent_MakeAvailable(fmt)
+#endif()
 
 # ##############################################################################
 # MATools
@@ -143,51 +143,18 @@ if(ROCKABLE_ENABLE_PROFILING)
 endif()
 
 # ##############################################################################
-# tclap
+# nlohmann-json (A REMPLACER PAR celui de toofus-gate)
 #FetchContent_Declare(
-#  tclap
-#  GIT_REPOSITORY https://github.com/xguerin/tclap.git
-#  GIT_TAG v1.2.5)
+#  nlohmann-json
+#  GIT_REPOSITORY https://github.com/nlohmann/json.git
+#  GIT_TAG v3.12.0)
 
-#FetchContent_GetProperties(tclap)
+#FetchContent_GetProperties(nlohmann-json)
 
-#if(NOT tclap_POPULATED)
-#  message(STATUS "Fetching tclap")
-#  FetchContent_MakeAvailable(tclap)
+#if(NOT nlohmann-json_POPULATED)
+#  message(STATUS "Fetching nlohmann-json")
+#  FetchContent_MakeAvailable(nlohmann-json)
 #endif()
-
-# ##############################################################################
-# nlohmann-json
-FetchContent_Declare(
-  nlohmann-json
-  GIT_REPOSITORY https://github.com/nlohmann/json.git
-  GIT_TAG v3.12.0)
-
-FetchContent_GetProperties(nlohmann-json)
-
-if(NOT nlohmann-json_POPULATED)
-  message(STATUS "Fetching nlohmann-json")
-  FetchContent_MakeAvailable(nlohmann-json)
-endif()
-
-# ##############################################################################
-# imgui
-
-if(ROCKABLE_COMPILE_SEE3 OR ROCKABLE_COMPILE_SEE4)
-
-  FetchContent_Declare(
-    imgui
-    GIT_REPOSITORY https://github.com/ocornut/imgui.git
-    GIT_TAG master)
-
-  FetchContent_GetProperties(imgui)
-
-  if(NOT imgui_POPULATED)
-    message(STATUS "Fetching imgui")
-    FetchContent_MakeAvailable(imgui)
-  endif()
-
-endif() # end of ROCKABLE_COMPILE_SEE3 or 4
 
 # ##############################################################################
 # OpenMP
@@ -246,45 +213,6 @@ else()
   if(GLUT_FOUND)
     message(STATUS "GLUT_INCLUDE_DIRS = " ${GLUT_INCLUDE_DIRS})
     message(STATUS "GLUT_LIBRARIES = " ${GLUT_LIBRARIES})
-  endif()
-
-endif()
-
-# ##############################################################################
-# glfw
-if(ROCKABLE_COMPILE_SEE2 OR ROCKABLE_COMPILE_SEE3)
-
-  if(NOT PkgConfig_FOUND)
-    find_package(PkgConfig REQUIRED)
-  endif()
-
-  pkg_check_modules(GLFW REQUIRED glfw3)
-
-  if(GLFW_FOUND)
-    message(STATUS "GLFW as been found with PkgConfig")
-    message(STATUS "GLFW_INCLUDE_DIRS = " ${GLFW_INCLUDE_DIRS})
-    message(STATUS "GLFW_LIBRARY_DIRS = " ${GLFW_LIBRARY_DIRS})
-    message(STATUS "GLFW_LIBRARIES = " ${GLFW_LIBRARIES})
-  endif()
-
-endif()
-
-# ##############################################################################
-# sdl2
-if(ROCKABLE_COMPILE_SEE4) # OR ROCKABLE_COMPILE_SEER)
-
-  if(NOT PkgConfig_FOUND)
-    find_package(PkgConfig REQUIRED)
-  endif()
-
-  # Check for SDL2 instead of GLFW
-  pkg_check_modules(SDL2 REQUIRED sdl2)
-
-  if(SDL2_FOUND)
-    message(STATUS "SDL2 has been found with PkgConfig")
-    message(STATUS "SDL2_LIBRARY_DIRS = " ${SDL2_LIBRARY_DIRS})
-    message(STATUS "SDL2_INCLUDE_DIRS = " ${SDL2_INCLUDE_DIRS})
-    message(STATUS "SDL2_LIBRARIES = " ${SDL2_LIBRARIES})
   endif()
 
 endif()
@@ -401,119 +329,8 @@ if(ROCKABLE_COMPILE_SEE)
 endif()
 
 # ##############################################################################
-# interactive preprocessing (TODO see3 -> will be renamed something like 'craft' or 'seedit' or 'reveal'
-# or 'look') Before, the use of glfw will be replaced by glut (to avoid issues
-# with macosx)
-if(ROCKABLE_COMPILE_SEE3)
-
-  set(SEE3_FILES
-      ${CMAKE_SOURCE_DIR}/Apps/see3.cpp
-      ${imgui_SOURCE_DIR}/imgui.cpp
-      ${imgui_SOURCE_DIR}/imgui_draw.cpp
-      ${imgui_SOURCE_DIR}/imgui_tables.cpp
-      ${imgui_SOURCE_DIR}/imgui_widgets.cpp
-      ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
-      ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp)
-
-  add_executable(see3 ${SEE3_FILES})
-
-  if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux") # ===========
-
-    target_include_directories(
-      see3
-      PRIVATE ${OPENGL_INCLUDE_DIR} ${imgui_SOURCE_DIR}
-             ${imgui_SOURCE_DIR}/backends ${nlohmann-json_SOURCE_DIR}/include)
-
-    target_link_libraries(see3 PRIVATE glfw OpenGL::GL OpenGL::GLU Rockable_core)
-
-  else() # For APPLE  ===========
-
-    target_include_directories(
-      see3
-      PRIVATE ${GL_INCLUDE_DIRS} ${GLU_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS}
-             ${GLFW_INCLUDE_DIRS} ${imgui_SOURCE_DIR}
-             ${imgui_SOURCE_DIR}/backends)
-             
-    #target_compile_options(see3 PRIVATE "-ObjC++")  
-    #target_compile_options(see3 PRIVATE "-isystem")
-    
-    target_link_directories(see3 PRIVATE ${GL_LIBRARY_DIRS} ${GLU_LIBRARY_DIRS}
-                            ${GLFW_LIBRARY_DIRS})
-
-    target_link_libraries(see3 PRIVATE ${GL_LIBRARIES} ${GLU_LIBRARIES}
-                                      ${GLFW_LIBRARIES} Rockable_core)
-
-  endif() # ===========
-
-  install(TARGETS see3)
-
-endif() # end of ROCKABLE_COMPILE_SEE3
-
-# ##############################################################################
-# interactive preprocessing (TODO see4 -> will be renamed something like 'craft'
-# or 'look') Before, the use of glfw will be replaced by glut (to avoid issues
-# with macosx)
-if(ROCKABLE_COMPILE_SEE4)
-
-  set(SEE4_FILES
-      ${CMAKE_SOURCE_DIR}/Apps/see4.cpp
-      ${imgui_SOURCE_DIR}/imgui.cpp
-      ${imgui_SOURCE_DIR}/imgui_demo.cpp
-      ${imgui_SOURCE_DIR}/imgui_draw.cpp
-      ${imgui_SOURCE_DIR}/imgui_tables.cpp
-      ${imgui_SOURCE_DIR}/imgui_widgets.cpp
-      ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl2.cpp
-      ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp)
-
-  add_executable(see4 ${SEE4_FILES})
-
-  if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
-
-    target_include_directories(
-      see4
-      PUBLIC ${OPENGL_INCLUDE_DIR} ${SDL2_INCLUDE_DIRS} ${imgui_SOURCE_DIR}
-             ${imgui_SOURCE_DIR}/backends ${nlohmann-json_SOURCE_DIR}/include)
-
-    target_link_libraries(see4 PUBLIC SDL2 OpenGL::GL OpenGL::GLU Rockable_core)
-
-  else()
-
-    target_include_directories(
-      see4
-      PUBLIC ${GL_INCLUDE_DIRS} ${GLU_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS}
-             ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends
-             ${nlohmann-json_SOURCE_DIR}/include)
-
-    target_link_directories(see4 PUBLIC ${GL_LIBRARY_DIRS} ${GLU_LIBRARY_DIRS}
-                            ${SDL2_LIBRARY_DIRS})
-
-    target_link_libraries(see4 PUBLIC ${GL_LIBRARIES} ${GLU_LIBRARIES}
-                                      ${SDL2_LIBRARIES} Rockable_core)
-  endif()
-
-  install(TARGETS see4)
-
-endif() # end of ROCKABLE_COMPILE_SEE4
-
-
-# ##############################################################################
 # Dear My Seer
-
 if(ROCKABLE_COMPILE_SEER)
-  #set(SEER_SOURCE_DIR ${CMAKE_SOURCE_DIR}/Apps/DearMySeer)
-  #message(STATUS "Building Dear My Seer: ${SEER_SOURCE_DIR}")
-  
-  # It uses the Makefile that is inside the folder of DearMySeer
-  #add_custom_target(
-  #    seer
-  #    ALL
-  #    COMMAND ${CMAKE_MAKE_PROGRAM} -C ${SEER_SOURCE_DIR} ROCKABLE_LIB=$<TARGET_FILE:Rockable_core>
-  #    COMMAND ${CMAKE_COMMAND} -E copy
-  #            ${SEER_SOURCE_DIR}/seer
-  #            ${CMAKE_BINARY_DIR}/seer
-  #    DEPENDS Rockable_core
-  #    COMMENT "Building Dear My Seer with its own make"
-  #)
   
   find_package(GLEW REQUIRED)
   message(STATUS "GLEW_INCLUDE_DIRS = " ${GLEW_INCLUDE_DIRS})
@@ -524,12 +341,9 @@ if(ROCKABLE_COMPILE_SEER)
   message(STATUS "SDL2_LIBRARIES = " ${SDL2_LIBRARIES})
   
   find_package(OpenGL REQUIRED)
-  if(OPENGL_FOUND)
-    message(STATUS "OPENGL_INCLUDE_DIR = " ${OPENGL_INCLUDE_DIR})
-    message(STATUS "OPENGL_LIBRARIES = " ${OPENGL_LIBRARIES})
-  endif()
-  
-  
+  message(STATUS "OPENGL_INCLUDE_DIR = " ${OPENGL_INCLUDE_DIR})
+  message(STATUS "OPENGL_LIBRARIES = " ${OPENGL_LIBRARIES})
+ 
   set(SEER_FILES
       ${CMAKE_SOURCE_DIR}/Apps/DearMySeer/seer.cpp
       ${CMAKE_SOURCE_DIR}/Apps/DearMySeer/ImGuiSDLApplication.cpp
@@ -548,13 +362,11 @@ if(ROCKABLE_COMPILE_SEER)
 
   add_executable(seer ${SEER_FILES})
 
-  target_include_directories(
-      seer
+  target_include_directories(seer
       PUBLIC ${OPENGL_INCLUDE_DIR} ${SDL2_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS}
              ${CMAKE_SOURCE_DIR}/Apps/DearMySeer ${CMAKE_SOURCE_DIR}/Apps/mini-imgui-implot)
 
   target_link_libraries(seer PUBLIC OpenGL::GL SDL2::SDL2 GLEW::GLEW Rockable_core)
-
 
   install(TARGETS seer)
   

@@ -48,7 +48,8 @@
 #include <png.h>
 #endif
 
-#include <nlohmann/json.hpp>
+//#include <nlohmann/json.hpp>
+#include "toofus-gate/nlohmann/json.hpp"
 
 #include "ColorTable.hpp"
 #include "fileTool.hpp"
