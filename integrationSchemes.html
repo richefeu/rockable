@@ -1,23 +1,26 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="./">
+<html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Integration schemes &mdash; Rockable 1.0.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
 
   
     <link rel="canonical" href="https://richefeu.github.io/rockable/integrationSchemes.html" />
-      <script src="_static/jquery.js?v=5d32c60e"></script>
-      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=8d563738"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -89,7 +92,7 @@
            <div itemprop="articleBody">
              
   <section id="integration-schemes">
-<span id="integrationschemes"></span><h1>Integration schemes<a class="headerlink" href="#integration-schemes" title="Link to this heading"></a></h1>
+<span id="integrationschemes"></span><h1>Integration schemes<a class="headerlink" href="#integration-schemes" title="Permalink to this heading"></a></h1>
 <p>In a <code class="docutils literal notranslate"><span class="pre">conf-file</span></code>, the integration scheme to be used is set with the keyword <code class="docutils literal notranslate"><span class="pre">Integrator</span></code>
 followed by the name of the scheme (defined below). The position, velocity and acceleration
 vectors is noted <span class="math notranslate nohighlight">\(\underline{x}\)</span>, <span class="math notranslate nohighlight">\(\underline{v}\)</span> and <span class="math notranslate nohighlight">\(\underline{a}\)</span>, respectively;
@@ -102,7 +105,7 @@ and the driven bodies with velocity imposed (translation or rotation) are update
 \mathbf{Q}_{t+\Delta t} &amp;= \mathbf{Q}_{t} + \mathbf{\dot{Q}}\left(\underline{\omega}^\mbox{imposed}_{t}\right) \Delta t
 \end{cases}\end{split}\]</div>
 <section id="euler-scheme-keyword-euler">
-<h2>Euler scheme (keyword <code class="docutils literal notranslate"><span class="pre">Euler</span></code>)<a class="headerlink" href="#euler-scheme-keyword-euler" title="Link to this heading"></a></h2>
+<h2>Euler scheme (keyword <code class="docutils literal notranslate"><span class="pre">Euler</span></code>)<a class="headerlink" href="#euler-scheme-keyword-euler" title="Permalink to this heading"></a></h2>
 <p>The Euler scheme is a simple and intuitive time integration method, but it has limitations. One of the main limitations is that it is conditionally stable. Therefore, the time step size must be carefully chosen to ensure numerical stability. Additionally, the explicit Euler method is only first-order accurate, meaning that errors in position and velocity tend to accumulate over time, especially for stiff systems. This can lead to inaccuracies in the simulation, especially for long integration times or complex systems.</p>
 <p>For a discrete particle in DEM, the equations used to update its position and velocity using the Euler scheme are as follows:</p>
 <p><strong>Position update</strong></p>
@@ -123,7 +126,7 @@ and the driven bodies with velocity imposed (translation or rotation) are update
 <p>where <span class="math notranslate nohighlight">\(\underline{a}_t\)</span> (and <span class="math notranslate nohighlight">\(\underline{\dot{\omega}}_t\)</span>) is the acceleration calculated from the forces (and moments) acting on the particle at time step <span class="math notranslate nohighlight">\(t\)</span>.</p>
 </section>
 <section id="velocity-verlet-scheme-keyword-velocityverlet-default">
-<h2>Velocity-Verlet scheme (keyword <code class="docutils literal notranslate"><span class="pre">velocityVerlet</span></code>, Default)<a class="headerlink" href="#velocity-verlet-scheme-keyword-velocityverlet-default" title="Link to this heading"></a></h2>
+<h2>Velocity-Verlet scheme (keyword <code class="docutils literal notranslate"><span class="pre">velocityVerlet</span></code>, Default)<a class="headerlink" href="#velocity-verlet-scheme-keyword-velocityverlet-default" title="Permalink to this heading"></a></h2>
 <p>The Velocity Verlet method has several advantages. It is second-order accurate, meaning that it reduces the numerical errors in position and velocity and improves the overall accuracy of the simulation. Additionally, the Velocity Verlet method is time-reversible, which means that the integration process can be reversed without introducing significant errors. Moreover, it conserves energy, making it particularly suitable for conservative systems like those encountered in DEM.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -148,7 +151,7 @@ and the driven bodies with velocity imposed (translation or rotation) are update
 <p>where <span class="math notranslate nohighlight">\(\underline{a}_{t+\Delta t}\)</span> (and <span class="math notranslate nohighlight">\(\underline{\dot{\omega}}_{t+\Delta t}\)</span>)  is the acceleration calculated from the forces (and moments) acting on the particle at time step <span class="math notranslate nohighlight">\(t+\Delta t\)</span>.</p>
 </section>
 <section id="beeman-scheme-keyword-beeman">
-<h2>Beeman scheme (keyword <code class="docutils literal notranslate"><span class="pre">Beeman</span></code>)<a class="headerlink" href="#beeman-scheme-keyword-beeman" title="Link to this heading"></a></h2>
+<h2>Beeman scheme (keyword <code class="docutils literal notranslate"><span class="pre">Beeman</span></code>)<a class="headerlink" href="#beeman-scheme-keyword-beeman" title="Permalink to this heading"></a></h2>
 <p>The Beeman method is a second-order accurate integration technique, which means it provides better accuracy compared to the first-order explicit Euler (or Velocity Verlet) method. This leads to more accurate and reliable simulations of particle dynamics in DEM. Additionally, the Beeman method is relatively easy to implement and computationally efficient compared to some higher-order methods.</p>
 <p>For a discrete particle in DEM, the equations used to update its position and velocity using the Beeman method are as follows:</p>
 <p><strong>Position update</strong></p>
@@ -169,7 +172,7 @@ and the driven bodies with velocity imposed (translation or rotation) are update
 <p>where <span class="math notranslate nohighlight">\(\underline{a}_{t+\Delta t}\)</span> represents the acceleration calculated from the forces acting on the particle at the next time step.</p>
 </section>
 <section id="runge-kutta-nystrom-4th-order-scheme-keyword-rungekutta4">
-<h2>Runge-Kutta-Nyström 4th-order scheme (keyword <code class="docutils literal notranslate"><span class="pre">RungeKutta4</span></code>)<a class="headerlink" href="#runge-kutta-nystrom-4th-order-scheme-keyword-rungekutta4" title="Link to this heading"></a></h2>
+<h2>Runge-Kutta-Nyström 4th-order scheme (keyword <code class="docutils literal notranslate"><span class="pre">RungeKutta4</span></code>)<a class="headerlink" href="#runge-kutta-nystrom-4th-order-scheme-keyword-rungekutta4" title="Permalink to this heading"></a></h2>
 <p>The Runge-Kutta-Nyström (RKN) 4th-order scheme is a higher-order accurate integration technique, providing better accuracy compared to lower-order methods like the explicit Euler or Velocity Verlet. This can lead to more accurate and reliable simulations of particle dynamics in DEM. Additionally, the RKN 4th-order scheme has good stability properties and can handle stiff systems more effectively than lower-order methods.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
