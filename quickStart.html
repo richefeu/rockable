@@ -1,25 +1,22 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Quick-start guid &mdash; Rockable 1.0.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
   
     <link rel="canonical" href="https://richefeu.github.io/rockable/quickStart.html" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -93,13 +90,13 @@
            <div itemprop="articleBody">
              
   <section id="quick-start-guid">
-<h1>Quick-start guid<a class="headerlink" href="#quick-start-guid" title="Permalink to this heading"></a></h1>
+<h1>Quick-start guid<a class="headerlink" href="#quick-start-guid" title="Link to this heading"></a></h1>
 <section id="what-is-rockable">
-<h2>What is Rockable?<a class="headerlink" href="#what-is-rockable" title="Permalink to this heading"></a></h2>
+<h2>What is Rockable?<a class="headerlink" href="#what-is-rockable" title="Link to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">Rockable</span></code> is a DEM code written in C++11 (tend to become C++17). The two main specificities of the code are (<em>i</em>) to hold sphero-polyhedral shapes, (<em>ii</em>) to manage breakable interfaces. This technique has been developed in another code named <code class="docutils literal notranslate"><span class="pre">DEMbox</span></code> which was designed to do more things, with a higher degree of abstraction. Also, it is designed and developed for an academic usage.</p>
 </section>
 <section id="compilation-with-cmake">
-<h2>Compilation with cmake<a class="headerlink" href="#compilation-with-cmake" title="Permalink to this heading"></a></h2>
+<h2>Compilation with cmake<a class="headerlink" href="#compilation-with-cmake" title="Link to this heading"></a></h2>
 <p>The preferred method for building the project is by using CMake, a widely-used build system. Follow these steps to compile the project:</p>
 <ol class="arabic simple">
 <li><p>Create a new directory called build (you can choose any name) in the project’s root directory:</p></li>
@@ -140,7 +137,7 @@
 </ul>
 </section>
 <section id="compilation-with-makefile">
-<h2>Compilation with <cite>Makefile</cite><a class="headerlink" href="#compilation-with-makefile" title="Permalink to this heading"></a></h2>
+<h2>Compilation with <cite>Makefile</cite><a class="headerlink" href="#compilation-with-makefile" title="Link to this heading"></a></h2>
 <p>The compilation is managed with a classic <cite>Makefile</cite>. Some options can be set at compile time: <code class="docutils literal notranslate"><span class="pre">FT_CORR</span></code>, and <code class="docutils literal notranslate"><span class="pre">COMPONENTWISE_NUM_DAMPING</span></code>. To disable an option it is advised to rename it by adding a letter ‘n’ at the beginning.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">FT_CORR</span></code>: with this option, the tangential force is corrected to account for the rotation of the local framework</p></li>
@@ -159,7 +156,7 @@ Finally, the applications run and see can be compiled with the following command
 </div>
 </section>
 <section id="compilation-with-spack">
-<h2>Compilation with spack<a class="headerlink" href="#compilation-with-spack" title="Permalink to this heading"></a></h2>
+<h2>Compilation with spack<a class="headerlink" href="#compilation-with-spack" title="Link to this heading"></a></h2>
 <p>This external library is available here: <a class="reference external" href="https://github.com/richefeu/rockable">https://github.com/richefeu/rockable</a>, this installation does not require direct download of <cite>Rockable</cite>.</p>
 <p>Installation of <cite>Rockable</cite> via <cite>spack</cite>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>--depth<span class="o">=</span><span class="m">2</span><span class="w"> </span>--branch<span class="o">=</span>v1.1.0<span class="w"> </span>https://github.com/spack/spack.git
@@ -199,10 +196,10 @@ see3<span class="w"> </span><span class="o">[</span>false<span class="o">]</span
 </div>
 </section>
 <section id="running-a-simulation">
-<h2>Running a simulation<a class="headerlink" href="#running-a-simulation" title="Permalink to this heading"></a></h2>
+<h2>Running a simulation<a class="headerlink" href="#running-a-simulation" title="Link to this heading"></a></h2>
 <p>To run a simulation, a configuration file has to be written. The format of such a file is described in the section Syntax for conf-files. We show here a simple example simulating a sphere bouncing on a plan.</p>
 <div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">input.txt</span><a class="headerlink" href="#id1" title="Permalink to this code"></a></div>
+<div class="code-block-caption"><span class="caption-text">input.txt</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Rockable 20-02-2017
 t 0
 tmax 0.06
@@ -234,7 +231,7 @@ Sphere 1 0 1 -0.5 0.5 0 3.69 -3.29 0 0 0 0 0.707 0 0.707 0 0 0 -50.52 0 0 0
 </div>
 <p>The shape-file as described in the section Syntax for shape-files is a file named SphereAndPlan.shp with the following content:</p>
 <div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">SphereAndPlan.sph</span><a class="headerlink" href="#id2" title="Permalink to this code"></a></div>
+<div class="code-block-caption"><span class="caption-text">SphereAndPlan.sph</span><a class="headerlink" href="#id2" title="Link to this code"></a></div>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&lt;
 name Plan
 radius 0.05
@@ -299,7 +296,7 @@ I/m 0.00493333 0.00493333 0.0032
 </div>
 </section>
 <section id="visualising-the-simulations">
-<h2>Visualising the simulations<a class="headerlink" href="#visualising-the-simulations" title="Permalink to this heading"></a></h2>
+<h2>Visualising the simulations<a class="headerlink" href="#visualising-the-simulations" title="Link to this heading"></a></h2>
 <p>Normally, the application <code class="docutils literal notranslate"><span class="pre">see</span></code> has been built as the same time than <code class="docutils literal notranslate"><span class="pre">rockable</span></code>.
 The application <code class="docutils literal notranslate"><span class="pre">see</span></code> needs <code class="docutils literal notranslate"><span class="pre">freeglut</span></code>, the simplest way to use openGL and display 3D things.
 For more details, see <a class="reference internal" href="visualisation.html#visualisation"><span class="std std-ref">Visualisation tools</span></a>.</p>
