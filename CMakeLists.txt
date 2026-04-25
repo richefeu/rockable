@@ -141,6 +141,7 @@ find_package(OpenGL REQUIRED)
 if(OPENGL_FOUND)
   message(STATUS "OPENGL_INCLUDE_DIR = " ${OPENGL_INCLUDE_DIR})
   message(STATUS "OPENGL_LIBRARIES = " ${OPENGL_LIBRARIES})
+  message(STATUS "OPENGL_glu_LIBRARY = ${OPENGL_glu_LIBRARY}")
 endif()
 
 find_package(GLUT REQUIRED)
@@ -194,16 +195,18 @@ endif()
 # visualiser see (with glut or freeglut)
 if(ROCKABLE_COMPILE_SEE)
 
-  target_include_directories(see
-      PRIVATE ${OPENGL_INCLUDE_DIR} ${GLU_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS}
-              ${nlohmann-json_SOURCE_DIR}/include /usr/local/include)
+  add_executable(see ${CMAKE_SOURCE_DIR}/Apps/see.cpp)
+
+  target_include_directories(
+    see
+    PRIVATE ${OPENGL_INCLUDE_DIR} ${GLUT_INCLUDE_DIR} /usr/local/include)
 
   target_link_libraries(see PRIVATE OpenGL::GL OpenGL::GLU ${GLUT_LIBRARIES}
-                                    Rockable_core ) # PNG::PNG
+                                    Rockable_core)
 
   install(TARGETS see)
 
-endif()
+endif() # end of ROCKABLE_COMPILE_SEE
 
 # ##############################################################################
 # Dear My Seer
@@ -217,9 +220,9 @@ if(ROCKABLE_COMPILE_SEER)
   message(STATUS "SDL2_INCLUDE_DIRS = " ${SDL2_INCLUDE_DIRS})
   message(STATUS "SDL2_LIBRARIES = " ${SDL2_LIBRARIES})
   
-  find_package(OpenGL REQUIRED)
-  message(STATUS "OPENGL_INCLUDE_DIR = " ${OPENGL_INCLUDE_DIR})
-  message(STATUS "OPENGL_LIBRARIES = " ${OPENGL_LIBRARIES})
+  #find_package(OpenGL REQUIRED)
+  #message(STATUS "OPENGL_INCLUDE_DIR = " ${OPENGL_INCLUDE_DIR})
+  #message(STATUS "OPENGL_LIBRARIES = " ${OPENGL_LIBRARIES})
  
   set(SEER_FILES
       ${CMAKE_SOURCE_DIR}/Apps/DearMySeer/seer.cpp
