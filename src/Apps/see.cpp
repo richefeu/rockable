@@ -1886,7 +1886,7 @@ int main(int argc, char* argv[]) {
 
   // ==== Init GLUT and create window
   glutInit(&argc, argv);
-  glutSetOption(GLUT_MULTISAMPLE, 8);
+  //glutSetOption(GLUT_MULTISAMPLE, 8);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA | GLUT_DEPTH | GLUT_MULTISAMPLE);
   glutInitWindowPosition(50, 50);
   glutInitWindowSize(width, height);

@@ -5,7 +5,7 @@
 #define GL_SILENCE_DEPRECATION
 #endif
 
-#include <GL/freeglut.h>
+#include <GL/glut.h>
 
 #include "Core/Shape.hpp"
 #include "stackTracer.hpp"

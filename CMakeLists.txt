@@ -40,11 +40,8 @@ option(ROCKABLE_ENABLE_SOFT_PARTICLES "Enable strainning of particles" OFF)
 option(ROCKABLE_ENABLE_PERIODIC "Enable full periodic boundary conditions" OFF)
 
 option(ROCKABLE_COMPILE_POSTPRO "Compile the application to run post-processing commands" ON)
-option(ROCKABLE_COMPILE_SEE "Compile the glut application to visualize the conf-files" OFF)
-#option(ROCKABLE_COMPILE_SEE2 "Compile the glfw application to visualize the conf-files" OFF)
-#option(ROCKABLE_COMPILE_SEE3 "Compile the application to edit graphically the input files" OFF)
-#option(ROCKABLE_COMPILE_SEE4 "Compile the application to edit graphically the input files" OFF)
-option(ROCKABLE_COMPILE_SEER "Compile Dear My Seer" ON)
+option(ROCKABLE_COMPILE_SEE "Compile the glut application to visualize the conf-files" ON)
+option(ROCKABLE_COMPILE_SEER "Compile Dear My Seer (and Dear My Shape)" OFF)
 option(ROCKABLE_COMPILE_PREPRO "Compile the preprocessing tools" ON)
 option(ROCKABLE_COMPILE_CONF2VTK "Convert conf files to VTK" OFF)
 
@@ -109,20 +106,6 @@ if(NOT toofus_POPULATED)
 endif()
 
 # ##############################################################################
-# Fetching fmt (A REMPLACER PAR celui de toofus-gate)
-#FetchContent_Declare(
-#  fmt
-#  GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-#  GIT_TAG main
-#  GIT_PROGRESS TRUE
-#  USES_TERMINAL_DOWNLOAD TRUE)
-#FetchContent_GetProperties(fmt)
-#if(NOT fmt_POPULATED)
-#  message(STATUS "Fetching fmt")
-#  FetchContent_MakeAvailable(fmt)
-#endif()
-
-# ##############################################################################
 # MATools
 if(ROCKABLE_ENABLE_PROFILING)
   FetchContent_Declare(
@@ -143,20 +126,6 @@ if(ROCKABLE_ENABLE_PROFILING)
 endif()
 
 # ##############################################################################
-# nlohmann-json (A REMPLACER PAR celui de toofus-gate)
-#FetchContent_Declare(
-#  nlohmann-json
-#  GIT_REPOSITORY https://github.com/nlohmann/json.git
-#  GIT_TAG v3.12.0)
-
-#FetchContent_GetProperties(nlohmann-json)
-
-#if(NOT nlohmann-json_POPULATED)
-#  message(STATUS "Fetching nlohmann-json")
-#  FetchContent_MakeAvailable(nlohmann-json)
-#endif()
-
-# ##############################################################################
 # OpenMP
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND)
@@ -168,53 +137,16 @@ endif()
 
 # ##############################################################################
 # OpenGL and glut
-if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
+find_package(OpenGL REQUIRED)
+if(OPENGL_FOUND)
+  message(STATUS "OPENGL_INCLUDE_DIR = " ${OPENGL_INCLUDE_DIR})
+  message(STATUS "OPENGL_LIBRARIES = " ${OPENGL_LIBRARIES})
+endif()
 
-  # here, we do not uses find_package(glut) so that the version installed by
-  # apple is NOT used
-  if(NOT PkgConfig_FOUND)
-    find_package(PkgConfig REQUIRED)
-  endif()
-
-  pkg_check_modules(GL REQUIRED gl)
-  pkg_check_modules(GLU REQUIRED glu)
-  pkg_check_modules(GLUT REQUIRED glut>=3.4.0)
-
-  if(GL_FOUND)
-    message(STATUS "GL as been found with PkgConfig")
-    message(STATUS "GL_LIBRARY_DIRS = " ${GL_LIBRARY_DIRS})
-    message(STATUS "GL_INCLUDE_DIRS = " ${GL_INCLUDE_DIRS})
-    message(STATUS "GL_LIBRARIES = " ${GL_LIBRARIES})
-  endif()
-
-  if(GLU_FOUND)
-    message(STATUS "GLU as been found with PkgConfig")
-    message(STATUS "GLU_LIBRARY_DIRS = " ${GLU_LIBRARY_DIRS})
-    message(STATUS "GLU_INCLUDE_DIRS = " ${GLU_INCLUDE_DIRS})
-    message(STATUS "GLU_LIBRARIES = " ${GLU_LIBRARIES})
-  endif()
-
-  if(GLUT_FOUND)
-    message(STATUS "GLUT as been found with PkgConfig")
-    message(STATUS "GLUT_LIBRARY_DIRS = " ${GLUT_LIBRARY_DIRS})
-    message(STATUS "GLUT_INCLUDE_DIRS = " ${GLUT_INCLUDE_DIRS})
-    message(STATUS "GLUT_LIBRARIES = " ${GLUT_LIBRARIES})
-  endif()
-
-else()
-
-  find_package(OpenGL REQUIRED)
-  if(OPENGL_FOUND)
-    message(STATUS "OPENGL_INCLUDE_DIR = " ${OPENGL_INCLUDE_DIR})
-    message(STATUS "OPENGL_LIBRARIES = " ${OPENGL_LIBRARIES})
-  endif()
-
-  find_package(GLUT REQUIRED)
-  if(GLUT_FOUND)
-    message(STATUS "GLUT_INCLUDE_DIRS = " ${GLUT_INCLUDE_DIRS})
-    message(STATUS "GLUT_LIBRARIES = " ${GLUT_LIBRARIES})
-  endif()
-
+find_package(GLUT REQUIRED)
+if(GLUT_FOUND)
+  message(STATUS "GLUT_INCLUDE_DIR = " ${GLUT_INCLUDE_DIR})
+  message(STATUS "GLUT_LIBRARIES = " ${GLUT_LIBRARIES})
 endif()
 
 # ##############################################################################
@@ -259,70 +191,15 @@ if(ROCKABLE_COMPILE_POSTPRO)
 endif()
 
 # ##############################################################################
-# visualiser see (it uses freeglut)
+# visualiser see (with glut or freeglut)
 if(ROCKABLE_COMPILE_SEE)
 
-  if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux") #=========
-
-    find_package(PNG REQUIRED)
-    if(PNG_FOUND)
-      message(STATUS "libpng found: ${PNG_INCLUDE_DIRS}")
-      message(STATUS "PNG_INCLUDE_DIRS = " ${PNG_INCLUDE_DIRS})
-      message(STATUS "PNG_LIBRARY_DIRS = " ${PNG_LIBRARY_DIRS})
-      message(STATUS "PNG_LIBRARY = " ${PNG_LIBRARY})
-    else()
-      message(STATUS "libpng not found")
-    endif()
-
-    add_executable(see ${CMAKE_SOURCE_DIR}/Apps/see.cpp)
-
-    if(PNG_FOUND)
-      target_compile_options(see PRIVATE -DWITH_LIBPNG)
-    endif()
-
-    target_include_directories(
-      see
+  target_include_directories(see
       PRIVATE ${OPENGL_INCLUDE_DIR} ${GLU_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS}
-              ${nlohmann-json_SOURCE_DIR}/include ${PNG_INCLUDE_DIRS})
+              ${nlohmann-json_SOURCE_DIR}/include /usr/local/include)
 
-    target_link_directories(see PRIVATE ${GLUT_LIBRARY_DIRS} ${PNG_LIBRARY_DIRS})
-
-    target_link_libraries(see PRIVATE OpenGL::GL OpenGL::GLU ${GLUT_LIBRARIES}
-                                     Rockable_core PNG::PNG)
-
-  else() # Darwin =========
-
-    if(NOT PkgConfig_FOUND)
-      find_package(PkgConfig REQUIRED)
-    endif()
-
-    pkg_check_modules(PNG REQUIRED libpng16)
-
-    if(PNG_FOUND)
-      message(STATUS "PNG has been found with PkgConfig")
-      message(STATUS "PNG_LIBRARY_DIRS = " ${PNG_LIBRARY_DIRS})
-      message(STATUS "PNG_INCLUDE_DIRS = " ${PNG_INCLUDE_DIRS})
-      message(STATUS "PNG_LIBRARIES = " ${PNG_LIBRARIES})
-    endif()
-
-    add_executable(see ${CMAKE_SOURCE_DIR}/Apps/see.cpp)
-
-    if(PNG_FOUND)
-      target_compile_options(see PRIVATE -DWITH_LIBPNG)
-    endif()
-
-    target_include_directories(
-      see PRIVATE ${GL_INCLUDE_DIRS} ${GLU_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS}
-                  ${nlohmann-json_SOURCE_DIR}/include ${PNG_INCLUDE_DIRS})
-
-    target_link_directories(see PRIVATE ${GL_LIBRARY_DIRS} ${GLU_LIBRARY_DIRS}
-                            ${GLUT_LIBRARY_DIRS} ${PNG_LIBRARY_DIRS})
-
-    target_link_libraries(
-      see PUBLIC ${GL_LIBRARIES} ${GLU_LIBRARIES} ${GLUT_LIBRARIES}
-                 ${PNG_LIBRARIES} Rockable_core)
-
-  endif() #=========
+  target_link_libraries(see PRIVATE OpenGL::GL OpenGL::GLU ${GLUT_LIBRARIES}
+                                    Rockable_core ) # PNG::PNG
 
   install(TARGETS see)
 
