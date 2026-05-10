@@ -93,5 +93,6 @@ Features
    integrationSchemes
    servoControllers
    visualisation
+   tools
    
    

@@ -305,6 +305,10 @@ class SFManip {
 
   // Insert a line after a match
   SFManip& insertAfter(const std::string& prefix, const std::string& newLine) {
+    if (verbose) {
+      std::cout << " > insertAfter: " << prefix << "  -->  " << newLine << std::endl;
+    }
+    
     for (size_t i = 0; i < lines.size(); ++i) {
       if (lines[i].rfind(prefix, 0) == 0) {
         lines.insert(lines.begin() + i + 1, newLine);
@@ -314,10 +318,6 @@ class SFManip {
 
     if (!ignoreMissing) {
       throw std::runtime_error("Line starting with '" + prefix + "' not found.");
-    }
-
-    if (verbose) {
-      std::cout << " > insertAfter: " << prefix << "  -->  " << newLine << std::endl;
     }
 
     return *this;
