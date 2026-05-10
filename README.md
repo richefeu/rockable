@@ -1,5 +1,5 @@
 <p align="center">
-<img src="./sphinxdoc/source/images/RockableRocks.png" width="50%"/>
+<img src="./sphinxdoc/source/images/RockableRocks.png" width="40%"/>
 </p>
 
 ## What is `Rockable`?   
@@ -108,10 +108,10 @@ The options available are listed below:
 * `ROCKABLE_ENABLE_SOFT_PARTICLES` (default is OFF): enable straining of particles.
 * `ROCKABLE_ENABLE_PERIODIC` (default is OFF): enable full periodic boundary conditions.
 * `ROCKABLE_COMPILE_SEE` (default is ON): compile the application to visualize the conf-files.
-* `ROCKABLE_COMPILE_SEE3` (default is OFF): compile the application to edit graphically the input files
+* `ROCKABLE_COMPILE_SEER` (default is OFF): compile the application to edit graphically the input files
 * `ROCKABLE_COMPILE_CONF2VTK` (default is OFF): compile the application to convert .conf into .vtk file to visualize results with paraview
 * `ROCKABLE_COMPILE_POSTPRO` (default is OFF): compile the application for postprocessing the results
-* `ROCKABLE_COMPILE_PREPRO` (default is OFF): compile the aplications to generate inputs for the code
+* `ROCKABLE_COMPILE_PREPRO` (default is ON): compile the aplications to generate inputs for the code
 
 ## How to run a simulation
 
@@ -241,10 +241,10 @@ Normally, the application `see` has been built at the same time than rockable:
 see conf100
 ```
 
-If compiled the application `see3` is also available:
+If compiled the application `seer` is also available:
 
 ```
-see3 conf100
+seer conf100
 ```
 
-It allows to edit confs interactively.
+It also allows to edit conf-files, but more interactively.

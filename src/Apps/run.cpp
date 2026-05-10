@@ -92,11 +92,11 @@ bool compareConf(std::string a_newConf, std::string a_regConf) {
 }
 
 /**
- *  @brief Deletes files matching the pattern 'conf*', 'kineticEnergy.txt', 'perf.txt', and 'staticBalance.txt'
- *         in the current directory.
+ *  @brief Deletes files matching the pattern 'conf*', 'kineticEnergy.txt', 'perf.txt', 'staticBalance.txt',
+ *         and 'checkplots.txt' in the current directory.
  */
 void cleanSimulationFolder() {
-  std::vector<std::string> filesToDelete = {"kineticEnergy.txt", "perf.txt", "staticBalance.txt"};
+  std::vector<std::string> filesToDelete = {"kineticEnergy.txt", "perf.txt", "staticBalance.txt", "checkplots.txt"};
   std::regex patternToDelete("conf.*");
 
   std::vector<std::filesystem::path> filesToRemove;

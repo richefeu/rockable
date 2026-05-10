@@ -1,32 +1,19 @@
 Rockable 21-08-2022
 
-#### time #############################
 t 0
 tmax 1.0
-dt $2 * 0.5e-6$
+dt 1e-6
 interVerlet 0.01
 interConf 0.05
 
-#### proximity of the particles #######
 DVerlet 0.08
 dVerlet 0.02
 
-#### properties for particles #########
 density 0 2700
 density 1 2700
 
-#BodyForce ViscousFluid 3000
-
-#VelocityBarrier 0.1
-#AngularVelocityBarrier 1.1
-#AngularVelocityBarrierExponent 5
-
-#useSoftParticles 1e6 0.0
-
-#### interaction model ################
 forceLaw Default
 
-#### interaction parameters ###########
 knContact 0 1 1e7
 en2Contact 0 1 0.02
 ktContact 0 1 1e7
@@ -41,7 +28,6 @@ muContact 1 1 0.9
 krContact 1 1 1e7
 murContact 1 1 0.0
 
-#### the system #######################
 iconf 0
 nDriven 1
 shapeFile shapes.shp

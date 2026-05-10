@@ -1,0 +1,86 @@
+# Example command file for SFManip processor
+# Lines starting with # are comments
+# Variables: .set name value
+# Loops: .foreach var value1 value2 ...
+#        .endforeach
+
+# ============================================================
+# Single loop over dt values
+# ============================================================
+
+#.quiet
+
+.foreach dt 0.1 0.5 1.0
+.read input.txt
+.findLineStartingWith dt
+.replaceBy "dt $dt"
+.createFolder "output/dt_$dt"
+.saveInFolder
+.endforeach
+
+.quiet
+
+# ============================================================
+# Single loop over solver names
+# ============================================================
+
+.foreach solver_name cg gmres
+.read input.txt
+.findLineStartingWith solver
+.replaceBy "solver $solver_name"
+.createFolder "output/$solver_name"
+.saveInFolder
+.endforeach
+
+# ============================================================
+# Nested loop test
+# This should generate:
+#
+# output/nested/cg_dt_0.1
+# output/nested/cg_dt_0.5
+# output/nested/gmres_dt_0.1
+# output/nested/gmres_dt_0.5
+#
+# and modify BOTH solver and dt in the file
+# ============================================================
+
+.clearCollection
+
+.foreach solver cg gmres
+    .foreach dt 0.1 0.5
+
+        .read input.txt
+
+        .findLineStartingWith  "# Physics"
+        .replaceBy "# Physics ----"
+
+        # Replace solver line
+        .findLineStartingWith "solver"
+        .replaceBy "solver $solver"
+
+        # Replace dt line
+        .findLineStartingWith dt
+        .replaceBy "dt ${dt}"
+
+        # Add extra info line
+        .appendLine "# generated with solver=$solver dt=$dt"
+
+        # Create unique output folder
+        .createFolder "output/nested/solver_${solver}/dt_$dt"
+
+        # Save modified file
+        .saveInFolder
+    .endforeach
+.endforeach
+
+.saveCollection "output/nested/all_generated.txt"
+
+# ============================================================
+# Set a variable and use it
+# ============================================================
+
+.set myparam 42
+.read input.txt
+.appendLine "# custom param: $myparam"
+.createFolder "output/manual"
+.saveInFolder

@@ -28,6 +28,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # All compiled applications will be in the BUILD folder
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
+set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/../INSTALL)
+message(STATUS "Installation prefix: ${CMAKE_INSTALL_PREFIX}")
+
 # ##############################################################################
 # OPTIONS
 
@@ -43,7 +46,7 @@ option(ROCKABLE_COMPILE_POSTPRO "Compile the application to run post-processing 
 option(ROCKABLE_COMPILE_SEE "Compile the glut application to visualize the conf-files" ON)
 option(ROCKABLE_COMPILE_SEER "Compile Dear My Seer (and Dear My Shape)" OFF)
 option(ROCKABLE_COMPILE_PREPRO "Compile the preprocessing tools" ON)
-option(ROCKABLE_COMPILE_CONF2VTK "Convert conf files to VTK" OFF)
+option(ROCKABLE_COMPILE_CONF2VTK "Convert conf files to VTK" ON)
 
 # ##############################################################################
 # compilation flags

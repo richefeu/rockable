@@ -1,0 +1,28 @@
+# ================================
+# Simulation configuration file
+# ================================
+
+# Time stepping
+dt 0.001
+steps 5000
+
+# Physics
+viscosity 0.00089
+density 1000
+
+# Solver settings
+solver conjugate_gradient
+max_iter 200
+tolerance 1e-5
+
+# Output options
+output false
+output_format vtk
+
+# Optional parameters (may or may not exist)
+# optional_param 10
+
+# Debugging
+debug false
+
+# End of file

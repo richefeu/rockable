@@ -42,6 +42,7 @@ randomlyOrientedVelocities::randomlyOrientedVelocities() { }
 
 void randomlyOrientedVelocities::addCommand() {  
   box->parser.kwMap["randomlyOrientedVelocities"] = [this](std::istream& conf) {
+    std::cerr << "jkjkjkjkjkjkjkjkjkjkjk" << std::endl;
     conf >> this->velocityMagnitude;
     exec();
   };
@@ -59,4 +60,6 @@ void randomlyOrientedVelocities::exec() {
     q.randomize();
     box->Particles[i].vel = q * u;
   }
+  Logger::trace("executed command 'randomlyOrientedVelocities {}'", velocityMagnitude);
+  std::cerr << "jkjkjkjkjkjkjkjkjkjkjk" << std::endl;
 }

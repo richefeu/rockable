@@ -1,5 +1,5 @@
 <
-name  SPHERE0
+name POLYR0
 radius 5.4550751250000001e-02
 preCompDone y
 volume 3.4814549352253138e-01
@@ -80,7 +80,7 @@ nf 12
 5 19 7 11 10 3
 >
 <
-name POLYR0
+name SPHERE0
 radius 0.43640601
 preCompDone y
 volume 3.4814549352253138e-01

@@ -1,0 +1,33 @@
+.quiet
+.clearCollection
+
+.foreach en2Contact 0.01 0.2 0.4 0.6
+  .foreach muContact 0.1 0.5
+
+    .read input.txt
+
+    # Replace en2 line
+    .findLineStartingWith "en2Contact 0 1"
+    .replaceBy "en2Contact 0 1 ${en2Contact}"
+
+    # Replace mu line
+    .findLineStartingWith "muContact 0 1"
+    .replaceBy "muContact 0 1 ${muContact}"
+    
+    .findLineStartingWith shapeFile
+    .replaceBy "shapeFile ../../shapes.shp"
+
+    # Add extra info line
+    .appendLine "# generated with en2=${en2Contact} mu=${muContact}"
+
+    # Create unique output folder
+    .createFolder "simulations/en2_${en2Contact}_mu_${muContact}"
+
+    # Save modified file
+    .saveInFolder
+  .endforeach
+.endforeach
+
+.saveCollection "all_inputs.txt"
+
+

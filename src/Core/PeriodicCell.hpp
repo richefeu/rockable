@@ -40,16 +40,16 @@
 
 class PeriodicCell {
  public:
-  mat9r h;                    ///< Matrix that hold the cell geometry (each column is a vector that defines a side)
-  mat9r hinv;                 ///< inverse of matrix h (recomputed each time h is updated)
-  mat9r vh;                   ///< Velocities of the collective DoF
-  mat9r ah;                   ///< Acceleration of the collective DoF
-  mat9r vhHinv;               ///< Cached composite matrix vh * hinv (Spatial Velocity Gradient)
-  mat9r hinvVh;               ///< Cached composite matrix hinv * vh (Convected Velocity Gradient)
-  mat9r Sig;                  ///< Mean stress matrix over the cell
-  double mass = 1.0;          ///< Mass of the periodic cell (a somehow fictive data)
-  double damping = 0.0;       ///< Damping coefficient for periodic cell dynamics (1/time)
-  double dampingRatio = 0.0;  ///< Stores dh / dh_critical
+  mat9r h;                   ///< Matrix that hold the cell geometry (each column is a vector that defines a side)
+  mat9r hinv;                ///< inverse of matrix h (recomputed each time h is updated)
+  mat9r vh;                  ///< Velocities of the collective DoF
+  mat9r ah;                  ///< Acceleration of the collective DoF
+  mat9r vhHinv;              ///< Cached composite matrix vh * hinv (Spatial Velocity Gradient)
+  mat9r hinvVh;              ///< Cached composite matrix hinv * vh (Convected Velocity Gradient)
+  mat9r Sig;                 ///< Mean stress matrix over the cell
+  double mass{1.0};          ///< Mass of the periodic cell (a somehow fictive data)
+  double damping{0.0};       ///< Damping coefficient for periodic cell dynamics (1/time)
+  double dampingRatio{0.0};  ///< Stores dh / dh_critical
 
   PeriodicCell();
   PeriodicCell(double XX, double XY, double XZ, double YX, double YY, double YZ, double ZX, double ZY, double ZZ);

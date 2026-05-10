@@ -67,59 +67,18 @@
 #include "PreproCommands/PreproCommand_stickVerticesInClusters.hpp"
 #include "PreproCommands/PreproCommand_stickVerticesInClustersMoments.hpp"
 
-// #include UNSHARED_FOLDER "./includes.hpp"
 
 // ==============================================================================================================
 //  INITIALISATIONS
 // ==============================================================================================================
 
 /**
- *   Construct a new Rockable:: Rockable object
+ *   Constructor 
  *
  */
 Rockable::Rockable() : m_linkCells(aabb, cellMinSizes) {
-  // Some default values (actually, most of them will be reset after)
-  t = 0.0;
-  tmax = 1.0;
-  computationStopAsked = 0;
-  dt = 1e-6;
-  interVerletC = 0.0;
-  interVerlet = 0.01;
-  interConfC = 0.0;
-  interConf = 0.25;
-  iconf = 0;
-  DVerlet = 0.0;
-  dVerlet = 0.0;
-  nDriven = 0;
-  shapeFile = "noShapeFile";
-
-  gravity.set(0.0, -9.81, 0.0);
-  bodyForce = nullptr;
-
-#ifdef ROCKABLE_ENABLE_PERIODIC
-  usePeriodicCell = 0;
-  cellMomentumCorrection = 0.0;
-  cellMomentumCorrectionC = 0.0;
-  cellVelocityCorrection = 0.0;
-  cellVelocityCorrectionC = 0.0;
-  cellMassRatio = -1.0;
-  useKineticStress = true;
-#endif
-
-  useSoftParticles = 0;
   Cinv.set(1e10, 0.0);
 
-  dynamicUpdateNL = 0;
-  dispUpdateNL = 1.0;
-  angleUpdateNL = 1.0;
-
-  numericalDampingCoeff = 0.0;
-  velocityBarrier = 0.0;
-  angularVelocityBarrier = 0.0;
-  velocityBarrierExponent = 1.0;
-  angularVelocityBarrierExponent = 1.0;
-
-  paramsInInterfaces = 0;
   idDensity = properties.add("density");
 
   optionNames["forceLaw"] = "Default";
@@ -131,8 +90,6 @@ Rockable::Rockable() : m_linkCells(aabb, cellMinSizes) {
   UpdateNL = [this]() { this->UpdateNL_bruteForce(); };
 
   optionNames["UpdateNL"] = "bruteForce";
-  cellMinSizes.set(1.0, 1.0, 1.0);
-  boxForLinkCellsOpt = 0;
 
   integrationStep = [this]() { this->velocityVerletStep(); };
   optionNames["Integrator"] = "velocityVerlet";
@@ -166,12 +123,6 @@ Rockable::Rockable() : m_linkCells(aabb, cellMinSizes) {
   idGcInnerBond = dataTable.add("gcInnerBond");
   idGcOuterBond = dataTable.add("gcOuterBond");
 
-  needUpdate = false;
-  interactiveMode = false;
-  glue_with_walls = false;
-
-  preventCrossingLength = 0.0;
-
   ExplicitRegistrations();
   initParser();
 }
@@ -184,6 +135,7 @@ Rockable::Rockable() : m_linkCells(aabb, cellMinSizes) {
  * Note: Compilation is slightly slower due to explicit registrations.
  */
 void Rockable::ExplicitRegistrations() {
+  
   // BodyForces
   REGISTRER_BASE_DERIVED(BodyForce, AttractingPoint);
   REGISTRER_BASE_DERIVED(BodyForce, PreferredDirection);
@@ -219,7 +171,6 @@ void Rockable::ExplicitRegistrations() {
   REGISTRER_BASE_DERIVED(PreproCommand, stickVerticesInClustersMoments);
   REGISTRER_BASE_DERIVED(PreproCommand, stickBCM);
 
-  // registerUnsharedModules();
 }
 
 /**
@@ -228,6 +179,7 @@ void Rockable::ExplicitRegistrations() {
  *   @param v The verbose level (trace = 6, debug = 5, info = 4, warn = 3, err = 2, critical = 1, off = 0)
  */
 void Rockable::setVerboseLevel(int v) {
+  //                           0      1           2      3       4       5        6
   std::string levelNames[] = {"off", "critical", "err", "warn", "info", "debug", "trace"};
 
   std::unordered_map<int, LogLevel> levelMap = {{0, LogLevel::off},  {1, LogLevel::critical}, {2, LogLevel::error},
@@ -337,19 +289,32 @@ bool Rockable::isInteractive() const { return interactiveMode; }
  *   Print in the terminal a Banner with some information
  */
 void Rockable::showBanner() {
+  
+#ifndef ROCKABLE_GIT_TAG
+#define ROCKABLE_GIT_TAG "UNKNOWN GIT TAG"
+#endif
+
+#ifndef ROCKABLE_LAST_COMMIT_DATE
+#define ROCKABLE_LAST_COMMIT_DATE "UNKNOWN LAST COMMIT DATE"
+#endif
+  
   std::cout << "\n\n";
   std::cout << msg::bold() << msg::fg_lightBlue() << "   Rockable" << msg::fg_default() << msg::normal()
-            << "  Copyright (C) 2016-2025  <vincent.richefeu@univ-grenoble-alpes.fr>\n";
+            << "  Copyright (C) 2016-2026  <vincent.richefeu@univ-grenoble-alpes.fr>\n";
   std::cout << "   GIT TAG = " << ROCKABLE_GIT_TAG << "\n";
   std::cout << "   LAST COMMIT DATE = " << ROCKABLE_LAST_COMMIT_DATE << "\n";
   std::cout << "   This program comes with ABSOLUTELY NO WARRANTY.\n";
   std::cout << "   " << msg::bold() << msg::fg_lightBlue() << "This is academic software" << msg::fg_default()
             << msg::normal() << "\n\n";
+  
+  /*
   std::cout << "   Documentation:       install sphinx-doc\n";
   std::cout << "   e.g., for mac OS X   brew install sphinx-doc\n";
   std::cout << "                        brew link sphinx-doc --force\n";
   std::cout << "                        make html\n";
   std::cout << "                        open build/html/index.html\n\n";
+  */
+  std::cout << "   Documentation: https://richefeu.github.io/rockable/\n";
   std::cout << std::endl;
 
 #ifdef FT_CORR
@@ -680,7 +645,8 @@ void Rockable::initParser() {
   parser.kwMap["t"] = __GET__(conf, t);
   parser.kwMap["tmax"] = __GET__(conf, tmax);
   parser.kwMap["dt"] = __DO__(conf) {
-    conf >> dt;
+    //conf >> dt;
+    ExprParser.getValue(conf, dt);
     dt_2 = 0.5 * dt;
     dt2 = dt * dt;
     dt2_2 = 0.5 * dt2;
@@ -1075,10 +1041,12 @@ void Rockable::initParser() {
     if (PC != nullptr) {
       PC->plug(this);
       PC->addCommand();
+      Logger::trace("The PreproCommand named {} has been added", command);
     } else {
       Logger::warn("The PreproCommand named {} was not added!", command);
     }
   }
+  
 }
 
 /**
@@ -2706,9 +2674,9 @@ void Rockable::integrate() {
     if (needUpdate || interVerletC >= interVerlet - dt_2) {
       PerfTimer tm;
 
-#ifdef ROCKABLE_ENABLE_PERIODIC      
-      updateCellDamping();
-      
+#ifdef ROCKABLE_ENABLE_PERIODIC
+      // updateCellDamping(); // (VR) remove, because there is no reason to recompute the periodic cell mass
+
       if (usePeriodicCell == 1) {
         reducedToRealKinematics();
         UpdateNL();
@@ -2899,8 +2867,11 @@ void Rockable::initialise_particle_forces_and_moments() {
 
 #pragma omp parallel for default(shared)
   for (size_t i = nDriven; i < Particles.size(); ++i) {
-    Particles[i].force = Particles[i].mass * gravity;
-    Particles[i].moment.reset();
+    Particles[i].force.reset();
+    Particles[i].moment.reset();  
+    
+    // FIXME: this should be move juste before the acceleration computation
+    //        to be compatible with NSCD algorithm
     if (bodyForce != nullptr) {
       vec3r force_more;
       vec3r moment_more;
@@ -2970,6 +2941,7 @@ void Rockable::update_interactions() {
       }
     }
   }
+  
 #else
 
   // In the following loop, ALL interactions are updated,
@@ -3367,9 +3339,9 @@ void Rockable::breakage_of_interfaces() {
     } else {
       whichBond = "Outer";
     }
-    std::cout << "Sticked (" << whichBond << ") interface between " << (*BI)->i << " and " << (*BI)->j
-              << " has broken ";
-    std::cout << "(" << (*BI)->concernedBonds.size() << " bonds)\n\n";
+    //std::cout << "Sticked (" << whichBond << ") interface between " << (*BI)->i << " and " << (*BI)->j
+    //          << " has broken ";
+    //std::cout << "(" << (*BI)->concernedBonds.size() << " bonds)\n\n";
 
     int g1 = Particles[(*BI)->i].group;
     int g2 = Particles[(*BI)->j].group;
@@ -3525,7 +3497,7 @@ void Rockable::compute_accelerations_from_resultants() {
   // Finally compute the accelerations (translation and rotation) of the particles
 #pragma omp parallel for default(shared)
   for (size_t i = nDriven; i < Particles.size(); ++i) {
-    Particles[i].acc = Particles[i].force / Particles[i].mass;
+    Particles[i].acc = Particles[i].force / Particles[i].mass + gravity;
 
 #ifdef ROCKABLE_ENABLE_PERIODIC
     // If there's a periodic cell, the accelerations are rescaled toward reduced coordinates

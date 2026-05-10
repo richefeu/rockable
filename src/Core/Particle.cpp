@@ -38,32 +38,15 @@
 #include "Particle.hpp"
 
 // Ctor
-Particle::Particle()
-    : group(0),
-      cluster(0),
-      pos(),
-      vel(),
-      acc(),
-      Q(),
-      vrot(),
-      arot(),
-      shape(0),
-      homothety(1.0),
-      inertia(),
-      mass(0.0),
-      //uniformTransformation(),
-      //stress(),
-      force(),
-      moment(),
-      obb() {
-  //uniformTransformation = mat9r::unit();
+Particle::Particle() {
+  // uniformTransformation = mat9r::unit();
 }
 
 /** @brief Given a vector expressed in the shape framework,
  *         this method returns its expression in the global framework
  *
  */
-vec3r Particle::Glob(vec3r& Vertex) const { return pos + Q * (/*uniformTransformation * */(homothety * Vertex)); }
+vec3r Particle::Glob(vec3r& Vertex) const { return pos + Q * (/*uniformTransformation * */ (homothety * Vertex)); }
 
 /** @brief Given the vertex number v of the shape,
  *         this method returns the vector expression in the global framework

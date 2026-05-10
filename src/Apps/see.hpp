@@ -98,8 +98,6 @@ nlohmann::json params = {{"colorMode", 0},
                            {"center", {0.0, 0.0, 0.0}},
                            {"up", {0.0, 1.0, 0.0}}}}};
 
-// brick color rgb is: 178, 34, 34
-
 AABB probe;
 size_t probe_MCnsteps = 10000;
 
@@ -110,12 +108,6 @@ int shapeWithoutThickness = 0;
 size_t totalNumberOfVertices = 0;  // it says how the sample will be long to display
 
 int selectedParticle = -1;
-
-// double arrowSize = 0.0005;
-// double arrowAngle = 0.7;
-// double radiusMin;
-// double radiusMax;
-// double radiusMean;
 
 int width = 700;
 int height = 700;
@@ -179,6 +171,5 @@ int screenshot(const char* filename);
 void selection(int x, int y);
 void editSelection();
 void resetColors(int mode, int rescale = 1);
-
 
 #endif /* end of include guard: SEE_HPP */

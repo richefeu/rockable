@@ -86,7 +86,6 @@ void init_documentation() {
   docu["density"] =
       "density [(int)groupNumber] [(double) density]\n\n"
       "Set the density of all particles belonging to the group groupNumber";
-
   docu["gravity"] = "gravity [(vec3r) value] \n\n value = components of the gravity\n";
   docu["ParamsInInterfaces"] =
       "ParamsInInterfaces [0/1]\n\n"

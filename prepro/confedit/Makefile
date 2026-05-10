@@ -1,5 +1,5 @@
 #CXX      = $(shell fltk-config --cxx)
-CXX      = c++-15
+CXX      = g++-15
 LINK     = $(CXX)
 CXXFLAGS = $(shell fltk-config --cxxflags ) -Wall -std=c++17 -I ~/toofus -I ../genesis/cpptools
 LDFLAGS  = $(shell fltk-config --ldflags )

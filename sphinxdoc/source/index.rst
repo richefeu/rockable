@@ -10,7 +10,7 @@ The specificities of the code are to handle:
 
 .. note::
 
-   It is designed and developed for academic use (which means that its source code is not publicly downloadable).
+   It is designed and developed meanly for academic use.
 
 .. image:: images/RockableRocks.png
    :width: 192px
@@ -48,17 +48,34 @@ Features
 - **Particle Shapes**: the code uses only one 3D shape: sphero-polyhedra or R-shapes. These shapes can be non-convex (with holes if necessary) and have rounded edges and corners (uniform radius per shape).
 
   .. note:: 
-
      Some other shapes are currently considered for special boundary shapes (sphere, cylinder...) and specifique loadings.
 
 - **Boundary Conditions**: any rigid element can be used to apply boundary conditions. It is possible to impose velocity, force, or moment component by component. Some predefined systems with servo-control are also available for complex loading conditions (e.g., loading cycles or controlled pressure).
 
+- **Parallel Computation**: currently, an OpenMP optimization using compilation flags has been implemented. However, the computational speedup is relatively low. Typically, 8 cores are needed to halve the simulation time (for a dense system with a large number of elements). 
+
+- **HPC Computation**: Rockable can efficiently simulate around 100,000 sphero-polyhedral particles over several weeks. However, simulating millions of particles necessitates high-performance computing (HPC). To maintain the clarity and simplicity of Rockable's source code, HPC capabilities were developed separately. This led to the creation of **ExaDem**, a new HPC code that leverages a subset of Rockable's features for large-scale simulations. The primary objective is to enhance polyhedron-intensive simulations on modern HPC platforms.
+
   .. note:: 
+     The plan is to progressively integrate R-shape functionalities into the **ExaNBody** platform. 
+     This will enable the combination of these features with advanced hybrid parallelization techniques, 
+     such as MPI + OpenMP and GPU acceleration using CUDA or HIP backends.
 
-     The possibility of applying tri-periodic loading to an assembly is implemented and currently in the testing phase.
+- **Periodic boundary conditions**: introducing periodic boundary conditions allows simulations to model systems with repeating patterns or structures, which is often seen in various scientific and engineering contexts. This feature, recently implemented in Rockable enables simulation of systems while reducing edge effects. This is particularly valuable in the context of concurrent double-scale simulations. 
 
-- **Parallel Computation**: currently, an OpenMP optimization using compilation flags has been implemented. However, the computational speedup is relatively low. Typically, 8 cores are needed to halve the simulation time (for a dense system with a large number of elements).
+  .. note:: 
+     This task is currently handled with Lhassan Amarsid and Duc-Cuong Pham.
 
+- **Non-Smooth Contact Dynamics**: the NSCD approach, long utilized by our research group, is currently being integrated into Rockable. The theoretical modeling is complete, and the next phase involves implementation.
+
+  .. note:: 
+     This task is currently handled with Saeid Nezamabadi and Farhang Radjai.
+
+- **Homogeneously compliant particles**: Expanding the framework to handle flexible particles is a significant advancement. This allows simulation of particle materials that can deform under various conditions, such as soft particles, polymers, or biological tissues. The objective is not to determine the kinematic field with a large quantity of degrees of freedom but rather to make certain ones possible.
+
+  .. note:: 
+     This task is currently handled in the posdoc of Mukesh Singh Bisht.
+   
 - **Documentation**: there is little documentation, although efforts are being made to address this.
 
 

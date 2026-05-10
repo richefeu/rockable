@@ -76,6 +76,7 @@
 #include "kwParser.hpp"
 #include "linkCells.hpp"
 #include "message.hpp"
+#include "nanoExprParser2.hpp"
 
 // local headers
 #include "BodyForces/BodyForce.hpp"
@@ -112,83 +113,85 @@ class Rockable {
                                       ///< in case of multiple contacts between two particles
 
   DrivingSystem System;  ///< The system driver acting on the nDriven first particles
-  size_t nDriven;        ///< Number of sphero-polyhedra that are fix at the beginning of the list of bodies
+  size_t nDriven{0};     ///< Number of sphero-polyhedra that are fix at the beginning of the list of bodies
 
   std::vector<DataExtractor*> dataExtractors;  ///< Some data to be saved in files according to given processings
 
   std::vector<Tempo<double>> Tempos;  ///< Useful for force ramps for example
 
-  BodyForce* bodyForce;  ///< We can add body-forces and body-moments in addition to gravity
+  nanoExprParser<double> ExprParser;
+
+  BodyForce* bodyForce{nullptr};  ///< We can add body-forces and body-moments in addition to gravity
 
   // Shape library
-  std::string shapeFile;                  ///< Name of the file that contain the library of shapes
+  std::string shapeFile{"noShapeFile"};   ///< Name of the file that contain the library of shapes
   std::vector<Shape> Shapes;              ///< Loaded library of shapes
   std::map<std::string, size_t> shapeId;  ///< Associate a name of shape with its id in the vector 'Shapes'
 
 #ifdef ROCKABLE_ENABLE_PERIODIC
-  int usePeriodicCell;                   ///< Flag indicating if periodic cell is used
-  PeriodicCell Cell;                     ///< The periodic cell
-  double cellMomentumCorrection = 0.0;   ///< Time interval for momentum correction (0 = disabled)
-  double cellMomentumCorrectionC = 0.0;  ///< Counter for momentum correction
-  double cellVelocityCorrection = 0.0;   ///< Time interval for velocity correction (0 = disabled)
-  double cellVelocityCorrectionC = 0.0;  ///< Counter for velocity correction
-  double cellMassRatio = -1.0;           ///< Mass ratio override for the periodic cell (-1 = disabled)
-  bool useKineticStress = true;          ///< Flag indicating if kinetic stress contribution is used
+  int usePeriodicCell{0};               ///< Flag indicating if periodic cell is used
+  PeriodicCell Cell;                    ///< The periodic cell
+  double cellMomentumCorrection{0.0};   ///< Time interval for momentum correction (0 = disabled)
+  double cellMomentumCorrectionC{0.0};  ///< Counter for momentum correction
+  double cellVelocityCorrection{0.0};   ///< Time interval for velocity correction (0 = disabled)
+  double cellVelocityCorrectionC{0.0};  ///< Counter for velocity correction
+  double cellMassRatio{-1.0};           ///< Mass ratio override for the periodic cell (-1 = disabled)
+  bool useKineticStress{true};          ///< Flag indicating if kinetic stress contribution is used
 #endif
 
-  int useSoftParticles;  ///< Flag indicating if soft particles are used
-  Compliance Cinv;       ///< The inverse compliance
+  int useSoftParticles{0};  ///< Flag indicating if soft particles are used
+  Compliance Cinv;          ///< The inverse compliance
 
   // Time parameters
-  double t;                  ///< Current Time
-  double tmax;               ///< End time
-  double dt;                 ///< Time increment
-  int computationStopAsked;  ///< Ask to break the integration loop if positive
+  double t{0.0};                ///< Current Time
+  double tmax{1.0};             ///< End time
+  double dt{1e-6};              ///< Time increment
+  int computationStopAsked{0};  ///< Ask to break the integration loop if positive
 
   // Simulation flow
-  double interVerlet;  ///< Time interval between each update of the neighbor-list
-  double interConf;    ///< Time interval between the CONF files
+  double interVerlet{0.01};  ///< Time interval between each update of the neighbor-list
+  double interConf{0.25};    ///< Time interval between the CONF files
 
   // Neighbor list
-  double DVerlet;  ///< Distance of Verlet for obb intersections
-  double dVerlet;  ///< Distance of Verlet for sub-body proximities
+  double DVerlet{0.0};  ///< Distance of Verlet for obb intersections
+  double dVerlet{0.0};  ///< Distance of Verlet for sub-body proximities
 
   // Mechanical properties
   Properties properties;  ///< Density of the particles (defined by group)
   DataTable dataTable;    ///< Table that hold the parameters for the force-laws
 
   // Neighbor list
-  int dynamicUpdateNL;   ///< Flag to activate or not the dynamic update of the neighbor list
-  double dispUpdateNL;   ///< The moving distance that trigger an update of the neighbor list
-  double angleUpdateNL;  ///< The moving rotation-angle that trigger an update of the neighbor list
+  int dynamicUpdateNL{0};     ///< Flag to activate or not the dynamic update of the neighbor list
+  double dispUpdateNL{1.0};   ///< The moving distance that trigger an update of the neighbor list
+  double angleUpdateNL{1.0};  ///< The moving rotation-angle that trigger an update of the neighbor list
 
   // Numerical Damping
-  double numericalDampingCoeff;    ///< Coefficient of the so-called Cundall damping (0 = disabled)
-  double velocityBarrier;          ///< Velocity Barrier by weighting the particle accelerations (0 = disabled)
-  double angularVelocityBarrier;   ///< Angular velocity Barrier by weighting the particle accelerations (0 = disabled)
-  double velocityBarrierExponent;  ///< The exponent to be used with velocityBarrier
-  double angularVelocityBarrierExponent;  ///< The exponent to be used with angularVelocityBarrier
+  double numericalDampingCoeff{0.0};    ///< Coefficient of the so-called Cundall damping (0 = disabled)
+  double velocityBarrier{0.0};          ///< Velocity Barrier by weighting the particle accel. (0 = disabled)
+  double angularVelocityBarrier{0.0};   ///< Angular velocity Barrier by weighting the particle accel. (0 = disabled)
+  double velocityBarrierExponent{1.0};  ///< The exponent to be used with velocityBarrier
+  double angularVelocityBarrierExponent{1.0};  ///< The exponent to be used with angularVelocityBarrier
 
   // Other parameters
-  int iconf;                ///< Current configuration ID
-  AABB aabb;                ///< Axis Aligned Bounding Box (AABB) that surrounds some free bodies.
-  std::vector<AABB> paabb;  ///< AABBs of all particles
-  vec3r gravity;            ///< Gravity acceleration
-  int paramsInInterfaces;   ///< Flag saying if the parameters for sticked blonds
-                            ///< are embedded within the interfaces
-  bool glue_with_walls;     ///< flag to say if the glue can be also set between free and controlled particles
+  int iconf{0};                    ///< Current configuration ID
+  AABB aabb;                       ///< Axis Aligned Bounding Box (AABB) that surrounds some free bodies.
+  std::vector<AABB> paabb;         ///< AABBs of all particles
+  vec3r gravity{0.0, -9.81, 0.0};  ///< Gravity acceleration
+  int paramsInInterfaces{0};       ///< Flag saying if the parameters for sticked blonds
+                                   ///< are embedded within the interfaces
+  bool glue_with_walls{false};     ///< flag to say if the glue can be also set between free and controlled particles
 
-  vec3r cellMinSizes;      ///< Sizes of the linked cells in the 3 directions x, y ad z
-  int boxForLinkCellsOpt;  ///< Option for defining the master cell when linkCells' stategy in employed
+  vec3r cellMinSizes{1.0, 1.0, 1.0};  ///< Sizes of the linked cells in the 3 directions x, y ad z
+  int boxForLinkCellsOpt{0};          ///< Option for defining the master cell when linkCells' stategy in employed
 
   std::map<std::string, std::string> optionNames;  ///< All the options refered to as a string and set
                                                    ///< as a string also
 
-  ForceLaw* forceLaw;       ///< User defined force law
-  linkCells m_linkCells;    ///< Used to dectect contact by using the linkCell method
-  Traversals m_traversals;  ///< Used to store different cell traversal.
+  ForceLaw* forceLaw{nullptr};  ///< User defined force law
+  linkCells m_linkCells;        ///< Used to dectect contact by using the linkCell method
+  Traversals m_traversals;      ///< Used to store different cell traversal.
 
-  double preventCrossingLength;  ///< The length used to prevent crossing
+  double preventCrossingLength{0.0};  ///< The length used to prevent crossing
 
   // Ctor
   Rockable();
@@ -247,9 +250,6 @@ class Rockable {
   preComputeUpdate m_reorg;       ///< Some stuff to update in parallel forces and moments in OpenMP
 
  public:
-  // Core CD method (TODO)
-  // ...
-
   // Save/Load methods
   kwParser parser;
   void clearMemory();            ///< Clear the Particles and Interactions
@@ -296,10 +296,11 @@ class Rockable {
   // =============================================================================================================
 
 #ifdef ROCKABLE_ENABLE_PERIODIC
-  void applyPeriodicCellDriftCorrection();  ///< Apply momentum/velocity drift correction for periodic cell  
-  void updateCellDamping();            ///< Update Cell mass based on periodic mass ratio
+  void applyPeriodicCellDriftCorrection();  ///< Apply momentum/velocity drift correction for periodic cell
+  void updateCellDamping();                 ///< Update Cell mass based on periodic mass ratio
+  // TODO: VR-> rename updateCellDamping computePeriodicCellMass()
 #endif
-  
+
   void velocityControlledDrive();      ///< Impose the velocities of driven bodies
   void numericalDamping();             ///< The Cundall damping solution
   void applyVelocityBarrier();         ///< The velocity barrier solution
@@ -316,39 +317,39 @@ class Rockable {
   void readLawData(std::istream&, size_t id);             ///< Helper method to read a law in loadConf
   void writeLawData(std::ostream&, const char* parName);  ///< Helper method to write law in saveConf
 
-  bool interactiveMode;  ///< computation (false) or visualization (true) modes
+  bool interactiveMode{false};  ///< computation (false) or visualization (true) modes
 
   // Some predefined identifiers to get (quickly) data from input tables
-  size_t idDensity;  ///< Identifier of the density parameter
+  size_t idDensity{0};  ///< Identifier of the density parameter
 
-  size_t idKnContact;     ///< Identifier of normal stiffness for contact
-  size_t idEn2Contact;    ///< Identifier of normal energy-restitution coefficient
-  size_t idKtContact;     ///< Identifier of tangential stiffness for contact
-  size_t idMuContact;     ///< Identifier of friction coefficient for contact
-  size_t idKrContact;     ///< Identifier of angular stiffness for contact
-  size_t idMurContact;    ///< Identifier of rolling-friction coefficient for contact
-  size_t idViscTContact;  ///< Identifier of tangential viscuous parameter for contact
+  size_t idKnContact{0};     ///< Identifier of normal stiffness for contact
+  size_t idEn2Contact{0};    ///< Identifier of normal energy-restitution coefficient
+  size_t idKtContact{0};     ///< Identifier of tangential stiffness for contact
+  size_t idMuContact{0};     ///< Identifier of friction coefficient for contact
+  size_t idKrContact{0};     ///< Identifier of angular stiffness for contact
+  size_t idMurContact{0};    ///< Identifier of rolling-friction coefficient for contact
+  size_t idViscTContact{0};  ///< Identifier of tangential viscuous parameter for contact
 
-  size_t idKnInnerBond;    ///< Identifier of normal stiffness for inner-bonds
-  size_t idKtInnerBond;    ///< Identifier of tangential stiffness for inner-bonds
-  size_t idKrInnerBond;    ///< Identifier of angular stiffness for inner-bonds
-  size_t idEn2InnerBond;   ///< Identifier of normal energy-restitution for inner-bonds
-  size_t idFn0InnerBond;   ///< Identifier of normal threshold force for inner-bonds
-  size_t idFt0InnerBond;   ///< Identifier of tangential threshold force for inner-bonds
-  size_t idMom0InnerBond;  ///< Identifier of threshold bendind-moment for inner-bonds
-  size_t idPowInnerBond;   ///< Identifier of power in yield function for inner-bonds
+  size_t idKnInnerBond{0};    ///< Identifier of normal stiffness for inner-bonds
+  size_t idKtInnerBond{0};    ///< Identifier of tangential stiffness for inner-bonds
+  size_t idKrInnerBond{0};    ///< Identifier of angular stiffness for inner-bonds
+  size_t idEn2InnerBond{0};   ///< Identifier of normal energy-restitution for inner-bonds
+  size_t idFn0InnerBond{0};   ///< Identifier of normal threshold force for inner-bonds
+  size_t idFt0InnerBond{0};   ///< Identifier of tangential threshold force for inner-bonds
+  size_t idMom0InnerBond{0};  ///< Identifier of threshold bendind-moment for inner-bonds
+  size_t idPowInnerBond{0};   ///< Identifier of power in yield function for inner-bonds
 
-  size_t idKnOuterBond;    ///< Identifier of normal stiffness for outer-bonds
-  size_t idKtOuterBond;    ///< Identifier of tangential stiffness for outer-bonds
-  size_t idKrOuterBond;    ///< Identifier of angular stiffness for outer-bonds
-  size_t idEn2OuterBond;   ///< Identifier of normal energy-restitution for outer-bonds
-  size_t idFn0OuterBond;   ///< Identifier of normal threshold force for outer-bonds
-  size_t idFt0OuterBond;   ///< Identifier of tangential threshold force for outer-bonds
-  size_t idMom0OuterBond;  ///< Identifier of threshold bendind-moment for outer-bonds
-  size_t idPowOuterBond;   ///< Identifier of power in yield function for outer-bonds
+  size_t idKnOuterBond{0};    ///< Identifier of normal stiffness for outer-bonds
+  size_t idKtOuterBond{0};    ///< Identifier of tangential stiffness for outer-bonds
+  size_t idKrOuterBond{0};    ///< Identifier of angular stiffness for outer-bonds
+  size_t idEn2OuterBond{0};   ///< Identifier of normal energy-restitution for outer-bonds
+  size_t idFn0OuterBond{0};   ///< Identifier of normal threshold force for outer-bonds
+  size_t idFt0OuterBond{0};   ///< Identifier of tangential threshold force for outer-bonds
+  size_t idMom0OuterBond{0};  ///< Identifier of threshold bendind-moment for outer-bonds
+  size_t idPowOuterBond{0};   ///< Identifier of power in yield function for outer-bonds
 
-  size_t idGcInnerBond;  ///< Identifier of ____
-  size_t idGcOuterBond;  ///< Identifier of ____
+  size_t idGcInnerBond{0};  ///< Identifier of ____
+  size_t idGcOuterBond{0};  ///< Identifier of ____
 
   // Postponed breakage of BreakableInterfaces
   std::set<BreakableInterface*> interfacesToBreak;  ///< Pointers to interfaces to be broken
@@ -357,30 +358,30 @@ class Rockable {
   double totalBrokenArea{0.0};  // for tracking area of interface liberated during breakage
 
   // dynamic update of the Neighbor-List (NL)
-  bool needUpdate;              ///< when true, an updateNL will be done at the next time increment
-  double maxDeltaPos;           ///< Overall maximum displacement since the last updateNL
-  double maxDeltaRot;           ///< Overall maximum rotation angle since the last updateNL
+  bool needUpdate{false};       ///< when true, an updateNL will be done at the next time increment
+  double maxDeltaPos{1.0};      ///< Overall maximum displacement since the last updateNL
+  double maxDeltaRot{1.0};      ///< Overall maximum rotation angle since the last updateNL
   std::vector<vec3r> deltaPos;  ///< displacement vector of each particle (since last updateNL)
   std::vector<quat> deltaQ;     ///< rotation quaternion of each particle (since last updateNL)
 
   // CPU time measurments
-  double timeInUpdateNL;          ///< Used to measure elapsed time by the update of NL
-  double timeInForceComputation;  ///< Used to measure elapsed time by the force laws
+  double timeInUpdateNL{0.0};          ///< Used to measure elapsed time by the update of NL
+  double timeInForceComputation{0.0};  ///< Used to measure elapsed time by the force laws
 
   // Counters for the simulation flow
-  double interVerletC;  ///< Counter between Verlet-updates
-  double interConfC;    ///< Counter between savings of conf-files
+  double interVerletC{0.0};  ///< Counter between Verlet-updates
+  double interConfC{0.0};    ///< Counter between savings of conf-files
 
   // time-step constants
-  double dt_2;   ///< Half the time-step
-  double dt_6;   ///< Time-step divided by 6
-  double dt2_2;  ///< Half the squared time-step
-  double dt2;    ///< Double of time-step
-  double dt2_8;  ///< Squared time-step divided by 8
-  double dt2_6;  ///< Squared time-step divided by 6
+  double dt_2{0.0000005};                ///< Half the time-step
+  double dt_6{0.00000016666666666666};   ///< Time-step divided by 6
+  double dt2_2{0.0000000000005};         ///< Half the squared time-step
+  double dt2{0.000000000001};            ///< Double of time-step
+  double dt2_8{0.000000000000125};       ///< Squared time-step divided by 8
+  double dt2_6{0.00000000000016666666};  ///< Squared time-step divided by 6
 
   // input files
-  std::string m_path = std::string();  ///< Default path to load our input files is the current directory
+  std::string m_path{""};  ///< Default path to load our input files is the current directory
 
   // output files
   std::ofstream perfFile;           ///< to store performance data in the course of a computation
