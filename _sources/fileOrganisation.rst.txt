@@ -7,7 +7,7 @@ Organisation of the files
 📁 ``examples``
 ---------------
 
-Directory containing example simulations or processings. The example name **helloworld** can be a starting point.
+Directory containing example simulations or processings. The example name **helloworld** can be a starting point but the reste of the folder is a kind of sand-box the developers use to test their features.
 
 
 📁 ``prepro``

@@ -1,5 +1,5 @@
-Quick-start guid
-================
+Quick-start guide
+=================
 
 What is Rockable?
 -----------------
