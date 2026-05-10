@@ -1,0 +1,381 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Application generator &mdash; Rockable 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://richefeu.github.io/rockable/generator.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Application sweepable" href="sweepable.html" />
+    <link rel="prev" title="Tools comming with rockable" href="tools.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Rockable
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickStart.html">Quick-start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fileOrganisation.html">Organisation of the files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntaxConf.html">Format of configuration files (conf-file)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntaxShapes.html">Format of shape-files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forceLaws.html">Force laws</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualisation.html">Visualisation tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tools.html">Tools comming with rockable</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Application <cite>generator</cite></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#command-reference">Command Reference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#file-output">File output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#printing-and-arithmetic">Printing and arithmetic</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#particle-counting">Particle counting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#transformations">Transformations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#shape-generation">Shape Generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#packing-generation">Packing Generation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sweepable.html">Application <cite>sweepable</cite></a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Rockable</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="tools.html">Tools comming with rockable</a></li>
+      <li class="breadcrumb-item active">Application <cite>generator</cite></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/generator.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="application-generator">
+<h1>Application <cite>generator</cite><a class="headerlink" href="#application-generator" title="Link to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">generator</span></code> reads commands from a text file and produces Rockable
+configuration files (shape files, input files, packings). It is the standard
+pre-processing tool for setting up simulations.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>generator<span class="w"> </span>&lt;command-file&gt;
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Leave at least one blank line at the end of the command file to avoid
+parsing issues.</p>
+</div>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#example" id="id1">Example</a></p></li>
+<li><p><a class="reference internal" href="#command-reference" id="id2">Command Reference</a></p>
+<ul>
+<li><p><a class="reference internal" href="#file-output" id="id3">File output</a></p></li>
+<li><p><a class="reference internal" href="#printing-and-arithmetic" id="id4">Printing and arithmetic</a></p></li>
+<li><p><a class="reference internal" href="#particle-counting" id="id5">Particle counting</a></p></li>
+<li><p><a class="reference internal" href="#transformations" id="id6">Transformations</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#shape-generation" id="id7">Shape Generation</a></p></li>
+<li><p><a class="reference internal" href="#packing-generation" id="id8">Packing Generation</a></p></li>
+</ul>
+</nav>
+<section id="example">
+<h2><a class="toc-backref" href="#id1" role="doc-backlink">Example</a><a class="headerlink" href="#example" title="Link to this heading"></a></h2>
+<p>The following script generates a shape file and a full Rockable input file
+with a random close packing of cuboids:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span># --- shapes ---
+open shapes.txt
+generateShape:cuboid Cuboid 0.0005 0.03 0.01 0.01
+generateShape:xyz_walls 0.25 0.25 0.25 0.0005
+close
+
+# --- input file ---
+open input.txt
+print Rockable 21-08-2022
+print #### time #############################
+print t 0
+print tmax 2.0
+print dt 5e-6
+print interVerlet 0.001
+print interConf 0.01
+print
+print #### options ##########################
+print forceLaw Default
+print Integrator Beeman
+print
+print #### proximity of the particles #######
+print DVerlet 0.005
+print dVerlet 0.0025
+print
+print #### properties for particles #########
+print density 0 2700
+print density 1 2700
+print
+print #### interaction parameters ###########
+print knContact 0 1 1e6
+print en2Contact 0 1 0.02
+print ktContact 0 1 1e6
+print muContact 0 1 0.6
+print krContact 0 1 0.0
+print murContact 0 1 0.0
+print
+print #### the system #######################
+print iconf 0
+print shapeFile shapes.txt
+print nDriven 0
+Particles:placeHolder
+
+generatePacking:RandomClosePacking
+Cuboid
+CUBOID Y
+0.2 0.2 0.3
+0.03 0.01 0.01
+1.0 1.0
+2000
+0.9
+0
+0
+
+close
+</pre></div>
+</div>
+</section>
+<section id="command-reference">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Command Reference</a><a class="headerlink" href="#command-reference" title="Link to this heading"></a></h2>
+<section id="file-output">
+<h3><a class="toc-backref" href="#id3" role="doc-backlink">File output</a><a class="headerlink" href="#file-output" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">open</span> <span class="pre">&lt;filename&gt;</span></code></dt><dd><p>Open <code class="docutils literal notranslate"><span class="pre">filename</span></code> for output. All subsequent <code class="docutils literal notranslate"><span class="pre">print</span></code>, <code class="docutils literal notranslate"><span class="pre">compute</span></code>, and
+packing commands write to this file until <code class="docutils literal notranslate"><span class="pre">close</span></code> is called. If no file
+is open, output goes to the console.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">close</span></code></dt><dd><p>Close the current output file. If <code class="docutils literal notranslate"><span class="pre">Particles:placeHolder</span></code> was used, the
+final particle count is written back into the file at that position before
+closing.</p>
+</dd>
+</dl>
+</section>
+<section id="printing-and-arithmetic">
+<h3><a class="toc-backref" href="#id4" role="doc-backlink">Printing and arithmetic</a><a class="headerlink" href="#printing-and-arithmetic" title="Link to this heading"></a></h3>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">print</span> <span class="pre">&lt;text&gt;</span></code></dt><dd><p>Write <code class="docutils literal notranslate"><span class="pre">text</span></code> to the current output, trimming leading and trailing spaces,
+and append a newline. Useful for writing raw lines into shape or
+configuration files.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">print&gt;</span> <span class="pre">&lt;text&gt;</span></code></dt><dd><p>Same as <code class="docutils literal notranslate"><span class="pre">print</span></code> but without the trailing newline. The next output
+statement continues on the same line.</p>
+<p>Example — writing a computed contact stiffness on one line:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>print&gt; knContact 0 0
+&lt;compute 500000 * 2
+</pre></div>
+</div>
+<p>produces: <code class="docutils literal notranslate"><span class="pre">knContact</span> <span class="pre">0</span> <span class="pre">0</span> <span class="pre">1000000</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">compute</span> <span class="pre">&lt;label&gt;</span> <span class="pre">&lt;expression&gt;</span></code></dt><dd><p>Evaluate a mathematical expression and write <code class="docutils literal notranslate"><span class="pre">label</span> <span class="pre">result</span></code> to the output.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">compute</span> <span class="pre">Particles</span> <span class="pre">5^3</span> <span class="pre">+</span> <span class="pre">6</span></code> produces <code class="docutils literal notranslate"><span class="pre">Particles</span> <span class="pre">131</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&lt;compute</span> <span class="pre">&lt;expression&gt;</span></code></dt><dd><p>Evaluate an expression and write only the result (preceded by a space),
+without a label. Intended to be combined with <code class="docutils literal notranslate"><span class="pre">print&gt;</span></code> on the previous
+line (see example above).</p>
+</dd>
+</dl>
+</section>
+<section id="particle-counting">
+<h3><a class="toc-backref" href="#id5" role="doc-backlink">Particle counting</a><a class="headerlink" href="#particle-counting" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">Particles:placeHolder</span></code></dt><dd><p>Reserve a slot in the output file where the total particle count will be
+written when <code class="docutils literal notranslate"><span class="pre">close</span></code> is called. The count is updated automatically by
+every packing command.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">incrementNoParticles</span> <span class="pre">&lt;n&gt;</span></code></dt><dd><p>Manually increase the tracked particle count by the integer <code class="docutils literal notranslate"><span class="pre">n</span></code>. Use this
+when adding particles through <code class="docutils literal notranslate"><span class="pre">print</span></code> rather than through a packing
+command.</p>
+</dd>
+</dl>
+</section>
+<section id="transformations">
+<h3><a class="toc-backref" href="#id6" role="doc-backlink">Transformations</a><a class="headerlink" href="#transformations" title="Link to this heading"></a></h3>
+<p>A global transformation is maintained throughout script execution and applied
+by packing commands when placing particles.</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">transformation:add_translation</span> <span class="pre">&lt;x&gt;</span> <span class="pre">&lt;y&gt;</span> <span class="pre">&lt;z&gt;</span></code></dt><dd><p>Add a translation to the current transformation.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">transformation:add_rotation</span> <span class="pre">&lt;x&gt;</span> <span class="pre">&lt;y&gt;</span> <span class="pre">&lt;z&gt;</span> <span class="pre">&lt;angle_deg&gt;</span></code></dt><dd><p>Add a rotation around the axis <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y,</span> <span class="pre">z)</span></code> by <code class="docutils literal notranslate"><span class="pre">angle_deg</span></code> degrees.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">transformation:reset</span></code></dt><dd><p>Reset the transformation to identity (clears both translation and rotation).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">transformation:reset_translation</span></code></dt><dd><p>Reset only the translation component.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">transformation:reset_rotation</span></code></dt><dd><p>Reset only the rotation component.</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="shape-generation">
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Shape Generation</a><a class="headerlink" href="#shape-generation" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">generateShape:sphere</span> <span class="pre">&lt;name&gt;</span> <span class="pre">&lt;radius&gt;</span></code></dt><dd><p>Generate a spherical shape.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">generateShape:cube</span> <span class="pre">&lt;name&gt;</span> <span class="pre">&lt;radius&gt;</span> <span class="pre">&lt;sideSize&gt;</span></code></dt><dd><p>Generate a cubic shape of side length <code class="docutils literal notranslate"><span class="pre">sideSize</span></code> with corner radius
+<code class="docutils literal notranslate"><span class="pre">radius</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">generateShape:cuboid</span> <span class="pre">&lt;name&gt;</span> <span class="pre">&lt;radius&gt;</span> <span class="pre">&lt;sx&gt;</span> <span class="pre">&lt;sy&gt;</span> <span class="pre">&lt;sz&gt;</span></code></dt><dd><p>Generate a cuboid shape with side lengths <code class="docutils literal notranslate"><span class="pre">(sx,</span> <span class="pre">sy,</span> <span class="pre">sz)</span></code> and corner
+radius <code class="docutils literal notranslate"><span class="pre">radius</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">generateShape:pyramid3</span> <span class="pre">&lt;name&gt;</span> <span class="pre">&lt;radius&gt;</span> <span class="pre">&lt;sideSize&gt;</span></code></dt><dd><p>Generate a triangular pyramid shape.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">generateShape:thin_cylinder</span> <span class="pre">&lt;name&gt;</span> <span class="pre">&lt;Rin&gt;</span> <span class="pre">&lt;Rout&gt;</span> <span class="pre">&lt;H&gt;</span> <span class="pre">&lt;nbSectors&gt;</span></code></dt><dd><p>Generate a thin cylindrical shell with inner radius <code class="docutils literal notranslate"><span class="pre">Rin</span></code>, outer radius
+<code class="docutils literal notranslate"><span class="pre">Rout</span></code>, height <code class="docutils literal notranslate"><span class="pre">H</span></code>, and <code class="docutils literal notranslate"><span class="pre">nbSectors</span></code> angular sectors.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">generateShape:cuboid_container</span> <span class="pre">&lt;name&gt;</span> <span class="pre">&lt;radius&gt;</span> <span class="pre">&lt;sx&gt;</span> <span class="pre">&lt;sy&gt;</span> <span class="pre">&lt;sz&gt;</span> <span class="pre">&lt;hasTop&gt;</span> <span class="pre">&lt;hasBottom&gt;</span></code></dt><dd><p>Generate an open or closed cuboid container. <code class="docutils literal notranslate"><span class="pre">hasTop</span></code> and <code class="docutils literal notranslate"><span class="pre">hasBottom</span></code>
+are integers (<code class="docutils literal notranslate"><span class="pre">0</span></code> = absent, <code class="docutils literal notranslate"><span class="pre">1</span></code> = present).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">generateShape:rectangle_xz</span> <span class="pre">&lt;name&gt;</span> <span class="pre">&lt;radius&gt;</span> <span class="pre">&lt;side_x&gt;</span> <span class="pre">&lt;side_z&gt;</span></code></dt><dd><p>Generate a rectangular plate in the <em>xz</em> plane.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">generateShape:rectangle_xy</span> <span class="pre">&lt;name&gt;</span> <span class="pre">&lt;radius&gt;</span> <span class="pre">&lt;side_x&gt;</span> <span class="pre">&lt;side_y&gt;</span></code></dt><dd><p>Generate a rectangular plate in the <em>xy</em> plane.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">generateShape:rhombicuboctahedron</span> <span class="pre">&lt;name&gt;</span> <span class="pre">&lt;radius&gt;</span> <span class="pre">&lt;sx&gt;</span> <span class="pre">&lt;sy&gt;</span> <span class="pre">&lt;sz&gt;</span></code></dt><dd><p>Generate a rhombicuboctahedron shape.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">generateShape:xyz_walls</span> <span class="pre">&lt;sx&gt;</span> <span class="pre">&lt;sy&gt;</span> <span class="pre">&lt;sz&gt;</span> <span class="pre">&lt;Rw&gt;</span></code></dt><dd><p>Generate three flat wall shapes (one per axis) sized <code class="docutils literal notranslate"><span class="pre">(sx,</span> <span class="pre">sy,</span> <span class="pre">sz)</span></code> with
+corner radius <code class="docutils literal notranslate"><span class="pre">Rw</span></code>.</p>
+</dd>
+</dl>
+</section>
+<section id="packing-generation">
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">Packing Generation</a><a class="headerlink" href="#packing-generation" title="Link to this heading"></a></h2>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">addParticle</span> <span class="pre">&lt;name&gt;</span> <span class="pre">&lt;group&gt;</span> <span class="pre">&lt;cluster&gt;</span> <span class="pre">&lt;homothety&gt;</span> <span class="pre">&lt;px&gt;</span> <span class="pre">&lt;py&gt;</span> <span class="pre">&lt;pz&gt;</span> <span class="pre">&lt;qs&gt;</span> <span class="pre">&lt;qx&gt;</span> <span class="pre">&lt;qy&gt;</span> <span class="pre">&lt;qz&gt;</span></code></dt><dd><p>Place a single particle at position <code class="docutils literal notranslate"><span class="pre">(px,</span> <span class="pre">py,</span> <span class="pre">pz)</span></code> with quaternion
+orientation <code class="docutils literal notranslate"><span class="pre">(qs,</span> <span class="pre">qx,</span> <span class="pre">qy,</span> <span class="pre">qz)</span></code>, homothety scale <code class="docutils literal notranslate"><span class="pre">homothety</span></code>, assigned
+to <code class="docutils literal notranslate"><span class="pre">group</span></code> and <code class="docutils literal notranslate"><span class="pre">cluster</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">generatePacking:wallBox</span> <span class="pre">&lt;group&gt;</span> <span class="pre">&lt;LX&gt;</span> <span class="pre">&lt;LY&gt;</span> <span class="pre">&lt;LZ&gt;</span> <span class="pre">&lt;Rw&gt;</span></code></dt><dd><p>Generate six flat wall particles forming a closed box of dimensions
+<code class="docutils literal notranslate"><span class="pre">LX</span> <span class="pre">×</span> <span class="pre">LY</span> <span class="pre">×</span> <span class="pre">LZ</span></code> with wall corner radius <code class="docutils literal notranslate"><span class="pre">Rw</span></code>, all assigned to
+<code class="docutils literal notranslate"><span class="pre">group</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">generatePacking:grid</span> <span class="pre">&lt;name&gt;</span> <span class="pre">&lt;ox&gt;</span> <span class="pre">&lt;oy&gt;</span> <span class="pre">&lt;oz&gt;</span> <span class="pre">&lt;bx&gt;</span> <span class="pre">&lt;by&gt;</span> <span class="pre">&lt;bz&gt;</span> <span class="pre">&lt;nx&gt;</span> <span class="pre">&lt;ny&gt;</span> <span class="pre">&lt;nz&gt;</span> <span class="pre">&lt;group&gt;</span> <span class="pre">&lt;cluster&gt;</span> <span class="pre">&lt;homothety&gt;</span> <span class="pre">&lt;randQ&gt;</span></code></dt><dd><p>Fill a box of size <code class="docutils literal notranslate"><span class="pre">(bx,</span> <span class="pre">by,</span> <span class="pre">bz)</span></code> starting at origin <code class="docutils literal notranslate"><span class="pre">(ox,</span> <span class="pre">oy,</span> <span class="pre">oz)</span></code>
+with a regular <code class="docutils literal notranslate"><span class="pre">nx</span> <span class="pre">×</span> <span class="pre">ny</span> <span class="pre">×</span> <span class="pre">nz</span></code> grid of particles of shape <code class="docutils literal notranslate"><span class="pre">name</span></code>.
+Set <code class="docutils literal notranslate"><span class="pre">randQ</span></code> to <code class="docutils literal notranslate"><span class="pre">1</span></code> for random orientations.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">generatePacking:grid_clust</span> <span class="pre">&lt;name&gt;</span> <span class="pre">&lt;ox&gt;</span> <span class="pre">&lt;oy&gt;</span> <span class="pre">&lt;oz&gt;</span> <span class="pre">&lt;bx&gt;</span> <span class="pre">&lt;by&gt;</span> <span class="pre">&lt;bz&gt;</span> <span class="pre">&lt;nx&gt;</span> <span class="pre">&lt;ny&gt;</span> <span class="pre">&lt;nz&gt;</span> <span class="pre">&lt;group&gt;</span> <span class="pre">&lt;cluster&gt;</span> <span class="pre">&lt;homothety&gt;</span> <span class="pre">&lt;randQ&gt;</span></code></dt><dd><p>Same as <code class="docutils literal notranslate"><span class="pre">generatePacking:grid</span></code> but assigns incrementing cluster indices
+to each particle.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">generatePacking:RandomClosePacking</span> <span class="pre">&lt;name&gt;</span> <span class="pre">&lt;boxShape&gt;</span> <span class="pre">&lt;direction&gt;</span> <span class="pre">&lt;bx&gt;</span> <span class="pre">&lt;by&gt;</span> <span class="pre">&lt;bz&gt;</span> <span class="pre">&lt;xOBB&gt;</span> <span class="pre">&lt;yOBB&gt;</span> <span class="pre">&lt;zOBB&gt;</span> <span class="pre">&lt;hmin&gt;</span> <span class="pre">&lt;hmax&gt;</span> <span class="pre">&lt;nbTarget&gt;</span> <span class="pre">&lt;solidFraction&gt;</span> <span class="pre">&lt;group&gt;</span> <span class="pre">&lt;cluster&gt;</span></code></dt><dd><p>Generate a random close packing inside a box of size <code class="docutils literal notranslate"><span class="pre">(bx,</span> <span class="pre">by,</span> <span class="pre">bz)</span></code>.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 75.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">boxShape</span></code></p></td>
+<td><p>Container geometry: <code class="docutils literal notranslate"><span class="pre">CUBOID</span></code> or <code class="docutils literal notranslate"><span class="pre">CYLINDER</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">direction</span></code></p></td>
+<td><p>Packing growth direction: <code class="docutils literal notranslate"><span class="pre">X</span></code>, <code class="docutils literal notranslate"><span class="pre">Y</span></code>, or <code class="docutils literal notranslate"><span class="pre">Z</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">xOBB</span></code> <code class="docutils literal notranslate"><span class="pre">yOBB</span></code> <code class="docutils literal notranslate"><span class="pre">zOBB</span></code></p></td>
+<td><p>Bounding box dimensions of the particle shape</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hmin</span></code> <code class="docutils literal notranslate"><span class="pre">hmax</span></code></p></td>
+<td><p>Homothety range (size scatter)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">nbTarget</span></code></p></td>
+<td><p>Target number of particles</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">solidFraction</span></code></p></td>
+<td><p>Target solid fraction (0–1)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">group</span></code> <code class="docutils literal notranslate"><span class="pre">cluster</span></code></p></td>
+<td><p>Group and cluster indices assigned to all particles</p></td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tools.html" class="btn btn-neutral float-left" title="Tools comming with rockable" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="sweepable.html" class="btn btn-neutral float-right" title="Application sweepable" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2026, Vincent Richefeu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
