@@ -115,7 +115,7 @@ void writeVTKSPHER(int num) {
   fprintf(sortie_vtk, "VECTORS Radius float\n");
 
   for (i = 0; i < nbgrains; i++) {
-    fprintf(sortie_vtk, "0. 0. %lf\n", Sphers[i]->MinskowskiRadius());
+    fprintf(sortie_vtk, "0. 0. %lf\n", Sphers[i]->MinkowskiRadius());
   }
 
   fprintf(sortie_vtk, "VECTORS Vel float\n");
@@ -412,7 +412,7 @@ void writeVTKContactsSpheres(int num) {
         if (it->dn > 0.0 && it->stick == nullptr)
           continue;
         else {
-          fMax = box.Particles[i].MinskowskiRadius() + box.Particles[j].MinskowskiRadius();
+          fMax = box.Particles[i].MinkowskiRadius() + box.Particles[j].MinkowskiRadius();
           if (fMax != 0.)
             fprintf(sortie_vtk, "0. 0. %lf\n", fMax / 2.);
           else
@@ -520,11 +520,11 @@ void writeVTKContactsLines(int num) {
         }
 
         if (it->type == eeType) {
-          vec3r dnorm = it->n * (box.Particles[i].MinskowskiRadius());
+          vec3r dnorm = it->n * (box.Particles[i].MinkowskiRadius());
           fprintf(sortie_vtk, "%e %e %e\n", it->pos.x, it->pos.y, it->pos.z);
           fprintf(sortie_vtk, "%e %e %e\n", it->pos.x + dnorm.x, it->pos.y + dnorm.y, it->pos.z + dnorm.z);
 
-          dnorm = it->n * (box.Particles[j].MinskowskiRadius());
+          dnorm = it->n * (box.Particles[j].MinkowskiRadius());
           fprintf(sortie_vtk, "%e %e %e\n", it->pos.x, it->pos.y, it->pos.z);
           fprintf(sortie_vtk, "%e %e %e\n", it->pos.x - dnorm.x, it->pos.y - dnorm.y, it->pos.z - dnorm.z);
         }

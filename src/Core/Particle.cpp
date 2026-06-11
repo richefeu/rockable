@@ -65,10 +65,10 @@ vec3r Particle::GlobFaceVertex(size_t f, size_t v) const {
 }
 
 /**
- *  @brief Get the scaled Minskowski radius
+ *  @brief Get the scaled Minkowski radius
  *
  */
-double Particle::MinskowskiRadius() const { return homothety * shape->radius; }
+double Particle::MinkowskiRadius() const { return homothety * shape->radius; }
 
 /**
  * @brief Update the placement of the Oriented Bounding Box according to the current position and orientation of the
@@ -89,7 +89,7 @@ bool Particle::VertexIsNearVertex(Particle& Pi, Particle& Pj, size_t isub, size_
                                   const vec3r& jPeriodicShift) {
   vec3r pos_iv = Pi.GlobVertex(isub);
   vec3r pos_jv = Pj.GlobVertex(jsub) + jPeriodicShift;
-  double sum = Pi.MinskowskiRadius() + Pj.MinskowskiRadius() + dmax;
+  double sum = Pi.MinkowskiRadius() + Pj.MinkowskiRadius() + dmax;
   return (norm2(pos_jv - pos_iv) <= sum * sum);
 }
 
@@ -108,7 +108,7 @@ bool Particle::VertexIsNearEdge(Particle& Pi, Particle& Pj, size_t isub, size_t 
   if (r < -dmax) return false;
   if (r > 1.0 + dmax) return false;
 
-  double sum = Pi.MinskowskiRadius() + Pj.MinskowskiRadius() + dmax;
+  double sum = Pi.MinkowskiRadius() + Pj.MinkowskiRadius() + dmax;
 
   return (norm2(pos_iv - (pos0_jv + r * E)) <= sum * sum);
 }
@@ -161,7 +161,7 @@ bool Particle::VertexIsNearFace(Particle& Pi, Particle& Pj, size_t isub, size_t 
   }
 
   if (ODD == 1) {
-    dist -= (Pi.MinskowskiRadius() + Pj.MinskowskiRadius());
+    dist -= (Pi.MinkowskiRadius() + Pj.MinkowskiRadius());
     if (dist <= dmax) return true;
   }
   return false;
@@ -200,7 +200,7 @@ bool Particle::EdgeIsNearEdge(Particle& Pi, Particle& Pj, size_t isub, size_t js
 
     if (s >= 0.0 && s <= 1.0 && t >= 0.0 && t <= 1.0) {
       n = (pos0_iv + s * Ei) - (pos0_jv + t * Ej);
-      double sum = Pi.MinskowskiRadius() + Pj.MinskowskiRadius() + dmax;
+      double sum = Pi.MinkowskiRadius() + Pj.MinkowskiRadius() + dmax;
       return (norm2(n) <= sum * sum);
     }
   }

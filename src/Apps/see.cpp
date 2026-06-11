@@ -1321,7 +1321,7 @@ void drawInteractionFrames() {
         continue;
       }
 
-      dnorm = it->n * 2.0 * (box.Particles[i].MinskowskiRadius() + box.Particles[j].MinskowskiRadius());
+      dnorm = it->n * 2.0 * (box.Particles[i].MinkowskiRadius() + box.Particles[j].MinkowskiRadius());
 
       glBegin(GL_LINES);
       glVertex3f(it->pos.x - dnorm.x, it->pos.y - dnorm.y, it->pos.z - dnorm.z);

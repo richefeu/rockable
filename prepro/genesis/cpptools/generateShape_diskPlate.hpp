@@ -39,7 +39,7 @@
 #include <cmath>
 #include <iostream>
 
-// radius = Minskowski radius
+// radius = Minkowski radius
 // Rout = external radius
 // The origin coordinate is in the middle
 // I/m is a fake one

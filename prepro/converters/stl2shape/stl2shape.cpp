@@ -397,7 +397,7 @@ int main(int argc, char const* argv[]) {
     TCLAP::CmdLine cmd("Convert a binary STL file to a shape that can be used by Rockable", ' ', "0.3");
     TCLAP::UnlabeledValueArg<std::string> nameArg("input", "Name of the input STL binary file", true, "file.stl",
                                                   "stl file");
-    TCLAP::ValueArg<double> radiusArg("r", "radius", "Radius of the rounded edges (Minskowski radius) to be used", true,
+    TCLAP::ValueArg<double> radiusArg("r", "radius", "Radius of the rounded edges (Minkowski radius) to be used", true,
                                       1.0, "double");
     TCLAP::ValueArg<double> scaleArg("s", "scaleFactor", "Set the (re-)scale factor of the output object", false, 1.0,
                                      "double");

@@ -1365,7 +1365,7 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
     // be saved)
     OBB subObbi;
     subObbi.center = Particles[i].GlobVertex(isub);
-    subObbi.enlarge(Particles[i].MinskowskiRadius() + dmax);
+    subObbi.enlarge(Particles[i].MinkowskiRadius() + dmax);
     OBB obbj = Particles[j].obb;
     obbj.translate(jPeriodicShift);
     obbj.enlarge(dmax);
@@ -1388,7 +1388,7 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
 
     OBB subObbj;
     subObbj.center = Particles[j].GlobVertex(jsub) + jPeriodicShift;
-    subObbj.enlarge(Particles[j].MinskowskiRadius() + dmax);
+    subObbj.enlarge(Particles[j].MinkowskiRadius() + dmax);
     OBB obbi = Particles[i].obb;
     obbi.enlarge(dmax);
     if (!(obbi.intersect(subObbj))) {
@@ -3913,7 +3913,7 @@ void Rockable::computeAABB(size_t first, size_t last) {
 
 #pragma omp parallel for default(shared)
   for (size_t i = 0; i < Particles.size(); i++) {
-    double radius = Particles[i].MinskowskiRadius();
+    double radius = Particles[i].MinkowskiRadius();
     paabb[i].set_single(Particles[i].GlobVertex(0));
     for (size_t v = 1; v < Particles[i].shape->vertex.size(); v++) {
       paabb[i].add(Particles[i].GlobVertex(v));

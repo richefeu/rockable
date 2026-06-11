@@ -217,7 +217,7 @@ void Shape::fitObb_imposed_axis(){
   obb.center = invN * center;
   obb.extent = 0.5 * (maxim - minim);
 
-  obb.enlarge(radius);  // Add the Minskowski radius  
+  obb.enlarge(radius);  // Add the Minkowski radius  
 }
 
 mat9r Shape::getCovarianceMatrix() {
@@ -322,7 +322,7 @@ void Shape::fitObb_any() {
   obb.e[2] = f;
   obb.extent = 0.5 * (maxim - minim);
 
-  obb.enlarge(radius);  // Add the Minskowski radius
+  obb.enlarge(radius);  // Add the Minkowski radius
 }
 
 // See pdf document "Minimum-Area Rectangle Containing a Convex Polygon" (@see
@@ -385,7 +385,7 @@ void Shape::fitObb_convex() {
     }
   }
 
-  obb.enlarge(radius);  // Add the Minskowski radius
+  obb.enlarge(radius);  // Add the Minkowski radius
 }
 
 // Say whether a point is inside the shape

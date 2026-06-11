@@ -68,7 +68,7 @@ void ClusterAABB::record() {
   for (size_t i = 0; i < box->Particles.size(); i++) {
     if (box->Particles[i].cluster == icluster) {
       aabb.set_single(box->Particles[i].GlobVertex(0));
-      double radius = box->Particles[i].MinskowskiRadius();
+      double radius = box->Particles[i].MinkowskiRadius();
       aabb.enlarge(radius);
       for (size_t v = 0; v < box->Particles[i].shape->vertex.size(); v++) {
         AABB boxi;
@@ -83,7 +83,7 @@ void ClusterAABB::record() {
 
   for (size_t i = i0; i < box->Particles.size(); i++) {
     if (box->Particles[i].cluster == icluster) {
-      double radius = box->Particles[i].MinskowskiRadius();
+      double radius = box->Particles[i].MinkowskiRadius();
       for (size_t v = 0; v < box->Particles[i].shape->vertex.size(); v++) {
 
         AABB boxi;

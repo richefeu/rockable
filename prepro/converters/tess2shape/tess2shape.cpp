@@ -238,7 +238,7 @@ void Tess2Shape::readTess() {
  * @brief Create the Rockable-shapes from the polyhedra.
  *
  * This function iterates over the Shapes that have been previously extracted
- * and it removes a slice of thickness 'Minskowski radius'.
+ * and it removes a slice of thickness 'Minkowski radius'.
  *
  *
  * @return nothing
@@ -439,7 +439,7 @@ void Tess2Shape::readCommands(const char* name) {
   parser.kwMap["inputFileName"] = __GET__(Com, inputFileName);
   parser.kwMap["shapesFileName"] = __GET__(Com, shapesFileName);
 
-  parser.kwMap["MinskowskiRadius"] = __GET__(Com, radius);
+  parser.kwMap["MinkowskiRadius"] = __GET__(Com, radius);
 
   parser.kwMap["ParticlesGroup"] = __GET__(Com, ParticlesGroup);
   parser.kwMap["ParticlesCluster"] = __GET__(Com, ParticlesCluster);
