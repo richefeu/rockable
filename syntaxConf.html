@@ -53,6 +53,12 @@
 <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#timing">Timing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#neighbor-list-nl">Neighbor List (NL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#parallel-mode">Parallel mode</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#available-options">Available options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#input-keyword">Input keyword</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#configuration-backups">Configuration Backups</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#computation-options">Computation options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#library-of-particle-shapes">Library of Particle Shapes</a></li>
@@ -178,6 +184,48 @@ These dynamic updates will not affect the regular updates (every <code class="do
 </ul>
 </li>
 </ul>
+</section>
+<section id="parallel-mode">
+<h2>Parallel mode<a class="headerlink" href="#parallel-mode" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">parallel_mode</span></code> parameter controls the parallel execution strategy used by Rockable for force computation and interaction handling.
+It defines how work is distributed across threads and how memory conflicts are handled during updates.</p>
+<section id="available-options">
+<h3>Available options<a class="headerlink" href="#available-options" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">DefaultParallelMode</span></code></dt><dd><p>Uses the default execution strategy defined by Rockable.
+Typically mapped to the most stable or recommended mode depending on the build configuration.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">InteractionBuffer</span></code></dt><dd><p>Uses an intermediate buffer to store interactions before applying updates.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">CellMutex</span></code></dt><dd><p>Assigns one thread per cell and protects shared data using mutexes.
+Simple and safe, but may introduce synchronization overhead.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">WaveMethod</span></code></dt><dd><p>Uses a wave-based decomposition with 27 waves.
+One thread processes one cell without mutexes, relying on a structured traversal order to avoid conflicts.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">WaveMethodBlock</span></code></dt><dd><p>Similar to <code class="docutils literal notranslate"><span class="pre">WaveMethod</span></code> but operates on blocks of at least 8 cells.
+Uses an 8-wave decomposition and improves cache efficiency while maintaining lock-free execution.</p>
+</dd>
+</dl>
+</section>
+<section id="input-keyword">
+<h3>Input keyword<a class="headerlink" href="#input-keyword" title="Link to this heading"></a></h3>
+<p>The input parameter <code class="docutils literal notranslate"><span class="pre">parallel_mode</span></code> is parsed from string values.</p>
+<p>Accepted keywords are <strong>exactly identical</strong> to the enum names:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">DefaultParallelMode</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">InteractionBuffer</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CellMutex</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">WaveMethod</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">WaveMethodBlock</span></code></p></li>
+</ul>
+</section>
+<section id="example">
+<h3>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">parallel_mode WaveMethodBlock</span>
+</pre></div>
+</div>
+</section>
 </section>
 <section id="configuration-backups">
 <h2>Configuration Backups<a class="headerlink" href="#configuration-backups" title="Link to this heading"></a></h2>
