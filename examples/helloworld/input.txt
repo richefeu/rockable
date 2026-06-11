@@ -1,5 +1,7 @@
 Rockable 21-08-2022
 
+#parallel_mode DefaultParallelMode
+
 #### time #############################
 t 0
 tmax 1.0

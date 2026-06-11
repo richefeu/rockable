@@ -193,9 +193,9 @@ int main(int argc, char const* argv[]) {
     return 0;
   }
 
-  box.setVerboseLevel(verboseLevel);
-  box.console_run(confFileName);
+  box.setVerboseLevel(verboseLevel);  
   box.setOpenMPThreads(nbThreads);
+  box.console_run(confFileName);
 
   // In case -r and -n arguments have been used
   if (!(newconf == "") && !(regconf == "")) {
