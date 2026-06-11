@@ -79,10 +79,10 @@ void stickVerticesInClusters::exec() {
 
         for (size_t iv = 0; iv < box->Particles[i].shape->vertex.size(); iv++) {
           vec3r Vi = box->Particles[i].GlobVertex(iv);
-          double Ri = box->Particles[i].MinskowskiRadius();
+          double Ri = box->Particles[i].MinkowskiRadius();
           for (size_t jv = 0; jv < box->Particles[j].shape->vertex.size(); jv++) {
             vec3r Vj = box->Particles[j].GlobVertex(jv);
-            double Rj = box->Particles[j].MinskowskiRadius();
+            double Rj = box->Particles[j].MinkowskiRadius();
 
             double distSqr = norm2(Vj - Vi);
             double dMaxSqr = epsilonDist + (Ri + Rj);

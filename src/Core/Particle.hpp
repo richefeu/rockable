@@ -112,7 +112,7 @@ class Particle {
   vec3r Glob(vec3r& pos) const;
   vec3r GlobVertex(size_t v) const;
   vec3r GlobFaceVertex(size_t f, size_t v) const;
-  double MinskowskiRadius() const;
+  double MinkowskiRadius() const;
 
   void updateObb();
 

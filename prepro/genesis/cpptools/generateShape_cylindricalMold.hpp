@@ -39,7 +39,7 @@
 #include <cmath>
 #include <iostream>
 
-// radius = Minskowski radius
+// radius = Minkowski radius
 // height = internal height
 // Rin = internal radius
 // The origin coordinate is at the bottom inside

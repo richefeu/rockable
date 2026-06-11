@@ -75,7 +75,7 @@ class Shape {
   char preCompDone{'n'};    ///< Can be 'n' or 'y' to allow or not (resp.) the
                             ///< numerical computation of mass center, volume and I/m
   bool isSurface{false};    ///< If true, the shape is a surface (not a volume formed by a polyedron)
-  double radius{0.0};       ///< Minskowski radius
+  double radius{0.0};       ///< Minkowski radius
   double volume{0.0};       ///< Volume
   vec3r inertia_mass;       ///< Diagonal terms of the matrix of inertia/mass (in the principal framework)
   OBB obb;                  ///< Oriented Bounding Box

@@ -13,9 +13,9 @@ To run a simulation, we need that all required shapes are defined in a single sh
 
   The name of the shape (without space). When the particles are listed in a conf-file, its shape is referred to as this defined keyword
   
-- ``radius`` (*double*) **MinskowskiRadius**
+- ``radius`` (*double*) **MinkowskiRadius**
 
-  The radius of the rounded edges (so-called Minskowski radius) of the shape (there is only one radius per sphero-polyhedron)
+  The radius of the rounded edges (so-called Minkowski radius) of the shape (there is only one radius per sphero-polyhedron)
   
 - ``preCompDone`` ``y`` or ``n``
 
