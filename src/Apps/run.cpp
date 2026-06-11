@@ -194,15 +194,8 @@ int main(int argc, char const* argv[]) {
   }
 
   box.setVerboseLevel(verboseLevel);
-
-#ifdef _OPENMP
-  omp_set_num_threads(nbThreads);
-  Logger::info("OpenMP acceleration (Number of threads = {})", nbThreads);
-#else
-  Logger::info("No multithreading (compiled without OpenMP)");
-#endif
-
   box.console_run(confFileName);
+  box.setOpenMPThreads(nbThreads);
 
   // In case -r and -n arguments have been used
   if (!(newconf == "") && !(regconf == "")) {

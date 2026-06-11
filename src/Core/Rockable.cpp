@@ -461,6 +461,7 @@ void Rockable::saveConf(const char* fname) {
   conf << "interConf " << interConf << '\n';
   conf << "DVerlet " << DVerlet << '\n';
   conf << "dVerlet " << dVerlet << '\n';
+  conf << "parallel_mode " << to_string(parallel_mode) << '\n';
   for (size_t grp = 0; grp < properties.ngroup; grp++) {
     double density = properties.get(idDensity, grp);
     if (density > 0.0) {
@@ -658,6 +659,7 @@ void Rockable::initParser() {
   parser.kwMap["interConf"] = __GET__(conf, interConf);
   parser.kwMap["DVerlet"] = __GET__(conf, DVerlet);
   parser.kwMap["dVerlet"] = __GET__(conf, dVerlet);
+  parser.kwMap["parallel_mode"] = __GET__(conf, parallel_mode);
   parser.kwMap["density"] = __DO__(conf) {
     size_t grp;
     double density;
@@ -3620,28 +3622,28 @@ void Rockable::accelerations() {
   }
 
   bool noActiveInteraction;
-  switch (mode) {
-    case 0: {
+  switch (parallel_mode) {
+    case ParallelMode::DefaultParallelMode: {
       build_activeInteractions();
       compute_forces_and_moments();
       compute_resultants();
     } break;
 
-    case 1: {
+    case ParallelMode::InteractionBuffer: {
       noActiveInteraction = computeInterArray();
       if (!noActiveInteraction) {
         computeForcesAndMoments();
       }
     } break;
 
-    case 2: {
+    case ParallelMode::CellMutex: {
       noActiveInteraction = computeInterArray();
       if (!noActiveInteraction) {
         m_traversals.applyKernelMutexes(apply_forces_mutexes, testInter);
       }
     } break;
 
-    case 3: {
+    case ParallelMode::WaveMethod: {
       noActiveInteraction = computeInterArray();
       if (!noActiveInteraction) {
         m_traversals.applyKernel(apply_forces, testInter);
@@ -3649,7 +3651,7 @@ void Rockable::accelerations() {
       }
     } break;
 
-    case 4: {
+    case ParallelMode::WaveMethodBlock: {
       noActiveInteraction = computeInterArray();
       if (!noActiveInteraction) {
         m_traversals.applyKernelBlock(apply_forces, testInter);
