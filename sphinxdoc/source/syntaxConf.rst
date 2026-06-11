@@ -88,6 +88,55 @@ Neighbor List (NL)
   - ``angleUpdateNL`` (*double*) **angleDegree**
 
 
+Parallel mode
+-------------
+
+The ``parallel_mode`` parameter controls the parallel execution strategy used by Rockable for force computation and interaction handling.
+It defines how work is distributed across threads and how memory conflicts are handled during updates.
+
+Available options
+~~~~~~~~~~~~~~~~~
+
+``DefaultParallelMode``
+    Uses the default execution strategy defined by Rockable.  
+    Typically mapped to the most stable or recommended mode depending on the build configuration.
+
+``InteractionBuffer``
+    Uses an intermediate buffer to store interactions before applying updates.  
+
+``CellMutex``
+    Assigns one thread per cell and protects shared data using mutexes.  
+    Simple and safe, but may introduce synchronization overhead.
+
+``WaveMethod``
+    Uses a wave-based decomposition with 27 waves.  
+    One thread processes one cell without mutexes, relying on a structured traversal order to avoid conflicts.
+
+``WaveMethodBlock``
+    Similar to ``WaveMethod`` but operates on blocks of at least 8 cells.  
+    Uses an 8-wave decomposition and improves cache efficiency while maintaining lock-free execution.
+
+Input keyword
+~~~~~~~~~~~~~
+
+The input parameter ``parallel_mode`` is parsed from string values.
+
+Accepted keywords are **exactly identical** to the enum names:
+
+- ``DefaultParallelMode``
+- ``InteractionBuffer``
+- ``CellMutex``
+- ``WaveMethod``
+- ``WaveMethodBlock``
+
+Example
+~~~~~~~
+
+.. code-block:: yaml
+
+    parallel_mode WaveMethodBlock
+
+
 Configuration Backups
 ---------------------
 
