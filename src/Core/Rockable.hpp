@@ -92,6 +92,7 @@
 #include "ProfilingTools.hpp"
 #include "SpringJoint.hpp"
 #include "clusterParticles.hpp"
+#include "ParallelMode.hpp"
 
 #include "MutexVector.hpp"
 #include "Traversals.hpp"
@@ -155,6 +156,10 @@ class Rockable {
   // Neighbor list
   double DVerlet{0.0};  ///< Distance of Verlet for obb intersections
   double dVerlet{0.0};  ///< Distance of Verlet for sub-body proximities
+
+
+  // Parallel mode
+  ParallelMode parallel_mode = ParallelMode::DefaultParallelMode;   ///< Define the parallel strategy (OpenMP)
 
   // Mechanical properties
   Properties properties;  ///< Density of the particles (defined by group)
