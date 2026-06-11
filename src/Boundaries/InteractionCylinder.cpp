@@ -49,7 +49,7 @@ bool InteractionCylinder::update(Boundary* Bi, Particle& Pj) {
   vec3r posj = Pj.GlobVertex(isub);
   vec3r pos_ij = posi - posj;  // from j to i
   double Ri = Pi->rCyl;
-  double Rj = Pj.MinskowskiRadius();
+  double Rj = Pj.MinkowskiRadius();
 
   prev_n = n;
   vec3r N = pos_ij - dot(pos_ij, Pi->nCyl) * Pi->nCyl;

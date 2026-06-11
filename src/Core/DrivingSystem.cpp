@@ -249,12 +249,12 @@ void DrivingSystem::read(bool allow_warn) {
           is >> pressure;
 
           ServoFunction = [icontr, idXmin, idXmax, idYmin, idYmax, idZmin, idZmax, pressure](Rockable& box) -> void {
-            const double Xmin = box.Particles[idXmin].pos.x + box.Particles[idXmin].MinskowskiRadius();
-            const double Xmax = box.Particles[idXmax].pos.x - box.Particles[idXmax].MinskowskiRadius();
-            const double Ymin = box.Particles[idYmin].pos.y + box.Particles[idYmin].MinskowskiRadius();
-            const double Ymax = box.Particles[idYmax].pos.y - box.Particles[idYmax].MinskowskiRadius();
-            const double Zmin = box.Particles[idZmin].pos.z + box.Particles[idZmin].MinskowskiRadius();
-            const double Zmax = box.Particles[idZmax].pos.z - box.Particles[idZmax].MinskowskiRadius();
+            const double Xmin = box.Particles[idXmin].pos.x + box.Particles[idXmin].MinkowskiRadius();
+            const double Xmax = box.Particles[idXmax].pos.x - box.Particles[idXmax].MinkowskiRadius();
+            const double Ymin = box.Particles[idYmin].pos.y + box.Particles[idYmin].MinkowskiRadius();
+            const double Ymax = box.Particles[idYmax].pos.y - box.Particles[idYmax].MinkowskiRadius();
+            const double Zmin = box.Particles[idZmin].pos.z + box.Particles[idZmin].MinkowskiRadius();
+            const double Zmax = box.Particles[idZmax].pos.z - box.Particles[idZmax].MinkowskiRadius();
             const double dX = fabs(Xmax - Xmin);
             const double dY = fabs(Ymax - Ymin);
             const double dZ = fabs(Zmax - Zmin);
@@ -279,12 +279,12 @@ void DrivingSystem::read(bool allow_warn) {
           controls[icontr + 3].value = -velocity;
           ServoFunction = [icontr, idXmin, idXmax, idYmin, idYmax, idZmin, idZmax, pressure,
                            velocity](Rockable& box) -> void {
-            const double Xmin = box.Particles[idXmin].pos.x + box.Particles[idXmin].MinskowskiRadius();
-            const double Xmax = box.Particles[idXmax].pos.x - box.Particles[idXmax].MinskowskiRadius();
-            const double Ymin = box.Particles[idYmin].pos.y + box.Particles[idYmin].MinskowskiRadius();
-            const double Ymax = box.Particles[idYmax].pos.y - box.Particles[idYmax].MinskowskiRadius();
-            const double Zmin = box.Particles[idZmin].pos.z + box.Particles[idZmin].MinskowskiRadius();
-            const double Zmax = box.Particles[idZmax].pos.z - box.Particles[idZmax].MinskowskiRadius();
+            const double Xmin = box.Particles[idXmin].pos.x + box.Particles[idXmin].MinkowskiRadius();
+            const double Xmax = box.Particles[idXmax].pos.x - box.Particles[idXmax].MinkowskiRadius();
+            const double Ymin = box.Particles[idYmin].pos.y + box.Particles[idYmin].MinkowskiRadius();
+            const double Ymax = box.Particles[idYmax].pos.y - box.Particles[idYmax].MinkowskiRadius();
+            const double Zmin = box.Particles[idZmin].pos.z + box.Particles[idZmin].MinkowskiRadius();
+            const double Zmax = box.Particles[idZmax].pos.z - box.Particles[idZmax].MinkowskiRadius();
             const double dX = fabs(Xmax - Xmin);
             const double dY = fabs(Ymax - Ymin);
             const double dZ = fabs(Zmax - Zmin);
@@ -327,12 +327,12 @@ void DrivingSystem::read(bool allow_warn) {
 
           ServoFunction = [icontr, idXmin, idXmax, idYmin, idYmax, idZmin, idZmax, xminValue, xmaxValue, yminValue,
                            ymaxValue, zminValue, zmaxValue](Rockable& box) -> void {
-            const double Xmin = box.Particles[idXmin].pos.x + box.Particles[idXmin].MinskowskiRadius();
-            const double Xmax = box.Particles[idXmax].pos.x - box.Particles[idXmax].MinskowskiRadius();
-            const double Ymin = box.Particles[idYmin].pos.y + box.Particles[idYmin].MinskowskiRadius();
-            const double Ymax = box.Particles[idYmax].pos.y - box.Particles[idYmax].MinskowskiRadius();
-            const double Zmin = box.Particles[idZmin].pos.z + box.Particles[idZmin].MinskowskiRadius();
-            const double Zmax = box.Particles[idZmax].pos.z - box.Particles[idZmax].MinskowskiRadius();
+            const double Xmin = box.Particles[idXmin].pos.x + box.Particles[idXmin].MinkowskiRadius();
+            const double Xmax = box.Particles[idXmax].pos.x - box.Particles[idXmax].MinkowskiRadius();
+            const double Ymin = box.Particles[idYmin].pos.y + box.Particles[idYmin].MinkowskiRadius();
+            const double Ymax = box.Particles[idYmax].pos.y - box.Particles[idYmax].MinkowskiRadius();
+            const double Zmin = box.Particles[idZmin].pos.z + box.Particles[idZmin].MinkowskiRadius();
+            const double Zmax = box.Particles[idZmax].pos.z - box.Particles[idZmax].MinkowskiRadius();
             const double dX = fabs(Xmax - Xmin);
             const double dY = fabs(Ymax - Ymin);
             const double dZ = fabs(Zmax - Zmin);
@@ -368,12 +368,12 @@ void DrivingSystem::read(bool allow_warn) {
           }
           ServoFunction = [icontr, idXmin, idXmax, idYmin, idYmax, idZmin, idZmax, pressure, LodeAngle,
                            sigRate](Rockable& box) -> void {
-            const double Xmin = box.Particles[idXmin].pos.x + box.Particles[idXmin].MinskowskiRadius();
-            const double Xmax = box.Particles[idXmax].pos.x - box.Particles[idXmax].MinskowskiRadius();
-            const double Ymin = box.Particles[idYmin].pos.y + box.Particles[idYmin].MinskowskiRadius();
-            const double Ymax = box.Particles[idYmax].pos.y - box.Particles[idYmax].MinskowskiRadius();
-            const double Zmin = box.Particles[idZmin].pos.z + box.Particles[idZmin].MinskowskiRadius();
-            const double Zmax = box.Particles[idZmax].pos.z - box.Particles[idZmax].MinskowskiRadius();
+            const double Xmin = box.Particles[idXmin].pos.x + box.Particles[idXmin].MinkowskiRadius();
+            const double Xmax = box.Particles[idXmax].pos.x - box.Particles[idXmax].MinkowskiRadius();
+            const double Ymin = box.Particles[idYmin].pos.y + box.Particles[idYmin].MinkowskiRadius();
+            const double Ymax = box.Particles[idYmax].pos.y - box.Particles[idYmax].MinkowskiRadius();
+            const double Zmin = box.Particles[idZmin].pos.z + box.Particles[idZmin].MinkowskiRadius();
+            const double Zmax = box.Particles[idZmax].pos.z - box.Particles[idZmax].MinkowskiRadius();
             const double dX = fabs(Xmax - Xmin);
             const double dY = fabs(Ymax - Ymin);
             const double dZ = fabs(Zmax - Zmin);

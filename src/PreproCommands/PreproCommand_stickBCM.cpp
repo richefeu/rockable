@@ -63,7 +63,7 @@ void stickBCM::exec() {
 
   for (size_t i = box->nDriven; i < box->Particles.size(); i++) {
 
-    double Ri = box->Particles[i].MinskowskiRadius();
+    double Ri = box->Particles[i].MinkowskiRadius();
     OBB obbi = box->Particles[i].obb;
     obbi.enlarge(0.6 * epsilonDist);
 
@@ -73,7 +73,7 @@ void stickBCM::exec() {
         continue;
       }
 
-      double Rj = box->Particles[j].MinskowskiRadius();
+      double Rj = box->Particles[j].MinkowskiRadius();
       OBB obbj = box->Particles[j].obb;
       obbj.enlarge(0.6 * epsilonDist);
 

@@ -148,8 +148,8 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
       // START_TIMER("UpdateVertexVertex");
       vec3r posi = Pi.GlobVertex(I.isub);
       vec3r posj = Pj.GlobVertex(I.jsub);
-      double Ri = Pi.MinskowskiRadius();
-      double Rj = Pj.MinskowskiRadius();
+      double Ri = Pi.MinkowskiRadius();
+      double Rj = Pj.MinkowskiRadius();
 
       I.prev_n = I.n;
       I.n = posi - posj;  // from j to i
@@ -183,8 +183,8 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
         return false;
       }
 
-      double Ri = Pi.MinskowskiRadius();
-      double Rj = Pj.MinskowskiRadius();
+      double Ri = Pi.MinkowskiRadius();
+      double Rj = Pj.MinkowskiRadius();
 
       I.prev_n = I.n;
       I.n = posi - (posj1 + r * E);  // from j to i
@@ -255,8 +255,8 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
       // ODD = 1 means that the projected point is inside the 3D-polygonal
       // face
       if (ODD) {
-        double Ri = Pi.MinskowskiRadius();
-        double Rj = Pj.MinskowskiRadius();
+        double Ri = Pi.MinkowskiRadius();
+        double Rj = Pj.MinkowskiRadius();
         I.prev_dn = I.dn;
         I.dn = dist - (Ri + Rj);
         I.pos = pos_iv - I.n * (Ri + 0.5 * I.dn);
@@ -314,8 +314,8 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
       }
 
       // from here n, s and t have been computed
-      double Ri = Pi.MinskowskiRadius();
-      double Rj = Pj.MinskowskiRadius();
+      double Ri = Pi.MinkowskiRadius();
+      double Rj = Pj.MinkowskiRadius();
       I.prev_dn = I.dn;
       I.dn = I.n.normalize() - (Ri + Rj);
       I.pos = posi1 + s * Ei - I.n * (Ri + 0.5 * I.dn);
@@ -335,8 +335,8 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
     [](Interaction& I, Particle& Pi, Particle& Pj) -> bool {
       vec3r posi = Pi.GlobVertex(I.isub);
       vec3r posj = Pj.GlobVertex(I.jsub) + I.jPeriodicShift;
-      double Ri = Pi.MinskowskiRadius();
-      double Rj = Pj.MinskowskiRadius();
+      double Ri = Pi.MinkowskiRadius();
+      double Rj = Pj.MinkowskiRadius();
 
       I.prev_n = I.n;
       I.n = posi - posj;  // from j to i
@@ -369,8 +369,8 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
         return false;
       }
 
-      double Ri = Pi.MinskowskiRadius();
-      double Rj = Pj.MinskowskiRadius();
+      double Ri = Pi.MinkowskiRadius();
+      double Rj = Pj.MinkowskiRadius();
 
       I.prev_n = I.n;
       I.n = posi - (posj1 + r * E);  // from j to i
@@ -441,8 +441,8 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
       // ODD = 1 means that the projected point is inside the 3D-polygonal
       // face
       if (ODD) {
-        double Ri = Pi.MinskowskiRadius();
-        double Rj = Pj.MinskowskiRadius();
+        double Ri = Pi.MinkowskiRadius();
+        double Rj = Pj.MinkowskiRadius();
         I.prev_dn = I.dn;
         I.dn = dist - (Ri + Rj);
         I.pos = pos_iv - I.n * (Ri + 0.5 * I.dn);
@@ -500,8 +500,8 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
       }
 
       // from here n, s and t have been computed
-      double Ri = Pi.MinskowskiRadius();
-      double Rj = Pj.MinskowskiRadius();
+      double Ri = Pi.MinkowskiRadius();
+      double Rj = Pj.MinkowskiRadius();
       I.prev_dn = I.dn;
       I.dn = I.n.normalize() - (Ri + Rj);
       I.pos = posi1 + s * Ei - I.n * (Ri + 0.5 * I.dn);
