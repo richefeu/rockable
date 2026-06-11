@@ -1,8 +1,7 @@
 #include "confedit.hpp"
 
 // TODO rename init_snippets()
-void init_completion() {
-  // comp["____"] = "____";
+void init_snippets() {
 
   comp["Time"] = "t _value_";
   comp["End time"] = "tmax _value_";
@@ -16,16 +15,16 @@ void init_completion() {
   comp["Gravity"] = "gravity _value_";
   comp["Parameters stored in the interfaces"] = "ParamsInInterfaces _0/1_";
   comp["Update NL dynamically"] = "dynamicUpdateNL _0/1_\ndispUpdateNL _distance_\nangleUpdateNL _angleDegree_";
-  comp["numericalDampingCoeff"] = "_____";
+  comp["numericalDampingCoeff"] = "numericalDampingCoeff _value_";
   comp["Velocity barriers"] =
       "VelocityBarrier _value_\n"
       "AngularVelocityBarrier _value_\n"
       "VelocityBarrierExponent _value_\n"
       "AngularVelocityBarrierExponent _value_\n";
 
-  comp["Tempo"] = "_____";
+  comp["Tempo"] = "Tempo NDCoeff _command_ _t1_ _t2_ _val1_ _val2_";
 
-  comp["force law"] = "forceLaw _Default/Avalanches/StickedLinks_";
+  comp["force law"] = "forceLaw _Default/Avalanche/StickedLinks/GeoVisc/BCM_";
 
   comp["Contact Parameters"] =
       "knContact _group1_ _group2_ _value_\n"
@@ -52,10 +51,27 @@ void init_completion() {
       "ft0OuterBond _group1_ _group2_ _value_\n"
       "mom0OuterBond _group1_ _group2_ _value_\n"
       "powOuterBond _group1_ _group2_ _value_\n";
+
+  comp["BCM bond fracture energy"] =
+      "gcInnerBond _group1_ _group2_ _value_\n"
+      "gcOuterBond _group1_ _group2_ _value_\n";
+
+  comp["Periodic cell"] =
+      "usePeriodicCell 1\n"
+      "h _xx_ _xy_ _xz_ _yx_ _yy_ _yz_ _zx_ _zy_ _zz_\n"
+      "vh 0 0 0 0 0 0 0 0 0\n"
+      "ah 0 0 0 0 0 0 0 0 0\n"
+      "mh _massRatio_\n"
+      "dh _damping_\n";
+
+  comp["Soft particles"] = "useSoftParticles _Young_ _Poisson_";
+
+  comp["Spring joint"] = "initSpringJoint _ibody_ _ix_ _iy_ _iz_ _jbody_ _jx_ _jy_ _jz_ _stiffness_";
+
+  comp["Prevent crossing"] = "preventCrossingLength _length_";
 }
 
 void init_documentation() {
-  // docu["___"] = "____";
 
   docu["Rockable"] =
       "A conf-file always starts with the header: Rockable dd-mm-yyyy (e.g., Rockable 20-02-2017).\n"
@@ -101,23 +117,106 @@ void init_documentation() {
   docu["angleUpdateNL"] =
       "angleUpdateNL [(double) angleDegree]\n\n"
       "The maximum angle that any body is allowed to rotate without updating the NL";
-  docu["numericalDampingCoeff"] = "_____";
-  docu["VelocityBarrier"] = "_____";
-  docu["AngularVelocityBarrier"] = "_____";
-  docu["VelocityBarrierExponent"] = "_____";
-  docu["AngularVelocityBarrierExponent"] = "_____";
-  docu["Tempo"] = "_____";
+  docu["numericalDampingCoeff"] =
+      "numericalDampingCoeff [(double) value]\n\n"
+      "Cundall non-viscous numerical damping coefficient (typically between 0 and 1).\n"
+      "At each step the accelerations are scaled by (1 - value) or (1 + value) depending\n"
+      "on whether they oppose or follow the velocity, which damps the motion.\n"
+      "Set to 0 to disable.";
+  docu["VelocityBarrier"] =
+      "VelocityBarrier [(double) value]\n\n"
+      "Reference translational velocity above which a barrier force progressively slows\n"
+      "the bodies down. The opposing force grows like (|v|/VelocityBarrier)^VelocityBarrierExponent.\n"
+      "Set to 0 (default) to disable.";
+  docu["AngularVelocityBarrier"] =
+      "AngularVelocityBarrier [(double) value]\n\n"
+      "Same as VelocityBarrier but applied to the angular velocity of the bodies.\n"
+      "Set to 0 (default) to disable.";
+  docu["VelocityBarrierExponent"] =
+      "VelocityBarrierExponent [(double) value]\n\n"
+      "Exponent used by the translational velocity barrier (see VelocityBarrier).\n"
+      "The larger the exponent, the sharper the barrier.";
+  docu["AngularVelocityBarrierExponent"] =
+      "AngularVelocityBarrierExponent [(double) value]\n\n"
+      "Exponent used by the angular velocity barrier (see AngularVelocityBarrier).";
+  docu["Tempo"] =
+      "Tempo [(string) target] ...\n\n"
+      "Defines a time-evolving ('tempo') parameter interpolated between two times.\n"
+      "Three forms are available:\n\n"
+      "  Tempo NDCoeff [command] [t1] [t2] [val1] [val2]\n"
+      "      drives the numericalDampingCoeff\n"
+      "  Tempo Inter [paramName] [group1] [group2] [command] [t1] [t2] [val1] [val2]\n"
+      "      drives an interaction parameter (e.g. knContact) between two groups\n"
+      "  Tempo Body [paramName] [group] [command] [t1] [t2] [val1] [val2]\n"
+      "      drives a body property (e.g. density) of a group\n\n"
+      "'command' selects the interpolation profile between (t1,val1) and (t2,val2).";
   docu["forceLaw"] =
       "forceLaw [(string)Name]\n\n"
       "Select a model for the computation of forces.\n"
-      "Possible Names are: 'Default', 'Avalanches' or 'StickedLinks'";
+      "Possible Names are: 'Default', 'Avalanche', 'StickedLinks', 'GeoVisc' or 'BCM'.";
 
-  docu["AddOrRemoveInteractions"] = "_____";
-  docu["UpdateNL"] = "_____";
-  docu["Integrator"] = "_____";
-  docu["cellMinSizes"] = "_____";
-  docu["boxForLinkCellsOpt"] = "_____";
-  docu["ContactPartnership"] = "_____";
+  docu["AddOrRemoveInteractions"] =
+      "AddOrRemoveInteractions [(string) Name]\n\n"
+      "Strategy used to detect which interactions must be created or deleted.\n"
+      "Possible Names are: 'bruteForce' (default) or 'OBBtree'.";
+  docu["UpdateNL"] =
+      "UpdateNL [(string) Name]\n\n"
+      "Strategy used to rebuild the neighbor list (NL).\n"
+      "Possible Names are: 'bruteForce' (default) or 'linkCells'.";
+  docu["Integrator"] =
+      "Integrator [(string) Name]\n\n"
+      "Time-integration scheme.\n"
+      "Possible Names are: 'velocityVerlet' (default), 'Euler', 'Beeman' or 'RungeKutta4'.";
+  docu["cellMinSizes"] =
+      "cellMinSizes [(double) value]\n\n"
+      "Minimum size of the cells used by the 'linkCells' neighbor-list strategy.";
+  docu["boxForLinkCellsOpt"] =
+      "boxForLinkCellsOpt [(int) 0/1]\n\n"
+      "Selects the bounding box used to build the link-cells grid.\n"
+      "0 (default): box surrounding all particles;\n"
+      "1: box surrounding only the free (non-driven) bodies.";
+  docu["ContactPartnership"] =
+      "ContactPartnership [(string) Name]\n\n"
+      "Model used to weight the contact stiffnesses when several sub-elements of two\n"
+      "bodies interact at once (used by some force laws).\n"
+      "Possible Names are: 'None' (default), 'NumberWeight', 'OverlapWeight' or 'SurfaceWeight'.";
+
+  docu["preventCrossingLength"] =
+      "preventCrossingLength [(double) value]\n\n"
+      "If positive, enables a safeguard that prevents bodies from crossing/tunneling\n"
+      "through each other when the overlap would exceed this characteristic length.";
+  docu["initSpringJoint"] =
+      "initSpringJoint [(int) ibody] [(vec3r) ipos0] [(int) jbody] [(vec3r) jpos0] [(double) stiffness]\n\n"
+      "Create a linear spring joint between bodies ibody and jbody, anchored at the\n"
+      "local positions ipos0 and jpos0, with the given stiffness.";
+  docu["PostProcessor"] =
+      "PostProcessor [(string) Name] ...\n\n"
+      "Adds a post-processor (used by the 'postpro' tool).\n"
+      "Possible Names are: 'ClusterGranulo' or 'ParticleStress'.\n"
+      "The remaining parameters depend on the chosen post-processor.";
+
+  // periodic cell
+  docu["usePeriodicCell"] =
+      "usePeriodicCell [0/1]\n\n"
+      "Enable (1) or disable (0) the periodic boundary cell.\n"
+      "Requires Rockable compiled with ROCKABLE_ENABLE_PERIODIC.";
+  docu["h"] =
+      "h [(mat9r) matrix]\n\n"
+      "The 3x3 matrix (9 components) defining the periodic cell (column vectors are the\n"
+      "periodicity vectors).";
+  docu["vh"] = "vh [(mat9r) matrix]\n\nTime derivative (velocity) of the periodic cell matrix 'h'.";
+  docu["ah"] = "ah [(mat9r) matrix]\n\nSecond time derivative (acceleration) of the periodic cell matrix 'h'.";
+  docu["mh"] = "mh [(double) value]\n\nMass ratio assigned to the periodic cell degrees of freedom.";
+  docu["dh"] = "dh [(double) value]\n\nNumerical damping applied to the periodic cell.";
+  docu["cellMomentumCorrection"] = "cellMomentumCorrection [0/1]\n\nEnable correction of the total momentum within the periodic cell.";
+  docu["cellVelocityCorrection"] = "cellVelocityCorrection [0/1]\n\nEnable correction of the velocities within the periodic cell.";
+  docu["useKineticStress"] = "useKineticStress [0/1]\n\nInclude the kinetic (velocity fluctuation) contribution in the stress of the periodic cell.";
+
+  // soft particles
+  docu["useSoftParticles"] =
+      "useSoftParticles [(double) Young] [(double) Poisson]\n\n"
+      "Enable deformable (soft) particles with the given Young modulus and Poisson ratio.\n"
+      "Requires Rockable compiled with ROCKABLE_ENABLE_SOFT_PARTICLES.";
 
   docu["knContact"] = "knContact [(int) group1] [(int) group2] [(double) value]";
   docu["en2Contact"] = "en2Contact [(int) group1] [(int) group2] [(double) value]";
@@ -142,6 +241,17 @@ void init_documentation() {
   docu["mom0OuterBond"] = "mom0OuterBond [(int) group1] [(int) group2] [(double) value]";
   docu["powOuterBond"] = "powOuterBond [(int) group1] [(int) group2] [(double) value]";
   docu["en2OuterBond"] = "en2OuterBond [(int) group1] [(int) group2] [(double) value]";
+
+  docu["krInnerBond"] = "krInnerBond [(int) group1] [(int) group2] [(double) value]";
+  docu["mom0InnerBond"] = "mom0InnerBond [(int) group1] [(int) group2] [(double) value]";
+  docu["gcInnerBond"] =
+      "gcInnerBond [(int) group1] [(int) group2] [(double) value]\n\n"
+      "Critical fracture energy (energy release rate Gc) of the inner bonds,\n"
+      "used by the BCM (Bonded Cell Model) force law.";
+  docu["gcOuterBond"] =
+      "gcOuterBond [(int) group1] [(int) group2] [(double) value]\n\n"
+      "Critical fracture energy (energy release rate Gc) of the outer bonds,\n"
+      "used by the BCM (Bonded Cell Model) force law.";
 
   docu["iconf"] =
       "iconf [(int) value]"
@@ -189,8 +299,17 @@ void init_documentation() {
       "   }\n"
       "   REPEAT FOR EACH BOND { [(int) type] [(int) isub] [(int) jsub] }\n"
       "}";
-  docu["DataExtractor"] = "____";
-  docu["BodyForce"] = "____";
+  docu["DataExtractor"] =
+      "DataExtractor [(string) Name] ...\n\n"
+      "Adds a data extractor that records quantities during the simulation.\n"
+      "Possible Names are: 'ClusterAABB', 'dnStat', 'DuoBalance', 'MeanVelocity' or 'TrackBody'.\n"
+      "The remaining parameters depend on the chosen extractor.\n"
+      "Kept for compatibility: prefer defining them in a file named 'dataExtractors.txt'.";
+  docu["BodyForce"] =
+      "BodyForce [(string) Name] ...\n\n"
+      "Activates a body force applied to the particles.\n"
+      "Possible Names are: 'AttractingPoint', 'PreferredDirection' or 'ViscousFluid'.\n"
+      "The remaining parameters depend on the chosen body force.";
 
   docu["stickVerticesInClusters"] =
       "stickVerticesInClusters [(double) Epsilon]\n\n"
@@ -201,17 +320,37 @@ void init_documentation() {
       "stickClusters [(double) Epsilon]\n\n"
       "This command will add glued interfaces between bodies having different cluster identifiers.\n"
       "Bonds are added when the distance is less than Epsilon.";
+  docu["stickVerticesInClustersMoments"] =
+      "stickVerticesInClustersMoments [(double) Epsilon]\n\n"
+      "Like stickVerticesInClusters, but the created bonds also transmit moments.\n"
+      "Bonds between vertices (spheres) of a same cluster are added when the distance\n"
+      "is less than Epsilon.";
+  docu["stickBCM"] =
+      "stickBCM [(double) Epsilon]\n\n"
+      "Create the bonded interfaces required by the BCM (Bonded Cell Model) force law\n"
+      "between neighboring sub-elements closer than Epsilon.";
 
   docu["copyParamsToInterfaces"] = "copyParamsToInterfaces [(string) isInnerStr]";
-  docu["setStiffnessRatioInterfaces"] = "____";
+  docu["setStiffnessRatioInterfaces"] =
+      "setStiffnessRatioInterfaces [(double) ratio]\n\n"
+      "Set the tangential-to-normal stiffness ratio kt/kn for every bond stored in the\n"
+      "glued interfaces (only for parameters that are embedded in the Interfaces).";
   docu["setVariableStickParams"] =
       "setVariableStickParams [(string) paramName] [(string) isInnerStr] [(double) lambda] [(double) m] [(int) "
       "timeSeeded]";
   docu["randomlyOrientedVelocities"] = "randomlyOrientedVelocities [(double) velocity]";
   docu["randomlyOrientedVelocitiesClusters"] = "randomlyOrientedVelocitiesClusters [(double) velocity] [(int) option]";
-  docu["setAllVelocities"] = "____";
-  docu["homothetyRange"] = "____";
-  docu["particlesClonage"] = "____";
+  docu["setAllVelocities"] =
+      "setAllVelocities [(vec3r) velocity]\n\n"
+      "Set the same velocity vector to ALL free (non-driven) bodies.";
+  docu["homothetyRange"] =
+      "homothetyRange [(int) idFirst] [(int) idLast] [(double) hmin] [(double) hmax] [(int) timeSeeded]\n\n"
+      "Assign to the bodies idFirst..idLast a homothety drawn from a uniform distribution\n"
+      "in [hmin, hmax]. If timeSeeded is 1, the random generator is seeded with the current time.";
+  docu["particlesClonage"] =
+      "particlesClonage [(int) idFirst] [(int) idLast] [(vec3r) translation]\n\n"
+      "Duplicate the bodies idFirst..idLast, shifting the clones by the translation vector.\n"
+      "The clones receive new cluster identifiers.";
 
   // driving system
   docu["Control"] =
@@ -224,7 +363,36 @@ void init_documentation() {
       "                     _xyzrot_Vel_, or _xyzrot_Mom_ \n\n"
       "This is a simple solution to impose a constant velocity or force/moment to a body.\n"
       "Notice that bodyNumber needs to be lower than 'nDriven'";
-  docu["Servo"] = "____";
+  docu["Servo"] =
+      "Servo [(string) Name] ...\n\n"
+      "Activates a predefined servo-controller that drives a set of walls/bodies.\n"
+      "The 'tritri*' servos (e.g. tritriIsostaticCompression, tritriBiaxialCompression,\n"
+      "tritriCustom, tritriLodeAngle) expect the 6 wall body numbers\n"
+      "(idXmin idXmax idYmin idYmax idZmin idZmax) followed by servo-specific parameters.\n"
+      "Other servos: shaker, triangle_shaker, sawtooth_shaker, ramp.\n"
+      "Servo commands are defined in the file 'drivingSystem.txt'.";
+  docu["PeriodicLoading"] =
+      "PeriodicLoading [(string) Name] ...\n\n"
+      "Drive the periodic cell with a predefined loading.\n"
+      "Example: 'PeriodicLoading IsotropicCompression [(double) pressure]'.\n"
+      "Defined in the file 'drivingSystem.txt'.";
+
+  // post-processing (postpro tool)
+  docu["PostProcessor"] =
+      "PostProcessor [(string) Name] ...\n\n"
+      "Adds a post-processor (used by the 'postpro' tool).\n"
+      "Possible Names are: 'ClusterGranulo' or 'ParticleStress'.";
+  docu["firstConf"] = "firstConf [(int) value]\n\nNumber of the first conf-file to post-process.";
+  docu["lastConf"] = "lastConf [(int) value]\n\nNumber of the last conf-file to post-process.";
+  docu["stepConf"] = "stepConf [(int) value]\n\nStep between two processed conf-files.";
+  docu["SievingSizes"] =
+      "SievingSizes [(int) nb] [(double) size1] [(double) size2] ...\n\n"
+      "List of nb sieving sizes used by the ClusterGranulo post-processor.";
+  docu["ConfVolumes"] =
+      "ConfVolumes [(int) nb]\n"
+      "REPEAT nb TIMES { [(int) iconf] [(double) volume] }\n\n"
+      "Per-conf reference volumes used by the ParticleStress post-processor.";
+  docu["Volume"] = "Volume [(double) value]\n\nReference volume used by the ParticleStress post-processor.";
 
   // shape
   docu["name"] =
@@ -249,14 +417,42 @@ void init_documentation() {
   docu["obb.e1"] = "obb.e1 [(vec3r) e1]\n\nExtent unit vector in the first direction";
   docu["obb.e2"] = "obb.e2 [(vec3r) e2]\n\nExtent unit vector in the second direction";
   docu["obb.e3"] = "obb.e3 [(vec3r) e3]\n\nExtent unit vector in the third direction";
+  docu["fibObbOption"] =
+      "fibObbOption [(int) option]\n\n"
+      "Algorithm used to build the OBB of the shape:\n"
+      "  0: covariance-based orientation\n"
+      "  1: minimum-volume strategy\n"
+      "  2: OBB aligned with the axes (AABB) [default]\n"
+      "  3: imposed axis";
   docu["OBBtreeLevel"] = "DEPRECATED!!";
-  docu["position"] = "____";
-  docu["orientation"] = "____";
-  docu["isSurface"] = "____";
-  docu["MCnstep"] = "____";
-  docu["nv"] = "____";
-  docu["ne"] = "____";
-  docu["nf"] = "____";
+  docu["position"] =
+      "position [(vec3r) center]\n\n"
+      "Position of the mass center of the shape, expressed in the local frame of the shape.\n"
+      "Usually computed automatically (Monte-Carlo integration) when preCompDone is 'n'.";
+  docu["orientation"] =
+      "orientation [(quat) Q]\n\n"
+      "Angular position (quaternion) of the principal-inertia frame of the shape.\n"
+      "Usually computed automatically when preCompDone is 'n'.";
+  docu["isSurface"] =
+      "isSurface\n\n"
+      "Flag (no value) marking the shape as an open surface rather than a closed volume.";
+  docu["MCnstep"] =
+      "MCnstep [(int) value]\n\n"
+      "Number of steps used in the Monte-Carlo integration of the mass properties\n"
+      "(volume, mass center, inertia). Clamped internally to the range [1000, 10000000].";
+  docu["nv"] =
+      "nv [(int) numberOfVertices]\n\n"
+      "REPEAT FOR EACH VERTEX { [(vec3r) position] }\n"
+      "List of the vertices (sphero-points) of the shape, in the local frame.";
+  docu["ne"] =
+      "ne [(int) numberOfEdges]\n\n"
+      "REPEAT FOR EACH EDGE { [(int) fromVertex] [(int) toVertex] }\n"
+      "List of the edges (sphero-segments) connecting two vertices.";
+  docu["nf"] =
+      "nf [(int) numberOfFaces]\n\n"
+      "REPEAT FOR EACH FACE { [(int) nbNodes] [(int) node1] [(int) node2] ... }\n"
+      "List of the faces (sphero-polygons), each given by its number of nodes\n"
+      "followed by the corresponding vertex indices.";
 }
 
 void init_keywords() {
@@ -272,7 +468,7 @@ void init_keywords() {
   code_keywords.insert(std::string("dVerlet"));
   code_keywords.insert(std::string("density"));
   code_keywords.insert(std::string("gravity"));
-  code_keywords.insert(std::string("paramsInInterfaces"));
+  code_keywords.insert(std::string("ParamsInInterfaces"));
   code_keywords.insert(std::string("dynamicUpdateNL"));
   code_keywords.insert(std::string("dispUpdateNL"));
   code_keywords.insert(std::string("angleUpdateNL"));
@@ -289,6 +485,23 @@ void init_keywords() {
   code_keywords.insert(std::string("cellMinSizes"));
   code_keywords.insert(std::string("boxForLinkCellsOpt"));
   code_keywords.insert(std::string("ContactPartnership"));
+  code_keywords.insert(std::string("preventCrossingLength"));
+  code_keywords.insert(std::string("initSpringJoint"));
+  code_keywords.insert(std::string("PostProcessor"));
+
+  // periodic cell (requires Rockable compiled with ROCKABLE_ENABLE_PERIODIC)
+  code_keywords.insert(std::string("usePeriodicCell"));
+  code_keywords.insert(std::string("h"));
+  code_keywords.insert(std::string("vh"));
+  code_keywords.insert(std::string("ah"));
+  code_keywords.insert(std::string("mh"));
+  code_keywords.insert(std::string("dh"));
+  code_keywords.insert(std::string("cellMomentumCorrection"));
+  code_keywords.insert(std::string("cellVelocityCorrection"));
+  code_keywords.insert(std::string("useKineticStress"));
+
+  // soft particles (requires Rockable compiled with ROCKABLE_ENABLE_SOFT_PARTICLES)
+  code_keywords.insert(std::string("useSoftParticles"));
 
   code_keywords.insert(std::string("knContact"));
   code_keywords.insert(std::string("en2Contact"));
@@ -302,9 +515,12 @@ void init_keywords() {
   code_keywords.insert(std::string("knInnerBond"));
   code_keywords.insert(std::string("en2InnerBond"));
   code_keywords.insert(std::string("ktInnerBond"));
+  code_keywords.insert(std::string("krInnerBond"));
   code_keywords.insert(std::string("fn0InnerBond"));
   code_keywords.insert(std::string("ft0InnerBond"));
+  code_keywords.insert(std::string("mom0InnerBond"));
   code_keywords.insert(std::string("powInnerBond"));
+  code_keywords.insert(std::string("gcInnerBond"));
 
   code_keywords.insert(std::string("knOuterBond"));
   code_keywords.insert(std::string("ktOuterBond"));
@@ -314,6 +530,7 @@ void init_keywords() {
   code_keywords.insert(std::string("mom0OuterBond"));
   code_keywords.insert(std::string("powOuterBond"));
   code_keywords.insert(std::string("en2OuterBond"));
+  code_keywords.insert(std::string("gcOuterBond"));
 
   code_keywords.insert(std::string("iconf"));
   code_keywords.insert(std::string("nDriven"));
@@ -331,7 +548,9 @@ void init_keywords() {
 
   // processing
   code_keywords.insert(std::string("stickVerticesInClusters"));
+  code_keywords.insert(std::string("stickVerticesInClustersMoments"));
   code_keywords.insert(std::string("stickClusters"));
+  code_keywords.insert(std::string("stickBCM"));
   code_keywords.insert(std::string("copyParamsToInterfaces"));
   code_keywords.insert(std::string("setStiffnessRatioInterfaces"));
   code_keywords.insert(std::string("setVariableStickParams"));
@@ -344,6 +563,16 @@ void init_keywords() {
   // driving system
   code_keywords.insert(std::string("Control"));
   code_keywords.insert(std::string("Servo"));
+  code_keywords.insert(std::string("PeriodicLoading"));
+
+  // post-processing (postpro tool input files)
+  code_keywords.insert(std::string("PostProcessor"));
+  code_keywords.insert(std::string("firstConf"));
+  code_keywords.insert(std::string("lastConf"));
+  code_keywords.insert(std::string("stepConf"));
+  code_keywords.insert(std::string("ConfVolumes"));
+  code_keywords.insert(std::string("SievingSizes"));
+  code_keywords.insert(std::string("Volume"));
 
   // shapes
   code_keywords.insert(std::string("name"));
@@ -356,6 +585,7 @@ void init_keywords() {
   code_keywords.insert(std::string("obb.e1"));
   code_keywords.insert(std::string("obb.e2"));
   code_keywords.insert(std::string("obb.e3"));
+  code_keywords.insert(std::string("fibObbOption"));
   code_keywords.insert(std::string("OBBtreeLevel"));
   code_keywords.insert(std::string("position"));
   code_keywords.insert(std::string("orientation"));
@@ -380,9 +610,10 @@ void init_types() {
 
   // force laws
   code_types.insert(std::string("Default"));
-  code_types.insert(std::string("Avalanches"));
+  code_types.insert(std::string("Avalanche"));
   code_types.insert(std::string("StickedLinks"));
   code_types.insert(std::string("GeoVisc"));
+  code_types.insert(std::string("BCM"));
 
   // add or remove interaction
   code_types.insert(std::string("bruteForce"));
@@ -390,6 +621,12 @@ void init_types() {
 
   // updateNL
   code_types.insert(std::string("linkCells"));
+
+  // contact partnership models
+  code_types.insert(std::string("None"));
+  code_types.insert(std::string("NumberWeight"));
+  code_types.insert(std::string("OverlapWeight"));
+  code_types.insert(std::string("SurfaceWeight"));
 
   // integrator
   code_types.insert(std::string("velocityVerlet"));
@@ -408,6 +645,12 @@ void init_types() {
   code_types.insert(std::string("DuoBalance"));
   code_types.insert(std::string("MeanVelocity"));
   code_types.insert(std::string("TrackBody"));
+  code_types.insert(std::string("TrackDamage"));
+  code_types.insert(std::string("TrackRockfall"));
+
+  // post-processors
+  code_types.insert(std::string("ClusterGranulo"));
+  code_types.insert(std::string("ParticleStress"));
 
   // controls (driving system)
   code_types.insert(std::string("_x_Vel_"));
@@ -436,50 +679,51 @@ void init_types() {
   code_types.insert(std::string("ramp"));
 }
 
+// Returns the stream's current offset, clamped to [0, length]. std::istream
+// returns -1 from tellg() once EOF has been reached (e.g. after extracting the
+// last token of a buffer without a trailing separator); without this clamp the
+// computed offsets go negative and we write style[] out of bounds.
+static int stream_pos(std::istream& is, int length) {
+  std::streampos p = is.tellg();
+  if (p == std::streampos(-1)) return length;
+  int pos = static_cast<int>(p);
+  if (pos < 0) return 0;
+  if (pos > length) return length;
+  return pos;
+}
+
 void style_parse(const char* text, char* style, int length) {
   for (int i = 0; i < length; i++) {
     if (text[i] != '\n') {
       style[i] = 'A';
     }
   }
-  std::istringstream is((char*)text);
+  std::istringstream is(std::string(text, length));
 
   std::string token;
-  is >> token;
-
-  while (is.good()) {
+  while (is >> token) {
+    int to = stream_pos(is, length);
+    int from = to - static_cast<int>(token.size());
+    if (from < 0) from = 0;
 
     if (token[0] == '/' || token[0] == '#' || token[0] == '!') {
-      int from = is.tellg();
-      from -= token.size();
       getline(is, token);  // ignore the rest of the current line
-      int to = is.tellg();
-      for (int pos = from; pos < to; pos++) {
+      int lineEnd = stream_pos(is, length);
+      for (int pos = from; pos < lineEnd; pos++) {
         style[pos] = 'B';
       }
-      is >> token;  // next token before continuing
       continue;
-    } else {
-      std::set<std::string>::iterator it = code_keywords.find(token);
-      if (it != code_keywords.end()) {
-        int to = is.tellg();
-        int from = to - token.size();
-        for (int pos = from; pos < to; pos++) {
-          style[pos] = 'D';
-        }
-      } else {
-        std::set<std::string>::iterator ittype = code_types.find(token);
-        if (ittype != code_types.end()) {
-          int to = is.tellg();
-          int from = to - token.size();
-          for (int pos = from; pos < to; pos++) {
-            style[pos] = 'C';
-          }
-        }
-      }
     }
 
-    is >> token;
+    if (code_keywords.find(token) != code_keywords.end()) {
+      for (int pos = from; pos < to; pos++) {
+        style[pos] = 'D';
+      }
+    } else if (code_types.find(token) != code_types.end()) {
+      for (int pos = from; pos < to; pos++) {
+        style[pos] = 'C';
+      }
+    }
   }  // while
 }
 
@@ -511,8 +755,7 @@ void style_update(int pos,                      // I - Position of update
                   void* cbArg) {                // I - Callback data
   int start,                                    // Start of text
       end;                                      // End of text
-  char last,                                    // Last style on line
-      *style,                                   // Style data
+  char *style,                                  // Style data
       *text;                                    // Text data
 
   // If this is just a selection change, just unselect the style buffer...
@@ -539,43 +782,19 @@ void style_update(int pos,                      // I - Position of update
   // callbacks...
   stylebuf->select(pos, pos + nInserted - nDeleted);
 
-  // Re-parse the changed region; we do this by parsing from the
-  // beginning of the previous line of the changed region to the end of
-  // the line of the changed region...  Then we check the last
-  // style character and keep updating if we have a multi-line
-  // comment character...
+  // Re-parse only the line(s) touched by the change. The Rockable conf format
+  // has no multi-line constructs (comments end at the line), so a line's style
+  // depends solely on its own content; there is no need to reparse the rest of
+  // the buffer, which would be very slow on large files.
   start = textbuf->line_start(pos);
-  //  if (start > 0) start = textbuf->line_start(start - 1);
   end = textbuf->line_end(pos + nInserted);
   text = textbuf->text_range(start, end);
   style = stylebuf->text_range(start, end);
-  if (start == end) {
-    last = 0;
-  } else {
-    last = style[end - start - 1];
-  }
 
   style_parse(text, style, end - start);
 
   stylebuf->replace(start, end, style);
   ((Fl_Text_Editor*)cbArg)->redisplay_range(start, end);
-
-  if (start == end || last != style[end - start - 1]) {
-    // Either the user deleted some text, or the last character
-    // on the line changed styles, so reparse the
-    // remainder of the buffer...
-    free(text);
-    free(style);
-
-    end = textbuf->length();
-    text = textbuf->text_range(start, end);
-    style = stylebuf->text_range(start, end);
-
-    style_parse(text, style, end - start);
-
-    stylebuf->replace(start, end, style);
-    ((Fl_Text_Editor*)cbArg)->redisplay_range(start, end);
-  }
 
   free(text);
   free(style);
@@ -704,7 +923,7 @@ void load_file(const char* newfile, int ipos) {
   int insert = (ipos != -1);
   changed = insert;
   if (!insert) {
-    strcpy(filename, "");
+    filename[0] = '\0';
   }
   int r;
   if (!insert) {
@@ -716,7 +935,7 @@ void load_file(const char* newfile, int ipos) {
   if (r) {
     fl_alert("Error reading from file \'%s\':\n%s.", newfile, strerror(errno));
   } else if (!insert) {
-    strcpy(filename, newfile);
+    snprintf(filename, sizeof(filename), "%s", newfile);
   }
   loading = 0;
   textbuf->call_modify_callbacks();
@@ -726,7 +945,7 @@ void save_file(const char* newfile) {
   if (textbuf->savefile(newfile)) {
     fl_alert("Error writing to file \'%s\':\n%s.", newfile, strerror(errno));
   } else {
-    strcpy(filename, newfile);
+    snprintf(filename, sizeof(filename), "%s", newfile);
   }
   changed = 0;
   textbuf->call_modify_callbacks();
@@ -778,7 +997,7 @@ void find_cb(Fl_Widget* w, void* v) {
   val = fl_input("Search String:", e->search);
   if (val != NULL) {
     // User entered a string - go find it!
-    strcpy(e->search, val);
+    snprintf(e->search, sizeof(e->search), "%s", val);
     find2_cb(w, v);
   }
 }
@@ -805,7 +1024,7 @@ void find2_cb(Fl_Widget* w, void* v) {
 
 void set_title(Fl_Window* w) {
   if (filename[0] == '\0') {
-    strcpy(title, "Untitled");
+    snprintf(title, sizeof(title), "Untitled");
   } else {
     char* slash;
     slash = strrchr(filename, '/');
@@ -815,14 +1034,15 @@ void set_title(Fl_Window* w) {
     }
 #endif
     if (slash != NULL) {
-      strcpy(title, slash + 1);
+      snprintf(title, sizeof(title), "%s", slash + 1);
     } else {
-      strcpy(title, filename);
+      snprintf(title, sizeof(title), "%s", filename);
     }
   }
 
   if (changed) {
-    strcat(title, " (modified)");
+    size_t len = strlen(title);
+    snprintf(title + len, sizeof(title) - len, " (modified)");
   }
 
   w->label(title);
@@ -834,6 +1054,7 @@ void changed_cb(int, int nInserted, int nDeleted, int, const char*, void* v) {
   }
   EditorWindow* w = (EditorWindow*)v;
   set_title(w);
+  update_status(w);
   if (loading) {
     w->editor->show_insert_position();
   }
@@ -1032,22 +1253,194 @@ void view_cb(Fl_Widget*, void*) {
   w->show();
 }
 
+void goto_start_cb(Fl_Widget*, void* v) {
+  EditorWindow* e = (EditorWindow*)v;
+  e->editor->insert_position(0);
+  e->editor->show_insert_position();
+}
+
+void goto_end_cb(Fl_Widget*, void* v) {
+  EditorWindow* e = (EditorWindow*)v;
+  e->editor->insert_position(textbuf->length());
+  e->editor->show_insert_position();
+}
+
+void goto_line_cb(Fl_Widget*, void* v) {
+  EditorWindow* e = (EditorWindow*)v;
+  const char* val = fl_input("Go to line:", "1");
+  if (val == NULL) {
+    return;
+  }
+  int line = atoi(val);
+  if (line < 1) {
+    line = 1;
+  }
+  // skip_lines(0, line - 1) returns the buffer position at the start of 'line'
+  int pos = textbuf->skip_lines(0, line - 1);
+  e->editor->insert_position(pos);
+  e->editor->show_insert_position();
+}
+
+// ----- Status bar -----------------------------------------------------------
+
+void update_status(EditorWindow* w) {
+  if (!w || !w->status || !w->editor) {
+    return;
+  }
+  int pos = w->editor->insert_position();
+  int line = textbuf->count_lines(0, pos) + 1;
+  int col = pos - textbuf->line_start(pos) + 1;
+  char buf[128];
+  snprintf(buf, sizeof(buf), "  Ln %d, Col %d  |  %d chars", line, col, textbuf->length());
+  w->status->copy_label(buf);
+}
+
+int ConfTextEditor::handle(int e) {
+  int r = Fl_Text_Editor::handle(e);
+  update_status(win);
+  return r;
+}
+
+// ----- Theme ----------------------------------------------------------------
+
+int dark_mode = 1;  // dark is the default theme
+
+void apply_theme_to_editor(Fl_Text_Editor* ed) {
+  if (dark_mode) {
+    ed->color(fl_rgb_color(30, 30, 30));
+    ed->textcolor(fl_rgb_color(220, 220, 220));
+    ed->selection_color(fl_rgb_color(60, 90, 140));
+    ed->cursor_color(fl_rgb_color(80, 170, 255));
+    ed->linenumber_bgcolor(fl_rgb_color(58, 58, 58));
+    ed->linenumber_fgcolor(fl_rgb_color(140, 140, 140));
+  } else {
+    ed->color(FL_WHITE);
+    ed->textcolor(fl_rgb_color(30, 30, 30));
+    ed->selection_color(fl_rgb_color(180, 210, 255));
+    ed->cursor_color(fl_rgb_color(0, 120, 215));
+    ed->linenumber_bgcolor(fl_rgb_color(240, 240, 240));
+    ed->linenumber_fgcolor(fl_rgb_color(150, 150, 150));
+  }
+}
+
+// Theme the window "chrome" (menu bar + status bar) plus the editor itself.
+void apply_theme_to_window(EditorWindow* e) {
+  if (!e) {
+    return;
+  }
+  Fl_Color bg, fg;
+  if (dark_mode) {
+    bg = fl_rgb_color(45, 45, 45);
+    fg = fl_rgb_color(220, 220, 220);
+  } else {
+    bg = fl_rgb_color(238, 238, 238);
+    fg = fl_rgb_color(40, 40, 40);
+  }
+  if (e->editor) {
+    apply_theme_to_editor(e->editor);
+  }
+  if (e->menubar) {
+    e->menubar->color(bg);
+    e->menubar->textcolor(fg);
+  }
+  if (e->status) {
+    e->status->color(bg);
+    e->status->labelcolor(fg);
+  }
+  e->redraw();
+}
+
+void apply_theme() {
+  if (dark_mode) {
+    // Syntax colors tuned for a dark background
+    styletable[0].color = fl_rgb_color(220, 220, 220);  // A - Plain
+    styletable[1].color = fl_rgb_color(120, 190, 120);  // B - Comments
+    styletable[2].color = fl_rgb_color(90, 200, 200);   // C - Types
+    styletable[3].color = fl_rgb_color(110, 160, 255);  // D - Keywords
+    Fl::background(45, 45, 45);
+    Fl::background2(30, 30, 30);
+    Fl::foreground(220, 220, 220);
+  } else {
+    styletable[0].color = FL_BLACK;       // A - Plain
+    styletable[1].color = FL_DARK_GREEN;  // B - Comments
+    styletable[2].color = FL_DARK_CYAN;   // C - Types
+    styletable[3].color = FL_BLUE;        // D - Keywords
+    Fl::background(238, 238, 238);
+    Fl::background2(255, 255, 255);
+    Fl::foreground(30, 30, 30);
+  }
+  Fl::reload_scheme();
+
+  // Push the new look to every open editor view
+  for (Fl_Window* win = Fl::first_window(); win; win = Fl::next_window(win)) {
+    apply_theme_to_window(dynamic_cast<EditorWindow*>(win));
+  }
+}
+
+void theme_light_cb(Fl_Widget*, void*) {
+  dark_mode = 0;
+  apply_theme();
+}
+
+void theme_dark_cb(Fl_Widget*, void*) {
+  dark_mode = 1;
+  apply_theme();
+}
+
+void ConfTextEditor::draw() {
+  Fl_Text_Editor::draw();
+  int lnw = linenumber_width();
+  if (lnw <= 0) {
+    return;  // gutter hidden -> no separator
+  }
+  // Vertical separator at the right edge of the line-number gutter
+  fl_color(dark_mode ? fl_rgb_color(90, 90, 90) : fl_rgb_color(190, 190, 190));
+  int sepx = x() + lnw - 1;
+  fl_push_clip(x(), y(), w(), h());
+  fl_line(sepx, y() + 1, sepx, y() + h() - 2);
+  fl_pop_clip();
+}
+
 Fl_Window* new_view() {
   EditorWindow* w = new EditorWindow(with0, height0, title);
 
+  const int menuH = 30;
+  const int statusH = 24;
+
   w->begin();
-  Fl_Menu_Bar* m = new Fl_Menu_Bar(0, 0, with0, 30);
+  Fl_Menu_Bar* m = new Fl_Menu_Bar(0, 0, with0, menuH);
   m->copy(menuitems, w);
-  w->editor = new Fl_Text_Editor(0, 30, with0, height0 - 30);
-  w->editor->textfont(FL_SCREEN);
+  m->box(FL_FLAT_BOX);  // honor color() instead of the scheme's gradient
+  w->menubar = m;
+
+  ConfTextEditor* ed = new ConfTextEditor(0, menuH, with0, height0 - menuH - statusH);
+  ed->win = w;
+  w->editor = ed;
+  w->editor->textfont(TF);
   w->editor->textsize(TS);
-  w->editor->cursor_style(Fl_Text_Display::HEAVY_CURSOR);
-  w->editor->cursor_color(FL_RED);
+  w->editor->cursor_style(Fl_Text_Display::SIMPLE_CURSOR);
   // w->editor->wrap_mode(Fl_Text_Editor::WRAP_AT_BOUNDS, 250);
   w->editor->buffer(textbuf);
+
+  // Line numbers shown by default (matches the FL_MENU_VALUE flag on the menu toggle)
+  w->editor->linenumber_width(line_num_width);
+  w->editor->linenumber_size(TS);
+  w->editor->linenumber_font(TF);
+  w->editor->linenumber_align(FL_ALIGN_RIGHT);
+  w->line_numbers = 1;
+
   w->editor->highlight_data(stylebuf, styletable, sizeof(styletable) / sizeof(styletable[0]), 'A', style_unfinished_cb,
                             0);
   w->plugDialogsWithEditor();
+
+  // Status bar pinned to the bottom (editor is the resizable widget above it)
+  w->status = new Fl_Box(0, height0 - statusH, with0, statusH, "Ln 1, Col 1");
+  w->status->box(FL_FLAT_BOX);
+  w->status->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+  w->status->labelsize(12);
+  w->status->labelfont(FL_HELVETICA);
+
+  apply_theme_to_window(w);  // colors for editor + menu bar + status (current theme)
 
   w->end();
   w->resizable(w->editor);
@@ -1064,19 +1457,27 @@ Fl_Window* new_view() {
 void cb(const char* fname) { load_file(fname, -1); }
 
 int main(int argc, char** argv) {
+  Fl::scheme("gleam");  // modern, flat theme that honors background colors
+
   textbuf = new Fl_Text_Buffer;
   // textbuf->transcoding_warning_action = NULL;
   init_keywords();
   init_types();
   init_documentation();
-  init_completion();
+  init_snippets();
   style_init();
   fl_open_callback(cb);
   fl_message_hotspot(1);
 
+  apply_theme();  // set syntax/background colors for the default (dark) theme
+
   Fl_Window* window = new_view();
 
   window->show(1, argv);
+
+  // Re-apply after show(): showing the window re-initializes some scheme colors,
+  // so we set the theme colors again here to make sure the dark theme wins.
+  apply_theme();
 
   // #ifndef __APPLE__
   if (argc > 1) {

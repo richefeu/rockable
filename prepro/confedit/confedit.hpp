@@ -17,6 +17,7 @@
 #endif
 
 #include <FL/Fl.H>
+#include <FL/Fl_Box.H>
 #include <FL/Fl_Browser.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Double_Window.H>
@@ -29,6 +30,7 @@
 #include <FL/Fl_Text_Editor.H>
 #include <FL/filename.H>
 #include <FL/fl_ask.H>
+#include <FL/fl_draw.H>
 #include <FL/x.H>  // for fl_open_callback
 
 #include "quat.hpp"
@@ -49,14 +51,15 @@ Fl_Text_Buffer* textbuf = 0;
 const int line_num_width = 60;
 
 // Syntax highlighting stuff...
-#define TS 14  // default editor textsize
+#define TS 15        // default editor textsize
+#define TF FL_COURIER  // default editor textfont (scalable monospace)
 Fl_Text_Buffer* stylebuf = 0;
 Fl_Text_Display::Style_Table_Entry styletable[] = {
     // Style table
-    {FL_BLACK, FL_SCREEN, TS},        // A - Plain
-    {FL_DARK_YELLOW, FL_SCREEN, TS},  // B - Line comments
-    {FL_DARK_CYAN, FL_SCREEN, TS},    // C - Types
-    {FL_BLUE, FL_SCREEN, TS},         // D - Keywords
+    {FL_BLACK, TF, TS},       // A - Plain
+    {FL_DARK_GREEN, TF, TS},  // B - Line comments
+    {FL_DARK_CYAN, TF, TS},   // C - Types
+    {FL_BLUE, TF, TS},        // D - Keywords
 };
 
 std::set<std::string> code_keywords;
@@ -87,6 +90,27 @@ void replace_cb(Fl_Widget*, void*);
 void replace2_cb(Fl_Widget*, void*);
 void replcan_cb(Fl_Widget*, void*);
 void view_cb(Fl_Widget*, void*);
+
+void goto_line_cb(Fl_Widget*, void* v);
+void goto_start_cb(Fl_Widget*, void* v);
+void goto_end_cb(Fl_Widget*, void* v);
+
+void theme_light_cb(Fl_Widget*, void* v);
+void theme_dark_cb(Fl_Widget*, void* v);
+
+// Defined in confedit.cpp; refreshes the "Ln x, Col y" status bar of window w.
+class EditorWindow;
+void update_status(EditorWindow* w);
+
+// Fl_Text_Editor subclass that refreshes the status bar after every event
+// (so caret moves from arrow keys / mouse clicks are reflected too).
+class ConfTextEditor : public Fl_Text_Editor {
+ public:
+  EditorWindow* win;
+  ConfTextEditor(int x, int y, int w, int h) : Fl_Text_Editor(x, y, w, h), win(0) {}
+  int handle(int e) override;
+  void draw() override;  // adds a separator line at the right of the gutter
+};
 
 void doc_selection_cb(Fl_Widget*, void* v);
 void deg_to_rad_cb(Fl_Widget*, void* v);
@@ -179,6 +203,8 @@ class EditorWindow : public Fl_Double_Window {
   int line_numbers;
 
   Fl_Text_Editor* editor;
+  Fl_Menu_Bar* menubar;  // top menu bar (kept for theming)
+  Fl_Box* status;        // bottom status bar (Ln/Col indicator)
   char search[256];
 
   void plugDialogsWithEditor() { add_particle_dlg->editor = editor; }
@@ -213,8 +239,12 @@ Fl_Menu_Item menuitems[] = {
     //{"&Delete", 0, (Fl_Callback*)delete_cb},
     {"&Documentation", FL_COMMAND + 'd', (Fl_Callback*)doc_selection_cb},
     {"Preferences", 0, 0, 0, FL_SUBMENU},
-    {"Line Numbers", FL_COMMAND + 'l', (Fl_Callback*)linenumbers_cb, 0, FL_MENU_TOGGLE},
-    {"Word Wrap", 0, (Fl_Callback*)wordwrap_cb, 0, FL_MENU_TOGGLE},
+    {"Line Numbers", FL_COMMAND + 'l', (Fl_Callback*)linenumbers_cb, 0, FL_MENU_TOGGLE | FL_MENU_VALUE},
+    {"Word Wrap", 0, (Fl_Callback*)wordwrap_cb, 0, FL_MENU_TOGGLE | FL_MENU_DIVIDER},
+    {"Theme", 0, 0, 0, FL_SUBMENU},
+    {"Light", 0, (Fl_Callback*)theme_light_cb, 0, FL_MENU_RADIO},
+    {"Dark", 0, (Fl_Callback*)theme_dark_cb, 0, FL_MENU_RADIO | FL_MENU_VALUE},
+    {0},
     {0},
     {0},
 
@@ -223,6 +253,12 @@ Fl_Menu_Item menuitems[] = {
     {"F&ind Again", FL_COMMAND + 'g', (Fl_Callback*)find2_cb},
     {"&Replace...", FL_COMMAND + 'r', (Fl_Callback*)replace_cb},
     {"Re&place Again", FL_COMMAND + 't', (Fl_Callback*)replace2_cb},
+    {0},
+
+    {"&Go", 0, 0, 0, FL_SUBMENU},
+    {"Go to &Line...", FL_COMMAND + 'j', (Fl_Callback*)goto_line_cb},
+    {"Document &Start", FL_COMMAND + FL_Up, (Fl_Callback*)goto_start_cb},
+    {"Document &End", FL_COMMAND + FL_Down, (Fl_Callback*)goto_end_cb},
     {0},
 
     {"T&ools", 0, 0, 0, FL_SUBMENU},

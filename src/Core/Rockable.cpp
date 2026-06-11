@@ -67,13 +67,12 @@
 #include "PreproCommands/PreproCommand_stickVerticesInClusters.hpp"
 #include "PreproCommands/PreproCommand_stickVerticesInClustersMoments.hpp"
 
-
 // ==============================================================================================================
 //  INITIALISATIONS
 // ==============================================================================================================
 
 /**
- *   Constructor 
+ *   Constructor
  *
  */
 Rockable::Rockable() : m_linkCells(aabb, cellMinSizes) {
@@ -87,8 +86,8 @@ Rockable::Rockable() : m_linkCells(aabb, cellMinSizes) {
     return this->AddOrRemoveInteractions_bruteForce(i, j, dmax);
   };
   optionNames["AddOrRemoveInteractions"] = "bruteForce";
+  
   UpdateNL = [this]() { this->UpdateNL_bruteForce(); };
-
   optionNames["UpdateNL"] = "bruteForce";
 
   integrationStep = [this]() { this->velocityVerletStep(); };
@@ -135,7 +134,7 @@ Rockable::Rockable() : m_linkCells(aabb, cellMinSizes) {
  * Note: Compilation is slightly slower due to explicit registrations.
  */
 void Rockable::ExplicitRegistrations() {
-  
+
   // BodyForces
   REGISTRER_BASE_DERIVED(BodyForce, AttractingPoint);
   REGISTRER_BASE_DERIVED(BodyForce, PreferredDirection);
@@ -170,7 +169,6 @@ void Rockable::ExplicitRegistrations() {
   REGISTRER_BASE_DERIVED(PreproCommand, stickVerticesInClusters);
   REGISTRER_BASE_DERIVED(PreproCommand, stickVerticesInClustersMoments);
   REGISTRER_BASE_DERIVED(PreproCommand, stickBCM);
-
 }
 
 /**
@@ -289,7 +287,7 @@ bool Rockable::isInteractive() const { return interactiveMode; }
  *   Print in the terminal a Banner with some information
  */
 void Rockable::showBanner() {
-  
+
 #ifndef ROCKABLE_GIT_TAG
 #define ROCKABLE_GIT_TAG "UNKNOWN GIT TAG"
 #endif
@@ -297,7 +295,7 @@ void Rockable::showBanner() {
 #ifndef ROCKABLE_LAST_COMMIT_DATE
 #define ROCKABLE_LAST_COMMIT_DATE "UNKNOWN LAST COMMIT DATE"
 #endif
-  
+
   std::cout << "\n\n";
   std::cout << msg::bold() << msg::fg_lightBlue() << "   Rockable" << msg::fg_default() << msg::normal()
             << "  Copyright (C) 2016-2026  <vincent.richefeu@univ-grenoble-alpes.fr>\n";
@@ -306,7 +304,7 @@ void Rockable::showBanner() {
   std::cout << "   This program comes with ABSOLUTELY NO WARRANTY.\n";
   std::cout << "   " << msg::bold() << msg::fg_lightBlue() << "This is academic software" << msg::fg_default()
             << msg::normal() << "\n\n";
-  
+
   /*
   std::cout << "   Documentation:       install sphinx-doc\n";
   std::cout << "   e.g., for mac OS X   brew install sphinx-doc\n";
@@ -557,9 +555,10 @@ void Rockable::saveConf(const char* fname) {
          << Particles[i].homothety << ' ' << Particles[i].pos << ' ' << Particles[i].vel << ' ' << Particles[i].acc
          << ' ' << Particles[i].Q << ' ' << Particles[i].vrot << ' ' << Particles[i].arot;
     if (useSoftParticles == 1) {
-      // conf << ' ' << Particles[i].uniformTransformation << '\n';
+      //conf << ' ' << Particles[i].uniformTransformation << '\n'; // FIXME J'ai du enlever ce truc (à voir...)
+      conf << '\n';
     } else {
-      // conf << '\n';
+      conf << '\n';
     }
   }
 
@@ -645,7 +644,7 @@ void Rockable::initParser() {
   parser.kwMap["t"] = __GET__(conf, t);
   parser.kwMap["tmax"] = __GET__(conf, tmax);
   parser.kwMap["dt"] = __DO__(conf) {
-    //conf >> dt;
+    // conf >> dt;
     ExprParser.getValue(conf, dt);
     dt_2 = 0.5 * dt;
     dt2 = dt * dt;
@@ -675,7 +674,6 @@ void Rockable::initParser() {
 
 #ifdef ROCKABLE_ENABLE_PERIODIC
   parser.kwMap["usePeriodicCell"] = __GET__(conf, usePeriodicCell);
-
   parser.kwMap["h"] = __GET__(conf, Cell.h);
   parser.kwMap["vh"] = __GET__(conf, Cell.vh);
   parser.kwMap["ah"] = __GET__(conf, Cell.ah);
@@ -684,14 +682,34 @@ void Rockable::initParser() {
   parser.kwMap["cellMomentumCorrection"] = __GET__(conf, cellMomentumCorrection);
   parser.kwMap["cellVelocityCorrection"] = __GET__(conf, cellVelocityCorrection);
   parser.kwMap["useKineticStress"] = __GET__(conf, useKineticStress);
+#else
+  auto PERIODIC_NOT_ENABLED = __DO__(conf) {
+    std::cout << "!!!!!! PERIODIC_NOT_ENABLED when Rockable was compiled" << std::endl;
+  };
+  parser.kwMap["usePeriodicCell"] = PERIODIC_NOT_ENABLED;
+  parser.kwMap["h"] = PERIODIC_NOT_ENABLED;
+  parser.kwMap["vh"] = PERIODIC_NOT_ENABLED;
+  parser.kwMap["ah"] = PERIODIC_NOT_ENABLED;
+  parser.kwMap["mh"] = PERIODIC_NOT_ENABLED;
+  parser.kwMap["dh"] = PERIODIC_NOT_ENABLED;
+  parser.kwMap["cellMomentumCorrection"] = PERIODIC_NOT_ENABLED;
+  parser.kwMap["cellVelocityCorrection"] = PERIODIC_NOT_ENABLED;
+  parser.kwMap["useKineticStress"] = PERIODIC_NOT_ENABLED;
 #endif
 
+#ifdef ROCKABLE_ENABLE_SOFT_PARTICLES
   parser.kwMap["useSoftParticles"] = __DO__(conf) {
     useSoftParticles = 1;
     double Y, P;
     conf >> Y >> P;
     Cinv.set(Y, P);
   };
+#else
+  auto SOFT_PARTICLES_NOT_ENABLED = __DO__(conf) {
+    std::cout << "!!!!!! SOFT_PARTICLES_NOT_ENABLED when Rockable was compiled" << std::endl;
+  };
+  parser.kwMap["useSoftParticles"] = SOFT_PARTICLES_NOT_ENABLED;
+#endif
 
   parser.kwMap["numericalDampingCoeff"] = __GET__(conf, numericalDampingCoeff);
   parser.kwMap["VelocityBarrier"] = __GET__(conf, velocityBarrier);
@@ -1046,7 +1064,6 @@ void Rockable::initParser() {
       Logger::warn("The PreproCommand named {} was not added!", command);
     }
   }
-  
 }
 
 /**
@@ -2868,8 +2885,8 @@ void Rockable::initialise_particle_forces_and_moments() {
 #pragma omp parallel for default(shared)
   for (size_t i = nDriven; i < Particles.size(); ++i) {
     Particles[i].force.reset();
-    Particles[i].moment.reset();  
-    
+    Particles[i].moment.reset();
+
     // FIXME: this should be move juste before the acceleration computation
     //        to be compatible with NSCD algorithm
     if (bodyForce != nullptr) {
@@ -2941,7 +2958,7 @@ void Rockable::update_interactions() {
       }
     }
   }
-  
+
 #else
 
   // In the following loop, ALL interactions are updated,
@@ -3339,9 +3356,9 @@ void Rockable::breakage_of_interfaces() {
     } else {
       whichBond = "Outer";
     }
-    //std::cout << "Sticked (" << whichBond << ") interface between " << (*BI)->i << " and " << (*BI)->j
-    //          << " has broken ";
-    //std::cout << "(" << (*BI)->concernedBonds.size() << " bonds)\n\n";
+    // std::cout << "Sticked (" << whichBond << ") interface between " << (*BI)->i << " and " << (*BI)->j
+    //           << " has broken ";
+    // std::cout << "(" << (*BI)->concernedBonds.size() << " bonds)\n\n";
 
     int g1 = Particles[(*BI)->i].group;
     int g2 = Particles[(*BI)->j].group;
