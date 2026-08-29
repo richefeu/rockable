@@ -14,8 +14,10 @@ Here is what came out of it.
 
 **Development roadmap**
 
-* Finalise the full periodic boundary conditions.
-* Continue the work on deformable particles (DCEM).
+* Finalise the full periodic boundary conditions (Duc-Cuong).
+* Continue the work on deformable particles (Discrete Compliant-Element Method, Mukesh).
+* Finalise the special boundaries (Lhassan).
+* Consider adding deformable wires / membranes / grids.
 
 **For the user community, which keeps growing**
 
