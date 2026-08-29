@@ -1,3 +1,5 @@
+.. _syntaxConf:
+
 Format of configuration files (conf-file)
 ==========================================
 
