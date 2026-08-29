@@ -228,12 +228,9 @@ if(ROCKABLE_COMPILE_SEER)
   #message(STATUS "OPENGL_INCLUDE_DIR = " ${OPENGL_INCLUDE_DIR})
   #message(STATUS "OPENGL_LIBRARIES = " ${OPENGL_LIBRARIES})
  
-  set(SEER_FILES
-      ${CMAKE_SOURCE_DIR}/Apps/DearMySeer/seer.cpp
-      ${CMAKE_SOURCE_DIR}/Apps/DearMySeer/ImGuiSDLApplication.cpp
-      ${CMAKE_SOURCE_DIR}/Apps/DearMySeer/Scene3D.cpp
-      ${CMAKE_SOURCE_DIR}/Apps/DearMySeer/ParticleColoring.cpp
-      ${CMAKE_SOURCE_DIR}/Apps/DearMySeer/Slicing.cpp      
+  # Dear ImGui and ImPlot, shared by the two Dear My* applications and compiled
+  # once into a static library rather than twice into each executable.
+  set(MINI_IMGUI_FILES
       ${CMAKE_SOURCE_DIR}/Apps/mini-imgui-implot/imgui.cpp
       ${CMAKE_SOURCE_DIR}/Apps/mini-imgui-implot/imgui_demo.cpp
       ${CMAKE_SOURCE_DIR}/Apps/mini-imgui-implot/imgui_draw.cpp
@@ -244,16 +241,46 @@ if(ROCKABLE_COMPILE_SEER)
       ${CMAKE_SOURCE_DIR}/Apps/mini-imgui-implot/implot.cpp
       ${CMAKE_SOURCE_DIR}/Apps/mini-imgui-implot/implot_items.cpp)
 
+  add_library(mini_imgui_implot STATIC ${MINI_IMGUI_FILES})
+
+  target_include_directories(mini_imgui_implot
+      PUBLIC ${OPENGL_INCLUDE_DIR} ${SDL2_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS}
+             ${CMAKE_SOURCE_DIR}/Apps/mini-imgui-implot)
+
+  target_link_libraries(mini_imgui_implot PUBLIC OpenGL::GL SDL2::SDL2 GLEW::GLEW)
+
+  # ---- Dear My Seer: the viewer of conf-files
+  set(SEER_FILES
+      ${CMAKE_SOURCE_DIR}/Apps/DearMySeer/seer.cpp
+      ${CMAKE_SOURCE_DIR}/Apps/DearMySeer/ImGuiSDLApplication.cpp
+      ${CMAKE_SOURCE_DIR}/Apps/DearMySeer/Scene3D.cpp
+      ${CMAKE_SOURCE_DIR}/Apps/DearMySeer/ParticleColoring.cpp
+      ${CMAKE_SOURCE_DIR}/Apps/DearMySeer/Slicing.cpp)
+
   add_executable(seer ${SEER_FILES})
 
   target_include_directories(seer
-      PUBLIC ${OPENGL_INCLUDE_DIR} ${SDL2_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS}
-             ${CMAKE_SOURCE_DIR}/Apps/DearMySeer ${CMAKE_SOURCE_DIR}/Apps/mini-imgui-implot)
+      PUBLIC ${CMAKE_SOURCE_DIR}/Apps/DearMySeer)
 
-  target_link_libraries(seer PUBLIC OpenGL::GL SDL2::SDL2 GLEW::GLEW Rockable_core)
+  target_link_libraries(seer PUBLIC mini_imgui_implot Rockable_core)
 
   install(TARGETS seer)
-  
+
+  # ---- Dear My Shape: the viewer/editor of shape libraries
+  set(SHAPE_FILES
+      ${CMAKE_SOURCE_DIR}/Apps/DearMyShape/shape.cpp
+      ${CMAKE_SOURCE_DIR}/Apps/DearMyShape/ImGuiSDLApplication.cpp
+      ${CMAKE_SOURCE_DIR}/Apps/DearMyShape/Scene3D.cpp)
+
+  add_executable(shape ${SHAPE_FILES})
+
+  target_include_directories(shape
+      PUBLIC ${CMAKE_SOURCE_DIR}/Apps/DearMyShape)
+
+  target_link_libraries(shape PUBLIC mini_imgui_implot Rockable_core)
+
+  install(TARGETS shape)
+
 endif() # end of ROCKABLE_COMPILE_SEER
 
 # ##############################################################################

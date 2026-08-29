@@ -76,3 +76,38 @@ Thanks to **Dear ImGui**, many features are now accessible through a modern and 
 **Dear My Seer** is based on **Rockable**'s input format, meaning it can be used with other DEM applications.
 All you need to do is provide the configuration file (conf-file) in the correct format (this is what **ExaDEM** already does).
 
+
+
+Application `shape` (Dear My Shape)
+-----------------------------------
+
+**Dear My Shape** is to shape libraries what **Dear My Seer** is to conf-files:
+the Dear ImGui successor of ``shapeSurvey``. It opens a ``.shp`` library, draws
+its shapes, and lets them be inspected one by one.
+
+.. code-block:: sh
+
+   shape shapes.txt
+
+The argument is optional and defaults to ``shapes.txt``.
+
+It is built by the same CMake option as ``seer``, ``ROCKABLE_COMPILE_SEER``,
+which is on by default. The two applications share the vendored Dear ImGui and
+ImPlot sources, compiled once into a static library.
+
+.. note::
+
+   ``shapeSurvey`` is still built and still works; it is described in
+   :ref:`shapeSurvey`. ``shape`` is the newer take on the same job, built on
+   SDL2 and Dear ImGui instead of ``freeglut`` and X11.
+
+.. warning::
+
+   Both **Dear My Seer** and **Dear My Shape** are under active development and
+   their feature sets are not frozen.
+
+   ``shape`` already fits the bounding box, toggles ``preCompDone`` and computes
+   the mass properties of the displayed shape, but it has **no save**: nothing
+   it computes can be written back to the library. Until that lands, use
+   ``shapeSurvey`` for the pre-computation you intend to keep, and ``shape`` to
+   look at a library.

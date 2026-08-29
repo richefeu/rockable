@@ -25,9 +25,9 @@ int main(int argc, char* argv[]) {
   }
 
   if (app.scene3d.readShapeLib(shapeFileName.c_str()) == 0) {
-    return 0;
+    std::cerr << "No shape to display. Goodbye." << std::endl;
+    return 1;
   }
-  
-  
+
   return app.run();
 }

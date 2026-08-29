@@ -1174,11 +1174,18 @@ void ImGuiSDLApplication::cleanup() {
 
   saveConfigToSeparateFile();
 
-  ImPlot::DestroyContext();
+  // cleanup() runs from the destructor, which is reached even when init() was
+  // never called (an early return in main, for instance). Tearing down a
+  // context that was never created segfaults, so each teardown is guarded.
+  if (ImPlot::GetCurrentContext() != nullptr) {
+    ImPlot::DestroyContext();
+  }
 
-  ImGui_ImplOpenGL3_Shutdown();
-  ImGui_ImplSDL2_Shutdown();
-  ImGui::DestroyContext();
+  if (ImGui::GetCurrentContext() != nullptr) {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
+  }
 
   if (glContext) {
     SDL_GL_DeleteContext(glContext);

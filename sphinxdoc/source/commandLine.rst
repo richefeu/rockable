@@ -77,6 +77,9 @@ The other executables
        sets the verbosity of the core. See :ref:`Visualisation`.
    * - ``seer``
      - *Dear My Seer*, the Dear ImGui viewer that supersedes ``see``.
+   * - ``shape [shapeFile]``
+     - *Dear My Shape*, the Dear ImGui browser of shape libraries. See
+       :ref:`Visualisation`.
    * - ``conftovtk``
      - Convert **every** ``conf*`` of the folder into VTK files for ParaView.
    * - ``postpro <commandFile>``
@@ -173,7 +176,7 @@ Options that select what gets compiled:
      - ``see``
    * - ``ROCKABLE_COMPILE_SEER``
      - ``ON``
-     - ``seer`` (Dear My Seer)
+     - ``seer`` (Dear My Seer) and ``shape`` (Dear My Shape)
    * - ``ROCKABLE_COMPILE_CONF2VTK``
      - ``ON``
      - ``conftovtk``

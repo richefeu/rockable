@@ -39,6 +39,12 @@ int Scene3D::readShapeLib(const char* fileName) {
 
   std::cout << "Number of Shapes found: " << Shapes.size() << std::endl;
 
+  if (Shapes.empty()) {
+    std::cout << "No shape in '" << fileName << "'. A shape library holds its shapes between '<' and '>'."
+              << std::endl;
+    return 0;
+  }
+
   ishape = 0;
   if (Shapes[ishape].preCompDone == 'n') {
     Shapes[ishape].fitObb();

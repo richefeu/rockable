@@ -38,3 +38,10 @@ INSTALL
 
 # Papers and manuscripts (kept out of the code repository)
 Papers/
+
+# Binaries and objects built in place by the standalone Makefiles of the
+# Dear My* applications (CMake builds them into BUILD/ and installs to INSTALL/)
+src/Apps/DearMySeer/seer
+src/Apps/DearMyShape/shape
+src/Apps/*/*.o
+src/Apps/mini-imgui-implot/*.o
