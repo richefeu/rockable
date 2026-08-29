@@ -43,19 +43,42 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="quickStart.html">Quick-start guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fileOrganisation.html">Organisation of the files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commandLine.html">Command line and build options</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Input formats</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="syntaxConf.html">Format of configuration files (conf-file)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="syntaxShapes.html">Format of shape-files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drivingSystem.html">Driving the boundaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Physical models</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="forceLaws.html">Force laws</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bodyForces.html">Body forces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="periodicBoundaryConditions.html">Periodic boundary conditions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="softParticles.html">Deformable particles</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Results</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dataExtractors.html">Data extractors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postProcessing.html">Post-processing (<code class="docutils literal notranslate"><span class="pre">postpro</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualisation.html">Visualisation tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools comming with rockable</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools coming with Rockable</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="developerGuide.html">Extending Rockable</a></li>
 </ul>
 
         </div>
@@ -157,7 +180,7 @@ such as MPI + OpenMP and GPU acceleration using CUDA or HIP backends.</p>
 <li><p><strong>Documentation</strong>: there is little documentation, although efforts are being made to address this.</p></li>
 </ul>
 <div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="quickStart.html">Quick-start guide</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="quickStart.html#what-is-rockable">What is Rockable?</a></li>
@@ -175,6 +198,19 @@ such as MPI + OpenMP and GPU acceleration using CUDA or HIP backends.</p>
 <li class="toctree-l2"><a class="reference internal" href="fileOrganisation.html#test">📁 <code class="docutils literal notranslate"><span class="pre">test</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="commandLine.html">Command line and build options</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="commandLine.html#rockable"><code class="docutils literal notranslate"><span class="pre">rockable</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="commandLine.html#the-other-executables">The other executables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commandLine.html#building">Building</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commandLine.html#compilation-options">Compilation options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commandLine.html#files-of-a-simulation-folder">Files of a simulation folder</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Input formats</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="syntaxConf.html">Format of configuration files (conf-file)</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#header">Header</a></li>
 <li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#keywords">Keywords</a></li>
@@ -194,22 +230,61 @@ such as MPI + OpenMP and GPU acceleration using CUDA or HIP backends.</p>
 <li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#file-drivingsystem-txt">File drivingSystem.txt</a></li>
 <li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#pre-processing-commands">Pre-processing Commands</a></li>
 <li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#data-extractors">Data Extractors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#body-forces">Body Forces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#body-properties-and-environment">Body properties and environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#interfaces-and-bonds">Interfaces and bonds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#interaction-parameters">Interaction parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#time-dependent-parameters">Time-dependent parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#velocity-barriers">Velocity barriers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#optional-features">Optional features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntaxConf.html#deprecated-keywords">Deprecated keywords</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="syntaxShapes.html">Format of shape-files</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="syntaxShapes.html#definition-of-a-shape">Definition of a shape</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="preProcessing.html#stickverticesinclusters-double-epsilon"><code class="docutils literal notranslate"><span class="pre">stickVerticesInClusters</span></code> (<em>double</em>) <strong>Epsilon</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="preProcessing.html#stickclusters-double-epsilon"><code class="docutils literal notranslate"><span class="pre">stickClusters</span></code> (<em>double</em>) <strong>Epsilon</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="preProcessing.html#setallvelocities-vec3r-velocity"><code class="docutils literal notranslate"><span class="pre">setAllVelocities</span></code> (<em>vec3r</em>) <strong>velocity</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="drivingSystem.html">Driving the boundaries</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="drivingSystem.html#the-file-drivingsystem-txt">The file <code class="docutils literal notranslate"><span class="pre">drivingSystem.txt</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="drivingSystem.html#imposing-a-component-control">Imposing a component: <code class="docutils literal notranslate"><span class="pre">Control</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="drivingSystem.html#automatic-controls-servo">Automatic controls: <code class="docutils literal notranslate"><span class="pre">Servo</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="drivingSystem.html#driving-a-periodic-cell">Driving a periodic cell</a></li>
+<li class="toctree-l2"><a class="reference internal" href="drivingSystem.html#a-worked-example-a-box-of-six-walls">A worked example: a box of six walls</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="servoControllers.html#the-tritri-family">The <code class="docutils literal notranslate"><span class="pre">tritri</span></code> family</a></li>
+<li class="toctree-l2"><a class="reference internal" href="servoControllers.html#shakers">Shakers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="servoControllers.html#ramps">Ramps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="preProcessing.html#creating-glued-interfaces">Creating glued interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preProcessing.html#tuning-the-interfaces">Tuning the interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preProcessing.html#setting-the-kinematics">Setting the kinematics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preProcessing.html#populating-the-sample">Populating the sample</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preProcessing.html#a-typical-bonded-sample">A typical bonded sample</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Physical models</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="forceLaws.html">Force laws</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="forceLaws.html#default-model-keywork-default">Default model (keywork <code class="docutils literal notranslate"><span class="pre">Default</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="forceLaws.html#law-for-rock-avalanches-keywork-avalanche">Law for rock avalanches (keywork <code class="docutils literal notranslate"><span class="pre">Avalanche</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="forceLaws.html#breakable-elastic-solid-bonds-keywork-stickedlinks">Breakable elastic solid bonds (keywork <code class="docutils literal notranslate"><span class="pre">StickedLinks</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="forceLaws.html#default-model-keyword-default">Default model (keyword <code class="docutils literal notranslate"><span class="pre">Default</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="forceLaws.html#law-for-rock-avalanches-keyword-avalanche">Law for rock avalanches (keyword <code class="docutils literal notranslate"><span class="pre">Avalanche</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="forceLaws.html#breakable-elastic-solid-bonds-keyword-stickedlinks">Breakable elastic solid bonds (keyword <code class="docutils literal notranslate"><span class="pre">StickedLinks</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="forceLaws.html#bonded-cell-method-keyword-bcm">Bonded Cell Method (keyword <code class="docutils literal notranslate"><span class="pre">BCM</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="forceLaws.html#slow-landslides-keyword-geovisc">Slow landslides (keyword <code class="docutils literal notranslate"><span class="pre">GeoVisc</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="forceLaws.html#summary-of-the-parameters-used-by-each-law">Summary of the parameters used by each law</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bodyForces.html">Body forces</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bodyForces.html#viscousfluid-double-fluiddensity"><code class="docutils literal notranslate"><span class="pre">ViscousFluid</span></code> (<em>double</em>) <strong>fluidDensity</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="bodyForces.html#attractingpoint-vec3r-point-double-acceleration"><code class="docutils literal notranslate"><span class="pre">AttractingPoint</span></code> (<em>vec3r</em>) <strong>point</strong> (<em>double</em>) <strong>acceleration</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="bodyForces.html#preferreddirection-vec3r-axisbody-vec3r-axis-double-momentmax"><code class="docutils literal notranslate"><span class="pre">PreferredDirection</span></code> (<em>vec3r</em>) <strong>axisBody</strong> (<em>vec3r</em>) <strong>axis</strong> (<em>double</em>) <strong>momentMax</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="bodyForces.html#relation-with-the-other-dissipation-mechanisms">Relation with the other dissipation mechanisms</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a><ul>
@@ -225,9 +300,37 @@ such as MPI + OpenMP and GPU acceleration using CUDA or HIP backends.</p>
 <li class="toctree-l2"><a class="reference internal" href="integrationSchemes.html#runge-kutta-nystrom-4th-order-scheme-keyword-rungekutta4">Runge-Kutta-Nyström 4th-order scheme (keyword <code class="docutils literal notranslate"><span class="pre">RungeKutta4</span></code>)</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="servoControllers.html#the-tritri-series-servos">The <code class="docutils literal notranslate"><span class="pre">tritri</span></code> series servos</a></li>
-<li class="toctree-l2"><a class="reference internal" href="servoControllers.html#shakers">shakers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="periodicBoundaryConditions.html">Periodic boundary conditions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="periodicBoundaryConditions.html#the-cell">The cell</a></li>
+<li class="toctree-l2"><a class="reference internal" href="periodicBoundaryConditions.html#corrections-and-stress-measurement">Corrections and stress measurement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="periodicBoundaryConditions.html#driving-the-cell">Driving the cell</a></li>
+<li class="toctree-l2"><a class="reference internal" href="periodicBoundaryConditions.html#visualising-a-periodic-sample">Visualising a periodic sample</a></li>
+<li class="toctree-l2"><a class="reference internal" href="periodicBoundaryConditions.html#current-status">Current status</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="softParticles.html">Deformable particles</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="softParticles.html#activating-the-feature">Activating the feature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="softParticles.html#current-status">Current status</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Results</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dataExtractors.html">Data extractors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dataExtractors.html#the-file-dataextractors-txt">The file <code class="docutils literal notranslate"><span class="pre">dataExtractors.txt</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataExtractors.html#common-parameters">Common parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataExtractors.html#available-extractors">Available extractors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataExtractors.html#declaring-an-extractor-inside-a-conf-file">Declaring an extractor inside a conf-file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataExtractors.html#plotting-the-results">Plotting the results</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="postProcessing.html">Post-processing (<code class="docutils literal notranslate"><span class="pre">postpro</span></code>)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="postProcessing.html#the-command-file">The command file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="postProcessing.html#particlestress"><code class="docutils literal notranslate"><span class="pre">ParticleStress</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="postProcessing.html#clustergranulo"><code class="docutils literal notranslate"><span class="pre">ClusterGranulo</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="postProcessing.html#post-processing-without-postpro">Post-processing without <code class="docutils literal notranslate"><span class="pre">postpro</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="visualisation.html">Visualisation tools</a><ul>
@@ -235,9 +338,32 @@ such as MPI + OpenMP and GPU acceleration using CUDA or HIP backends.</p>
 <li class="toctree-l2"><a class="reference internal" href="visualisation.html#application-seer-dear-my-seer">Application <cite>seer</cite> (Dear My Seer)</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools comming with rockable</a><ul>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools coming with Rockable</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="generator.html">Application <cite>generator</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="shapeSurvey.html">Application <code class="docutils literal notranslate"><span class="pre">shapeSurvey</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="converters.html">Converters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sweepable.html">Application <cite>sweepable</cite></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="developerGuide.html">Extending Rockable</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="developerGuide.html#the-factory-mechanism">The factory mechanism</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developerGuide.html#the-keyword-parser">The keyword parser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developerGuide.html#adding-a-force-law">Adding a force law</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developerGuide.html#adding-a-data-extractor">Adding a data extractor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developerGuide.html#adding-a-pre-processing-command">Adding a pre-processing command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developerGuide.html#adding-a-post-processor">Adding a post-processor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developerGuide.html#where-things-live">Where things live</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developerGuide.html#testing-a-change">Testing a change</a></li>
 </ul>
 </li>
 </ul>

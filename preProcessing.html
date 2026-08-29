@@ -17,11 +17,12 @@
       <script src="_static/documentation_options.js?v=8d563738"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Force laws" href="forceLaws.html" />
-    <link rel="prev" title="Format of shape-files" href="syntaxShapes.html" /> 
+    <link rel="prev" title="Available servo-controllers" href="servoControllers.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -43,24 +44,49 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="quickStart.html">Quick-start guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fileOrganisation.html">Organisation of the files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commandLine.html">Command line and build options</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Input formats</span></p>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="syntaxConf.html">Format of configuration files (conf-file)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="syntaxShapes.html">Format of shape-files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drivingSystem.html">Driving the boundaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Pre-processing commands</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#stickverticesinclusters-double-epsilon"><code class="docutils literal notranslate"><span class="pre">stickVerticesInClusters</span></code> (<em>double</em>) <strong>Epsilon</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#stickclusters-double-epsilon"><code class="docutils literal notranslate"><span class="pre">stickClusters</span></code> (<em>double</em>) <strong>Epsilon</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#setallvelocities-vec3r-velocity"><code class="docutils literal notranslate"><span class="pre">setAllVelocities</span></code> (<em>vec3r</em>) <strong>velocity</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#creating-glued-interfaces">Creating glued interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tuning-the-interfaces">Tuning the interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#setting-the-kinematics">Setting the kinematics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#populating-the-sample">Populating the sample</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#a-typical-bonded-sample">A typical bonded sample</a></li>
 </ul>
 </li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Physical models</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="forceLaws.html">Force laws</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bodyForces.html">Body forces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="periodicBoundaryConditions.html">Periodic boundary conditions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="softParticles.html">Deformable particles</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Results</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dataExtractors.html">Data extractors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postProcessing.html">Post-processing (<code class="docutils literal notranslate"><span class="pre">postpro</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualisation.html">Visualisation tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools comming with rockable</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools coming with Rockable</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="developerGuide.html">Extending Rockable</a></li>
 </ul>
 
         </div>
@@ -89,20 +115,182 @@
              
   <section id="pre-processing-commands">
 <span id="prepro"></span><h1>Pre-processing commands<a class="headerlink" href="#pre-processing-commands" title="Link to this heading"></a></h1>
-<p>This pre-processing commands are used, most of the time, at the end of a configuration file.</p>
-<section id="stickverticesinclusters-double-epsilon">
-<h2><code class="docutils literal notranslate"><span class="pre">stickVerticesInClusters</span></code> (<em>double</em>) <strong>Epsilon</strong><a class="headerlink" href="#stickverticesinclusters-double-epsilon" title="Link to this heading"></a></h2>
-<p>This command will add glued interfaces between bodies having the same cluster identifier.
-Only bonds between vertices (spheres) are added when the distance is less than <strong>Epsilon</strong>.</p>
+<p>Pre-processing commands are keywords of the conf-file that <strong>act on the system
+once it has been read</strong>, rather than describing it. They are the way to glue
+bodies together, to randomise velocities, or to duplicate a group of particles,
+without having to generate all of it explicitly.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>They act on a system that is already set, so they belong at the <strong>end</strong> of
+the input file, after <code class="docutils literal notranslate"><span class="pre">Particles</span></code> and, when relevant, after
+<code class="docutils literal notranslate"><span class="pre">Interactions</span></code>. A command placed before the particles are read would find
+nothing to work on.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A pre-processing command is executed <strong>once</strong>, when the file is read, and it
+is never written back into the conf-files that the computation saves. The
+dumps hold the <em>result</em> of the command: the interfaces it created, or the
+velocities it set. Restarting from a dump therefore does not re-run it,
+which is what you want.</p>
+</div>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#creating-glued-interfaces" id="id2">Creating glued interfaces</a></p></li>
+<li><p><a class="reference internal" href="#tuning-the-interfaces" id="id3">Tuning the interfaces</a></p></li>
+<li><p><a class="reference internal" href="#setting-the-kinematics" id="id4">Setting the kinematics</a></p></li>
+<li><p><a class="reference internal" href="#populating-the-sample" id="id5">Populating the sample</a></p></li>
+<li><p><a class="reference internal" href="#a-typical-bonded-sample" id="id6">A typical bonded sample</a></p></li>
+</ul>
+</nav>
+<section id="creating-glued-interfaces">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Creating glued interfaces</a><a class="headerlink" href="#creating-glued-interfaces" title="Link to this heading"></a></h2>
+<p>These commands build the <code class="docutils literal notranslate"><span class="pre">Interfaces</span></code> of the sample. Two bodies are glued when
+they are closer than a distance <strong>Epsilon</strong>, and the resulting bonds are what a
+breakable force law (<code class="docutils literal notranslate"><span class="pre">StickedLinks</span></code>, <code class="docutils literal notranslate"><span class="pre">BCM</span></code>) acts on.</p>
+<p>A bond is said to be <strong>inner</strong> when the two bodies share the same <code class="docutils literal notranslate"><span class="pre">cluster</span></code>
+number, and <strong>outer</strong> otherwise. This is what selects the <code class="docutils literal notranslate"><span class="pre">*InnerBond</span></code> or
+<code class="docutils literal notranslate"><span class="pre">*OuterBond</span></code> parameters.</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">stickVerticesInClusters</span></code> (<em>double</em>) <strong>Epsilon</strong></dt><dd><p>Glue the bodies that have the <strong>same</strong> cluster identifier. Only
+vertex-vertex bonds (sphere to sphere) are created, when the distance is
+less than <strong>Epsilon</strong>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">stickVerticesInClustersMoments</span></code> (<em>double</em>) <strong>Epsilon</strong></dt><dd><p>Same as above, with the transmission of moments enabled at the bonds. Use
+this one when the assembly has to resist bending rather than only traction.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">stickClusters</span></code> (<em>double</em>) <strong>Epsilon</strong></dt><dd><p>Glue bodies belonging to <strong>different</strong> clusters. All the bond types are
+created, not only vertex-vertex, when the distance is less than
+<strong>Epsilon</strong>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">stickBCM</span></code> (<em>double</em>) <strong>Epsilon</strong></dt><dd><p>Build the interfaces required by the <code class="docutils literal notranslate"><span class="pre">BCM</span></code> force law. Beyond creating the
+bonds, it computes the <strong>area</strong> of each interface, which is what the
+energy-based rupture criterion needs, and copies <code class="docutils literal notranslate"><span class="pre">knInnerBond</span></code>,
+<code class="docutils literal notranslate"><span class="pre">ktInnerBond</span></code> and <code class="docutils literal notranslate"><span class="pre">gcInnerBond</span></code> into each interface. All the interfaces
+it creates are flagged as inner.</p>
+</dd>
+</dl>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p><code class="docutils literal notranslate"><span class="pre">glue_with_walls</span> <span class="pre">yes</span></code>, placed before these commands, extends them to the
+driven bodies, so that a sample can be glued to its container.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Choosing <strong>Epsilon</strong> is a geometric matter: it must be large enough to catch
+the neighbours that should be bonded, and small enough not to bond bodies
+that merely pass close to each other. A value of the order of the Minkowski
+radius is a reasonable starting point.</p>
+</div>
 </section>
-<section id="stickclusters-double-epsilon">
-<h2><code class="docutils literal notranslate"><span class="pre">stickClusters</span></code> (<em>double</em>) <strong>Epsilon</strong><a class="headerlink" href="#stickclusters-double-epsilon" title="Link to this heading"></a></h2>
-<p>This command will add glued interfaces between bodies having different cluster identifier.
-Bonds are added when the distance is less than <strong>Epsilon</strong>.</p>
+<section id="tuning-the-interfaces">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Tuning the interfaces</a><a class="headerlink" href="#tuning-the-interfaces" title="Link to this heading"></a></h2>
+<p>These commands modify interfaces that already exist, so they must come <strong>after</strong>
+one of the sticking commands.</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">copyParamsToInterfaces</span></code> (<em>string</em>) <strong>inner|outer</strong></dt><dd><p>Copy the parameters of the group-pair table into each interface, so that
+every interface then carries its own copy. Only the interfaces of the
+selected kind are touched: <code class="docutils literal notranslate"><span class="pre">inner</span></code> visits the interfaces whose two bodies
+share a cluster, <code class="docutils literal notranslate"><span class="pre">outer</span></code> the others.</p>
+<p>This command sets <code class="docutils literal notranslate"><span class="pre">ParamsInInterfaces</span></code> to 1 by itself, so the copied
+values are saved in the conf-files and read back on a restart.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The two branches do not copy the same set. <code class="docutils literal notranslate"><span class="pre">outer</span></code> copies
+<span class="math notranslate nohighlight">\(k_n, k_t, k_r, f_n^0, f_t^0, M_0\)</span> and the exponent, whereas
+<code class="docutils literal notranslate"><span class="pre">inner</span></code> copies only <span class="math notranslate nohighlight">\(k_n, k_t, f_n^0, f_t^0\)</span> and the exponent:
+the rolling stiffness and the moment threshold are <strong>not</strong> copied for
+inner bonds, and keep whatever the interface already held. Set them
+explicitly if your model relies on them.</p>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">setStiffnessRatioInterfaces</span></code> (<em>double</em>) <strong>ratio</strong></dt><dd><p>Set <span class="math notranslate nohighlight">\(k_t = \text{ratio} \times k_n\)</span> in every interface.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">setVariableStickParams</span></code> (<em>string</em>) <strong>paramName</strong> (<em>string</em>) <strong>inner|outer</strong> (<em>double</em>) <strong>lambda</strong> (<em>int</em>) <strong>m</strong> (<em>int</em>) <strong>timeSeeded</strong></dt><dd><p>Draw one interface parameter from a <strong>Weibull</strong> distribution of scale
+<code class="docutils literal notranslate"><span class="pre">lambda</span></code> and modulus <code class="docutils literal notranslate"><span class="pre">m</span></code>, independently for each interface. This is the
+usual way of introducing a controlled scatter of strength, and hence a
+progressive rather than simultaneous failure.</p>
+<p><code class="docutils literal notranslate"><span class="pre">timeSeeded</span></code> set to 1 seeds the random generator on the clock, so that two
+runs differ; set to 0, the same sample is reproduced exactly.</p>
+</dd>
+</dl>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>These commands write into the interfaces themselves, and the force laws only
+read what an interface carries when <code class="docutils literal notranslate"><span class="pre">ParamsInInterfaces</span></code> is 1.
+<code class="docutils literal notranslate"><span class="pre">copyParamsToInterfaces</span></code> sets that flag on its own; the two others do not,
+so set <code class="docutils literal notranslate"><span class="pre">ParamsInInterfaces</span> <span class="pre">1</span></code> in the conf-file if you use them alone.</p>
+</div>
 </section>
-<section id="setallvelocities-vec3r-velocity">
-<h2><code class="docutils literal notranslate"><span class="pre">setAllVelocities</span></code> (<em>vec3r</em>) <strong>velocity</strong><a class="headerlink" href="#setallvelocities-vec3r-velocity" title="Link to this heading"></a></h2>
-<p>Set the velocity vector of all particles (that are not driven) to the prescribed vector <strong>velocity</strong>.</p>
+<section id="setting-the-kinematics">
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Setting the kinematics</a><a class="headerlink" href="#setting-the-kinematics" title="Link to this heading"></a></h2>
+<p>The velocities of the <strong>driven</strong> bodies are never modified by these commands.</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">setAllVelocities</span></code> (<em>vec3r</em>) <strong>velocity</strong></dt><dd><p>Set the velocity vector of all the free particles to the prescribed vector.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">randomlyOrientedVelocities</span></code> (<em>double</em>) <strong>velocityMagnitude</strong></dt><dd><p>Give every free particle a velocity of the prescribed magnitude, in a
+direction drawn uniformly at random. Each particle gets its own direction.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">randomlyOrientedVelocitiesClusters</span></code> (<em>double</em>) <strong>velocityMagnitude</strong> (<em>int</em>) <strong>opt</strong></dt><dd><p>Same, but a single direction is drawn per <strong>cluster</strong>, so that the bodies of
+a cluster keep moving together instead of being torn apart at the first
+step.</p>
+<p><code class="docutils literal notranslate"><span class="pre">opt</span></code> set to 1 forces the vertical component downwards
+(<span class="math notranslate nohighlight">\(v_y \leftarrow -|v_y|\)</span>), which is what a release of blocks above a
+slope needs; set to 0, the direction stays uniform over the sphere.</p>
+</dd>
+</dl>
+</section>
+<section id="populating-the-sample">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Populating the sample</a><a class="headerlink" href="#populating-the-sample" title="Link to this heading"></a></h2>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">homothetyRange</span></code> (<em>int</em>) <strong>ifirst</strong> (<em>int</em>) <strong>ilast</strong> (<em>double</em>) <strong>hmin</strong> (<em>double</em>) <strong>hmax</strong> (<em>int</em>) <strong>timeSeeded</strong></dt><dd><p>Give the particles from <code class="docutils literal notranslate"><span class="pre">ifirst</span></code> to <code class="docutils literal notranslate"><span class="pre">ilast</span></code> a homothety drawn uniformly
+in <span class="math notranslate nohighlight">\([h_\text{min}, h_\text{max}]\)</span>. This is how a size dispersion is
+introduced without defining one shape per size.</p>
+<p><code class="docutils literal notranslate"><span class="pre">timeSeeded</span></code> behaves as in <code class="docutils literal notranslate"><span class="pre">setVariableStickParams</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The command recomputes the mass and the inertia of each particle it
+touches, from the new homothety, the volume of its shape and the density
+of its group. The <code class="docutils literal notranslate"><span class="pre">density</span></code> of every group concerned must therefore
+already be defined when the command is executed, which is the case as
+long as it sits at the end of the file.</p>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">particlesClonage</span></code> (<em>int</em>) <strong>ifirst</strong> (<em>int</em>) <strong>ilast</strong> (<em>vec3r</em>) <strong>translation</strong></dt><dd><p>Duplicate the particles from <code class="docutils literal notranslate"><span class="pre">ifirst</span></code> to <code class="docutils literal notranslate"><span class="pre">ilast</span></code>, translated by the
+given vector. Useful to build a periodic-looking pattern, or to stack
+several copies of a prepared block.</p>
+<p>The clones are appended at the end of the particle list, and they are given
+<strong>new cluster numbers</strong>, continuing after the highest one in use. A cloned
+block is therefore a separate cluster: bonds inside a clone stay inner,
+while the clone is not glued to its original.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The clones are appended after the file has been read, so the particle
+count of the input file no longer matches the number of bodies in
+memory. The next conf-file written by the computation records the new
+count, and is a consistent input on its own.</p>
+</div>
+</dd>
+</dl>
+</section>
+<section id="a-typical-bonded-sample">
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">A typical bonded sample</a><a class="headerlink" href="#a-typical-bonded-sample" title="Link to this heading"></a></h2>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">input.txt (end of the file)</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>...
+ParamsInInterfaces 1
+Particles 512
+...
+
+stickVerticesInClusters 0.05
+copyParamsToInterfaces inner
+setVariableStickParams fn0InnerBond inner 1.0e4 5 0
+</pre></div>
+</div>
+</div>
+<p>The sample is glued cluster by cluster, each interface then receives its own
+copy of the parameters, and the tensile strength of the bonds is finally
+scattered with a Weibull law of modulus 5.</p>
 </section>
 </section>
 
@@ -110,7 +298,7 @@ Bonds are added when the distance is less than <strong>Epsilon</strong>.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="syntaxShapes.html" class="btn btn-neutral float-left" title="Format of shape-files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="servoControllers.html" class="btn btn-neutral float-left" title="Available servo-controllers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="forceLaws.html" class="btn btn-neutral float-right" title="Force laws" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

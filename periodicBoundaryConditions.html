@@ -1,0 +1,319 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Periodic boundary conditions &mdash; Rockable 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://richefeu.github.io/rockable/periodicBoundaryConditions.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Deformable particles" href="softParticles.html" />
+    <link rel="prev" title="Integration schemes" href="integrationSchemes.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Rockable
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickStart.html">Quick-start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fileOrganisation.html">Organisation of the files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commandLine.html">Command line and build options</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Input formats</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="syntaxConf.html">Format of configuration files (conf-file)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntaxShapes.html">Format of shape-files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drivingSystem.html">Driving the boundaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Physical models</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="forceLaws.html">Force laws</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bodyForces.html">Body forces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Periodic boundary conditions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#the-cell">The cell</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#corrections-and-stress-measurement">Corrections and stress measurement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#driving-the-cell">Driving the cell</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#visualising-a-periodic-sample">Visualising a periodic sample</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#current-status">Current status</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="softParticles.html">Deformable particles</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Results</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dataExtractors.html">Data extractors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postProcessing.html">Post-processing (<code class="docutils literal notranslate"><span class="pre">postpro</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualisation.html">Visualisation tools</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools coming with Rockable</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="developerGuide.html">Extending Rockable</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Rockable</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Periodic boundary conditions</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/periodicBoundaryConditions.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="periodic-boundary-conditions">
+<span id="periodicboundaryconditions"></span><h1>Periodic boundary conditions<a class="headerlink" href="#periodic-boundary-conditions" title="Link to this heading"></a></h1>
+<p>Periodic boundary conditions replace the walls by a repeating cell, which
+removes the edge effects that a container inevitably introduces. This matters
+whenever the quantity of interest is a bulk property rather than the response of
+a finite sample, and it is what makes concurrent double-scale simulations
+possible.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>These keywords are only understood when Rockable has been compiled with</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>..<span class="w"> </span>-DROCKABLE_ENABLE_PERIODIC<span class="o">=</span>ON
+</pre></div>
+</div>
+<p>Without that option the keywords are still accepted, but each of them only
+prints <code class="docutils literal notranslate"><span class="pre">PERIODIC_NOT_ENABLED</span> <span class="pre">when</span> <span class="pre">Rockable</span> <span class="pre">was</span> <span class="pre">compiled</span></code> and does nothing.
+<code class="docutils literal notranslate"><span class="pre">rockable</span> <span class="pre">-b</span></code> tells you which options a binary was built with.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Periodic boundary conditions and the special boundaries
+(<code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_BOUNDARY</span></code>) cannot be used together.</p>
+</div>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#the-cell" id="id2">The cell</a></p></li>
+<li><p><a class="reference internal" href="#corrections-and-stress-measurement" id="id3">Corrections and stress measurement</a></p></li>
+<li><p><a class="reference internal" href="#driving-the-cell" id="id4">Driving the cell</a></p></li>
+<li><p><a class="reference internal" href="#visualising-a-periodic-sample" id="id5">Visualising a periodic sample</a></p></li>
+<li><p><a class="reference internal" href="#current-status" id="id6">Current status</a></p></li>
+</ul>
+</nav>
+<section id="the-cell">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">The cell</a><a class="headerlink" href="#the-cell" title="Link to this heading"></a></h2>
+<p>The cell is described by a <span class="math notranslate nohighlight">\(3 \times 3\)</span> matrix <span class="math notranslate nohighlight">\(\mathbf{h}\)</span> whose
+<strong>columns</strong> are the three vectors spanning the cell. A cubic cell of side
+<span class="math notranslate nohighlight">\(L\)</span> is simply <span class="math notranslate nohighlight">\(\mathbf{h} = L\,\mathbf{I}\)</span>, and a sheared cell has
+off-diagonal terms.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">usePeriodicCell</span></code> (<em>int</em>)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1</span></code> activates the periodic cell, <code class="docutils literal notranslate"><span class="pre">0</span></code> disables it.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">h</span></code> (<em>mat9r</em>)</p></td>
+<td><p>The cell matrix, nine reals given row by row.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">vh</span></code> (<em>mat9r</em>)</p></td>
+<td><p>Velocity of the cell matrix, <span class="math notranslate nohighlight">\(\dot{\mathbf{h}}\)</span>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ah</span></code> (<em>mat9r</em>)</p></td>
+<td><p>Acceleration of the cell matrix, <span class="math notranslate nohighlight">\(\ddot{\mathbf{h}}\)</span>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mh</span></code> (<em>double</em>)</p></td>
+<td><p>Mass ratio used to build the inertia of the cell degrees of freedom.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dh</span></code> (<em>double</em>)</p></td>
+<td><p>Numerical damping applied to the cell degrees of freedom.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The cell has its own dynamics: it is not a kinematic constraint but a set of
+nine degrees of freedom integrated along with the particles, which is what
+allows a <strong>stress</strong> to be imposed on it. <code class="docutils literal notranslate"><span class="pre">mh</span></code> sets how heavy those degrees of
+freedom are, and therefore how fast the cell responds; <code class="docutils literal notranslate"><span class="pre">dh</span></code> damps their
+oscillations.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>A cell that oscillates instead of converging under a constant pressure is
+the sign of an <code class="docutils literal notranslate"><span class="pre">mh</span></code> too small or a <code class="docutils literal notranslate"><span class="pre">dh</span></code> too small. Both are numerical
+parameters, to be calibrated like <code class="docutils literal notranslate"><span class="pre">numericalDampingCoeff</span></code>.</p>
+</div>
+</section>
+<section id="corrections-and-stress-measurement">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Corrections and stress measurement</a><a class="headerlink" href="#corrections-and-stress-measurement" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 34.0%" />
+<col style="width: 66.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">cellVelocityCorrection</span></code> (<em>int</em>)</p></td>
+<td><p>Removes the mean velocity drift of the sample.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cellMomentumCorrection</span></code> (<em>int</em>)</p></td>
+<td><p>Removes the total momentum drift of the sample.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">useKineticStress</span></code> (<em>int</em>)</p></td>
+<td><p>Includes the kinetic (velocity fluctuation) term in the stress used to
+drive the cell.</p></td>
+</tr>
+</tbody>
+</table>
+<p>A fully periodic system has no boundary to anchor it, so nothing prevents the
+whole sample from drifting: any residual momentum is conserved for ever. The two
+correction flags remove that drift, and are normally left on.</p>
+<p><code class="docutils literal notranslate"><span class="pre">useKineticStress</span></code> matters as soon as the sample is not quasi-static. The
+stress of a granular assembly is the sum of a contact term and a kinetic term;
+for a slow compression the second is negligible, for a rapid flow it is not.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Kinematics are stored in the conf-files in <strong>real</strong> coordinates, and
+converted to the reduced coordinates of the cell internally when the file is
+read. A conf-file of a periodic simulation therefore remains readable, and
+<code class="docutils literal notranslate"><span class="pre">see</span></code> displays it correctly.</p>
+</div>
+</section>
+<section id="driving-the-cell">
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Driving the cell</a><a class="headerlink" href="#driving-the-cell" title="Link to this heading"></a></h2>
+<p>The loading is set in <code class="docutils literal notranslate"><span class="pre">drivingSystem.txt</span></code> (see <a class="reference internal" href="drivingSystem.html#drivingsystem"><span class="std std-ref">Driving the boundaries</span></a>), with the
+<code class="docutils literal notranslate"><span class="pre">PeriodicLoading</span></code> keyword instead of the <code class="docutils literal notranslate"><span class="pre">Control</span></code> and <code class="docutils literal notranslate"><span class="pre">Servo</span></code> entries used
+for walls.</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">PeriodicLoading</span> <span class="pre">IsotropicCompression</span></code> (<em>double</em>) <strong>pressure</strong></dt><dd><p>The three diagonal components of the cell are stress-driven at
+<span class="math notranslate nohighlight">\(-p\)</span>, and every shear component is held at zero velocity. This is the
+periodic equivalent of <code class="docutils literal notranslate"><span class="pre">tritriIsostaticCompression</span></code>, and the usual way of
+preparing a dense periodic sample.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">PeriodicLoading</span> <span class="pre">TriaxialCompression</span></code> (<em>string</em>) <strong>X|Y|Z</strong> (<em>double</em>) <strong>pressure</strong> (<em>double</em>) <strong>strainRate</strong></dt><dd><p>The named direction is strain-driven at a constant rate, the two others
+being kept at <code class="docutils literal notranslate"><span class="pre">pressure</span></code>. The imposed velocity is recomputed at every step
+as <span class="math notranslate nohighlight">\(\dot{\varepsilon}\, h_{ii}\)</span>, so the <strong>strain rate</strong> stays
+constant as the cell shrinks, rather than the velocity.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">PeriodicLoading</span> <span class="pre">SimpleShearDeformable</span></code> (<em>string</em>) <strong>XY|XZ|YX|YZ|ZX|ZY</strong> (<em>double</em>) <strong>pressure</strong> (<em>double</em>) <strong>shearRate</strong></dt><dd><p>Shear at a constant rate on the named component, the three normal components
+being stress-driven at <code class="docutils literal notranslate"><span class="pre">pressure</span></code>. The two letters name the component of
+<span class="math notranslate nohighlight">\(\mathbf{h}\)</span> that is sheared; the normal direction used to convert the
+rate into a velocity follows from it.</p>
+</dd>
+</dl>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">drivingSystem.txt</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>PeriodicLoading IsotropicCompression 100
+</pre></div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">PeriodicLoading</span></code> replaces the walls entirely: <code class="docutils literal notranslate"><span class="pre">nDriven</span></code> should be 0, and
+there is no wall body in the <code class="docutils literal notranslate"><span class="pre">Particles</span></code> list.</p>
+</div>
+</section>
+<section id="visualising-a-periodic-sample">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Visualising a periodic sample</a><a class="headerlink" href="#visualising-a-periodic-sample" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">see</span></code> draws the cell as a box, toggled with the key <code class="docutils literal notranslate"><span class="pre">P</span></code>. The particles are
+drawn at their real positions, so a particle straddling a face of the cell is
+shown on one side only; this is expected, and not a sign that the periodicity is
+broken.</p>
+</section>
+<section id="current-status">
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Current status</a><a class="headerlink" href="#current-status" title="Link to this heading"></a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Periodic boundary conditions are implemented and usable, but they are still
+described as being in a testing phase. The work is carried out with
+<em>Lhassan Amarsid</em> and <em>Duc-Cuong Pham</em>. Check your results against a known
+case before relying on them, in particular for the deformable-cell shear.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="integrationSchemes.html" class="btn btn-neutral float-left" title="Integration schemes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="softParticles.html" class="btn btn-neutral float-right" title="Deformable particles" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2026, Vincent Richefeu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

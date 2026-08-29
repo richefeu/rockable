@@ -17,11 +17,12 @@
       <script src="_static/documentation_options.js?v=8d563738"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Format of shape-files" href="syntaxShapes.html" />
-    <link rel="prev" title="Organisation of the files" href="fileOrganisation.html" /> 
+    <link rel="prev" title="Command line and build options" href="commandLine.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -43,10 +44,14 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="quickStart.html">Quick-start guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fileOrganisation.html">Organisation of the files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commandLine.html">Command line and build options</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Input formats</span></p>
+<ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Format of configuration files (conf-file)</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#header">Header</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#keywords">Keywords</a></li>
@@ -71,16 +76,43 @@
 <li class="toctree-l2"><a class="reference internal" href="#file-drivingsystem-txt">File drivingSystem.txt</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#pre-processing-commands">Pre-processing Commands</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data-extractors">Data Extractors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#body-forces">Body Forces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#body-properties-and-environment">Body properties and environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interfaces-and-bonds">Interfaces and bonds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interaction-parameters">Interaction parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#time-dependent-parameters">Time-dependent parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#velocity-barriers">Velocity barriers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#optional-features">Optional features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#deprecated-keywords">Deprecated keywords</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="syntaxShapes.html">Format of shape-files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drivingSystem.html">Driving the boundaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Physical models</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="forceLaws.html">Force laws</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bodyForces.html">Body forces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="periodicBoundaryConditions.html">Periodic boundary conditions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="softParticles.html">Deformable particles</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Results</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dataExtractors.html">Data extractors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postProcessing.html">Post-processing (<code class="docutils literal notranslate"><span class="pre">postpro</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualisation.html">Visualisation tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools comming with rockable</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools coming with Rockable</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="developerGuide.html">Extending Rockable</a></li>
 </ul>
 
         </div>
@@ -108,7 +140,7 @@
            <div itemprop="articleBody">
              
   <section id="format-of-configuration-files-conf-file">
-<h1>Format of configuration files (conf-file)<a class="headerlink" href="#format-of-configuration-files-conf-file" title="Link to this heading"></a></h1>
+<span id="syntaxconf"></span><h1>Format of configuration files (conf-file)<a class="headerlink" href="#format-of-configuration-files-conf-file" title="Link to this heading"></a></h1>
 <p>The conf-files are the files that hold the whole configuration at a given time. They are used for the following purposes:</p>
 <ol class="arabic simple">
 <li><p>Defining the initial configuration and parameters of a simulation.</p></li>
@@ -250,7 +282,7 @@ The format described here can be used as both input and output of a simulation.<
 <li><p><strong>Description</strong>: The interactions between particles involve different types of interaction, such as sphere-sphere, sphere-tube, sphere-polygon, and tube-tube. The best strategy to be used depends on the complexity of the involved shapes.</p></li>
 </ul>
 </li>
-<li><p><code class="docutils literal notranslate"><span class="pre">UpdateNLStrategy</span></code> (<em>string</em>) <strong>Option</strong></p>
+<li><p><code class="docutils literal notranslate"><span class="pre">UpdateNL</span></code> (<em>string</em>) <strong>Option</strong></p>
 <p>Choose the strategy for updating neighbor lists.</p>
 <ul class="simple">
 <li><p><strong>Options</strong>: <code class="docutils literal notranslate"><span class="pre">bruteForce</span></code> (default) or <code class="docutils literal notranslate"><span class="pre">linkCells</span></code></p></li>
@@ -347,19 +379,10 @@ in a file named <code class="docutils literal notranslate"><span class="pre">dri
 </section>
 <section id="file-drivingsystem-txt">
 <h2>File drivingSystem.txt<a class="headerlink" href="#file-drivingsystem-txt" title="Link to this heading"></a></h2>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">Control</span></code> (<em>string</em>) <strong>mode</strong> (<em>int</em>) <strong>bodyNumber</strong> (<em>double</em>) <strong>value</strong></p>
-<p>Use <strong>mode</strong> to set a velocity or force/moment for a specific body.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>There are two additional mode keywords for which the single <strong>value</strong> has to be replaced by three values
-(a vector of three components): <code class="docutils literal notranslate"><span class="pre">_xyzrot_Vel_</span></code> and <code class="docutils literal notranslate"><span class="pre">_xyzrot_Mom_</span></code>.</p>
-</div>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">Servo</span></code> (<em>string</em>) <strong>servoName</strong> &lt;<em>PARAMETERS</em>&gt;</p>
-<p>Set the parameter list depending on the selected servo (see <a class="reference internal" href="servoControllers.html#servo-controllers"><span class="std std-ref">Available servo-controllers</span></a>).</p>
-</li>
-</ul>
+<p>The bodies driven with <code class="docutils literal notranslate"><span class="pre">nDriven</span></code> are piloted from a separate file named
+<code class="docutils literal notranslate"><span class="pre">drivingSystem.txt</span></code>, which holds the <code class="docutils literal notranslate"><span class="pre">Control</span></code> and <code class="docutils literal notranslate"><span class="pre">Servo</span></code> entries.
+It has a page of its own: <a class="reference internal" href="drivingSystem.html#drivingsystem"><span class="std std-ref">Driving the boundaries</span></a>, and the servos are listed in
+<a class="reference internal" href="servoControllers.html#servo-controllers"><span class="std std-ref">Available servo-controllers</span></a>.</p>
 </section>
 <section id="pre-processing-commands">
 <h2>Pre-processing Commands<a class="headerlink" href="#pre-processing-commands" title="Link to this heading"></a></h2>
@@ -369,10 +392,259 @@ and interactions. For details on these commands, refer to: <a class="reference i
 </section>
 <section id="data-extractors">
 <h2>Data Extractors<a class="headerlink" href="#data-extractors" title="Link to this heading"></a></h2>
+<p>Measurements evaluated during the computation are declared in a file named
+<code class="docutils literal notranslate"><span class="pre">dataExtractors.txt</span></code>; see <a class="reference internal" href="dataExtractors.html#dataextractors"><span class="std std-ref">Data extractors</span></a>. The keyword
+<code class="docutils literal notranslate"><span class="pre">DataExtractor</span></code> is also accepted inside a conf-file, but it is deprecated
+because it is not written back into the saved conf-files.</p>
+</section>
+<section id="body-forces">
+<h2>Body Forces<a class="headerlink" href="#body-forces" title="Link to this heading"></a></h2>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">DataExtractor</span></code> (<em>string</em>) <strong>ExtractorName</strong> &lt;<em>PARAMETERS</em>&gt;</p>
-<p>The parameter list depends on the <strong>ExtractorName</strong>. Details are listed below.</p>
+<li><p><code class="docutils literal notranslate"><span class="pre">BodyForce</span></code> (<em>string</em>) <strong>Name</strong> &lt;<em>PARAMETERS</em>&gt;</p>
+<p>Apply a force computed from the state of each body alone. Only one body force
+can be active at a time. For possible <strong>Name</strong> and their parameters, see
+<a class="reference internal" href="bodyForces.html#bodyforces"><span class="std std-ref">Body forces</span></a>.</p>
 </li>
+</ul>
+</section>
+<section id="body-properties-and-environment">
+<h2>Body properties and environment<a class="headerlink" href="#body-properties-and-environment" title="Link to this heading"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">density</span></code> (<em>int</em>) <strong>groupNumber</strong> (<em>double</em>) <strong>value</strong></p>
+<p>Density, in kg/m³, of the bodies of a given group. The mass and the inertia of
+a particle are computed from this value, the volume of its shape and its
+homothety, at the moment the particle is read. <code class="docutils literal notranslate"><span class="pre">density</span></code> must therefore come
+<strong>before</strong> <code class="docutils literal notranslate"><span class="pre">Particles</span></code>.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gravity</span></code> (<em>vec3r</em>) <strong>vector</strong></p>
+<p>Gravity acceleration vector. It is a vector, not a magnitude, so an inclined
+gravity is the simplest way to tilt a whole sample without moving anything.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">precision</span></code> (<em>int</em>) <strong>nbDigits</strong></p>
+<p>Number of significant digits used when writing the conf-files. Increasing it
+makes a restart closer to a continuous run, at the cost of larger files.</p>
+</li>
+</ul>
+</section>
+<section id="interfaces-and-bonds">
+<h2>Interfaces and bonds<a class="headerlink" href="#interfaces-and-bonds" title="Link to this heading"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">ParamsInInterfaces</span></code> (<em>int</em>) <strong>0|1</strong></p>
+<p>When set to 1, each interface carries its own copy of the bond parameters,
+written on its line in the conf-file, instead of taking them from the
+group-pair table. This is required by the pre-processing commands that
+scatter the bond properties (see <a class="reference internal" href="preProcessing.html#prepro"><span class="std std-ref">Pre-processing commands</span></a>).</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Interfaces</span></code> (<em>int</em>) <strong>numberOfInterfaces</strong></p>
+<p>Opens the list of glued interfaces. Each entry holds, on one line:</p>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;i&gt;</span> <span class="pre">&lt;j&gt;</span> <span class="pre">&lt;nbBonds&gt;</span> <span class="pre">&lt;dn0&gt;</span></code></p>
+<p>then, only when <code class="docutils literal notranslate"><span class="pre">ParamsInInterfaces</span></code> is 1,</p>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;kn&gt;</span> <span class="pre">&lt;kt&gt;</span> <span class="pre">&lt;kr&gt;</span> <span class="pre">&lt;fn0&gt;</span> <span class="pre">&lt;ft0&gt;</span> <span class="pre">&lt;mom0&gt;</span> <span class="pre">&lt;power&gt;</span> <span class="pre">&lt;Gc&gt;</span></code></p>
+<p>and finally <code class="docutils literal notranslate"><span class="pre">nbBonds</span></code> triplets <code class="docutils literal notranslate"><span class="pre">&lt;type&gt;</span> <span class="pre">&lt;isub&gt;</span> <span class="pre">&lt;jsub&gt;</span></code> identifying the
+bonded sub-interactions among those already read in <code class="docutils literal notranslate"><span class="pre">Interactions</span></code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>A bond that cannot be matched with an existing interaction produces a
+warning and the <strong>whole interface</strong> is dropped. This is why <code class="docutils literal notranslate"><span class="pre">Interactions</span></code>
+must be read before <code class="docutils literal notranslate"><span class="pre">Interfaces</span></code>.</p>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">glue_with_walls</span></code> (<em>string</em>) <strong>yes|no</strong></p>
+<p>When set to yes, the sticking pre-processing commands also glue the free
+bodies to the driven ones. Accepted affirmative forms are <code class="docutils literal notranslate"><span class="pre">yes</span></code>, <code class="docutils literal notranslate"><span class="pre">YES</span></code>,
+<code class="docutils literal notranslate"><span class="pre">y</span></code>, <code class="docutils literal notranslate"><span class="pre">Y</span></code> and <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">initSpringJoint</span></code> (<em>int</em>) <strong>ibody</strong> (<em>vec3r</em>) <strong>ipos0</strong> (<em>int</em>) <strong>jbody</strong> (<em>vec3r</em>) <strong>jpos0</strong> (<em>double</em>) <strong>stiffness</strong></p>
+<p>Add a linear spring joining two bodies. The anchor points <code class="docutils literal notranslate"><span class="pre">ipos0</span></code> and
+<code class="docutils literal notranslate"><span class="pre">jpos0</span></code> are given in the <strong>body frames</strong>, so they follow the bodies as they
+rotate. Unlike an interface, a spring joint never breaks.</p>
+</li>
+</ul>
+</section>
+<section id="interaction-parameters">
+<h2>Interaction parameters<a class="headerlink" href="#interaction-parameters" title="Link to this heading"></a></h2>
+<p>All of them follow the same pattern, described in <a class="reference internal" href="forceLaws.html#force-laws"><span class="std std-ref">Force laws</span></a>:</p>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;parameter&gt;</span> <span class="pre">&lt;group1&gt;</span> <span class="pre">&lt;group2&gt;</span> <span class="pre">&lt;value&gt;</span></code></p>
+<p>The table is symmetric: setting <code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">2</span></code> also sets <code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">0</span></code>. A pair that is never
+defined keeps a value of zero, so <strong>every pair of groups that can meet must be
+given the parameters of the selected force law</strong>.</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Contact</span><a class="headerlink" href="#id1" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">knContact</span></code></p></td>
+<td><p>Normal stiffness <span class="math notranslate nohighlight">\(k_n\)</span>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ktContact</span></code></p></td>
+<td><p>Tangential stiffness <span class="math notranslate nohighlight">\(k_t\)</span>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">muContact</span></code></p></td>
+<td><p>Coulomb friction coefficient <span class="math notranslate nohighlight">\(\mu\)</span>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">krContact</span></code></p></td>
+<td><p>Rolling stiffness <span class="math notranslate nohighlight">\(k_r\)</span>. The resistant moment is computed only when
+it is strictly positive.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">murContact</span></code></p></td>
+<td><p>Rolling resistance coefficient <span class="math notranslate nohighlight">\(\mu_r\)</span>, used as a <strong>length</strong>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">en2Contact</span></code></p></td>
+<td><p>Squared normal restitution coefficient <span class="math notranslate nohighlight">\(e_n^2\)</span>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">en2ContactFromViscRate</span></code></p></td>
+<td><p>The same quantity, given the other way round: the value is the viscous
+damping rate <span class="math notranslate nohighlight">\(\alpha_n\)</span>, and <span class="math notranslate nohighlight">\(e_n^2\)</span> is deduced from it.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">viscTContact</span></code></p></td>
+<td><p>Tangential viscosity, read only by the <code class="docutils literal notranslate"><span class="pre">GeoVisc</span></code> law.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text">Bonds</span><a class="headerlink" href="#id2" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">knInnerBond</span></code>, <code class="docutils literal notranslate"><span class="pre">knOuterBond</span></code></p></td>
+<td><p>Normal stiffness of the bond.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ktInnerBond</span></code>, <code class="docutils literal notranslate"><span class="pre">ktOuterBond</span></code></p></td>
+<td><p>Tangential stiffness of the bond.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">krInnerBond</span></code>, <code class="docutils literal notranslate"><span class="pre">krOuterBond</span></code></p></td>
+<td><p>Rolling stiffness of the bond.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">en2InnerBond</span></code>, <code class="docutils literal notranslate"><span class="pre">en2OuterBond</span></code></p></td>
+<td><p>Squared normal restitution of the bond.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">fn0InnerBond</span></code>, <code class="docutils literal notranslate"><span class="pre">fn0OuterBond</span></code></p></td>
+<td><p>Normal (tensile) strength <span class="math notranslate nohighlight">\(f_n^0\)</span>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ft0InnerBond</span></code>, <code class="docutils literal notranslate"><span class="pre">ft0OuterBond</span></code></p></td>
+<td><p>Tangential strength <span class="math notranslate nohighlight">\(f_t^0\)</span>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mom0InnerBond</span></code>, <code class="docutils literal notranslate"><span class="pre">mom0OuterBond</span></code></p></td>
+<td><p>Moment strength <span class="math notranslate nohighlight">\(M_0\)</span>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">powInnerBond</span></code>, <code class="docutils literal notranslate"><span class="pre">powOuterBond</span></code></p></td>
+<td><p>Exponent <span class="math notranslate nohighlight">\(p\)</span> of the rupture criterion.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">gcInnerBond</span></code>, <code class="docutils literal notranslate"><span class="pre">gcOuterBond</span></code></p></td>
+<td><p>Fracture energy <span class="math notranslate nohighlight">\(G_c\)</span>, read by the <code class="docutils literal notranslate"><span class="pre">BCM</span></code> law.</p></td>
+</tr>
+</tbody>
+</table>
+<p>A bond is <strong>inner</strong> when the two bodies share the same <code class="docutils literal notranslate"><span class="pre">cluster</span></code> number, and
+<strong>outer</strong> otherwise.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">ContactPartnership</span></code> (<em>string</em>) <strong>model</strong></p>
+<p>Distributes the interaction parameters over the sub-contacts of a same pair of
+bodies, so that two bodies touching through many sub-contacts are not stiffer
+than two bodies touching through one. <strong>model</strong> is <code class="docutils literal notranslate"><span class="pre">None</span></code> (default),
+<code class="docutils literal notranslate"><span class="pre">NumberWeight</span></code>, <code class="docutils literal notranslate"><span class="pre">OverlapWeight</span></code> or <code class="docutils literal notranslate"><span class="pre">SurfaceWeight</span></code>.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">preventCrossingLength</span></code> (<em>double</em>) <strong>value</strong></p>
+<p>When strictly positive, stiffens the normal repulsion at large overlap, to
+prevent bodies from crossing each other. It is written in the conf-files only
+when it is non-zero.</p>
+</li>
+</ul>
+</section>
+<section id="time-dependent-parameters">
+<h2>Time-dependent parameters<a class="headerlink" href="#time-dependent-parameters" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">Tempo</span></code> keyword plugs a value onto a function of time, re-evaluated at
+every step. Two profiles exist:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 36.0%" />
+<col style="width: 64.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Profile</p></th>
+<th class="head"><p>Behaviour</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Range</span> <span class="pre">&lt;t1&gt;</span> <span class="pre">&lt;t2&gt;</span> <span class="pre">&lt;v1&gt;</span> <span class="pre">&lt;v2&gt;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">v1</span></code> while <span class="math notranslate nohighlight">\(t \in [t_1, t_2]\)</span>, <code class="docutils literal notranslate"><span class="pre">v2</span></code> outside.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Ramp</span> <span class="pre">&lt;t1&gt;</span> <span class="pre">&lt;t2&gt;</span> <span class="pre">&lt;v1&gt;</span> <span class="pre">&lt;v2&gt;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">v1</span></code> before <span class="math notranslate nohighlight">\(t_1\)</span>, linear interpolation up to <code class="docutils literal notranslate"><span class="pre">v2</span></code> at
+<span class="math notranslate nohighlight">\(t_2\)</span>, then <code class="docutils literal notranslate"><span class="pre">v2</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Three targets can be driven:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Tempo</span> <span class="pre">NDCoeff</span></code> &lt;<em>PROFILE</em>&gt;</p>
+<p>Drives the numerical damping coefficient.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Tempo</span> <span class="pre">Inter</span></code> (<em>string</em>) <strong>paramName</strong> (<em>int</em>) <strong>g1</strong> (<em>int</em>) <strong>g2</strong> &lt;<em>PROFILE</em>&gt;</p>
+<p>Drives one interaction parameter of a group pair. Both <code class="docutils literal notranslate"><span class="pre">g1</span> <span class="pre">g2</span></code> and
+<code class="docutils literal notranslate"><span class="pre">g2</span> <span class="pre">g1</span></code> are updated.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Tempo</span> <span class="pre">Body</span></code> (<em>string</em>) <strong>propName</strong> (<em>int</em>) <strong>group</strong> &lt;<em>PROFILE</em>&gt;</p>
+<p>Drives one body property, such as <code class="docutils literal notranslate"><span class="pre">density</span></code>, of a group.</p>
+</li>
+</ul>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">input.txt</span><a class="headerlink" href="#id3" title="Link to this code"></a></div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span># relax the friction progressively over the first half second
+Tempo Inter muContact 0 1 Ramp 0.0 0.5 0.9 0.2
+
+# damp strongly, but only at the beginning
+Tempo NDCoeff Range 0.0 0.1 0.05 0.0
+</pre></div>
+</div>
+</div>
+</section>
+<section id="velocity-barriers">
+<h2>Velocity barriers<a class="headerlink" href="#velocity-barriers" title="Link to this heading"></a></h2>
+<p>An alternative to numerical damping, described in <a class="reference internal" href="dissipation.html#dissipation"><span class="std std-ref">Global dissipation features</span></a>.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">VelocityBarrier</span></code> (<em>double</em>) <strong>value</strong> and <code class="docutils literal notranslate"><span class="pre">VelocityBarrierExponent</span></code> (<em>double</em>) <strong>value</strong></p>
+<p>Cap on the translational velocities, and the exponent of the barrier function.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AngularVelocityBarrier</span></code> (<em>double</em>) <strong>value</strong> and <code class="docutils literal notranslate"><span class="pre">AngularVelocityBarrierExponent</span></code> (<em>double</em>) <strong>value</strong></p>
+<p>The same, for the rotational velocities.</p>
+</li>
+</ul>
+</section>
+<section id="optional-features">
+<h2>Optional features<a class="headerlink" href="#optional-features" title="Link to this heading"></a></h2>
+<p>These keywords are only understood when Rockable has been compiled with the
+corresponding CMake option. Otherwise they are accepted but print a message
+saying the feature was not enabled; see <a class="reference internal" href="commandLine.html#commandline"><span class="std std-ref">Command line and build options</span></a>.</p>
+<ul class="simple">
+<li><p>Periodic cell: <code class="docutils literal notranslate"><span class="pre">usePeriodicCell</span></code>, <code class="docutils literal notranslate"><span class="pre">h</span></code>, <code class="docutils literal notranslate"><span class="pre">vh</span></code>, <code class="docutils literal notranslate"><span class="pre">ah</span></code>, <code class="docutils literal notranslate"><span class="pre">mh</span></code>, <code class="docutils literal notranslate"><span class="pre">dh</span></code>,
+<code class="docutils literal notranslate"><span class="pre">cellVelocityCorrection</span></code>, <code class="docutils literal notranslate"><span class="pre">cellMomentumCorrection</span></code>, <code class="docutils literal notranslate"><span class="pre">useKineticStress</span></code>.
+See <a class="reference internal" href="periodicBoundaryConditions.html#periodicboundaryconditions"><span class="std std-ref">Periodic boundary conditions</span></a>.</p></li>
+<li><p>Deformable particles: <code class="docutils literal notranslate"><span class="pre">useSoftParticles</span></code>. See <a class="reference internal" href="softParticles.html#softparticles"><span class="std std-ref">Deformable particles</span></a>.</p></li>
+</ul>
+</section>
+<section id="deprecated-keywords">
+<h2>Deprecated keywords<a class="headerlink" href="#deprecated-keywords" title="Link to this heading"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">separator</span></code> (<em>string</em>) <strong>keyword</strong></p>
+<p>Sets the separator used when writing the conf-files. It is marked for removal
+in the source and should not be used.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OBBtreeLevel</span></code>, in the shape files, is likewise deprecated.</p></li>
 </ul>
 </section>
 </section>
@@ -381,7 +653,7 @@ and interactions. For details on these commands, refer to: <a class="reference i
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="fileOrganisation.html" class="btn btn-neutral float-left" title="Organisation of the files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="commandLine.html" class="btn btn-neutral float-left" title="Command line and build options" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="syntaxShapes.html" class="btn btn-neutral float-right" title="Format of shape-files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

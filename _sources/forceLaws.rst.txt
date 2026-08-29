@@ -19,7 +19,7 @@ For example, to set the value :math:`10^8` to the normal stiffness :math:`k_n` b
 	 ...
 
 
-Default model (keywork ``Default``)
+Default model (keyword ``Default``)
 -----------------------------------
 
 This is the force law to be used in most cases. 
@@ -41,7 +41,7 @@ Coulomb friction tangent force, and rolling resistance moment
 
   .. math::
 
-     f_n^\text{visc} = \alpha_n \sqrt{2 m_\text{eff}} v_n
+     f_n^\text{visc} = 2 \alpha_n \sqrt{k_n m_\text{eff}} \, v_n
 
   where :math:`v_n` is the relative normal velocity, :math:`m_\text{eff}=(m_i m_j)/(m_i+m_j)` is the effective mass, and :math:`\alpha_n \in [0, 1[` is the rate of normal viscuous damping. There are two ways to set the value of :math:`\alpha_n`:
 
@@ -88,7 +88,7 @@ The resistant moment (:math:`\underline{M}`) accounts for rotational resistance 
 
 
 
-Law for rock avalanches (keywork ``Avalanche``)
+Law for rock avalanches (keyword ``Avalanche``)
 -----------------------------------------------
 
 This is historically the first law that has been implemented in ``Rockable`` (actually in ``DEMbox``, its ancestor).
@@ -113,7 +113,7 @@ The force-law implemented is specifically designed for simulating rock avalanche
 
 
 
-Breakable elastic solid bonds (keywork ``StickedLinks``)
+Breakable elastic solid bonds (keyword ``StickedLinks``)
 --------------------------------------------------------
 
 This law has been introduced since the PhD work of *Marta Stasiak*.
@@ -138,9 +138,9 @@ Two states can exist: cohesive bond and contact.
 
        .. math::
 
-          f_n^\text{visc} = \alpha_n \sqrt{2 m_\text{eff}} v_n	
+          f_n^\text{visc} = 2 \alpha_n \sqrt{k_n m_\text{eff}} \, v_n	
 
-       where :math:`\alpha_n` is indirectly set with the keywork ``en2InnerBond`` or ``en2OuterBond``.
+       where :math:`\alpha_n` is indirectly set with the keyword ``en2InnerBond`` or ``en2OuterBond``.
 
     b. **Tangential component**
 
@@ -150,12 +150,22 @@ Two states can exist: cohesive bond and contact.
 
            \Delta f_t = k_t (v_t \Delta t)
 
-    Optionally, an additional term for tangential viscosity (:math:`f_t^\text{visc} = \alpha_n \sqrt{2 m_\text{eff}} v_t`) can be added to the elastic part of the tangential force. However, this approach accumulates viscosity over time and may not be accurate:
+    Optionally, an additional term for tangential viscosity (:math:`f_t^\text{visc} = 2 \alpha_n \sqrt{k_n m_\text{eff}} \, v_t`) can be added to the elastic part of the tangential force. However, this approach accumulates viscosity over time and may not be accurate:
 
 
     c. **Moment vector**
-    
-    TODO
+
+       The moment carried by the bond is accumulated incrementally from the
+       relative rotation velocity, with the rolling stiffness :math:`k_r`
+       (keyword ``krInnerBond`` or ``krOuterBond``):
+
+       .. math::
+
+          \Delta \underline{M} = k_r \left( \underline{\omega}_j - \underline{\omega}_i \right) \Delta t
+
+       Unlike the resistant moment of a *contact*, this moment is **not**
+       capped: as long as the bond exists it grows freely, and it is the
+       rupture criterion below that limits it through :math:`M_0`.
 
     d. **Rupture criterion**
 
@@ -197,3 +207,233 @@ Note: The code includes conditional blocks for certain options (`FT_CORR` and `b
 
 
 
+
+
+
+Bonded Cell Method (keyword ``BCM``)
+------------------------------------
+
+This law was introduced to model a cohesive solid discretised into cells that
+share *faces*, rather than a packing of grains glued at a few points. The
+interface between two cells carries an **area**, and the rupture is governed by
+a **fracture energy** rather than by a force threshold.
+
+.. important::
+
+   ``BCM`` only makes sense once the interfaces have been created by the
+   pre-processing command ``stickBCM``, which is the command that computes the
+   area of each interface (see :ref:`prePro`). All the interfaces built that
+   way are flagged as *inner*, so ``BCM`` reads only the ``*InnerBond``
+   parameters.
+
+Cohesive bond
+^^^^^^^^^^^^^
+
+The stiffnesses of an interface are shared between the sub-bonds it holds. If
+the interface carries :math:`N_b` bonds, each of them uses
+
+.. math::
+
+   k_n \leftarrow \frac{k_n}{N_b} \qquad k_t \leftarrow \frac{k_t}{N_b}
+
+so that refining the discretisation of an interface does not stiffen it. The
+values of :math:`k_n` and :math:`k_t` come from ``knInnerBond`` and
+``ktInnerBond``, or from the interface itself when ``ParamsInInterfaces`` is 1.
+
+The normal force combines the elastic response, measured from the distance
+:math:`d_n^0` recorded at gluing, with the viscous damping:
+
+.. math::
+
+   f_n = -k_n \left( d_n - d_n^0 \right) + c\, v_n
+
+and the tangential force is accumulated incrementally, then completed by a
+viscous term:
+
+.. math::
+
+   \Delta \underline{f}_t = k_t\, \underline{v}_t \Delta t
+   \qquad\text{then}\qquad
+   \underline{f}_t \leftarrow \underline{f}_t + c\, \underline{v}_t
+
+.. warning::
+
+   As in ``StickedLinks``, the tangential viscous term is added to the
+   *accumulated* force rather than to its elastic part alone, so the viscosity
+   piles up over time. Keep this in mind when interpreting the tangential
+   response of a bond.
+
+Neither the tangential force nor the moment is capped while the bond holds: the
+bond is elastic until it breaks.
+
+Rupture criterion
+^^^^^^^^^^^^^^^^^
+
+The criterion is energetic and applies to the interface **as a whole**, not to
+its individual bonds. At each step, the elastic energy stored in the interface
+is summed over its bonds. Only the bonds in *tension* contribute to the normal
+part:
+
+.. math::
+
+   E_n = \sum_{b\,\mid\, d_n^b > d_n^0} \frac{1}{2} k_n \left( d_n^b - d_n^0 \right)^2
+   \qquad
+   E_t = \sum_{b} \frac{1}{2} k_t \left\Vert \underline{s}_b \right\Vert^2
+
+where :math:`\underline{s}_b` is the accumulated tangential sliding of the bond.
+The whole interface breaks as soon as
+
+.. math::
+
+   E_n + E_t > 2\, A\, G_c
+
+with :math:`A` the area of the interface and :math:`G_c` the fracture energy
+(keyword ``gcInnerBond``, or ``gcOuterBond`` for an outer interface). The factor
+2 accounts for the two surfaces created by the crack.
+
+.. note::
+
+   The stiffnesses used in this energy balance are the ones read from the
+   group-pair table, *not* the per-bond values divided by :math:`N_b` that the
+   force computation uses.
+
+When the criterion is met the interface is not broken immediately: it is added
+to a list and all its bonds are released once every force has been computed.
+This postponement avoids introducing an asymmetry in the incrementally computed
+tangential forces.
+
+Contact
+^^^^^^^
+
+Once a bond is broken, or between two cells that were never glued, the
+interaction falls back to a law identical to ``Default``: linear elastic normal
+repulsion with viscous damping and a positivity clamp, Coulomb friction capped
+at :math:`\mu f_n`, and a resistant moment capped at :math:`\mu_r f_n`. The
+parameters are then ``knContact``, ``ktContact``, ``muContact``, ``krContact``
+and ``murContact``, weighted by the contact partnership when one is active.
+
+The interface damage accumulated over a simulation can be followed with the
+``TrackDamage`` data extractor (see :ref:`dataExtractors`).
+
+
+Slow landslides (keyword ``GeoVisc``)
+-------------------------------------
+
+``GeoVisc`` is a variant of ``Default`` designed for slow landslides, where the
+relevant resistance is viscous rather than elastic-frictional. Its specific
+feature is to make the friction force **viscous** while still yielding on the
+Coulomb cone.
+
+Normal component
+^^^^^^^^^^^^^^^^
+
+Identical to ``Default``: linear elastic repulsion plus viscous damping, with
+the total clamped to remain positive.
+
+.. math::
+
+   f_n = \left[ -k_n d_n + c\, v_n \right]_{\geq 0}
+
+The keywords are ``knContact`` and ``en2Contact``.
+
+Tangential component
+^^^^^^^^^^^^^^^^^^^^
+
+This is where the law departs from ``Default``. The tangential force is *not*
+accumulated incrementally from a tangential stiffness; it is proportional to the
+current sliding velocity, through a tangential viscosity
+:math:`\eta_t` (keyword ``viscTContact``):
+
+.. math::
+
+   \underline{f}_t = \eta_t\, \underline{v}_t
+
+It is then projected back onto the Coulomb cone, using the **elastic** part of
+the normal force as the reference:
+
+.. math::
+
+   \left\Vert \underline{f}_t \right\Vert \leq \mu \left| f_n^\text{elas} \right|
+
+.. note::
+
+   Using :math:`f_n^\text{elas}` rather than the total :math:`f_n` keeps the
+   threshold free of the viscous fluctuations of the normal force. Compiling
+   with ``ALLOW_NEGATIVE_THRESHOLDS`` switches the reference to the total
+   :math:`f_n`.
+
+Because the tangential force has no memory, ``ktContact`` is not used by this
+law: a body at rest carries no tangential force, and the model cannot sustain a
+static shear. It is meant for creeping motion, not for equilibrium.
+
+Moment vector
+^^^^^^^^^^^^^
+
+As in ``Default``, and only when :math:`k_r > 0`:
+
+.. math::
+
+   \Delta \underline{M} = \left[ k_r \left( \underline{\omega}_j - \underline{\omega}_i \right) \Delta t \right]_{\pm \mu_r f_n}
+
+The keywords are ``krContact`` and ``murContact``.
+
+
+Summary of the parameters used by each law
+------------------------------------------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 34 13 13 13 13 14
+
+   * - Parameter
+     - ``Default``
+     - ``Avalanche``
+     - ``StickedLinks``
+     - ``BCM``
+     - ``GeoVisc``
+   * - ``knContact``, ``en2Contact``
+     - yes
+     - yes
+     - yes
+     - yes
+     - yes
+   * - ``ktContact``
+     - yes
+     - yes
+     - yes
+     - yes
+     - no
+   * - ``muContact``, ``krContact``, ``murContact``
+     - yes
+     - yes
+     - yes
+     - yes
+     - yes
+   * - ``viscTContact``
+     - no
+     - no
+     - no
+     - no
+     - yes
+   * - ``kn/kt/krInnerBond``, ``kn/kt/krOuterBond``
+     - no
+     - no
+     - yes
+     - inner only
+     - no
+   * - ``fn0/ft0/mom0/pow*Bond``, ``en2*Bond``
+     - no
+     - no
+     - yes
+     - no
+     - no
+   * - ``gcInnerBond``, ``gcOuterBond``
+     - no
+     - no
+     - no
+     - yes
+     - no
+
+A parameter that a law does not read may be left undefined in the conf-file.
+Conversely, every pair of groups that can come into contact must have the
+parameters of the selected law defined, otherwise they default to zero.

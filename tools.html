@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tools comming with rockable &mdash; Rockable 1.0.0 documentation</title>
+  <title>Tools coming with Rockable &mdash; Rockable 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
@@ -17,6 +17,7 @@
       <script src="_static/documentation_options.js?v=8d563738"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -43,23 +44,48 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="quickStart.html">Quick-start guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fileOrganisation.html">Organisation of the files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commandLine.html">Command line and build options</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Input formats</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="syntaxConf.html">Format of configuration files (conf-file)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="syntaxShapes.html">Format of shape-files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drivingSystem.html">Driving the boundaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Physical models</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="forceLaws.html">Force laws</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bodyForces.html">Body forces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="periodicBoundaryConditions.html">Periodic boundary conditions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="softParticles.html">Deformable particles</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Results</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dataExtractors.html">Data extractors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postProcessing.html">Post-processing (<code class="docutils literal notranslate"><span class="pre">postpro</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualisation.html">Visualisation tools</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Tools comming with rockable</a><ul>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tools</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tools coming with Rockable</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="generator.html">Application <cite>generator</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="shapeSurvey.html">Application <code class="docutils literal notranslate"><span class="pre">shapeSurvey</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="converters.html">Converters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sweepable.html">Application <cite>sweepable</cite></a></li>
 </ul>
 </li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="developerGuide.html">Extending Rockable</a></li>
 </ul>
 
         </div>
@@ -76,7 +102,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Tools comming with rockable</li>
+      <li class="breadcrumb-item active">Tools coming with Rockable</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/tools.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -86,8 +112,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="tools-comming-with-rockable">
-<span id="tools"></span><h1>Tools comming with rockable<a class="headerlink" href="#tools-comming-with-rockable" title="Link to this heading"></a></h1>
+  <section id="tools-coming-with-rockable">
+<span id="tools"></span><h1>Tools coming with Rockable<a class="headerlink" href="#tools-coming-with-rockable" title="Link to this heading"></a></h1>
+<p>Beyond <code class="docutils literal notranslate"><span class="pre">rockable</span></code> itself, the repository ships a set of tools for preparing
+the input of a simulation and for exploiting its output. The visualisers are
+described separately, in <a class="reference internal" href="visualisation.html#visualisation"><span class="std std-ref">Visualisation tools</span></a>.</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="generator.html">Application <cite>generator</cite></a><ul>
@@ -95,6 +124,20 @@
 <li class="toctree-l2"><a class="reference internal" href="generator.html#command-reference">Command Reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generator.html#shape-generation">Shape Generation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generator.html#packing-generation">Packing Generation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="shapeSurvey.html">Application <code class="docutils literal notranslate"><span class="pre">shapeSurvey</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="shapeSurvey.html#browsing-the-library">Browsing the library</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shapeSurvey.html#computing-the-mass-properties">Computing the mass properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shapeSurvey.html#fitting-the-bounding-box">Fitting the bounding box</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shapeSurvey.html#saving">Saving</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shapeSurvey.html#typical-workflow-after-a-conversion">Typical workflow after a conversion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="converters.html">Converters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="converters.html#stl2shape-from-a-triangulated-mesh"><code class="docutils literal notranslate"><span class="pre">stl2shape</span></code>: from a triangulated mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="converters.html#tess2shape-from-a-neper-tessellation"><code class="docutils literal notranslate"><span class="pre">tess2shape</span></code>: from a Neper tessellation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="converters.html#shape2mesh-from-a-shape-to-a-surface-mesh"><code class="docutils literal notranslate"><span class="pre">shape2mesh</span></code>: from a shape to a surface mesh</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="sweepable.html">Application <cite>sweepable</cite></a><ul>

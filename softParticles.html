@@ -1,0 +1,215 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deformable particles &mdash; Rockable 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://richefeu.github.io/rockable/softParticles.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Data extractors" href="dataExtractors.html" />
+    <link rel="prev" title="Periodic boundary conditions" href="periodicBoundaryConditions.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Rockable
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickStart.html">Quick-start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fileOrganisation.html">Organisation of the files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commandLine.html">Command line and build options</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Input formats</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="syntaxConf.html">Format of configuration files (conf-file)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntaxShapes.html">Format of shape-files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drivingSystem.html">Driving the boundaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Physical models</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="forceLaws.html">Force laws</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bodyForces.html">Body forces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="periodicBoundaryConditions.html">Periodic boundary conditions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Deformable particles</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#activating-the-feature">Activating the feature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#current-status">Current status</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Results</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dataExtractors.html">Data extractors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postProcessing.html">Post-processing (<code class="docutils literal notranslate"><span class="pre">postpro</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualisation.html">Visualisation tools</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools coming with Rockable</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="developerGuide.html">Extending Rockable</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Rockable</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Deformable particles</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/softParticles.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="deformable-particles">
+<span id="softparticles"></span><h1>Deformable particles<a class="headerlink" href="#deformable-particles" title="Link to this heading"></a></h1>
+<p>By default a Rockable particle is rigid: it has six degrees of freedom, three of
+translation and three of rotation. The <em>soft particles</em> extension adds a
+<strong>homogeneous deformation</strong> to each body, so that a particle can change shape
+under load without being discretised into a mesh.</p>
+<p>The intent, stated in the design of the feature, is not to resolve a full
+kinematic field with many degrees of freedom, but to make a few of them
+possible: enough to model soft grains, polymers or biological tissues, while
+keeping the cost of a discrete element method.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This feature requires</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>..<span class="w"> </span>-DROCKABLE_ENABLE_SOFT_PARTICLES<span class="o">=</span>ON
+</pre></div>
+</div>
+<p>Without it, the keyword is accepted but only prints
+<code class="docutils literal notranslate"><span class="pre">SOFT_PARTICLES_NOT_ENABLED</span> <span class="pre">when</span> <span class="pre">Rockable</span> <span class="pre">was</span> <span class="pre">compiled</span></code>.</p>
+</div>
+<section id="activating-the-feature">
+<h2>Activating the feature<a class="headerlink" href="#activating-the-feature" title="Link to this heading"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">useSoftParticles</span></code> (<em>double</em>) <strong>Young</strong> (<em>double</em>) <strong>Poisson</strong></p>
+<p>Activates the homogeneous straining of the particles and builds the
+compliance from the Young modulus <span class="math notranslate nohighlight">\(E\)</span> and the Poisson ratio
+<span class="math notranslate nohighlight">\(\nu\)</span> of the material the bodies are made of.</p>
+</li>
+</ul>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">input.txt</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>useSoftParticles 1e6 0.0
+</pre></div>
+</div>
+</div>
+<p>Both parameters are global: all the bodies share the same compliance, whatever
+their group. A Poisson ratio of zero, as above, means the body shortens along
+the loading direction without bulging sideways, which is the simplest case to
+interpret.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The compliance relates the average stress carried by a body to its uniform
+strain. The stiffness of the <strong>contacts</strong> is a different matter, set by
+<code class="docutils literal notranslate"><span class="pre">knContact</span></code> and <code class="docutils literal notranslate"><span class="pre">ktContact</span></code> as usual: a soft particle in a stiff contact
+and a stiff particle in a soft contact are two different models, and both
+are available.</p>
+</div>
+</section>
+<section id="current-status">
+<h2>Current status<a class="headerlink" href="#current-status" title="Link to this heading"></a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The extension is under active development, in the postdoctoral work of
+<em>Mukesh Singh Bisht</em>, and it is not yet complete. In particular, the uniform
+transformation of the particles is <strong>not written to the conf-files</strong>: the
+code that saved it is commented out, and the corresponding field is not read
+back either.</p>
+<p>The practical consequence is that a computation using soft particles cannot
+be restarted exactly from a dump. The positions, velocities and orientations
+are restored, but the accumulated deformation of each body is lost, and the
+bodies restart undeformed. Run such a simulation in one go, or check the
+state of the feature in the source before relying on a restart.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p><code class="docutils literal notranslate"><span class="pre">rockable</span> <span class="pre">-b</span></code> prints <code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_SOFT_PARTICLES</span></code> among the
+compilation options, which is the quickest way to tell whether the binary at
+hand supports the feature.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="periodicBoundaryConditions.html" class="btn btn-neutral float-left" title="Periodic boundary conditions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="dataExtractors.html" class="btn btn-neutral float-right" title="Data extractors" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2026, Vincent Richefeu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

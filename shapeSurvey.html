@@ -1,0 +1,346 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Application shapeSurvey &mdash; Rockable 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://richefeu.github.io/rockable/shapeSurvey.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Converters" href="converters.html" />
+    <link rel="prev" title="Application generator" href="generator.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Rockable
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickStart.html">Quick-start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fileOrganisation.html">Organisation of the files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commandLine.html">Command line and build options</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Input formats</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="syntaxConf.html">Format of configuration files (conf-file)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntaxShapes.html">Format of shape-files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drivingSystem.html">Driving the boundaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Physical models</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="forceLaws.html">Force laws</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bodyForces.html">Body forces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="periodicBoundaryConditions.html">Periodic boundary conditions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="softParticles.html">Deformable particles</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Results</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dataExtractors.html">Data extractors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postProcessing.html">Post-processing (<code class="docutils literal notranslate"><span class="pre">postpro</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualisation.html">Visualisation tools</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tools</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="tools.html">Tools coming with Rockable</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="generator.html">Application <cite>generator</cite></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Application <code class="docutils literal notranslate"><span class="pre">shapeSurvey</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#browsing-the-library">Browsing the library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#computing-the-mass-properties">Computing the mass properties</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fitting-the-bounding-box">Fitting the bounding box</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#saving">Saving</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#typical-workflow-after-a-conversion">Typical workflow after a conversion</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="converters.html">Converters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sweepable.html">Application <cite>sweepable</cite></a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="developerGuide.html">Extending Rockable</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Rockable</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="tools.html">Tools coming with Rockable</a></li>
+      <li class="breadcrumb-item active">Application <code class="docutils literal notranslate"><span class="pre">shapeSurvey</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/shapeSurvey.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="application-shapesurvey">
+<span id="shapesurvey"></span><h1>Application <code class="docutils literal notranslate"><span class="pre">shapeSurvey</span></code><a class="headerlink" href="#application-shapesurvey" title="Link to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">shapeSurvey</span></code> is an OpenGL browser for a shape library. It answers the two
+questions that come up whenever a shape file has been written by hand or
+produced by a converter: <em>does this shape look like what I meant?</em> and <em>are its
+mass properties right?</em></p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>shapeSurvey<span class="w"> </span>shapes.txt
+</pre></div>
+</div>
+<p>It is also the tool that <strong>pre-computes</strong> a library. A shape whose
+<code class="docutils literal notranslate"><span class="pre">preCompDone</span></code> is <code class="docutils literal notranslate"><span class="pre">n</span></code> has its volume, inertia and bounding box recomputed
+every time a simulation starts; running the computation once here and saving the
+result removes that cost, and lets you check the values before they are used.</p>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#browsing-the-library" id="id1">Browsing the library</a></p></li>
+<li><p><a class="reference internal" href="#computing-the-mass-properties" id="id2">Computing the mass properties</a></p></li>
+<li><p><a class="reference internal" href="#fitting-the-bounding-box" id="id3">Fitting the bounding box</a></p></li>
+<li><p><a class="reference internal" href="#saving" id="id4">Saving</a></p></li>
+<li><p><a class="reference internal" href="#typical-workflow-after-a-conversion" id="id5">Typical workflow after a conversion</a></p></li>
+</ul>
+</nav>
+<section id="browsing-the-library">
+<h2><a class="toc-backref" href="#id1" role="doc-backlink">Browsing the library</a><a class="headerlink" href="#browsing-the-library" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 16.0%" />
+<col style="width: 84.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Action</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">+</span></code> / <code class="docutils literal notranslate"><span class="pre">-</span></code></p></td>
+<td><p>Next / previous shape. A shape whose <code class="docutils literal notranslate"><span class="pre">preCompDone</span></code> is <code class="docutils literal notranslate"><span class="pre">n</span></code> gets its
+bounding box fitted on the fly when it is displayed.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">h</span></code></p></td>
+<td><p>Show the help.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">e</span></code></p></td>
+<td><p>Print the extents of the bounding box in the terminal.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">a</span></code> / <code class="docutils literal notranslate"><span class="pre">A</span></code></p></td>
+<td><p>Decrease / increase the transparency.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">b</span></code></p></td>
+<td><p>Background colours on/off.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">w</span></code> / <code class="docutils literal notranslate"><span class="pre">W</span></code></p></td>
+<td><p>Roll the camera about the viewing axis.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">q</span></code></p></td>
+<td><p>Quit.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The mouse rotates, pans and zooms as in <code class="docutils literal notranslate"><span class="pre">see</span></code>.</p>
+</section>
+<section id="computing-the-mass-properties">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Computing the mass properties</a><a class="headerlink" href="#computing-the-mass-properties" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 16.0%" />
+<col style="width: 84.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Action</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">c</span></code></p></td>
+<td><p>Compute the mass properties of the current shape, and set its
+<code class="docutils literal notranslate"><span class="pre">preCompDone</span></code> to <code class="docutils literal notranslate"><span class="pre">y</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">C</span></code></p></td>
+<td><p>The same for <strong>every</strong> shape of the library that is still marked <code class="docutils literal notranslate"><span class="pre">n</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
+<td><p>Reset <code class="docutils literal notranslate"><span class="pre">preCompDone</span></code> of the current shape to <code class="docutils literal notranslate"><span class="pre">n</span></code>, to force a
+recomputation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">N</span></code> / <code class="docutils literal notranslate"><span class="pre">n</span></code></p></td>
+<td><p>Multiply / divide by ten the number of Monte-Carlo samples
+(<code class="docutils literal notranslate"><span class="pre">MCnstep</span></code>), between <span class="math notranslate nohighlight">\(10^3\)</span> and <span class="math notranslate nohighlight">\(10^8\)</span>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">d</span></code></p></td>
+<td><p>Clean every shape, removing the duplicated entities.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The volume and the inertia of a sphero-polyhedron have no closed form in the
+general case, so they are estimated by Monte-Carlo sampling. The accuracy
+therefore depends on <code class="docutils literal notranslate"><span class="pre">MCnstep</span></code>, and the estimated relative error on the volume
+is printed with the result.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Increase <code class="docutils literal notranslate"><span class="pre">MCnstep</span></code> with <code class="docutils literal notranslate"><span class="pre">N</span></code> until the printed error is small enough for
+your purpose, then press <code class="docutils literal notranslate"><span class="pre">C</span></code> and <code class="docutils literal notranslate"><span class="pre">s</span></code>. For a shape used as a driven wall
+the default is plenty; for a grain whose mass drives the dynamics, it is
+worth a few more samples.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A shape marked <code class="docutils literal notranslate"><span class="pre">preCompDone</span> <span class="pre">y</span></code> is <strong>trusted</strong>: Rockable uses the volume and
+the inertia written in the file without checking them. This is efficient, and
+it is also how a wrong value gets used silently, so it is worth looking at
+the numbers once.</p>
+</div>
+</section>
+<section id="fitting-the-bounding-box">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Fitting the bounding box</a><a class="headerlink" href="#fitting-the-bounding-box" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 16.0%" />
+<col style="width: 84.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Action</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">o</span></code></p></td>
+<td><p>Cycle through the fitting strategies: covariance, minimum volume,
+axis-aligned, imposed axis. The chosen one is stored as
+<code class="docutils literal notranslate"><span class="pre">fibObbOption</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">t</span></code></p></td>
+<td><p>Build the OBB-tree of the current shape.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">k</span></code> / <code class="docutils literal notranslate"><span class="pre">K</span></code></p></td>
+<td><p>Show one level less / one level more of the tree.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The oriented bounding box is what the neighbour detection uses first, so a
+poorly fitted box costs time on every step. The four strategies differ in what
+they optimise: the covariance fit is fast and usually good, the minimum-volume
+fit is tighter on elongated shapes, and the axis-aligned one is only relevant
+for shapes already aligned with the axes.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The OBB-tree, and the <code class="docutils literal notranslate"><span class="pre">OBBtreeLevel</span></code> keyword of the shape files, are
+deprecated. The tree can still be built and displayed here, but the
+contact detection is driven by <code class="docutils literal notranslate"><span class="pre">AddOrRemoveInteractions</span></code>, whose
+<code class="docutils literal notranslate"><span class="pre">OBBtree</span></code> option builds what it needs on its own.</p>
+</div>
+</section>
+<section id="saving">
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Saving</a><a class="headerlink" href="#saving" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 16.0%" />
+<col style="width: 84.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Action</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">s</span></code></p></td>
+<td><p>Save the library back to <strong>the file it was read from</strong>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">p</span></code></p></td>
+<td><p>Export a sample: one particle per shape, laid out so that the library can
+be opened directly in <code class="docutils literal notranslate"><span class="pre">see</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="docutils literal notranslate"><span class="pre">s</span></code> overwrites the input file in place, without asking. Keep a copy of a
+library you care about before pressing it.</p>
+</div>
+</section>
+<section id="typical-workflow-after-a-conversion">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Typical workflow after a conversion</a><a class="headerlink" href="#typical-workflow-after-a-conversion" title="Link to this heading"></a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>stl2shape<span class="w"> </span>-i<span class="w"> </span>mesh.stl<span class="w"> </span>-r<span class="w"> </span><span class="m">0</span>.01<span class="w"> </span>-c<span class="w">    </span><span class="c1"># -&gt; mesh.shp, preCompDone n</span>
+shapeSurvey<span class="w"> </span>mesh.shp
+</pre></div>
+</div>
+<p>Then, in the window: browse with <code class="docutils literal notranslate"><span class="pre">+</span></code> to check the geometry, press <code class="docutils literal notranslate"><span class="pre">C</span></code> to
+compute the mass properties of every shape, and <code class="docutils literal notranslate"><span class="pre">s</span></code> to save. The library is
+then ready for a simulation, and no shape will be recomputed at start-up.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="generator.html" class="btn btn-neutral float-left" title="Application generator" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="converters.html" class="btn btn-neutral float-right" title="Converters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2026, Vincent Richefeu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

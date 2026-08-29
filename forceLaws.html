@@ -21,7 +21,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Global dissipation features" href="dissipation.html" />
+    <link rel="next" title="Body forces" href="bodyForces.html" />
     <link rel="prev" title="Pre-processing commands" href="preProcessing.html" /> 
 </head>
 
@@ -44,24 +44,60 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="quickStart.html">Quick-start guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fileOrganisation.html">Organisation of the files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commandLine.html">Command line and build options</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Input formats</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="syntaxConf.html">Format of configuration files (conf-file)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="syntaxShapes.html">Format of shape-files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drivingSystem.html">Driving the boundaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Physical models</span></p>
+<ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Force laws</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#default-model-keywork-default">Default model (keywork <code class="docutils literal notranslate"><span class="pre">Default</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#law-for-rock-avalanches-keywork-avalanche">Law for rock avalanches (keywork <code class="docutils literal notranslate"><span class="pre">Avalanche</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#breakable-elastic-solid-bonds-keywork-stickedlinks">Breakable elastic solid bonds (keywork <code class="docutils literal notranslate"><span class="pre">StickedLinks</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#default-model-keyword-default">Default model (keyword <code class="docutils literal notranslate"><span class="pre">Default</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#law-for-rock-avalanches-keyword-avalanche">Law for rock avalanches (keyword <code class="docutils literal notranslate"><span class="pre">Avalanche</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#breakable-elastic-solid-bonds-keyword-stickedlinks">Breakable elastic solid bonds (keyword <code class="docutils literal notranslate"><span class="pre">StickedLinks</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#bonded-cell-method-keyword-bcm">Bonded Cell Method (keyword <code class="docutils literal notranslate"><span class="pre">BCM</span></code>)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#cohesive-bond">Cohesive bond</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rupture-criterion">Rupture criterion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#contact">Contact</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#slow-landslides-keyword-geovisc">Slow landslides (keyword <code class="docutils literal notranslate"><span class="pre">GeoVisc</span></code>)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#normal-component">Normal component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tangential-component">Tangential component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#moment-vector">Moment vector</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#summary-of-the-parameters-used-by-each-law">Summary of the parameters used by each law</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bodyForces.html">Body forces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="periodicBoundaryConditions.html">Periodic boundary conditions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="softParticles.html">Deformable particles</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Results</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dataExtractors.html">Data extractors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postProcessing.html">Post-processing (<code class="docutils literal notranslate"><span class="pre">postpro</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualisation.html">Visualisation tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools comming with rockable</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools coming with Rockable</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="developerGuide.html">Extending Rockable</a></li>
 </ul>
 
         </div>
@@ -105,8 +141,8 @@ knContact 0 2 1e8
 </pre></div>
 </div>
 </div>
-<section id="default-model-keywork-default">
-<h2>Default model (keywork <code class="docutils literal notranslate"><span class="pre">Default</span></code>)<a class="headerlink" href="#default-model-keywork-default" title="Link to this heading"></a></h2>
+<section id="default-model-keyword-default">
+<h2>Default model (keyword <code class="docutils literal notranslate"><span class="pre">Default</span></code>)<a class="headerlink" href="#default-model-keyword-default" title="Link to this heading"></a></h2>
 <p>This is the force law to be used in most cases.
 In short, the model includes elastic linear normal force for contact, normal viscosity force, constant normal cohesion force at contact,
 Coulomb friction tangent force, and rolling resistance moment</p>
@@ -124,7 +160,7 @@ Coulomb friction tangent force, and rolling resistance moment</p>
 <li><p>The viscuous part of the normal contact force is</p></li>
 </ol>
 <div class="math notranslate nohighlight">
-\[f_n^\text{visc} = \alpha_n \sqrt{2 m_\text{eff}} v_n\]</div>
+\[f_n^\text{visc} = 2 \alpha_n \sqrt{k_n m_\text{eff}} \, v_n\]</div>
 <p>where <span class="math notranslate nohighlight">\(v_n\)</span> is the relative normal velocity, <span class="math notranslate nohighlight">\(m_\text{eff}=(m_i m_j)/(m_i+m_j)\)</span> is the effective mass, and <span class="math notranslate nohighlight">\(\alpha_n \in [0, 1[\)</span> is the rate of normal viscuous damping. There are two ways to set the value of <span class="math notranslate nohighlight">\(\alpha_n\)</span>:</p>
 <blockquote>
 <div><ol class="lowerroman simple">
@@ -161,8 +197,8 @@ Coulomb friction tangent force, and rolling resistance moment</p>
 <p>The moment resistance is applied only when <span class="math notranslate nohighlight">\(k_r &gt; 0\)</span>.</p>
 </div>
 </section>
-<section id="law-for-rock-avalanches-keywork-avalanche">
-<h2>Law for rock avalanches (keywork <code class="docutils literal notranslate"><span class="pre">Avalanche</span></code>)<a class="headerlink" href="#law-for-rock-avalanches-keywork-avalanche" title="Link to this heading"></a></h2>
+<section id="law-for-rock-avalanches-keyword-avalanche">
+<h2>Law for rock avalanches (keyword <code class="docutils literal notranslate"><span class="pre">Avalanche</span></code>)<a class="headerlink" href="#law-for-rock-avalanches-keyword-avalanche" title="Link to this heading"></a></h2>
 <p>This is historically the first law that has been implemented in <code class="docutils literal notranslate"><span class="pre">Rockable</span></code> (actually in <code class="docutils literal notranslate"><span class="pre">DEMbox</span></code>, its ancestor).</p>
 <p>The force-law implemented is specifically designed for simulating rock avalanches at Laboratoire 3SR. It governs the interactions between particles or bodies in a granular material, considering both normal and tangential forces as well as resistant moments due to rotational motion.</p>
 <ol class="arabic">
@@ -185,8 +221,8 @@ Coulomb friction tangent force, and rolling resistance moment</p>
 <p>The code includes conditional blocks for certain options (<cite>FT_CORR</cite>) which may affect the actual computations. Additionally, the equations use specific parameters (<cite>en2</cite> and <cite>mur</cite>), which should be defined and obtained from relevant data sources in the simulation setup.</p>
 </div>
 </section>
-<section id="breakable-elastic-solid-bonds-keywork-stickedlinks">
-<h2>Breakable elastic solid bonds (keywork <code class="docutils literal notranslate"><span class="pre">StickedLinks</span></code>)<a class="headerlink" href="#breakable-elastic-solid-bonds-keywork-stickedlinks" title="Link to this heading"></a></h2>
+<section id="breakable-elastic-solid-bonds-keyword-stickedlinks">
+<h2>Breakable elastic solid bonds (keyword <code class="docutils literal notranslate"><span class="pre">StickedLinks</span></code>)<a class="headerlink" href="#breakable-elastic-solid-bonds-keyword-stickedlinks" title="Link to this heading"></a></h2>
 <p>This law has been introduced since the PhD work of <em>Marta Stasiak</em>.</p>
 <p>Two states can exist: cohesive bond and contact.</p>
 <ol class="arabic">
@@ -202,8 +238,8 @@ Hooke’s elastic contact, combined with viscous damping:</p>
 <p>where <span class="math notranslate nohighlight">\(d_n^0\)</span> is the initial normal distance. This time, the parameter <span class="math notranslate nohighlight">\(k_n\)</span> is set with the keyword <code class="docutils literal notranslate"><span class="pre">knInnerBond</span></code> or <code class="docutils literal notranslate"><span class="pre">knOuterBond</span></code>.
 The viscous normal force is:</p>
 <div class="math notranslate nohighlight">
-\[f_n^\text{visc} = \alpha_n \sqrt{2 m_\text{eff}} v_n\]</div>
-<p>where <span class="math notranslate nohighlight">\(\alpha_n\)</span> is indirectly set with the keywork <code class="docutils literal notranslate"><span class="pre">en2InnerBond</span></code> or <code class="docutils literal notranslate"><span class="pre">en2OuterBond</span></code>.</p>
+\[f_n^\text{visc} = 2 \alpha_n \sqrt{k_n m_\text{eff}} \, v_n\]</div>
+<p>where <span class="math notranslate nohighlight">\(\alpha_n\)</span> is indirectly set with the keyword <code class="docutils literal notranslate"><span class="pre">en2InnerBond</span></code> or <code class="docutils literal notranslate"><span class="pre">en2OuterBond</span></code>.</p>
 </li>
 <li><p><strong>Tangential component</strong></p>
 <p>The tangential elastic force (<span class="math notranslate nohighlight">\(f_t\)</span>) is incrementally calculated based on the relative tangential velocity (<span class="math notranslate nohighlight">\(v_t\)</span>) and a tangential stiffness parameter (<span class="math notranslate nohighlight">\(k_t\)</span>, keyword <code class="docutils literal notranslate"><span class="pre">ktInnerBond</span></code> or <code class="docutils literal notranslate"><span class="pre">ktOuterBond</span></code>):</p>
@@ -211,12 +247,18 @@ The viscous normal force is:</p>
 \[\Delta f_t = k_t (v_t \Delta t)\]</div>
 </li>
 </ol>
-<p>Optionally, an additional term for tangential viscosity (<span class="math notranslate nohighlight">\(f_t^\text{visc} = \alpha_n \sqrt{2 m_\text{eff}} v_t\)</span>) can be added to the elastic part of the tangential force. However, this approach accumulates viscosity over time and may not be accurate:</p>
-<ol class="loweralpha simple" start="3">
-<li><p><strong>Moment vector</strong></p></li>
-</ol>
-<p>TODO</p>
-<ol class="loweralpha" start="4">
+<p>Optionally, an additional term for tangential viscosity (<span class="math notranslate nohighlight">\(f_t^\text{visc} = 2 \alpha_n \sqrt{k_n m_\text{eff}} \, v_t\)</span>) can be added to the elastic part of the tangential force. However, this approach accumulates viscosity over time and may not be accurate:</p>
+<ol class="loweralpha" start="3">
+<li><p><strong>Moment vector</strong></p>
+<p>The moment carried by the bond is accumulated incrementally from the
+relative rotation velocity, with the rolling stiffness <span class="math notranslate nohighlight">\(k_r\)</span>
+(keyword <code class="docutils literal notranslate"><span class="pre">krInnerBond</span></code> or <code class="docutils literal notranslate"><span class="pre">krOuterBond</span></code>):</p>
+<div class="math notranslate nohighlight">
+\[\Delta \underline{M} = k_r \left( \underline{\omega}_j - \underline{\omega}_i \right) \Delta t\]</div>
+<p>Unlike the resistant moment of a <em>contact</em>, this moment is <strong>not</strong>
+capped: as long as the bond exists it grows freely, and it is the
+rupture criterion below that limits it through <span class="math notranslate nohighlight">\(M_0\)</span>.</p>
+</li>
 <li><p><strong>Rupture criterion</strong></p>
 <p>The rupture criterion determines if the cohesive bond should break. If the yield value is greater than 0, the bond is irreversibly broken (actually, the breakage of the whole interface is scheduled as soon as possible). The yield function reads:</p>
 <div class="math notranslate nohighlight">
@@ -246,6 +288,210 @@ The viscous normal force is:</p>
 </ol>
 <p>Note: The code includes conditional blocks for certain options (<cite>FT_CORR</cite> and <cite>box-&gt;ctcPartnership.getWeight != nullptr</cite>) which may affect the actual computations.</p>
 </section>
+<section id="bonded-cell-method-keyword-bcm">
+<h2>Bonded Cell Method (keyword <code class="docutils literal notranslate"><span class="pre">BCM</span></code>)<a class="headerlink" href="#bonded-cell-method-keyword-bcm" title="Link to this heading"></a></h2>
+<p>This law was introduced to model a cohesive solid discretised into cells that
+share <em>faces</em>, rather than a packing of grains glued at a few points. The
+interface between two cells carries an <strong>area</strong>, and the rupture is governed by
+a <strong>fracture energy</strong> rather than by a force threshold.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p><code class="docutils literal notranslate"><span class="pre">BCM</span></code> only makes sense once the interfaces have been created by the
+pre-processing command <code class="docutils literal notranslate"><span class="pre">stickBCM</span></code>, which is the command that computes the
+area of each interface (see <a class="reference internal" href="preProcessing.html#prepro"><span class="std std-ref">Pre-processing commands</span></a>). All the interfaces built that
+way are flagged as <em>inner</em>, so <code class="docutils literal notranslate"><span class="pre">BCM</span></code> reads only the <code class="docutils literal notranslate"><span class="pre">*InnerBond</span></code>
+parameters.</p>
+</div>
+<section id="cohesive-bond">
+<h3>Cohesive bond<a class="headerlink" href="#cohesive-bond" title="Link to this heading"></a></h3>
+<p>The stiffnesses of an interface are shared between the sub-bonds it holds. If
+the interface carries <span class="math notranslate nohighlight">\(N_b\)</span> bonds, each of them uses</p>
+<div class="math notranslate nohighlight">
+\[k_n \leftarrow \frac{k_n}{N_b} \qquad k_t \leftarrow \frac{k_t}{N_b}\]</div>
+<p>so that refining the discretisation of an interface does not stiffen it. The
+values of <span class="math notranslate nohighlight">\(k_n\)</span> and <span class="math notranslate nohighlight">\(k_t\)</span> come from <code class="docutils literal notranslate"><span class="pre">knInnerBond</span></code> and
+<code class="docutils literal notranslate"><span class="pre">ktInnerBond</span></code>, or from the interface itself when <code class="docutils literal notranslate"><span class="pre">ParamsInInterfaces</span></code> is 1.</p>
+<p>The normal force combines the elastic response, measured from the distance
+<span class="math notranslate nohighlight">\(d_n^0\)</span> recorded at gluing, with the viscous damping:</p>
+<div class="math notranslate nohighlight">
+\[f_n = -k_n \left( d_n - d_n^0 \right) + c\, v_n\]</div>
+<p>and the tangential force is accumulated incrementally, then completed by a
+viscous term:</p>
+<div class="math notranslate nohighlight">
+\[\Delta \underline{f}_t = k_t\, \underline{v}_t \Delta t
+\qquad\text{then}\qquad
+\underline{f}_t \leftarrow \underline{f}_t + c\, \underline{v}_t\]</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>As in <code class="docutils literal notranslate"><span class="pre">StickedLinks</span></code>, the tangential viscous term is added to the
+<em>accumulated</em> force rather than to its elastic part alone, so the viscosity
+piles up over time. Keep this in mind when interpreting the tangential
+response of a bond.</p>
+</div>
+<p>Neither the tangential force nor the moment is capped while the bond holds: the
+bond is elastic until it breaks.</p>
+</section>
+<section id="rupture-criterion">
+<h3>Rupture criterion<a class="headerlink" href="#rupture-criterion" title="Link to this heading"></a></h3>
+<p>The criterion is energetic and applies to the interface <strong>as a whole</strong>, not to
+its individual bonds. At each step, the elastic energy stored in the interface
+is summed over its bonds. Only the bonds in <em>tension</em> contribute to the normal
+part:</p>
+<div class="math notranslate nohighlight">
+\[E_n = \sum_{b\,\mid\, d_n^b &gt; d_n^0} \frac{1}{2} k_n \left( d_n^b - d_n^0 \right)^2
+\qquad
+E_t = \sum_{b} \frac{1}{2} k_t \left\Vert \underline{s}_b \right\Vert^2\]</div>
+<p>where <span class="math notranslate nohighlight">\(\underline{s}_b\)</span> is the accumulated tangential sliding of the bond.
+The whole interface breaks as soon as</p>
+<div class="math notranslate nohighlight">
+\[E_n + E_t &gt; 2\, A\, G_c\]</div>
+<p>with <span class="math notranslate nohighlight">\(A\)</span> the area of the interface and <span class="math notranslate nohighlight">\(G_c\)</span> the fracture energy
+(keyword <code class="docutils literal notranslate"><span class="pre">gcInnerBond</span></code>, or <code class="docutils literal notranslate"><span class="pre">gcOuterBond</span></code> for an outer interface). The factor
+2 accounts for the two surfaces created by the crack.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The stiffnesses used in this energy balance are the ones read from the
+group-pair table, <em>not</em> the per-bond values divided by <span class="math notranslate nohighlight">\(N_b\)</span> that the
+force computation uses.</p>
+</div>
+<p>When the criterion is met the interface is not broken immediately: it is added
+to a list and all its bonds are released once every force has been computed.
+This postponement avoids introducing an asymmetry in the incrementally computed
+tangential forces.</p>
+</section>
+<section id="contact">
+<h3>Contact<a class="headerlink" href="#contact" title="Link to this heading"></a></h3>
+<p>Once a bond is broken, or between two cells that were never glued, the
+interaction falls back to a law identical to <code class="docutils literal notranslate"><span class="pre">Default</span></code>: linear elastic normal
+repulsion with viscous damping and a positivity clamp, Coulomb friction capped
+at <span class="math notranslate nohighlight">\(\mu f_n\)</span>, and a resistant moment capped at <span class="math notranslate nohighlight">\(\mu_r f_n\)</span>. The
+parameters are then <code class="docutils literal notranslate"><span class="pre">knContact</span></code>, <code class="docutils literal notranslate"><span class="pre">ktContact</span></code>, <code class="docutils literal notranslate"><span class="pre">muContact</span></code>, <code class="docutils literal notranslate"><span class="pre">krContact</span></code>
+and <code class="docutils literal notranslate"><span class="pre">murContact</span></code>, weighted by the contact partnership when one is active.</p>
+<p>The interface damage accumulated over a simulation can be followed with the
+<code class="docutils literal notranslate"><span class="pre">TrackDamage</span></code> data extractor (see <a class="reference internal" href="dataExtractors.html#dataextractors"><span class="std std-ref">Data extractors</span></a>).</p>
+</section>
+</section>
+<section id="slow-landslides-keyword-geovisc">
+<h2>Slow landslides (keyword <code class="docutils literal notranslate"><span class="pre">GeoVisc</span></code>)<a class="headerlink" href="#slow-landslides-keyword-geovisc" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">GeoVisc</span></code> is a variant of <code class="docutils literal notranslate"><span class="pre">Default</span></code> designed for slow landslides, where the
+relevant resistance is viscous rather than elastic-frictional. Its specific
+feature is to make the friction force <strong>viscous</strong> while still yielding on the
+Coulomb cone.</p>
+<section id="normal-component">
+<h3>Normal component<a class="headerlink" href="#normal-component" title="Link to this heading"></a></h3>
+<p>Identical to <code class="docutils literal notranslate"><span class="pre">Default</span></code>: linear elastic repulsion plus viscous damping, with
+the total clamped to remain positive.</p>
+<div class="math notranslate nohighlight">
+\[f_n = \left[ -k_n d_n + c\, v_n \right]_{\geq 0}\]</div>
+<p>The keywords are <code class="docutils literal notranslate"><span class="pre">knContact</span></code> and <code class="docutils literal notranslate"><span class="pre">en2Contact</span></code>.</p>
+</section>
+<section id="tangential-component">
+<h3>Tangential component<a class="headerlink" href="#tangential-component" title="Link to this heading"></a></h3>
+<p>This is where the law departs from <code class="docutils literal notranslate"><span class="pre">Default</span></code>. The tangential force is <em>not</em>
+accumulated incrementally from a tangential stiffness; it is proportional to the
+current sliding velocity, through a tangential viscosity
+<span class="math notranslate nohighlight">\(\eta_t\)</span> (keyword <code class="docutils literal notranslate"><span class="pre">viscTContact</span></code>):</p>
+<div class="math notranslate nohighlight">
+\[\underline{f}_t = \eta_t\, \underline{v}_t\]</div>
+<p>It is then projected back onto the Coulomb cone, using the <strong>elastic</strong> part of
+the normal force as the reference:</p>
+<div class="math notranslate nohighlight">
+\[\left\Vert \underline{f}_t \right\Vert \leq \mu \left| f_n^\text{elas} \right|\]</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Using <span class="math notranslate nohighlight">\(f_n^\text{elas}\)</span> rather than the total <span class="math notranslate nohighlight">\(f_n\)</span> keeps the
+threshold free of the viscous fluctuations of the normal force. Compiling
+with <code class="docutils literal notranslate"><span class="pre">ALLOW_NEGATIVE_THRESHOLDS</span></code> switches the reference to the total
+<span class="math notranslate nohighlight">\(f_n\)</span>.</p>
+</div>
+<p>Because the tangential force has no memory, <code class="docutils literal notranslate"><span class="pre">ktContact</span></code> is not used by this
+law: a body at rest carries no tangential force, and the model cannot sustain a
+static shear. It is meant for creeping motion, not for equilibrium.</p>
+</section>
+<section id="moment-vector">
+<h3>Moment vector<a class="headerlink" href="#moment-vector" title="Link to this heading"></a></h3>
+<p>As in <code class="docutils literal notranslate"><span class="pre">Default</span></code>, and only when <span class="math notranslate nohighlight">\(k_r &gt; 0\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\Delta \underline{M} = \left[ k_r \left( \underline{\omega}_j - \underline{\omega}_i \right) \Delta t \right]_{\pm \mu_r f_n}\]</div>
+<p>The keywords are <code class="docutils literal notranslate"><span class="pre">krContact</span></code> and <code class="docutils literal notranslate"><span class="pre">murContact</span></code>.</p>
+</section>
+</section>
+<section id="summary-of-the-parameters-used-by-each-law">
+<h2>Summary of the parameters used by each law<a class="headerlink" href="#summary-of-the-parameters-used-by-each-law" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 34.0%" />
+<col style="width: 13.0%" />
+<col style="width: 13.0%" />
+<col style="width: 13.0%" />
+<col style="width: 13.0%" />
+<col style="width: 14.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">Default</span></code></p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">Avalanche</span></code></p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">StickedLinks</span></code></p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">BCM</span></code></p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">GeoVisc</span></code></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">knContact</span></code>, <code class="docutils literal notranslate"><span class="pre">en2Contact</span></code></p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ktContact</span></code></p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+<td><p>no</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">muContact</span></code>, <code class="docutils literal notranslate"><span class="pre">krContact</span></code>, <code class="docutils literal notranslate"><span class="pre">murContact</span></code></p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">viscTContact</span></code></p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">kn/kt/krInnerBond</span></code>, <code class="docutils literal notranslate"><span class="pre">kn/kt/krOuterBond</span></code></p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+<td><p>inner only</p></td>
+<td><p>no</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">fn0/ft0/mom0/pow*Bond</span></code>, <code class="docutils literal notranslate"><span class="pre">en2*Bond</span></code></p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">gcInnerBond</span></code>, <code class="docutils literal notranslate"><span class="pre">gcOuterBond</span></code></p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+<td><p>no</p></td>
+</tr>
+</tbody>
+</table>
+<p>A parameter that a law does not read may be left undefined in the conf-file.
+Conversely, every pair of groups that can come into contact must have the
+parameters of the selected law defined, otherwise they default to zero.</p>
+</section>
 </section>
 
 
@@ -253,7 +499,7 @@ The viscous normal force is:</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="preProcessing.html" class="btn btn-neutral float-left" title="Pre-processing commands" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="dissipation.html" class="btn btn-neutral float-right" title="Global dissipation features" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="bodyForces.html" class="btn btn-neutral float-right" title="Body forces" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

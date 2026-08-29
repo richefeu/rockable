@@ -1,0 +1,317 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data extractors &mdash; Rockable 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://richefeu.github.io/rockable/dataExtractors.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Post-processing (postpro)" href="postProcessing.html" />
+    <link rel="prev" title="Deformable particles" href="softParticles.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Rockable
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickStart.html">Quick-start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fileOrganisation.html">Organisation of the files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commandLine.html">Command line and build options</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Input formats</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="syntaxConf.html">Format of configuration files (conf-file)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntaxShapes.html">Format of shape-files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drivingSystem.html">Driving the boundaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Physical models</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="forceLaws.html">Force laws</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bodyForces.html">Body forces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="periodicBoundaryConditions.html">Periodic boundary conditions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="softParticles.html">Deformable particles</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Results</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data extractors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#the-file-dataextractors-txt">The file <code class="docutils literal notranslate"><span class="pre">dataExtractors.txt</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#common-parameters">Common parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#available-extractors">Available extractors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#declaring-an-extractor-inside-a-conf-file">Declaring an extractor inside a conf-file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plotting-the-results">Plotting the results</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="postProcessing.html">Post-processing (<code class="docutils literal notranslate"><span class="pre">postpro</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualisation.html">Visualisation tools</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools coming with Rockable</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="developerGuide.html">Extending Rockable</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Rockable</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Data extractors</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/dataExtractors.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="data-extractors">
+<span id="dataextractors"></span><h1>Data extractors<a class="headerlink" href="#data-extractors" title="Link to this heading"></a></h1>
+<p>Data extractors are probes evaluated <strong>during</strong> a computation. They write plain
+text files that can be plotted directly, and they avoid the usual alternative of
+saving hundreds of conf-files only to post-process a single scalar afterwards.</p>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#the-file-dataextractors-txt" id="id2">The file <code class="docutils literal notranslate"><span class="pre">dataExtractors.txt</span></code></a></p></li>
+<li><p><a class="reference internal" href="#common-parameters" id="id3">Common parameters</a></p></li>
+<li><p><a class="reference internal" href="#available-extractors" id="id4">Available extractors</a></p></li>
+<li><p><a class="reference internal" href="#declaring-an-extractor-inside-a-conf-file" id="id5">Declaring an extractor inside a conf-file</a></p></li>
+<li><p><a class="reference internal" href="#plotting-the-results" id="id6">Plotting the results</a></p></li>
+</ul>
+</nav>
+<section id="the-file-dataextractors-txt">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">The file <code class="docutils literal notranslate"><span class="pre">dataExtractors.txt</span></code></a><a class="headerlink" href="#the-file-dataextractors-txt" title="Link to this heading"></a></h2>
+<p>The extractors are declared in a file named <code class="docutils literal notranslate"><span class="pre">dataExtractors.txt</span></code>, placed in
+the folder where the computation runs. The file is read once, at start-up, right
+after the driving system. Each entry starts with the name of an extractor,
+followed by its own parameters:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">dataExtractors.txt</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span># one line per extractor
+MeanVelocity     meanVelocity.txt 100
+TrackBody     12 body12.txt       100
+dnStat           dn.txt           500
+</pre></div>
+</div>
+</div>
+<p>A token starting with <code class="docutils literal notranslate"><span class="pre">/</span></code>, <code class="docutils literal notranslate"><span class="pre">#</span></code> or <code class="docutils literal notranslate"><span class="pre">!</span></code> discards the rest of the line.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The extractors are <strong>not</strong> saved into the conf-files. The file is re-read
+from the running folder every time a computation is started, so restarting
+from <code class="docutils literal notranslate"><span class="pre">conf27</span></code> keeps the same probes, and editing the file between two runs
+is enough to change them.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The extractors are ignored when the conf-file is opened by an interactive
+tool (<code class="docutils literal notranslate"><span class="pre">see</span></code>, <code class="docutils literal notranslate"><span class="pre">seer</span></code>, <code class="docutils literal notranslate"><span class="pre">conftovtk</span></code>, <code class="docutils literal notranslate"><span class="pre">postpro</span></code>). Only <code class="docutils literal notranslate"><span class="pre">rockable</span></code>
+evaluates them.</p>
+</div>
+</section>
+<section id="common-parameters">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Common parameters</a><a class="headerlink" href="#common-parameters" title="Link to this heading"></a></h2>
+<p>Every extractor ends its parameter list with the same two entries:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;filename&gt;</span></code></p></td>
+<td><p>Name of the text file to write. It is opened at start-up and flushed
+after each record, so it can be plotted while the computation runs.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;nrec&gt;</span></code></p></td>
+<td><p>Number of <strong>time steps</strong> between two records. This is a step count, not
+a duration: with <code class="docutils literal notranslate"><span class="pre">dt</span> <span class="pre">1e-6</span></code>, <code class="docutils literal notranslate"><span class="pre">nrec</span> <span class="pre">1000</span></code> records every millisecond of
+simulated time.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The first column of every output file is the time <span class="math notranslate nohighlight">\(t\)</span>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>A file named <code class="docutils literal notranslate"><span class="pre">extractedDataDoc.txt</span></code> is generated at start-up whenever at
+least one extractor is declared. It documents, extractor by extractor, what
+each column of each output file contains. It is the authoritative reference
+when a column ordering is not obvious.</p>
+</div>
+</section>
+<section id="available-extractors">
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Available extractors</a><a class="headerlink" href="#available-extractors" title="Link to this heading"></a></h2>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">MeanVelocity</span></code> (<em>string</em>) <strong>filename</strong> (<em>int</em>) <strong>nrec</strong></dt><dd><p>Mean of the velocity magnitude <span class="math notranslate nohighlight">\(\Vert \underline{v} \Vert\)</span> over
+<strong>all</strong> the bodies, driven ones included.</p>
+<p>Columns: <code class="docutils literal notranslate"><span class="pre">t</span></code>, mean velocity.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">TrackBody</span></code> (<em>int</em>) <strong>ibody</strong> (<em>string</em>) <strong>filename</strong> (<em>int</em>) <strong>nrec</strong></dt><dd><p>Full kinematics and loading of a single body.</p>
+<p>Columns: <code class="docutils literal notranslate"><span class="pre">t</span></code>, then <code class="docutils literal notranslate"><span class="pre">pos</span></code> (3), <code class="docutils literal notranslate"><span class="pre">vel</span></code> (3), <code class="docutils literal notranslate"><span class="pre">Q</span></code> (4, as <code class="docutils literal notranslate"><span class="pre">w</span> <span class="pre">x</span> <span class="pre">y</span> <span class="pre">z</span></code>),
+<code class="docutils literal notranslate"><span class="pre">vrot</span></code> (3), the resultant force (3) and the resultant moment (3).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When a component of the body is driven in <em>force</em>, the imposed force is
+subtracted from the recorded resultant, so that the column holds the
+force actually carried by the contacts.</p>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">TrackRockfall</span></code> (<em>int</em>) <strong>ibody</strong> (<em>double</em>) <strong>vStop</strong> (<em>double</em>) <strong>wStop</strong> (<em>string</em>) <strong>filename</strong> (<em>int</em>) <strong>nrec</strong></dt><dd><p>Same columns as <code class="docutils literal notranslate"><span class="pre">TrackBody</span></code>, but it also <strong>stops the computation</strong> when
+the tracked block has come to rest, which is what a rockfall study needs:
+there is no point integrating a block that has stopped.</p>
+<p>The run is stopped as soon as
+<span class="math notranslate nohighlight">\(\Vert \underline{v} \Vert &lt; v_\text{stop}\)</span> <strong>and</strong>
+<span class="math notranslate nohighlight">\(\Vert \underline{\omega} \Vert &lt; w_\text{stop}\)</span>, or as soon as the
+block leaves the bounding box of the driven bodies.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The stop test is inhibited before <span class="math notranslate nohighlight">\(t_\text{min} = v_\text{stop}/g\)</span>
+with <span class="math notranslate nohighlight">\(g = 9.81\)</span>. This grace period is computed automatically, and
+prevents a block released at rest from stopping the computation at the
+very first step, before gravity has had time to accelerate it.</p>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ClusterAABB</span></code> (<em>int</em>) <strong>icluster</strong> (<em>string</em>) <strong>filename</strong> (<em>int</em>) <strong>nrec</strong></dt><dd><p>Axis-aligned bounding box of one cluster, useful to follow the swelling or
+the spreading of a fragmenting body.</p>
+<p>Columns: <code class="docutils literal notranslate"><span class="pre">t</span></code>, <code class="docutils literal notranslate"><span class="pre">aabb.min</span></code> (3), <code class="docutils literal notranslate"><span class="pre">aabb.max</span></code> (3).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">dnStat</span></code> (<em>string</em>) <strong>filename</strong> (<em>int</em>) <strong>nrec</strong></dt><dd><p>Statistics of the normal distances <span class="math notranslate nohighlight">\(d_n\)</span> over all the interactions.
+It is the quickest way to check that a simulation is not over-compressed
+and that the time step is small enough.</p>
+<p>Columns: <code class="docutils literal notranslate"><span class="pre">t</span></code>, <code class="docutils literal notranslate"><span class="pre">dnMin</span></code>, <code class="docutils literal notranslate"><span class="pre">dnMax</span></code>, <code class="docutils literal notranslate"><span class="pre">dnMean</span></code>, the mean over the negative
+values only, the mean over the positive values only, the count of negative
+values, the count of positive values, and the position (3) where
+<code class="docutils literal notranslate"><span class="pre">dnMin</span></code> occurs.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">DuoBalance</span></code> (<em>int</em>) <strong>i</strong> (<em>int</em>) <strong>j</strong> (<em>string</em>) <strong>filename</strong> (<em>int</em>) <strong>nrec</strong></dt><dd><p>Composition of the interaction between two given bodies, by sub-interaction
+type.</p>
+<p>Columns: <code class="docutils literal notranslate"><span class="pre">t</span></code>, number of vertex-vertex, vertex-edge, vertex-face and
+edge-edge sub-interactions, then their sum weighted by the contact
+partnership.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">TrackDamage</span></code> (<em>string</em>) <strong>filename</strong> (<em>int</em>) <strong>nrec</strong></dt><dd><p>Damage of the sample, defined as the broken interface area divided by the
+interface area present initially.</p>
+<p>Columns: <code class="docutils literal notranslate"><span class="pre">t</span></code>, damage in <span class="math notranslate nohighlight">\([0, 1]\)</span>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only meaningful with a force law that breaks interfaces
+(<code class="docutils literal notranslate"><span class="pre">StickedLinks</span></code>, <code class="docutils literal notranslate"><span class="pre">BCM</span></code>) and once the interfaces have been created by
+a sticking pre-processing command.</p>
+</div>
+</dd>
+</dl>
+</section>
+<section id="declaring-an-extractor-inside-a-conf-file">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Declaring an extractor inside a conf-file</a><a class="headerlink" href="#declaring-an-extractor-inside-a-conf-file" title="Link to this heading"></a></h2>
+<p>A <code class="docutils literal notranslate"><span class="pre">DataExtractor</span></code> keyword is also accepted inside a conf-file:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>DataExtractor MeanVelocity meanVelocity.txt 100
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This form is kept for backward compatibility only, and it emits a warning.
+It has a real drawback: the line is <strong>not</strong> written back into the
+conf-files that the computation saves, so restarting from a dump silently
+loses the extractor. Use <code class="docutils literal notranslate"><span class="pre">dataExtractors.txt</span></code> instead.</p>
+</div>
+</section>
+<section id="plotting-the-results">
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Plotting the results</a><a class="headerlink" href="#plotting-the-results" title="Link to this heading"></a></h2>
+<p>The output files are column-formatted text, directly usable by <code class="docutils literal notranslate"><span class="pre">gnuplot</span></code>:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>plot 'meanVelocity.txt' u 1:2 w l t 'mean velocity'
+plot 'body12.txt' u 1:3 w l t 'height of body 12'
+</pre></div>
+</div>
+<p>The same holds for the three files that <code class="docutils literal notranslate"><span class="pre">rockable</span></code> always writes
+(<code class="docutils literal notranslate"><span class="pre">perf.txt</span></code>, <code class="docutils literal notranslate"><span class="pre">kineticEnergy.txt</span></code> and <code class="docutils literal notranslate"><span class="pre">staticBalance.txt</span></code>); the generated
+script <code class="docutils literal notranslate"><span class="pre">checkplots.txt</span></code> plots them in one go:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>gnuplot<span class="w"> </span>checkplots.txt
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="softParticles.html" class="btn btn-neutral float-left" title="Deformable particles" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="postProcessing.html" class="btn btn-neutral float-right" title="Post-processing (postpro)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2026, Vincent Richefeu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

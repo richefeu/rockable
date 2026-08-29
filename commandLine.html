@@ -1,0 +1,406 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Command line and build options &mdash; Rockable 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://richefeu.github.io/rockable/commandLine.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Format of configuration files (conf-file)" href="syntaxConf.html" />
+    <link rel="prev" title="Organisation of the files" href="fileOrganisation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Rockable
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickStart.html">Quick-start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fileOrganisation.html">Organisation of the files</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Command line and build options</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#rockable"><code class="docutils literal notranslate"><span class="pre">rockable</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-other-executables">The other executables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#building">Building</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#compilation-options">Compilation options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#files-of-a-simulation-folder">Files of a simulation folder</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Input formats</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="syntaxConf.html">Format of configuration files (conf-file)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntaxShapes.html">Format of shape-files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drivingSystem.html">Driving the boundaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Physical models</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="forceLaws.html">Force laws</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bodyForces.html">Body forces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="periodicBoundaryConditions.html">Periodic boundary conditions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="softParticles.html">Deformable particles</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Results</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dataExtractors.html">Data extractors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postProcessing.html">Post-processing (<code class="docutils literal notranslate"><span class="pre">postpro</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualisation.html">Visualisation tools</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools coming with Rockable</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="developerGuide.html">Extending Rockable</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Rockable</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Command line and build options</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/commandLine.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="command-line-and-build-options">
+<span id="commandline"></span><h1>Command line and build options<a class="headerlink" href="#command-line-and-build-options" title="Link to this heading"></a></h1>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#rockable" id="id1"><code class="docutils literal notranslate"><span class="pre">rockable</span></code></a></p></li>
+<li><p><a class="reference internal" href="#the-other-executables" id="id2">The other executables</a></p></li>
+<li><p><a class="reference internal" href="#building" id="id3">Building</a></p></li>
+<li><p><a class="reference internal" href="#compilation-options" id="id4">Compilation options</a></p></li>
+<li><p><a class="reference internal" href="#files-of-a-simulation-folder" id="id5">Files of a simulation folder</a></p></li>
+</ul>
+</nav>
+<section id="rockable">
+<h2><a class="toc-backref" href="#id1" role="doc-backlink"><code class="docutils literal notranslate"><span class="pre">rockable</span></code></a><a class="headerlink" href="#rockable" title="Link to this heading"></a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>rockable<span class="w"> </span><span class="o">[</span>conf-file<span class="o">]</span><span class="w"> </span><span class="o">[</span>options<span class="o">]</span>
+</pre></div>
+</div>
+<p>The positional argument is the conf-file to load; it defaults to <code class="docutils literal notranslate"><span class="pre">conf0</span></code>.
+Everything happens in the <strong>current folder</strong>: the companion files are looked up
+there, and the dumps are written there.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-j</span></code>, <code class="docutils literal notranslate"><span class="pre">--nbThreads</span></code> (<em>int</em>)</p></td>
+<td><p>Number of OpenMP threads, 1 by default. The parallel <em>strategy</em> itself is
+a conf-file keyword, <code class="docutils literal notranslate"><span class="pre">parallel_mode</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-v</span></code>, <code class="docutils literal notranslate"><span class="pre">--verbose</span></code> (<em>int</em>)</p></td>
+<td><p>Verbosity, from 0 to 6: <code class="docutils literal notranslate"><span class="pre">off</span></code>, <code class="docutils literal notranslate"><span class="pre">critical</span></code>, <code class="docutils literal notranslate"><span class="pre">err</span></code>, <code class="docutils literal notranslate"><span class="pre">warn</span></code>,
+<code class="docutils literal notranslate"><span class="pre">info</span></code> (the default), <code class="docutils literal notranslate"><span class="pre">debug</span></code>, <code class="docutils literal notranslate"><span class="pre">trace</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-c</span></code>, <code class="docutils literal notranslate"><span class="pre">--clean</span></code></p></td>
+<td><p>Delete <code class="docutils literal notranslate"><span class="pre">conf*</span></code>, <code class="docutils literal notranslate"><span class="pre">kineticEnergy.txt</span></code>, <code class="docutils literal notranslate"><span class="pre">perf.txt</span></code>,
+<code class="docutils literal notranslate"><span class="pre">staticBalance.txt</span></code> and <code class="docutils literal notranslate"><span class="pre">checkplots.txt</span></code> from the current folder,
+then exit.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-b</span></code>, <code class="docutils literal notranslate"><span class="pre">--banner</span></code></p></td>
+<td><p>Print the banner, which lists the version, the git tag and the
+compilation options actually used, then exit.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-n</span></code> (<em>string</em>) <code class="docutils literal notranslate"><span class="pre">-r</span></code> (<em>string</em>)</p></td>
+<td><p>Non-regression check. After the run, compare the two conf-files line by
+line from their <code class="docutils literal notranslate"><span class="pre">Particles</span></code> section onwards, and exit with an error if
+they differ.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-h</span></code>, <code class="docutils literal notranslate"><span class="pre">--help</span></code></p></td>
+<td><p>The usual help.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--version</span></code></p></td>
+<td><p>The git tag the binary was built from.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>rockable<span class="w"> </span>input.txt<span class="w"> </span>-j<span class="w"> </span><span class="m">8</span><span class="w"> </span>-v<span class="w"> </span><span class="m">5</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="docutils literal notranslate"><span class="pre">rockable</span> <span class="pre">-c</span></code> deletes files without asking for a confirmation. Run it in
+the folder of the simulation you really mean to clean.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Any dump is a valid input file, so <code class="docutils literal notranslate"><span class="pre">rockable</span> <span class="pre">conf27</span> <span class="pre">-j</span> <span class="pre">8</span></code> resumes the
+computation from configuration 27. The companion files are re-read from the
+folder, which is how a loading can be changed mid-course.</p>
+</div>
+</section>
+<section id="the-other-executables">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">The other executables</a><a class="headerlink" href="#the-other-executables" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 34.0%" />
+<col style="width: 66.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">see</span> <span class="pre">[conf-file]</span></code></p></td>
+<td><p>The OpenGL viewer. <code class="docutils literal notranslate"><span class="pre">-t</span> <span class="pre">&lt;file&gt;</span></code> loads a trajectory file, <code class="docutils literal notranslate"><span class="pre">-v</span> <span class="pre">&lt;int&gt;</span></code>
+sets the verbosity of the core. See <a class="reference internal" href="visualisation.html#visualisation"><span class="std std-ref">Visualisation tools</span></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">seer</span></code></p></td>
+<td><p><em>Dear My Seer</em>, the Dear ImGui viewer that supersedes <code class="docutils literal notranslate"><span class="pre">see</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">conftovtk</span></code></p></td>
+<td><p>Convert <strong>every</strong> <code class="docutils literal notranslate"><span class="pre">conf*</span></code> of the folder into VTK files for ParaView.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">postpro</span> <span class="pre">&lt;commandFile&gt;</span></code></p></td>
+<td><p>Run a post-processor over a range of dumps. See <a class="reference internal" href="postProcessing.html#postprocessing"><span class="std std-ref">Post-processing (postpro)</span></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">generator</span> <span class="pre">&lt;commandFile&gt;</span></code></p></td>
+<td><p>Build shape files, input files and packings. See the <code class="docutils literal notranslate"><span class="pre">generator</span></code> page.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">shapeSurvey</span> <span class="pre">&lt;shapeFile&gt;</span></code></p></td>
+<td><p>Inspect and pre-compute a shape library. See <a class="reference internal" href="shapeSurvey.html#shapesurvey"><span class="std std-ref">Application shapeSurvey</span></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sweepable</span> <span class="pre">[script]</span></code></p></td>
+<td><p>Generate a tree of input files for a parameter sweep.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">stl2shape</span> <span class="pre">-i</span> <span class="pre">&lt;f.stl&gt;</span> <span class="pre">-r</span> <span class="pre">&lt;R&gt;</span></code></p></td>
+<td><p>Convert a binary STL file into a shape. See <a class="reference internal" href="converters.html#converters"><span class="std std-ref">Converters</span></a>.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="building">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Building</a><a class="headerlink" href="#building" title="Link to this heading"></a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/richefeu/rockable.git
+<span class="nb">cd</span><span class="w"> </span>rockable
+sh<span class="w"> </span>install_rockable.sh
+</pre></div>
+</div>
+<p>The build happens in <code class="docutils literal notranslate"><span class="pre">BUILD</span></code> and the binaries are installed into <code class="docutils literal notranslate"><span class="pre">INSTALL</span></code>.
+Depending on the system, a few packages may be needed beforehand: <code class="docutils literal notranslate"><span class="pre">glfw3</span></code>,
+<code class="docutils literal notranslate"><span class="pre">opengl</span></code>, <code class="docutils literal notranslate"><span class="pre">freeglut</span></code>, and optionally <code class="docutils literal notranslate"><span class="pre">libpng</span></code> for PNG screenshots.</p>
+<p>To change the options:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>BUILD
+ccmake<span class="w"> </span>.
+<span class="c1"># set the options, then c, then e, then g</span>
+cmake<span class="w"> </span>..
+make<span class="w"> </span>-j
+make<span class="w"> </span>install
+</pre></div>
+</div>
+<p>To make the binaries reachable from the shell:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>add_install_to_path.sh
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The script must be <strong>sourced</strong>, not executed. A script run in a subshell
+cannot change the <code class="docutils literal notranslate"><span class="pre">PATH</span></code> of the shell that launched it.</p>
+</div>
+</section>
+<section id="compilation-options">
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Compilation options</a><a class="headerlink" href="#compilation-options" title="Link to this heading"></a></h2>
+<p>Options that change the physics, or the set of keywords understood. All default
+to <code class="docutils literal notranslate"><span class="pre">OFF</span></code>.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 40.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Effect</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_PERIODIC</span></code></p></td>
+<td><p>Tri-periodic cell: the <code class="docutils literal notranslate"><span class="pre">usePeriodicCell</span></code>, <code class="docutils literal notranslate"><span class="pre">h</span></code>, <code class="docutils literal notranslate"><span class="pre">vh</span></code>, <code class="docutils literal notranslate"><span class="pre">ah</span></code>,
+<code class="docutils literal notranslate"><span class="pre">mh</span></code>, <code class="docutils literal notranslate"><span class="pre">dh</span></code> keywords and the <code class="docutils literal notranslate"><span class="pre">PeriodicLoading</span></code> drivings. See
+<a class="reference internal" href="periodicBoundaryConditions.html#periodicboundaryconditions"><span class="std std-ref">Periodic boundary conditions</span></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_SOFT_PARTICLES</span></code></p></td>
+<td><p>Homogeneous straining of the particles, keyword <code class="docutils literal notranslate"><span class="pre">useSoftParticles</span></code>.
+See <a class="reference internal" href="softParticles.html#softparticles"><span class="std std-ref">Deformable particles</span></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_BOUNDARY</span></code></p></td>
+<td><p>The special boundary shapes, <code class="docutils literal notranslate"><span class="pre">Ball</span></code> and <code class="docutils literal notranslate"><span class="pre">Cylinder</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_USE_FT_CORR</span></code></p></td>
+<td><p>Objectivity correction of the tangential forces under large rotations.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_PROFILING</span></code></p></td>
+<td><p>Time profiling of the main routines, reported into <code class="docutils literal notranslate"><span class="pre">perf.txt</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_BOUNDARY</span></code> compiles the <code class="docutils literal notranslate"><span class="pre">Ball</span></code> and <code class="docutils literal notranslate"><span class="pre">Cylinder</span></code>
+boundaries, but their <code class="docutils literal notranslate"><span class="pre">read</span></code> methods are still empty stubs in the source.
+Enabling the option therefore does not yet give a usable feature.</p>
+</div>
+<p>Options that select what gets compiled:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 40.0%" />
+<col style="width: 20.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Builds</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_COMPILE_SEE</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ON</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">see</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_COMPILE_SEER</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ON</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">seer</span></code> (Dear My Seer)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_COMPILE_CONF2VTK</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ON</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">conftovtk</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_COMPILE_POSTPRO</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ON</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">postpro</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_COMPILE_PREPRO</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ON</span></code></p></td>
+<td><p>the pre-processing tools</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_USE_TESTING</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">OFF</span></code></p></td>
+<td><p>the regression tests</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p><code class="docutils literal notranslate"><span class="pre">rockable</span> <span class="pre">-b</span></code> prints which of these were actually enabled. It is the
+quickest way to explain a keyword that appears to do nothing.</p>
+</div>
+</section>
+<section id="files-of-a-simulation-folder">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Files of a simulation folder</a><a class="headerlink" href="#files-of-a-simulation-folder" title="Link to this heading"></a></h2>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>mySimulation/
+  input.txt              # the conf-file you write
+  shapes.txt             # shape library, named by shapeFile
+  shapes.rmsh            # optional skin meshes, used by see
+  drivingSystem.txt      # optional driving and servo
+  dataExtractors.txt     # optional measurements
+  see.json               # optional view settings
+  probe.txt              # optional measurement box
+  ------------ produced by the run ------------
+  conf0 conf1 conf2 ...  # the dumps
+  extractedDataDoc.txt   # what each extractor column holds
+  perf.txt               # time, efficiency, profiling
+  kineticEnergy.txt      # time, translational and rotational energy
+  staticBalance.txt      # time, equilibrium indicators
+  checkplots.txt         # gnuplot script for the three files above
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p><code class="docutils literal notranslate"><span class="pre">gnuplot</span> <span class="pre">checkplots.txt</span></code> plots the performance, the kinetic energy and the
+static balance in one go. Watching the kinetic energy fall is the usual way
+of deciding that a sample has reached equilibrium.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="fileOrganisation.html" class="btn btn-neutral float-left" title="Organisation of the files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="syntaxConf.html" class="btn btn-neutral float-right" title="Format of configuration files (conf-file)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2026, Vincent Richefeu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

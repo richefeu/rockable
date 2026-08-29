@@ -1,0 +1,434 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Extending Rockable &mdash; Rockable 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://richefeu.github.io/rockable/developerGuide.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Application sweepable" href="sweepable.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Rockable
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickStart.html">Quick-start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fileOrganisation.html">Organisation of the files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commandLine.html">Command line and build options</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Input formats</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="syntaxConf.html">Format of configuration files (conf-file)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntaxShapes.html">Format of shape-files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drivingSystem.html">Driving the boundaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="servoControllers.html">Available servo-controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preProcessing.html">Pre-processing commands</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Physical models</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="forceLaws.html">Force laws</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bodyForces.html">Body forces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="periodicBoundaryConditions.html">Periodic boundary conditions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="softParticles.html">Deformable particles</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Results</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dataExtractors.html">Data extractors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postProcessing.html">Post-processing (<code class="docutils literal notranslate"><span class="pre">postpro</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualisation.html">Visualisation tools</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools coming with Rockable</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Extending Rockable</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#the-factory-mechanism">The factory mechanism</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-keyword-parser">The keyword parser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#adding-a-force-law">Adding a force law</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#adding-a-data-extractor">Adding a data extractor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#adding-a-pre-processing-command">Adding a pre-processing command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#adding-a-post-processor">Adding a post-processor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#where-things-live">Where things live</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#testing-a-change">Testing a change</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Rockable</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Extending Rockable</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/developerGuide.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="extending-rockable">
+<span id="developerguide"></span><h1>Extending Rockable<a class="headerlink" href="#extending-rockable" title="Link to this heading"></a></h1>
+<p>Rockable is meant to be extended by reading and modifying it, not by scripting
+it from the outside. The design is deliberate: there is no Lua or Python layer,
+so a new interaction model is written in C++, compiled in, and becomes a keyword
+of the conf-file like any other.</p>
+<p>Five families of components are pluggable through the same mechanism: force
+laws, body forces, data extractors, pre-processing commands, and
+post-processors.</p>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#the-factory-mechanism" id="id1">The factory mechanism</a></p></li>
+<li><p><a class="reference internal" href="#the-keyword-parser" id="id2">The keyword parser</a></p></li>
+<li><p><a class="reference internal" href="#adding-a-force-law" id="id3">Adding a force law</a></p></li>
+<li><p><a class="reference internal" href="#adding-a-data-extractor" id="id4">Adding a data extractor</a></p></li>
+<li><p><a class="reference internal" href="#adding-a-pre-processing-command" id="id5">Adding a pre-processing command</a></p></li>
+<li><p><a class="reference internal" href="#adding-a-post-processor" id="id6">Adding a post-processor</a></p></li>
+<li><p><a class="reference internal" href="#where-things-live" id="id7">Where things live</a></p></li>
+<li><p><a class="reference internal" href="#testing-a-change" id="id8">Testing a change</a></p></li>
+</ul>
+</nav>
+<section id="the-factory-mechanism">
+<h2><a class="toc-backref" href="#id1" role="doc-backlink">The factory mechanism</a><a class="headerlink" href="#the-factory-mechanism" title="Link to this heading"></a></h2>
+<p>Each family has an abstract base class, and the concrete classes register
+themselves in a factory keyed by their <strong>class name</strong>. The registration happens
+in <code class="docutils literal notranslate"><span class="pre">Rockable::ExplicitRegistrations</span></code>:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">REGISTRER_BASE_DERIVED</span><span class="p">(</span><span class="n">ForceLaw</span><span class="p">,</span><span class="w"> </span><span class="n">Avalanche</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The macro stringifies the class name, so the keyword written in the conf-file is
+exactly the name of the C++ class. This is why <code class="docutils literal notranslate"><span class="pre">forceLaw</span> <span class="pre">Avalanches</span></code> does not
+work while <code class="docutils literal notranslate"><span class="pre">forceLaw</span> <span class="pre">Avalanche</span></code> does: the factory is looked up by that exact
+string.</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">ForceLaw</span><span class="o">*</span><span class="w"> </span><span class="n">FL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Factory</span><span class="o">&lt;</span><span class="n">ForceLaw</span><span class="o">&gt;::</span><span class="n">Instance</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">Create</span><span class="p">(</span><span class="n">lawName</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>When the lookup fails, Rockable warns and falls back to a default rather than
+stopping, so a misspelt name produces a warning and a silently different
+simulation. It is worth reading the first lines of the log.</p>
+</section>
+<section id="the-keyword-parser">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">The keyword parser</a><a class="headerlink" href="#the-keyword-parser" title="Link to this heading"></a></h2>
+<p>The conf-file is parsed by a <code class="docutils literal notranslate"><span class="pre">kwParser</span></code>, a map from a keyword to a lambda that
+reads the rest of the entry from the stream:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">parser</span><span class="p">.</span><span class="n">kwMap</span><span class="p">[</span><span class="s">"tmax"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">__GET__</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span><span class="w"> </span><span class="n">tmax</span><span class="p">);</span>
+
+<span class="n">parser</span><span class="p">.</span><span class="n">kwMap</span><span class="p">[</span><span class="s">"density"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">__DO__</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kt">size_t</span><span class="w"> </span><span class="n">grp</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">double</span><span class="w"> </span><span class="n">density</span><span class="p">;</span>
+<span class="w">  </span><span class="n">conf</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">grp</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">density</span><span class="p">;</span>
+<span class="w">  </span><span class="n">properties</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="n">idDensity</span><span class="p">,</span><span class="w"> </span><span class="n">grp</span><span class="p">,</span><span class="w"> </span><span class="n">density</span><span class="p">);</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>Anything the map does not know produces an <code class="docutils literal notranslate"><span class="pre">unknown</span> <span class="pre">token</span></code> message and is
+skipped. Two consequences are worth keeping in mind:</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The map is keyed by string, so <strong>two components registering the same keyword
+silently overwrite each other</strong>, the last one registered winning. When adding
+a component, check that its keyword is not already taken.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Parsing is token-based, not line-based. The arguments of a keyword may be
+spread over several lines, which is what makes the long <code class="docutils literal notranslate"><span class="pre">Servo</span></code> and
+packing entries readable.</p>
+</div>
+</section>
+<section id="adding-a-force-law">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Adding a force law</a><a class="headerlink" href="#adding-a-force-law" title="Link to this heading"></a></h2>
+<ol class="arabic">
+<li><p>Create <code class="docutils literal notranslate"><span class="pre">src/ForceLaws/ForceLaw_MyLaw.hpp</span></code> and <code class="docutils literal notranslate"><span class="pre">.cpp</span></code>, deriving from
+<code class="docutils literal notranslate"><span class="pre">ForceLaw</span></code>.</p></li>
+<li><p>Implement <code class="docutils literal notranslate"><span class="pre">init()</span></code>, which declares the parameters the law reads:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">MyLaw::init</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">box</span><span class="o">-&gt;</span><span class="n">idKnContact</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">box</span><span class="o">-&gt;</span><span class="n">dataTable</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="s">"knContact"</span><span class="p">);</span>
+<span class="w">  </span><span class="n">box</span><span class="o">-&gt;</span><span class="n">idMuContact</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">box</span><span class="o">-&gt;</span><span class="n">dataTable</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="s">"muContact"</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">dataTable.add</span></code> both allocates the group-pair table and makes the keyword
+readable from the conf-file. A parameter that is not declared here cannot be
+set.</p>
+</li>
+<li><p>Implement <code class="docutils literal notranslate"><span class="pre">computeInteraction(Interaction&amp;</span> <span class="pre">I)</span></code>. It returns <code class="docutils literal notranslate"><span class="pre">true</span></code> when
+the interaction is active, that is when it carries a non-zero force, and
+<code class="docutils literal notranslate"><span class="pre">false</span></code> when it should be ignored:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">bool</span><span class="w"> </span><span class="nf">MyLaw::computeInteraction</span><span class="p">(</span><span class="n">Interaction</span><span class="o">&amp;</span><span class="w"> </span><span class="n">I</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">I</span><span class="p">.</span><span class="n">dn</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">          </span><span class="c1">// no overlap, no contact</span>
+<span class="w">    </span><span class="n">I</span><span class="p">.</span><span class="n">fn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span>
+<span class="w">    </span><span class="n">I</span><span class="p">.</span><span class="n">ft</span><span class="p">.</span><span class="n">reset</span><span class="p">();</span>
+<span class="w">    </span><span class="n">I</span><span class="p">.</span><span class="n">mom</span><span class="p">.</span><span class="n">reset</span><span class="p">();</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Register the class in <code class="docutils literal notranslate"><span class="pre">Rockable::ExplicitRegistrations</span></code>, and add the file to
+<code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code>.</p></li>
+</ol>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p><code class="docutils literal notranslate"><span class="pre">computeInteraction</span></code> is called from a parallel loop. It may write to the
+interaction it is given, but writing to a body, or to any shared structure,
+needs the protection that <code class="docutils literal notranslate"><span class="pre">parallel_mode</span></code> provides. Look at how the
+existing laws accumulate forces before adding your own.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Start from <code class="docutils literal notranslate"><span class="pre">ForceLaw_Default.cpp</span></code> and change what you need.
+<code class="docutils literal notranslate"><span class="pre">ForceLaw_geoVisc.cpp</span></code> is a good example of a minimal departure: it is the
+default law with a viscous friction instead of an elastic one.</p>
+</div>
+</section>
+<section id="adding-a-data-extractor">
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Adding a data extractor</a><a class="headerlink" href="#adding-a-data-extractor" title="Link to this heading"></a></h2>
+<p>Derive from <code class="docutils literal notranslate"><span class="pre">DataExtractor</span></code> and implement four methods:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 24.0%" />
+<col style="width: 76.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Role</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">read(istream&amp;)</span></code></p></td>
+<td><p>Read the parameters from <code class="docutils literal notranslate"><span class="pre">dataExtractors.txt</span></code>, open the output file,
+and fill <code class="docutils literal notranslate"><span class="pre">docString</span></code> and <code class="docutils literal notranslate"><span class="pre">columnDoc</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">init()</span></code></p></td>
+<td><p>Anything that needs the configuration to be loaded and the driving
+system to be read.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">exec()</span></code></p></td>
+<td><p>Computations to perform with a period of <code class="docutils literal notranslate"><span class="pre">nstep</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">record()</span></code></p></td>
+<td><p>Write one line, with a period of <code class="docutils literal notranslate"><span class="pre">nrec</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">MyExtractor::read</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">istream</span><span class="o">&amp;</span><span class="w"> </span><span class="n">is</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">is</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">ibody</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">filename</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">nrec</span><span class="p">;</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">box</span><span class="o">-&gt;</span><span class="n">isInteractive</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">false</span><span class="p">)</span><span class="w"> </span><span class="n">recordFile</span><span class="p">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span>
+<span class="w">  </span><span class="n">nstep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">numeric_limits</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;::</span><span class="n">max</span><span class="p">();</span>
+
+<span class="w">  </span><span class="n">docString</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"ibody = "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">ibody</span><span class="p">;</span>
+<span class="w">  </span><span class="n">columnDoc</span><span class="p">.</span><span class="n">clear</span><span class="p">();</span>
+<span class="w">  </span><span class="n">columnDoc</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="s">"Time"</span><span class="p">);</span>
+<span class="w">  </span><span class="n">columnDoc</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="s">"what the second column holds"</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">isInteractive</span></code> test matters: it prevents the extractor from opening,
+and truncating, its output file when the conf-file is merely being looked at
+with <code class="docutils literal notranslate"><span class="pre">see</span></code> or <code class="docutils literal notranslate"><span class="pre">conftovtk</span></code>.</p>
+<p>Filling <code class="docutils literal notranslate"><span class="pre">columnDoc</span></code> is not optional in practice: it is what
+<code class="docutils literal notranslate"><span class="pre">extractedDataDoc.txt</span></code> is built from, and an output file whose columns are
+undocumented is of little use six months later.</p>
+</div>
+<p>Set <code class="docutils literal notranslate"><span class="pre">nstep</span></code> to a huge value when the extractor has nothing to compute between
+two records, as all the current ones do.</p>
+</section>
+<section id="adding-a-pre-processing-command">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Adding a pre-processing command</a><a class="headerlink" href="#adding-a-pre-processing-command" title="Link to this heading"></a></h2>
+<p>Derive from <code class="docutils literal notranslate"><span class="pre">PreproCommand</span></code> and implement two methods:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">myCommand::addCommand</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">box</span><span class="o">-&gt;</span><span class="n">parser</span><span class="p">.</span><span class="n">kwMap</span><span class="p">[</span><span class="s">"myCommand"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="k">this</span><span class="p">](</span><span class="n">std</span><span class="o">::</span><span class="n">istream</span><span class="o">&amp;</span><span class="w"> </span><span class="n">conf</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">conf</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">someParameter</span><span class="p">;</span>
+<span class="w">    </span><span class="n">exec</span><span class="p">();</span>
+<span class="w">  </span><span class="p">};</span>
+<span class="p">}</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">myCommand::exec</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// act on box-&gt;Particles, box-&gt;Interfaces, ...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Then add the name to the <code class="docutils literal notranslate"><span class="pre">commands</span></code> array at the end of
+<code class="docutils literal notranslate"><span class="pre">Rockable::initParser</span></code>, which is what instantiates the command and calls
+<code class="docutils literal notranslate"><span class="pre">addCommand</span></code> on it.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The keyword written in <code class="docutils literal notranslate"><span class="pre">addCommand</span></code> must match the class name used in the
+array. This is precisely where a copy/paste error is easy to make and hard to
+notice: a wrong keyword there does not fail, it overwrites another command’s
+entry and makes both behave unexpectedly.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A pre-processing command runs while the conf-file is being parsed, so it sees
+only what has been read <strong>before</strong> it. It must therefore be placed after the
+data it acts on, which is why they are documented as belonging at the end of
+the file.</p>
+</div>
+</section>
+<section id="adding-a-post-processor">
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Adding a post-processor</a><a class="headerlink" href="#adding-a-post-processor" title="Link to this heading"></a></h2>
+<p>Derive from <code class="docutils literal notranslate"><span class="pre">PostProcessor</span></code>, and implement <code class="docutils literal notranslate"><span class="pre">read</span></code>, <code class="docutils literal notranslate"><span class="pre">init</span></code>, <code class="docutils literal notranslate"><span class="pre">exec</span></code> and
+<code class="docutils literal notranslate"><span class="pre">end</span></code>. The parameters are read with a local <code class="docutils literal notranslate"><span class="pre">kwParser</span></code>, which lets a
+post-processor have its own small keyword set:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">MyPostProcessor::read</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">istream</span><span class="o">&amp;</span><span class="w"> </span><span class="n">is</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">kwParser</span><span class="w"> </span><span class="n">parser</span><span class="p">;</span>
+<span class="w">  </span><span class="n">parser</span><span class="p">.</span><span class="n">kwMap</span><span class="p">[</span><span class="s">"Volume"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">__GET__</span><span class="p">(</span><span class="n">istr</span><span class="p">,</span><span class="w"> </span><span class="n">Volume</span><span class="p">);</span>
+<span class="w">  </span><span class="n">parser</span><span class="p">.</span><span class="n">parse</span><span class="p">(</span><span class="n">is</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">exec()</span></code> is called once per processed conf-file, and <code class="docutils literal notranslate"><span class="pre">end()</span></code> after the last
+one, which is where a summary or a distribution is written.</p>
+</section>
+<section id="where-things-live">
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Where things live</a><a class="headerlink" href="#where-things-live" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 32.0%" />
+<col style="width: 68.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Directory</p></th>
+<th class="head"><p>Contents</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">src/Core</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Rockable</span></code>, <code class="docutils literal notranslate"><span class="pre">Particle</span></code>, <code class="docutils literal notranslate"><span class="pre">Shape</span></code>, <code class="docutils literal notranslate"><span class="pre">Interaction</span></code>,
+<code class="docutils literal notranslate"><span class="pre">DrivingSystem</span></code>, <code class="docutils literal notranslate"><span class="pre">PeriodicCell</span></code>: the heart of the code.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">src/Apps</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">run.cpp</span></code> (the <code class="docutils literal notranslate"><span class="pre">rockable</span></code> binary), <code class="docutils literal notranslate"><span class="pre">see.cpp</span></code>, <code class="docutils literal notranslate"><span class="pre">postpro.cpp</span></code>,
+<code class="docutils literal notranslate"><span class="pre">conftovtk.cpp</span></code>, <code class="docutils literal notranslate"><span class="pre">DearMySeer</span></code>, <code class="docutils literal notranslate"><span class="pre">DearMyShape</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">src/ForceLaws</span></code></p></td>
+<td><p>One file per interaction model.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">src/BodyForces</span></code></p></td>
+<td><p>One file per body force.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">src/DataExtractors</span></code></p></td>
+<td><p>One file per on-the-fly measurement.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">src/PreproCommands</span></code></p></td>
+<td><p>One file per pre-processing command.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">src/PostProcessors</span></code></p></td>
+<td><p>One file per post-processor.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">src/ProcessingTools</span></code></p></td>
+<td><p>Reusable analyses: clusters, broken sub-clusters, interaction groups,
+mass range, solid fraction probe.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deps</span></code></p></td>
+<td><p>Dependencies fetched by CMake, <code class="docutils literal notranslate"><span class="pre">toofus</span></code> in particular.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The library <code class="docutils literal notranslate"><span class="pre">toofus</span></code> provides most of the utilities used throughout:
+<code class="docutils literal notranslate"><span class="pre">vec3r</span></code>, <code class="docutils literal notranslate"><span class="pre">quat</span></code>, <code class="docutils literal notranslate"><span class="pre">mat9r</span></code>, <code class="docutils literal notranslate"><span class="pre">AABB</span></code>, <code class="docutils literal notranslate"><span class="pre">OBB</span></code>, <code class="docutils literal notranslate"><span class="pre">kwParser</span></code>, <code class="docutils literal notranslate"><span class="pre">DataTable</span></code>,
+<code class="docutils literal notranslate"><span class="pre">Factory</span></code>, <code class="docutils literal notranslate"><span class="pre">Tempo</span></code>, and the logging.</p>
+</section>
+<section id="testing-a-change">
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">Testing a change</a><a class="headerlink" href="#testing-a-change" title="Link to this heading"></a></h2>
+<p>Build the regression tests with <code class="docutils literal notranslate"><span class="pre">-DROCKABLE_USE_TESTING=ON</span></code>. The comparison
+itself is available from the command line:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>rockable<span class="w"> </span>input.txt<span class="w"> </span>-n<span class="w"> </span>conf10<span class="w"> </span>-r<span class="w"> </span>reference/conf10
+</pre></div>
+</div>
+<p>which runs the simulation and then compares the two conf-files line by line from
+their <code class="docutils literal notranslate"><span class="pre">Particles</span></code> section onwards, exiting with an error if they differ.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>A conf-file whose first token is <code class="docutils literal notranslate"><span class="pre">redirection</span></code> holds a path and a file
+name, and loads that file instead. It is how the tests share one sample
+between several cases without duplicating it.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="sweepable.html" class="btn btn-neutral float-left" title="Application sweepable" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2026, Vincent Richefeu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
