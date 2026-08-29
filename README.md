@@ -2,11 +2,28 @@
 <img src="./sphinxdoc/source/images/RockableRocks.png" width="40%"/>
 </p>
 
+## Quick news
+
+The annual *Rockable day* was held on 28 August 2026 at Arts et Métiers, Aix-en-Provence. It is the yearly meeting where everyone involved in Rockable — developers, users, and the simply curious — gets together to present what has progressed and to agree on where the code should go next.
+
+Here is what came out of it.
+
+**Development roadmap**
+
+* Finalise the full periodic boundary conditions.
+* Continue the work on deformable particles (DCEM).
+
+**For the user community, which keeps growing**
+
+* Improve the documentation, using generative AI where it helps — while keeping a firm review of whatever it produces.
+* Set up a training school for the code: yearly, or every three years, depending on how many people want to attend.
+* Every user is encouraged to contribute documentation, including short tutorials written from their own learning — and to share them.
+
 ## What is `Rockable`?   
 
 Rockable is a DEM code written in C++, initiated by <vincent.richefeu@3sr-grenoble.fr>. The two main specificities of the code are (_i_) to hold sphero-polyhedral shapes, (_ii_) to manage breakable interfaces. It is developed for an **academic usage**. This means that the code is not intended to be a tool for all purposes. It can easily be used to do what it is designed for, but to extend it, it is necessary to master both the model (DEM, complex shapes and interaction laws) and its implementation (data structure). The benefit of a good understanding is to avoid a "hacking" that would eventually limit the developed possibilities. In other words, the design of the code (neither too specific nor too general) is intended to avoid any tendency towards a single thought.
 
-The use of the code is not interfaced by any tool (like lua, python or any graphical interface) to facilitate its use, except the input format as described in the [documentation](https://richefeu.github.io/rockable/). This makes it particularly streamlined and greatly facilitates its integration with other calculation codes. It is in this sense that Rockable is qualified of "academic code".
+The use of the code is not interfaced by any tool (like lua, python or any graphical interface) to facilitate its use, except the input format as described in the [documentation](https://richefeu.github.io/rockable/). This makes it particularly streamlined and greatly facilitates its integration with other calculation codes. It is in this sense that Rockable is qualified as an "academic code".
 
 ### Source tree 
 
@@ -20,7 +37,7 @@ The use of the code is not interfaced by any tool (like lua, python or any graph
 
 * `deps`: source files for Rockable dependencies fetched by `cmake`
 * `BUILD`: compilation files of the code (created by the script `install_rockable.sh`)
-* `INSTALL:` binaries of Rockable routines (created by the script `install_rockable.sh`)
+* `INSTALL`: binaries of Rockable routines (created by the script `install_rockable.sh`)
 
 ## Credits
 
@@ -28,7 +45,7 @@ The code was initially developed by *Vincent Richefeu*, at Laboratoire 3SR, to m
 
 Then, the breakable interfaces have been implemented during the PhD work of *Marta Stasiak*. A number of improvements have been added at that time thanks to intensive review with *Gael Combe*, Laboratoire 3SR.
 
-New functionalities are being studied thanks to new collaborations of people from CEA, INRA*e* and CNRS, particularly in the context of a scientific interest group (Groupement d'Interêt Scientifique, GIS, in French).
+New functionalities are being studied thanks to new collaborations of people from CEA, INRA*e* and CNRS, particularly in the context of a scientific interest group (Groupement d'Intérêt Scientifique, GIS, in French).
 For example, *Lhassan Amarsid* (CEA) is working on the introduction of periodic boundary conditions, and multi-processor 
 computing with domain decomposition. *Farhang Radjai* and students, are introducing new breakable interfaces with energy-based criteria, and also many other novel features.
 
@@ -47,12 +64,12 @@ Here is the non-exhaustive list of involved persons with their main mission:
 * **Patrick Mutabaruka** <patrick.mutabaruka@ifremer.fr> (Ifremer): coupling with Lattice Boltzmann Method (LBM)
 
 
-## Features
+## Features in a nutshell
 
 * **Particle Shapes:** the code uses only one 3D shape: sphero-polyhedra or *R*-shapes. These shapes can be non-convex (with cavities if needed) and have rounded edges and corners (uniform radius per shape).
 
 > [!NOTE]
-> Some other shapes are currently considered for special boundary shapes (sphere, cylinder...) and specifique loadings.
+> Some other shapes are currently considered for special boundary shapes (sphere, cylinder...) and specific loadings.
 	
 * **Boundary Conditions**: any rigid element can be used to apply boundary conditions. It is possible to impose velocity, force, or moment component by component. Some predefined systems with servo-control are also available for complex loading conditions (e.g., loading cycles or controlled pressure).
 
@@ -75,7 +92,7 @@ The source code can be cloned from github repository:
 git clone https://github.com/richefeu/rockable.git
 ```
 
-Using your OS package manager (yum, apt, brew etc) you will maybe need to install several package before compiling: `glfw3`, `opengl`,`freeglut`, `libpng2` (optionnal).
+Using your OS package manager (yum, apt, brew etc) you may need to install several packages before compiling: `glfw3`, `opengl`,`freeglut`, `libpng2` (optional).
 
 
 If you are lucky, the compilation is as simple as:
@@ -103,15 +120,16 @@ make install
 The options available are listed below:
 
 * `ROCKABLE_USE_FT_CORR` (default is OFF): add objectivity correction to tangent forces.
+* `ROCKABLE_USE_TESTING` (default is OFF): build the regression tests.
 * `ROCKABLE_ENABLE_PROFILING` (default is OFF): enable time profiling.
 * `ROCKABLE_ENABLE_BOUNDARY` (default is OFF): enable the special boundaries like Ball or Cylinder.
 * `ROCKABLE_ENABLE_SOFT_PARTICLES` (default is OFF): enable straining of particles.
 * `ROCKABLE_ENABLE_PERIODIC` (default is OFF): enable full periodic boundary conditions.
 * `ROCKABLE_COMPILE_SEE` (default is ON): compile the application to visualize the conf-files.
-* `ROCKABLE_COMPILE_SEER` (default is OFF): compile the application to edit graphically the input files
-* `ROCKABLE_COMPILE_CONF2VTK` (default is OFF): compile the application to convert .conf into .vtk file to visualize results with paraview
-* `ROCKABLE_COMPILE_POSTPRO` (default is OFF): compile the application for postprocessing the results
-* `ROCKABLE_COMPILE_PREPRO` (default is ON): compile the aplications to generate inputs for the code
+* `ROCKABLE_COMPILE_SEER` (default is ON): compile Dear My Seer (and Dear My Shape), the successor of `see`.
+* `ROCKABLE_COMPILE_CONF2VTK` (default is ON): compile the application to convert the conf-files into VTK files, to visualize the results with paraview.
+* `ROCKABLE_COMPILE_POSTPRO` (default is ON): compile the application for postprocessing the results.
+* `ROCKABLE_COMPILE_PREPRO` (default is ON): compile the applications to generate inputs for the code.
 
 ## How to run a simulation
 
@@ -119,7 +137,7 @@ The options available are listed below:
 <img src="./gif-doc/run-hello.gif" width="90%"/>
 </p>
 
-Before runing rockable you will need to source rockable environnement to add the INSTALL directory to your standard binaries PATH:
+Before running rockable you will need to source the rockable environment to add the INSTALL directory to your standard binaries PATH:
 
 ```sh
 source add_install_to_path.sh
@@ -134,7 +152,7 @@ source add_install_to_path.sh
 To run a simulation, a configuration file has to be written. The format of such a file is described in the documentation. We show here a simple example (**input.txt**) simulating a sphere bouncing on a plan.
 
 ```
-Rockable 20-02-2017
+Rockable 21-08-2022
 t 0
 tmax 0.06
 dt 1e-6
@@ -146,7 +164,7 @@ dVerlet 0.02
 density 0 2700
 density 1 2700
 
-forceLaw Avalanches
+forceLaw Avalanche
 knContact 0 1 1e6
 en2Contact 0 1 0.05
 ktContact 0 1 1e7
@@ -203,8 +221,9 @@ obb.e1 1 0 0
 obb.e2 0 1 0
 obb.e3 0 0 1
 obb.center 0 0 0
-volume 0.004021
-I/m 0.00493333 0.00493333 0.0032
+volume 0.00214466
+I/m 0.00256 0.00256 0.00256
+>
 ```
 
 Then you can launch Rockable using:
@@ -225,9 +244,9 @@ The verbosity of logs can be managed:
 rockable -v 6 input.txt 
 ```
 
-Highest number corresponds highest verbosity. `6: trace`, `5: debug`, `4: warn`, `3: warn`, `2: err`, `1: critical`, `0: off`
+Highest number corresponds highest verbosity. `6: trace`, `5: debug`, `4: info`, `3: warn`, `2: err`, `1: critical`, `0: off`
 
-If the files produced by a computation (conf*, kineticEnergy.txt, perf.txt, and staticBalance.txt) have to be deleted, rockable can do the job.
+If the files produced by a computation (conf*, kineticEnergy.txt, perf.txt, staticBalance.txt, and checkplots.txt) have to be deleted, rockable can do the job.
 
 ```
 rockable -c
@@ -235,7 +254,7 @@ rockable -c
 
 ## Visualising the simulations
 
-Normally, the application `see` has been built at the same time than rockable:
+Normally, the application `see` has been built at the same time as rockable:
 
 ```
 see conf100
