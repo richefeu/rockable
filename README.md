@@ -4,7 +4,7 @@
 
 ## Quick news
 
-The annual *Rockable day* was held on 28 August 2026 at Arts et Métiers, Aix-en-Provence. It is the yearly meeting where everyone involved in Rockable — developers, users, and the simply curious — gets together to present what has progressed and to agree on where the code should go next.
+The annual *Rockable day* was held on 28 August 2025 at Arts et Métiers, Aix-en-Provence. It is the yearly meeting where everyone involved in Rockable — developers, users, and the simply curious — gets together to present what has progressed and to agree on where the code should go next.
 
 Here is what came out of it.
 
