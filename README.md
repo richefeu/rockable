@@ -6,6 +6,10 @@
 
 The annual *Rockable day* was held on 28 August 2026 at Arts et Métiers, Aix-en-Provence. It is the yearly meeting where everyone involved in Rockable — developers, users, and the simply curious — gets together to present what has progressed and to agree on where the code should go next.
 
+<p align="center">
+<img src="./photos/rockable-day-2026.jpg" width="90%" alt="Participants of the Rockable day 2026, Arts et Métiers, Aix-en-Provence"/>
+</p>
+
 Here is what came out of it.
 
 **Development roadmap**
