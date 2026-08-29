@@ -181,7 +181,7 @@ combination — ready to be launched in parallel with the companion script
 <p>Running <code class="docutils literal notranslate"><span class="pre">sweepable</span></code> without arguments writes <code class="docutils literal notranslate"><span class="pre">batchable.sh</span></code> to the current
 directory:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>./sweepable
-<span class="c1"># → File &#39;batchable.sh&#39; has been created</span>
+<span class="c1"># → File 'batchable.sh' has been created</span>
 chmod<span class="w"> </span>+x<span class="w"> </span>batchable.sh
 </pre></div>
 </div>
@@ -195,12 +195,12 @@ chmod<span class="w"> </span>+x<span class="w"> </span>batchable.sh
         .read input.txt
 
         .findLineStartingWith solver
-        .replaceBy &quot;solver $solver&quot;
+        .replaceBy "solver $solver"
 
         .findLineStartingWith dt
-        .replaceBy &quot;dt $dt&quot;
+        .replaceBy "dt $dt"
 
-        .createFolder &quot;output/${solver}_dt_$dt&quot;
+        .createFolder "output/${solver}_dt_$dt"
         .saveInFolder
 
     .endforeach
@@ -266,7 +266,7 @@ processes. Output from each run is captured in <code class="docutils literal not
 preserve spaces. Comments start with <code class="docutils literal notranslate"><span class="pre">#</span></code>.</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span># This is a comment
 .read input.txt
-.appendLine &quot;# generated automatically&quot;
+.appendLine "# generated automatically"
 </pre></div>
 </div>
 </section>
@@ -278,8 +278,8 @@ preserve spaces. Comments start with <code class="docutils literal notranslate">
 </div>
 <p>Use it with <code class="docutils literal notranslate"><span class="pre">$name</span></code> or <code class="docutils literal notranslate"><span class="pre">${name}</span></code> (braces avoid ambiguity in composite strings):</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>.set dt 0.5
-.createFolder &quot;output/dt_$dt&quot;
-.createFolder &quot;output/${dt}_run&quot;
+.createFolder "output/dt_$dt"
+.createFolder "output/${dt}_run"
 </pre></div>
 </div>
 </section>
@@ -435,14 +435,14 @@ after the loop exits.</p>
 <p><code class="docutils literal notranslate"><span class="pre">SFManip</span></code> can also be used directly in C++ without the script interpreter.</p>
 <section id="basic-example">
 <h3><a class="toc-backref" href="#id19" role="doc-backlink">Basic example</a><a class="headerlink" href="#basic-example" title="Link to this heading"></a></h3>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;simuFileManips.hpp&quot;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">"simuFileManips.hpp"</span>
 
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="n">SFManip</span><span class="w"> </span><span class="n">sf</span><span class="p">;</span>
-<span class="w">    </span><span class="n">sf</span><span class="p">.</span><span class="n">read</span><span class="p">(</span><span class="s">&quot;input.txt&quot;</span><span class="p">)</span>
-<span class="w">      </span><span class="p">.</span><span class="n">findLineStartingWith</span><span class="p">(</span><span class="s">&quot;dt&quot;</span><span class="p">)</span>
-<span class="w">      </span><span class="p">.</span><span class="n">replaceBy</span><span class="p">(</span><span class="s">&quot;dt %.3f&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">)</span>
-<span class="w">      </span><span class="p">.</span><span class="n">createFolder</span><span class="p">(</span><span class="s">&quot;output/run1&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">sf</span><span class="p">.</span><span class="n">read</span><span class="p">(</span><span class="s">"input.txt"</span><span class="p">)</span>
+<span class="w">      </span><span class="p">.</span><span class="n">findLineStartingWith</span><span class="p">(</span><span class="s">"dt"</span><span class="p">)</span>
+<span class="w">      </span><span class="p">.</span><span class="n">replaceBy</span><span class="p">(</span><span class="s">"dt %.3f"</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">)</span>
+<span class="w">      </span><span class="p">.</span><span class="n">createFolder</span><span class="p">(</span><span class="s">"output/run1"</span><span class="p">)</span>
 <span class="w">      </span><span class="p">.</span><span class="n">saveInFolder</span><span class="p">();</span>
 <span class="p">}</span>
 </pre></div>
@@ -450,25 +450,25 @@ after the loop exits.</p>
 </section>
 <section id="full-sweep-example">
 <h3><a class="toc-backref" href="#id20" role="doc-backlink">Full sweep example</a><a class="headerlink" href="#full-sweep-example" title="Link to this heading"></a></h3>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;simuFileManips.hpp&quot;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">"simuFileManips.hpp"</span>
 
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="n">SFManip</span><span class="o">::</span><span class="n">clearCollection</span><span class="p">();</span>
 
-<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">solver</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;cg&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;gmres&quot;</span><span class="p">})</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">solver</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="s">"cg"</span><span class="p">,</span><span class="w"> </span><span class="s">"gmres"</span><span class="p">})</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">dt</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="mf">0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">})</span><span class="w"> </span><span class="p">{</span>
 <span class="w">            </span><span class="n">SFManip</span><span class="p">()</span>
-<span class="w">              </span><span class="p">.</span><span class="n">read</span><span class="p">(</span><span class="s">&quot;input.txt&quot;</span><span class="p">)</span>
-<span class="w">              </span><span class="p">.</span><span class="n">findLineStartingWith</span><span class="p">(</span><span class="s">&quot;solver&quot;</span><span class="p">)</span>
-<span class="w">              </span><span class="p">.</span><span class="n">replaceBy</span><span class="p">(</span><span class="s">&quot;solver %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">solver</span><span class="p">)</span>
-<span class="w">              </span><span class="p">.</span><span class="n">findLineStartingWith</span><span class="p">(</span><span class="s">&quot;dt&quot;</span><span class="p">)</span>
-<span class="w">              </span><span class="p">.</span><span class="n">replaceBy</span><span class="p">(</span><span class="s">&quot;dt %.3f&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dt</span><span class="p">)</span>
-<span class="w">              </span><span class="p">.</span><span class="n">createFolder</span><span class="p">(</span><span class="s">&quot;output/%s_dt_%.3f&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">solver</span><span class="p">,</span><span class="w"> </span><span class="n">dt</span><span class="p">)</span>
+<span class="w">              </span><span class="p">.</span><span class="n">read</span><span class="p">(</span><span class="s">"input.txt"</span><span class="p">)</span>
+<span class="w">              </span><span class="p">.</span><span class="n">findLineStartingWith</span><span class="p">(</span><span class="s">"solver"</span><span class="p">)</span>
+<span class="w">              </span><span class="p">.</span><span class="n">replaceBy</span><span class="p">(</span><span class="s">"solver %s"</span><span class="p">,</span><span class="w"> </span><span class="n">solver</span><span class="p">)</span>
+<span class="w">              </span><span class="p">.</span><span class="n">findLineStartingWith</span><span class="p">(</span><span class="s">"dt"</span><span class="p">)</span>
+<span class="w">              </span><span class="p">.</span><span class="n">replaceBy</span><span class="p">(</span><span class="s">"dt %.3f"</span><span class="p">,</span><span class="w"> </span><span class="n">dt</span><span class="p">)</span>
+<span class="w">              </span><span class="p">.</span><span class="n">createFolder</span><span class="p">(</span><span class="s">"output/%s_dt_%.3f"</span><span class="p">,</span><span class="w"> </span><span class="n">solver</span><span class="p">,</span><span class="w"> </span><span class="n">dt</span><span class="p">)</span>
 <span class="w">              </span><span class="p">.</span><span class="n">saveInFolder</span><span class="p">();</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="n">SFManip</span><span class="o">::</span><span class="n">saveCollection</span><span class="p">(</span><span class="s">&quot;generated.txt&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="n">SFManip</span><span class="o">::</span><span class="n">saveCollection</span><span class="p">(</span><span class="s">"generated.txt"</span><span class="p">);</span>
 <span class="p">}</span>
 </pre></div>
 </div>
