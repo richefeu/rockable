@@ -3,6 +3,14 @@
 #include "fileTool.hpp"
 #include "glTools.hpp"
 
+#include <algorithm>
+#include <cstring>
+#include <sstream>
+#include <vector>
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "toofus-gate/stb/stb_image_write.h"
+
 void printHelp() {
   switch2D::go(width, height);
 
@@ -387,17 +395,50 @@ void drawFrame() {
   glShape::arrow(vec3r::zero(), len * vec3r::unit_z());
 }
 
-void drawShape(size_t ishp) {
-  if (ishp >= Shapes.size()) {
-    return;
-  }
-  if (mouse_mode != NOTHING) {
-    return;
-  }
+// Draw the given geometry again as a thin black wireframe sitting on the surface
+// (a small polygon offset keeps the lines from z-fighting with the fill).
+static void wireOverlay(const std::function<void()>& emit) {
+  GLboolean lit = glIsEnabled(GL_LIGHTING);
+  glDisable(GL_LIGHTING);
+  glColor3f(0.0f, 0.0f, 0.0f);
+  glLineWidth(0.7f);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  glEnable(GL_POLYGON_OFFSET_LINE);
+  glPolygonOffset(-1.0f, -1.0f);
+  emit();
+  glDisable(GL_POLYGON_OFFSET_LINE);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  if (lit) glEnable(GL_LIGHTING);
+}
 
+// Area-weighted centroid of a planar face, in 3D. A plain vertex average can
+// land on a reentrant corner (or outside the polygon) for a non-convex face,
+// which would make the inside() probe below unreliable.
+static vec3r faceCentroid(size_t ishp, const std::vector<size_t>& F, const vec3r& N) {
+  const std::vector<vec3r>& V = Shapes[ishp].vertex;
+  vec3r o = V[F[0]];
+  vec3r bx = V[F[1]] - o; bx.normalize();
+  vec3r by = cross(N, bx);
+  double A = 0.0, cx = 0.0, cy = 0.0;
+  size_t n = F.size();
+  for (size_t k = 0; k < n; ++k) {
+    vec3r p0 = V[F[k]] - o, p1 = V[F[(k + 1) % n]] - o;
+    double x0 = p0 * bx, y0 = p0 * by, x1 = p1 * bx, y1 = p1 * by;
+    double cr = x0 * y1 - x1 * y0;
+    A += cr; cx += (x0 + x1) * cr; cy += (y0 + y1) * cr;
+  }
+  if (std::fabs(A) < 1e-14) {                 // degenerate: fall back to the average
+    vec3r c(0, 0, 0);
+    for (size_t k = 0; k < n; ++k) c += V[F[k]];
+    return c / (double)n;
+  }
+  return o + (cx / (3.0 * A)) * bx + (cy / (3.0 * A)) * by;
+}
+
+// Emit the overlapping-primitive geometry of a shape (no colour set here, so the
+// same call serves both the filled pass and the wireframe pass).
+static void emitPrimitives(size_t ishp) {
   double R = Shapes[ishp].radius;
-  // glColor4f(0.666f, 0.729f, 0.09f, alpha); // yellow
-  glColor4f(.761f, .733f, .976f, alpha);
 
   size_t nv = Shapes[ishp].vertex.size();
   for (size_t v = 0; v < nv; ++v) {
@@ -417,32 +458,59 @@ void drawShape(size_t ishp) {
     glShape::tube(orig, arrow, 2.0 * R);
   }
 
+  bool solid = !Shapes[ishp].isSurface;
   size_t nf = Shapes[ishp].face.size();
   for (size_t f = 0; f < nf; ++f) {
-    if (Shapes[ishp].face[f].size() < 3) {
+    const std::vector<size_t>& F = Shapes[ishp].face[f];
+    if (F.size() < 3) {
       continue;
     }  // At least 3 pts!
-    vec3r N = cross(Shapes[ishp].vertex[Shapes[ishp].face[f][1]] - Shapes[ishp].vertex[Shapes[ishp].face[f][0]],
-                    Shapes[ishp].vertex[Shapes[ishp].face[f][2]] - Shapes[ishp].vertex[Shapes[ishp].face[f][0]]);
+    vec3r N = cross(Shapes[ishp].vertex[F[1]] - Shapes[ishp].vertex[F[0]],
+                    Shapes[ishp].vertex[F[2]] - Shapes[ishp].vertex[F[0]]);
     N.normalize();
 
-    glBegin(GL_TRIANGLE_FAN);
-    glNormal3f(N.x, N.y, N.z);
-    for (size_t v = 0; v < Shapes[ishp].face[f].size(); ++v) {
-      glVertex3f(Shapes[ishp].vertex[Shapes[ishp].face[f][v]].x + N.x * R,
-                 Shapes[ishp].vertex[Shapes[ishp].face[f][v]].y + N.y * R,
-                 Shapes[ishp].vertex[Shapes[ishp].face[f][v]].z + N.z * R);
+    // Which offset polygons are actually on the surface?
+    //   open surface -> both (+R and -R): the shape is a slab of thickness 2R.
+    //   solid        -> only the outward one; the inward offset is an interior
+    //                   face (hidden when opaque, but it shows through in
+    //                   transparency, so we must not draw it).
+    int sLo = -1, sHi = +1;                    // default: draw both (surface)
+    if (solid) {
+      vec3r cf = faceCentroid(ishp, F, N);
+      double m = 1.25 * R;                      // probe just beyond the surface
+      bool inPlus  = Shapes[ishp].inside(cf + N * m);
+      bool inMinus = Shapes[ishp].inside(cf - N * m);
+      if (inPlus != inMinus) {                  // outward = the side that is outside
+        sLo = sHi = (!inPlus) ? +1 : -1;
+      }                                         // else ambiguous: keep both (safe)
     }
-    glEnd();
 
-    glBegin(GL_TRIANGLE_FAN);
-    glNormal3f(-N.x, -N.y, -N.z);
-    for (size_t v = 0; v < Shapes[ishp].face[f].size(); ++v) {
-      glVertex3f(Shapes[ishp].vertex[Shapes[ishp].face[f][v]].x - N.x * R,
-                 Shapes[ishp].vertex[Shapes[ishp].face[f][v]].y - N.y * R,
-                 Shapes[ishp].vertex[Shapes[ishp].face[f][v]].z - N.z * R);
+    for (int s = sLo; s <= sHi; s += 2) {
+      vec3r Ns = (s > 0) ? N : -N;
+      glBegin(GL_TRIANGLE_FAN);
+      glNormal3f(Ns.x, Ns.y, Ns.z);
+      for (size_t v = 0; v < F.size(); ++v) {
+        glVertex3f(Shapes[ishp].vertex[F[v]].x + Ns.x * R,
+                   Shapes[ishp].vertex[F[v]].y + Ns.y * R,
+                   Shapes[ishp].vertex[F[v]].z + Ns.z * R);
+      }
+      glEnd();
     }
-    glEnd();
+  }
+}
+
+void drawShape(size_t ishp) {
+  if (ishp >= Shapes.size()) {
+    return;
+  }
+  if (mouse_mode != NOTHING) {
+    return;
+  }
+
+  glColor4f(shapeColor[0], shapeColor[1], shapeColor[2], alpha);
+  emitPrimitives(ishp);
+  if (show_wire) {
+    wireOverlay([ishp]() { emitPrimitives(ishp); });
   }
 }
 
@@ -547,6 +615,143 @@ void buildMenu() {
   glutAddMenuEntry("Quit", 0);
 }
 
+// Draw the skin mesh of a shape (the .rmsh companion), as an alternative to the
+// overlapping-primitive rendering of drawShape(). Positions and exact normals
+// are stored per vertex, in the body frame, exactly like drawShape() uses.
+void drawSkin(size_t ishp) {
+  if (ishp >= Shapes.size()) return;
+  auto it = skinMeshes.find(Shapes[ishp].name);
+  if (it == skinMeshes.end()) {
+    std::cout << "No skin mesh named '" << Shapes[ishp].name << "' in " << skinFile << std::endl;
+    return;
+  }
+  const ShapeMesh& m = it->second;
+
+  // Triangle draw order. Marching cubes emits its triangles grid-slab by
+  // grid-slab, and blending a transparent mesh in that order against a written
+  // depth buffer makes the far side appear and vanish in slab-wide bands, which
+  // read as internal planes. Sorting the triangles back to front (the same cure
+  // as in `see`) blends them correctly and still leaves a valid depth buffer
+  // for the wireframe overlay. Opaque rendering needs no order.
+  static std::vector<size_t> order;
+  order.resize(m.tri.size());
+  for (size_t t = 0; t < order.size(); ++t) order[t] = t;
+  if (alpha < 0.999f) {
+    std::vector<double> d2(m.tri.size());
+    for (size_t t = 0; t < m.tri.size(); ++t) {
+      vec3r c = (1.0 / 3.0) * (m.P[m.tri[t].a] + m.P[m.tri[t].b] + m.P[m.tri[t].c]);
+      d2[t] = norm2(c - eye);
+    }
+    std::sort(order.begin(), order.end(), [&d2](size_t a, size_t b) { return d2[a] > d2[b]; });
+  }
+
+  auto emit = [&m]() {
+    glBegin(GL_TRIANGLES);
+    for (size_t o = 0; o < order.size(); ++o) {
+      size_t t = order[o];
+      size_t idx[3] = {m.tri[t].a, m.tri[t].b, m.tri[t].c};
+      for (int k = 0; k < 3; ++k) {
+        const vec3r& n = m.N[idx[k]];
+        const vec3r& p = m.P[idx[k]];
+        glNormal3f(n.x, n.y, n.z);
+        glVertex3f(p.x, p.y, p.z);
+      }
+    }
+    glEnd();
+  };
+  glColor4f(shapeColor[0], shapeColor[1], shapeColor[2], alpha);
+  emit();
+  if (show_wire) {
+    wireOverlay(emit);
+  }
+}
+
+// Place the camera on a sphere around the current shape, using an elevation and
+// azimuth (degrees, z up) like matplotlib's mplot3d, at the fit-view distance.
+void set_view(double elev_deg, double azim_deg) {
+  OBB& obb = Shapes[ishape].obb;
+  center = obb.center;
+  vec3r diag = 2.0 * (obb.extent[0] * obb.e[0] + obb.extent[1] * obb.e[1] + obb.extent[2] * obb.e[2]);
+  double d = 0.5 * diag.length() / (atan(view_angle * M_PI / 360.0));
+  double e = elev_deg * M_PI / 180.0, a = azim_deg * M_PI / 180.0;
+  vec3r dir(cos(e) * cos(a), cos(e) * sin(a), sin(e));
+  eye = center + d * dir;
+  vec3r worldUp(0.0, 0.0, 1.0);
+  if (fabs(dir * worldUp) > 0.98) worldUp.set(0.0, 1.0, 0.0);
+  up = worldUp;
+}
+
+// Read the rendered frame back and write it as a PNG (row-flipped). The size is
+// taken from the actual viewport, so it is correct even on a scaled framebuffer.
+void saveScreenshot(const char* filename) {
+  GLint vp[4];
+  glGetIntegerv(GL_VIEWPORT, vp);
+  int W = vp[2], H = vp[3];
+  std::vector<unsigned char> pix((size_t)W * H * 4);
+  glPixelStorei(GL_PACK_ALIGNMENT, 1);
+  glReadBuffer(GL_BACK);
+  glReadPixels(0, 0, W, H, GL_RGBA, GL_UNSIGNED_BYTE, pix.data());
+  std::vector<unsigned char> flip((size_t)W * H * 4);
+  for (int y = 0; y < H; ++y) {
+    std::memcpy(&flip[(size_t)(H - 1 - y) * W * 4], &pix[(size_t)y * W * 4], (size_t)W * 4);
+  }
+  if (stbi_write_png(filename, W, H, 4, flip.data(), W * 4) == 0) {
+    std::cout << "Could not write " << filename << std::endl;
+  } else {
+    std::cout << "wrote " << filename << " (" << W << "x" << H << ")" << std::endl;
+  }
+}
+
+// One-shot display callback used in screenshot mode: render a clean frame (just
+// the shape, no axes/OBB/text), save it, and quit.
+void screenshotDisplay() {
+  if (shot_transparent) {
+    glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+  } else {
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+  }
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  adjust_clipping_plans();
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+  gluLookAt(eye.x, eye.y, eye.z, center.x, center.y, center.z, up.x, up.y, up.z);
+
+  glShadeModel(GL_SMOOTH);
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_LIGHTING);
+
+  if (!skinFile.empty()) {
+    drawSkin(ishape);
+  } else {
+    drawShape(ishape);
+  }
+
+  glFinish();
+  saveScreenshot(outputFile.c_str());
+  exit(0);
+}
+
+void printCLIhelp() {
+  std::cout << "shapeSurvey - inspect r-shapes, or render one to an image (CLI)\n\n"
+            << "Usage: shapeSurvey <shapeFile> [options]\n\n"
+            << "  -o, --output <file.png>  render one clean frame to <file.png> and exit\n"
+            << "  -i, --index  <n>         shape to render (0-based, default 0)\n"
+            << "  -N, --name   <name>      shape to render, by name\n"
+            << "  -W, --width  <px>        image width  (default 800)\n"
+            << "  -H, --height <px>        image height (default 800)\n"
+            << "  -A, --alpha  <a>         opacity in [0,1] (default 1)\n"
+            << "      --elev   <deg>       camera elevation, z up (default 22)\n"
+            << "      --azim   <deg>       camera azimuth        (default -55)\n"
+            << "      --skin   <file.rmsh> draw the skin mesh instead of the primitives\n"
+            << "      --radius <R>         override the Minkowski radius (0 = raw triangles)\n"
+            << "      --wire               overlay the mesh as a thin black wireframe\n"
+            << "      --color  <r,g,b>     fill colour in [0,1] (default 0.761,0.733,0.976)\n"
+            << "      --transparent        transparent background\n"
+            << "  -h, --help               this help\n\n"
+            << "With no --output, shapeSurvey opens the interactive viewer.\n";
+}
+
 // =====================================================================
 // Main function
 // =====================================================================
@@ -555,14 +760,60 @@ int main(int argc, char* argv[]) {
 
   StackTracer::initSignals();
 
-  if (argc == 1) {
-    if (readShapeLib("shapes") == 0) {
-      return 0;
+  // ---- Parse the command line (positional shapeFile + options) ----
+  std::string inputFile = "shapes";
+  int shapeIndex = 0;
+  std::string shapeName = "";
+  for (int i = 1; i < argc; ++i) {
+    std::string a = argv[i];
+    auto next = [&](const char* def) -> std::string {
+      return (i + 1 < argc) ? std::string(argv[++i]) : std::string(def);
+    };
+    if (a == "-o" || a == "--output") outputFile = next("out.png");
+    else if (a == "-i" || a == "--index") shapeIndex = std::stoi(next("0"));
+    else if (a == "-N" || a == "--name") shapeName = next("");
+    else if (a == "-W" || a == "--width") width = std::stoi(next("800"));
+    else if (a == "-H" || a == "--height") height = std::stoi(next("800"));
+    else if (a == "-A" || a == "--alpha") alpha = std::stof(next("1"));
+    else if (a == "--elev") shot_elev = std::stod(next("22"));
+    else if (a == "--azim") shot_azim = std::stod(next("-55"));
+    else if (a == "--skin") skinFile = next("");
+    else if (a == "--radius") radiusOverride = std::stod(next("-1"));
+    else if (a == "--transparent") shot_transparent = 1;
+    else if (a == "--wire") show_wire = 1;
+    else if (a == "--color") {
+      std::string c = next("0.761,0.733,0.976");
+      std::replace(c.begin(), c.end(), ',', ' ');
+      std::istringstream iss(c);
+      iss >> shapeColor[0] >> shapeColor[1] >> shapeColor[2];
     }
-  } else if (argc == 2) {
-    if (readShapeLib(argv[1]) == 0) {
-      return 0;
+    else if (a == "--bg") show_background = 1;
+    else if (a == "-h" || a == "--help") { printCLIhelp(); return 0; }
+    else if (!a.empty() && a[0] != '-') inputFile = a;
+    else { std::cout << "Unknown option: " << a << std::endl; printCLIhelp(); return 0; }
+  }
+
+  if (readShapeLib(inputFile.c_str()) == 0) {
+    return 0;
+  }
+
+  // ---- Select the shape to show/render ----
+  if (!shapeName.empty()) {
+    bool found = false;
+    for (size_t i = 0; i < Shapes.size(); ++i) {
+      if (Shapes[i].name == shapeName) { ishape = i; found = true; break; }
     }
+    if (!found) std::cout << "No shape named '" << shapeName << "', using shape 0" << std::endl;
+  } else if (shapeIndex >= 0 && (size_t)shapeIndex < Shapes.size()) {
+    ishape = (size_t)shapeIndex;
+  }
+  if (radiusOverride >= 0.0) {  // e.g. --radius 0 shows the imported triangles, no rounding
+    Shapes[ishape].radius = radiusOverride;
+  }
+  if (Shapes[ishape].preCompDone == 'n') Shapes[ishape].fitObb();
+  if (!skinFile.empty()) {
+    skinMeshes = loadRmsh(skinFile);
+    std::cout << "Loaded " << skinMeshes.size() << " skin mesh(es) from " << skinFile << std::endl;
   }
 
   // ==== Init GLUT and create window
@@ -573,17 +824,24 @@ int main(int argc, char* argv[]) {
   glutInitWindowSize(width, height);
   main_window = glutCreateWindow("ShapeSurvey");
 
-  // ==== Register callbacks
-  glutDisplayFunc(display);
-  glutReshapeFunc(reshape);
-  glutKeyboardFunc(keyboard);
-  // glutSpecialFunc(processSpecialKeys);
-  glutMouseFunc(mouse);
-  glutMotionFunc(motion);
+  bool screenshotMode = !outputFile.empty();
 
-  // ==== Menu
-  buildMenu();
-  glutAttachMenu(GLUT_RIGHT_BUTTON);
+  // ==== Register callbacks
+  if (screenshotMode) {
+    glutDisplayFunc(screenshotDisplay);  // renders one frame, saves, exits
+    glutReshapeFunc(reshape);
+  } else {
+    glutDisplayFunc(display);
+    glutReshapeFunc(reshape);
+    glutKeyboardFunc(keyboard);
+    // glutSpecialFunc(processSpecialKeys);
+    glutMouseFunc(mouse);
+    glutMotionFunc(motion);
+
+    // ==== Menu
+    buildMenu();
+    glutAttachMenu(GLUT_RIGHT_BUTTON);
+  }
 
   glText::init();
 
@@ -636,8 +894,12 @@ int main(int argc, char* argv[]) {
   glDepthFunc(GL_LEQUAL);
 
   // ==== Enter GLUT event processing cycle
+  if (screenshotMode) {
+    set_view(shot_elev, shot_azim);
+  } else {
+    fit_view();
+  }
   adjust_clipping_plans();
-  fit_view();
   glutMainLoop();
   return 0;
 }

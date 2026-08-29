@@ -35,6 +35,8 @@
 
 #include "see.hpp"
 
+#include <algorithm>
+
 void local_to_json() {
   params["window"]["width"] = width;
   params["window"]["height"] = height;
@@ -557,7 +559,7 @@ void selection(int x, int y) {
       glTranslatef(pos.x, pos.y, pos.z);
       quat2GLMatrix<GLfloat>(box.Particles[i].Q, Rot_Matrix);
       glMultMatrixf(Rot_Matrix);
-      drawShape(box.Particles[i].shape, box.Particles[i].homothety);
+      drawShapeOrMesh(box.Particles[i].shape, box.Particles[i].homothety);
       glPopMatrix();
     }
   }
@@ -778,6 +780,54 @@ void reshape(int w, int h) {
 }
 
 // Draw the shape of the sphero-polyhedron in its own framework
+// Draw a precomputed skin mesh (from the .rmsh companion). The particle frame
+// (translation + rotation) is already on the GL stack; here we only scale by the
+// homothety and emit the triangles with their exact per-vertex normals.
+void drawShapeMesh(const ShapeMesh& m, double homothety) {
+  const float h = (float)homothety;
+  glBegin(GL_TRIANGLES);
+  for (size_t t = 0; t < m.tri.size(); ++t) {
+    const size_t idx[3] = {m.tri[t].a, m.tri[t].b, m.tri[t].c};
+    for (int k = 0; k < 3; ++k) {
+      const vec3r& n = m.N[idx[k]];
+      const vec3r& p = m.P[idx[k]];
+      glNormal3f((float)n.x, (float)n.y, (float)n.z);
+      glVertex3f(h * (float)p.x, h * (float)p.y, h * (float)p.z);
+    }
+  }
+  glEnd();
+}
+
+// Use the skin mesh of this shape when one was loaded, otherwise fall back to
+// the overlapping-primitive drawing. The mesh is compiled once into a GL display
+// list at unit homothety; a per-particle homothety is applied as a scale.
+void drawShapeOrMesh(Shape* s, double homothety) {
+  std::map<std::string, ShapeMesh>::const_iterator it = shapeMeshes.find(s->name);
+  if (it == shapeMeshes.end()) {
+    drawShape(s, homothety);
+    return;
+  }
+  unsigned int& list = shapeMeshLists[s->name];
+  if (list == 0) {
+    list = glGenLists(1);
+    if (list != 0) {
+      glNewList(list, GL_COMPILE);
+      drawShapeMesh(it->second, 1.0);
+      glEndList();
+    }
+  }
+  if (list == 0) {  // display lists unavailable: draw directly
+    drawShapeMesh(it->second, homothety);
+  } else if (homothety != 1.0) {
+    glPushMatrix();
+    glScaled(homothety, homothety, homothety);
+    glCallList(list);
+    glPopMatrix();
+  } else {
+    glCallList(list);
+  }
+}
+
 void drawShape(Shape* s, double homothety, const mat9r& T) {
   double R = homothety * s->radius;
   int nbLevelSphere = 2;
@@ -896,48 +946,66 @@ void drawParticles() {
 
   glEnable(GL_LIGHTING);
   glEnable(GL_DEPTH_TEST);
-  for (size_t i = box.nDriven; i < box.Particles.size(); ++i) {
-    int alpha = (int)floor(params["alpha_particles"].get<GLfloat>() * 255);
-    if (selectedParticle >= 0 && i == (size_t)selectedParticle) {
-      glColor4ub(234, 255, 0, alpha);  // shiny yellow
-    } else {
-      if (i >= pcolors.size()) {
-        glColor4ub(params["ParticleColor"][0].get<int>(), params["ParticleColor"][1].get<int>(),
-                   params["ParticleColor"][2].get<int>(), alpha);
-      } else {
-        glColor4ub(pcolors[i].r, pcolors[i].g, pcolors[i].b, alpha);
-      }
-    }
+  glEnable(GL_NORMALIZE);  // keep skin-mesh normals unit when a homothety scales them
 
-    vec3r pos = box.Particles[i].pos;
-
-    glPushMatrix();
-    glTranslatef(pos.x, pos.y, pos.z);
-    quat2GLMatrix<GLfloat>(box.Particles[i].Q, Rot_Matrix);
-    glMultMatrixf(Rot_Matrix);
-    drawShape(box.Particles[i].shape, box.Particles[i].homothety /*, box.Particles[i].uniformTransformation*/);
-    glPopMatrix();
-  }
-
+  // Driven particles (floor, walls) first, so the opaque scene is in the depth
+  // buffer before any transparent grain is blended over it.
   if (params["show_driven"].get<int>() == 1) {
+    int alpha = (int)floor(params["alpha_fixparticles"].get<GLfloat>() * 255);
     for (size_t i = 0; i < box.nDriven; ++i) {
-      int alpha = (int)floor(params["alpha_fixparticles"].get<GLfloat>() * 255);
       if (selectedParticle >= 0 && i == (size_t)selectedParticle) {
         glColor4ub(234, 255, 0, alpha);
       } else {
         glColor4ub(128, 128, 128, alpha);
       }
-
       vec3r pos = box.Particles[i].pos;
-
       glPushMatrix();
       glTranslatef(pos.x, pos.y, pos.z);
       quat2GLMatrix<GLfloat>(box.Particles[i].Q, Rot_Matrix);
       glMultMatrixf(Rot_Matrix);
-      drawShape(box.Particles[i].shape, box.Particles[i].homothety /*, box.Particles[i].uniformTransformation*/);
+      drawShapeOrMesh(box.Particles[i].shape, box.Particles[i].homothety);
       glPopMatrix();
     }
   }
+
+  // Free particles. When they are transparent, draw them back-to-front and stop
+  // writing depth, so a nearer grain no longer hides the ones behind it. This is
+  // the usual order-dependent-blending fix; without it the transparency looks
+  // wrong regardless of the toolkit (freeglut or otherwise).
+  int alpha = (int)floor(params["alpha_particles"].get<GLfloat>() * 255);
+  bool transparent = (alpha < 254);
+
+  static std::vector<size_t> order;
+  order.clear();
+  for (size_t i = box.nDriven; i < box.Particles.size(); ++i) order.push_back(i);
+  if (transparent) {
+    std::sort(order.begin(), order.end(), [](size_t a, size_t b) {
+      return norm2(box.Particles[a].pos - eye) > norm2(box.Particles[b].pos - eye);
+    });
+    glDepthMask(GL_FALSE);
+  }
+
+  for (size_t k = 0; k < order.size(); ++k) {
+    size_t i = order[k];
+    if (selectedParticle >= 0 && i == (size_t)selectedParticle) {
+      glColor4ub(234, 255, 0, alpha);  // shiny yellow
+    } else if (i >= pcolors.size()) {
+      glColor4ub(params["ParticleColor"][0].get<int>(), params["ParticleColor"][1].get<int>(),
+                 params["ParticleColor"][2].get<int>(), alpha);
+    } else {
+      glColor4ub(pcolors[i].r, pcolors[i].g, pcolors[i].b, alpha);
+    }
+
+    vec3r pos = box.Particles[i].pos;
+    glPushMatrix();
+    glTranslatef(pos.x, pos.y, pos.z);
+    quat2GLMatrix<GLfloat>(box.Particles[i].Q, Rot_Matrix);
+    glMultMatrixf(Rot_Matrix);
+    drawShapeOrMesh(box.Particles[i].shape, box.Particles[i].homothety);
+    glPopMatrix();
+  }
+
+  if (transparent) glDepthMask(GL_TRUE);
 }
 
 void drawTrajectories() {
@@ -1856,6 +1924,19 @@ int main(int argc, char* argv[]) {
   box.loadConf(confFileName.c_str());
   textZone.addLine("conf-file: %s (time = %f)", confFileName.c_str(), box.t);
   box.computeAABB();
+
+  // Optional skin meshes: the "<shapeFile stem>.rmsh" companion next to the
+  // shape file. When present, particles are drawn with these meshes.
+  {
+    std::string sf = box.shapeFile;
+    size_t dot = sf.find_last_of('.');
+    std::string rmshPath = (dot == std::string::npos ? sf : sf.substr(0, dot)) + ".rmsh";
+    shapeMeshes = loadRmsh(rmshPath);
+    if (!shapeMeshes.empty()) {
+      std::cout << "Loaded " << shapeMeshes.size() << " skin mesh(es) from " << rmshPath << std::endl;
+      textZone.addLine("skin meshes: %zu from %s", shapeMeshes.size(), rmshPath.c_str());
+    }
+  }
 
   if (fileTool::fileExists(trajFileName.c_str())) {
     readTraj(trajFileName.c_str());

@@ -44,7 +44,7 @@ option(ROCKABLE_ENABLE_PERIODIC "Enable full periodic boundary conditions" OFF)
 
 option(ROCKABLE_COMPILE_POSTPRO "Compile the application to run post-processing commands" ON)
 option(ROCKABLE_COMPILE_SEE "Compile the glut application to visualize the conf-files" ON)
-option(ROCKABLE_COMPILE_SEER "Compile Dear My Seer (and Dear My Shape)" OFF)
+option(ROCKABLE_COMPILE_SEER "Compile Dear My Seer (and Dear My Shape)" ON)
 option(ROCKABLE_COMPILE_PREPRO "Compile the preprocessing tools" ON)
 option(ROCKABLE_COMPILE_CONF2VTK "Convert conf files to VTK" ON)
 
@@ -162,6 +162,7 @@ include_directories(${CMAKE_SOURCE_DIR} ${toofus_SOURCE_DIR} ${fmt_SOURCE_DIR}/i
 file(
   GLOB
   core_object_files
+  CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/BodyForces/*.cpp
   ${CMAKE_SOURCE_DIR}/Core/*.cpp
   ${CMAKE_SOURCE_DIR}/DataExtractors/*.cpp
@@ -171,7 +172,7 @@ file(
   ${CMAKE_SOURCE_DIR}/ProcessingTools/*.cpp)
 
 if(ROCKABLE_ENABLE_BOUNDARY)
-  file(GLOB boundaries_files ${CMAKE_SOURCE_DIR} /Boundaries/*.cpp)
+  file(GLOB boundaries_files CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR} /Boundaries/*.cpp)
   list(APPEND core_object_files ${boundaries_files})
 endif() # end of ROCKABLE_ENABLE_BOUNDARY
 

@@ -58,10 +58,18 @@
 
 #include "BlockRelease.hpp"
 #include "Core/Rockable.hpp"
+#include "Core/ShapeMesh.hpp"
 #include "ProcessingTools/processingTool_probeSolidFraction.hpp"
 
 Rockable box;
 int confNum = 0;
+
+/// Skin meshes read from the "<shapeFile stem>.rmsh" companion, keyed by shape
+/// name. When non-empty, see draws these meshes instead of the crude primitives.
+std::map<std::string, ShapeMesh> shapeMeshes;
+/// One GL display list per skin mesh (compiled lazily at unit homothety), so the
+/// same shape is uploaded once and only recalled for each of its particles.
+std::map<std::string, unsigned int> shapeMeshLists;
 
 std::vector<BlockRelease> releases;
 
@@ -129,6 +137,8 @@ vec3r center;
 vec3r up;
 
 void drawShape(Shape* s, double homothety = 1.0, const mat9r& T = mat9r::unit());
+void drawShapeMesh(const ShapeMesh& m, double homothety = 1.0);
+void drawShapeOrMesh(Shape* s, double homothety = 1.0);
 void drawForces();
 void drawC2CNormalForce();
 void drawVelocities();

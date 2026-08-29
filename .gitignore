@@ -35,3 +35,6 @@ perflog*
 !examples/**/input.txt
 BUILD
 INSTALL
+
+# Papers and manuscripts (kept out of the code repository)
+Papers/

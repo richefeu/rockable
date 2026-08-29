@@ -8,6 +8,7 @@
 #include <GL/glut.h>
 
 #include "Core/Shape.hpp"
+#include "Core/ShapeMesh.hpp"
 #include "stackTracer.hpp"
 
 #include <fstream>
@@ -17,6 +18,20 @@
 std::vector<Shape> Shapes;
 size_t ishape = 0;  // id of the current shape beeing shown
 std::string shapeFileName = "shapes";
+
+// ---- CLI screenshot (headless one-shot rendering) ----
+// When outputFile is non-empty, shapeSurvey renders a single clean frame of the
+// selected shape (no axes, no OBB, no text) and writes it to that PNG, then
+// exits, instead of opening the interactive window.
+std::string outputFile = "";              // empty => interactive mode
+std::string skinFile = "";                // optional .rmsh: draw the skin mesh instead of primitives
+std::map<std::string, ShapeMesh> skinMeshes;  // keyed by shape name
+double shot_elev = 22.0;                   // camera elevation (deg), z is up
+double shot_azim = -55.0;                  // camera azimuth (deg)
+int shot_transparent = 0;                  // 1 => transparent background (alpha 0)
+int show_wire = 0;                         // 1 => overlay the mesh as black wireframe
+float shapeColor[3] = {0.761f, 0.733f, 0.976f};  // fill colour (RGB in [0,1])
+double radiusOverride = -1.0;              // >=0 => force the Minkowski radius R (0 => raw triangles)
 
 int main_window;
 
@@ -45,6 +60,10 @@ vec3r center;
 vec3r up;
 
 void drawShape(size_t ishp);
+void drawSkin(size_t ishp);
+void set_view(double elev_deg, double azim_deg);
+void screenshotDisplay();
+void saveScreenshot(const char* filename);
 void recursiveDrawOBB(OBBnode<subBox> * node, int wantedLevel, int level = 0);
 void drawObbLevel(size_t ishp, size_t wantedLevel);
 void drawFrame();

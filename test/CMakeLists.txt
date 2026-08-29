@@ -38,6 +38,16 @@ if (ROCKABLE_ENABLE_PERIODIC)
   add_test(NAME 2_prismes_gravity_reg COMMAND rockable ${TEST_DIR}/redirection_2_prismes_gravity.conf -n ${WORK_DIR}/conf1 -r ${REGRESSION_DIR}/regression_2_prismes_gravity.conf)
 endif()
 
+# Unit test of the r-shape signed distance function (skin-mesh, phase 0)
+add_executable(test_ShapeSDF ${TEST_DIR}/ShapeSDF/test_ShapeSDF.cpp)
+target_link_libraries(test_ShapeSDF PUBLIC Rockable_core)
+add_test(NAME ShapeSDF COMMAND test_ShapeSDF)
+
+# Unit test of the r-shape skin mesher (skin-mesh, phase 1)
+add_executable(test_ShapeMesh ${TEST_DIR}/ShapeSDF/test_ShapeMesh.cpp)
+target_link_libraries(test_ShapeMesh PUBLIC Rockable_core)
+add_test(NAME ShapeMesh COMMAND test_ShapeMesh ${TEST_DIR}/input/518_poly/shape.shp)
+
 add_test(NAME 50_prismes_gravity_reg COMMAND rockable ${TEST_DIR}/redirection_50_prismes_gravity.conf -n ${WORK_DIR}/conf1 -r ${REGRESSION_DIR}/regression_50_prismes_gravity.conf)
 add_test(NAME 518_poly_bruteforce_default_noPeriodicity COMMAND rockable ${TEST_DIR}/redirection_test_518_poly_bruteforce_default_noperiod.conf -n ${WORK_DIR}/conf3001 -r ${REGRESSION_DIR}/regression_518_poly_default_noperiod.conf)
 add_test(NAME 518_poly_bruteforce_avalanches_noPeriodicity COMMAND rockable ${TEST_DIR}/redirection_test_518_poly_bruteforce_avalanches_noperiod.conf -n ${WORK_DIR}/conf3001 -r ${REGRESSION_DIR}/regression_518_poly_avalanches_noperiod.conf)

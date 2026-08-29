@@ -410,9 +410,18 @@ bool Shape::inside(const vec3r& point) {
     if (nb_intersect % 2 != 0) return true;  // Should be optimized by the compilator
   }
 
-  // === inside NODES or EDGES ===
-  vec3r E, V;
+  // === inside NODES ===
+  // Every vertex is a ball of the skeleton, whether or not an edge touches it.
+  // A shape can be a single vertex (a sphere) or carry vertices without any
+  // incident edge, so the vertices have to be tested on their own
   double d2;
+  for (size_t v = 0; v < vertex.size(); ++v) {
+    d2 = norm2(point - vertex[v]);
+    if (d2 < radius * radius) return true;
+  }
+
+  // === inside EDGES ===
+  vec3r E, V;
   for (size_t e = 0; e < edge.size(); ++e) {
     size_t i0 = edge[e].first;
     size_t i1 = edge[e].second;
