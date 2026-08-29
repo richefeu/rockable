@@ -68,7 +68,7 @@ force applied to a wall is the target stress times the corresponding area.
 
 
 ``tritriIsostaticCompression`` (*double*) **pressure**
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Isotropic compression. The same pressure is applied on the three ``max`` walls,
 the three ``min`` walls staying fixed:
@@ -149,7 +149,7 @@ This example holds the three ``min`` walls fixed, confines :math:`x` and
 
 
 ``tritriLodeAngle`` (*double*) **pressure** (*double*) **LodeAngle** (*double*) **sigRate**
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A stress path at constant Lode angle, used to explore the deviatoric plane
 rather than a single triaxial path. Starting from an isotropic state at
@@ -197,7 +197,7 @@ automatically, so it does not need to be a unit vector.
 
 
 ``shaker`` (*int*) **body** (*vec3r*) **dir** (*double*) **A** (*double*) **freq**
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Sinusoidal oscillation of amplitude :math:`A` and frequency :math:`f`:
 
@@ -221,7 +221,7 @@ twice per period. The acceleration is zero except at the reversals, which avoids
 the continuously varying inertial forcing of a sine.
 
 ``sawtooth_shaker`` (*int*) **body** (*vec3r*) **dir** (*double*) **A** (*double*) **freq** (*double*) **t_ini**
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ``triangle_shaker`` with a settable phase origin ``t_ini``, so that the
 oscillation can be made to start at a chosen time rather than at :math:`t = 0`.
