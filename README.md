@@ -4,7 +4,8 @@
 
 ## Quick news
 
-The annual *Rockable day* was held on 28 August 2026 at Arts et Métiers, Aix-en-Provence. It is the yearly meeting where everyone involved in Rockable — developers, users, and the simply curious — gets together to present what has progressed and to agree on where the code should go next.
+The annual *Rockable day* was held on 28 August 2026 at Arts et Métiers, Aix-en-Provence. It is the yearly meeting where everyone involved in Rockable - developers, users, and the simply curious - gets together to present what has progressed and to agree on where the code should go next.
+It is also where the wider family of applications orbiting around Rockable gets discussed: [ExaDEM](https://github.com/Collab4exaNBody/exaDEM) for large-scale HPC runs, MPMbox for the material point method, and quite a few others, each built for its own purpose and carrying its own specificities.
 
 <p align="center">
 <img src="./photos/rockable-day-2026-aix-en-provence.jpg" width="90%" alt="Participants of the Rockable day 2026, Arts et Métiers, Aix-en-Provence"/>
@@ -21,9 +22,9 @@ Here is what came out of it.
 
 **For the user community, which keeps growing**
 
-* Improve the documentation, using generative AI where it helps — while keeping a firm review of whatever it produces.
+* Improve the documentation, using generative AI where it helps - while keeping a firm review of whatever it produces.
 * Set up a training school for the code: yearly, or every three years, depending on how many people want to attend.
-* Every user is encouraged to contribute documentation, including short tutorials written from their own learning — and to share them.
+* Every user is encouraged to contribute documentation, including short tutorials written from their own learning - and to share them.
 
 ## What is `Rockable`?   
 
