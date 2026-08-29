@@ -81,18 +81,49 @@ Features
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Getting started
 
    quickStart
    fileOrganisation
+   commandLine
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Input formats
+
    syntaxConf
    syntaxShapes
+   drivingSystem
+   servoControllers
    preProcessing
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Physical models
+
    forceLaws
+   bodyForces
    dissipation
    integrationSchemes
-   servoControllers
+   periodicBoundaryConditions
+   softParticles
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Results
+
+   dataExtractors
+   postProcessing
    visualisation
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Tools
+
    tools
-   
-   
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Development
+
+   developerGuide

@@ -163,7 +163,7 @@ Computation options
   - **Options**: ``bruteForce`` (default) or ``OBBtree``
   - **Description**: The interactions between particles involve different types of interaction, such as sphere-sphere, sphere-tube, sphere-polygon, and tube-tube. The best strategy to be used depends on the complexity of the involved shapes.
 
-- ``UpdateNLStrategy`` (*string*) **Option**
+- ``UpdateNL`` (*string*) **Option**
 
   Choose the strategy for updating neighbor lists.
 
