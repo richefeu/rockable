@@ -213,7 +213,7 @@ if(ROCKABLE_COMPILE_SEE)
 endif() # end of ROCKABLE_COMPILE_SEE
 
 # ##############################################################################
-# Dear My Seer
+# Dear My Seer (and Dear My Shape)
 if(ROCKABLE_COMPILE_SEER)
   
   find_package(GLEW REQUIRED)
