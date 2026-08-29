@@ -45,3 +45,6 @@ src/Apps/DearMySeer/seer
 src/Apps/DearMyShape/shape
 src/Apps/*/*.o
 src/Apps/mini-imgui-implot/*.o
+
+# Tutorials: a local playground, deliberately not tracked
+tutorials/
