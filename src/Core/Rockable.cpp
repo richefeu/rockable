@@ -2954,6 +2954,11 @@ void Rockable::update_interactions() {
       std::vector<Interaction*>& InterLoc = m_vecInteractions[k];
       for (auto it = InterLoc.begin(); it != InterLoc.end(); ++it) {
         (*it)->jPeriodicShift = Cell.getBranchCorrection(Particles[(*it)->i].pos, Particles[(*it)->j].pos);
+        // The image of j sits one (or more) cell vector away from j, so in a cell that is
+        // being deformed it does not travel at the velocity of j. The difference is
+        // vh . hinv . jPeriodicShift, and it is what a sheared cell needs in order to
+        // behave as a Lees-Edwards boundary.
+        (*it)->jPeriodicVelShift = Cell.vhHinv * (*it)->jPeriodicShift;
         Interaction::UpdateDispatcherPeriodic[(*it)->type](**it, Particles[(*it)->i], Particles[(*it)->j]);
       }
     }

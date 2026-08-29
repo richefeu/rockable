@@ -73,9 +73,13 @@ class Interaction {
 
   vec3r ds;
 
-  vec3r pos;             ///< Contact position
-  vec3r vel;             ///< Relative velocity (j relative to i)
-  vec3r jPeriodicShift;  ///< In case of periodic cell, this the shifting of particle j
+  vec3r pos;                ///< Contact position
+  vec3r vel;                ///< Relative velocity (j relative to i)
+  vec3r jPeriodicShift;     ///< In case of periodic cell, this the shifting of particle j
+  vec3r jPeriodicVelShift;  ///< Velocity of the image of j relative to j itself, that is
+                            ///< vh . hinv . jPeriodicShift. It is zero unless the cell is
+                            ///< being deformed, and it is what makes a shear cell behave
+                            ///< as a Lees-Edwards boundary
 
   double fn{0.0};  ///< Normal force (scalar value)
   vec3r ft;        ///< Tangential force (vector)

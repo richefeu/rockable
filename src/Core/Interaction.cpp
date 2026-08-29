@@ -50,6 +50,7 @@ Interaction::Interaction()
       pos(),
       vel(),
       jPeriodicShift(),
+      jPeriodicVelShift(),
       fn(0.0),
       ft(),
       mom(),
@@ -70,6 +71,7 @@ Interaction::Interaction(const Interaction& I)
       pos(I.pos),
       vel(I.vel),
       jPeriodicShift(I.jPeriodicShift),
+      jPeriodicVelShift(I.jPeriodicVelShift),
       fn(I.fn),
       ft(I.ft),
       mom(I.mom),
@@ -90,6 +92,7 @@ Interaction::Interaction(size_t I, size_t J, int Type, size_t Isub, size_t Jsub,
       pos(),
       vel(),
       jPeriodicShift(),
+      jPeriodicVelShift(),
       fn(0.0),
       ft(),
       mom(),
@@ -111,6 +114,7 @@ Interaction& Interaction::operator=(const Interaction& other) {
     pos = other.pos;
     vel = other.vel;
     jPeriodicShift = other.jPeriodicShift;
+    jPeriodicVelShift = other.jPeriodicVelShift;
     fn = other.fn;
     ft = other.ft;
     mom = other.mom;
@@ -345,8 +349,8 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
 
       I.pos = posi - I.n * (Ri + 0.5 * I.dn);
       // v(Qj) - v(Qi)
-      I.vel =
-          (Pj.vel - cross(I.pos - (Pj.pos + I.jPeriodicShift), Pj.vrot)) - (Pi.vel - cross(I.pos - Pi.pos, Pi.vrot));
+      I.vel = ((Pj.vel + I.jPeriodicVelShift) - cross(I.pos - (Pj.pos + I.jPeriodicShift), Pj.vrot)) -
+              (Pi.vel - cross(I.pos - Pi.pos, Pi.vrot));
 
       return true;
     },
@@ -382,7 +386,7 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
       I.pos = posi - I.n * (Ri + 0.5 * I.dn);
       // v(Qj) - v(Qi)
       I.vel =
-          (Pj.vel - cross(I.pos - (Pj.pos + I.jPeriodicShift), Pj.vrot)) -
+          ((Pj.vel + I.jPeriodicVelShift) - cross(I.pos - (Pj.pos + I.jPeriodicShift), Pj.vrot)) -
           (Pi.vel - cross(I.pos - Pi.pos, Pi.vrot));
 
       return true;
@@ -454,7 +458,7 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
         I.pos = pos_iv - I.n * (Ri + 0.5 * I.dn);
         // v(Qj) - v(Qi)
         I.vel =
-            (Pj.vel - cross(I.pos - (Pj.pos + I.jPeriodicShift), Pj.vrot)) -
+            ((Pj.vel + I.jPeriodicVelShift) - cross(I.pos - (Pj.pos + I.jPeriodicShift), Pj.vrot)) -
             (Pi.vel - cross(I.pos - Pi.pos, Pi.vrot));
 
         return true;
@@ -516,7 +520,7 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
       I.pos = posi1 + s * Ei - I.n * (Ri + 0.5 * I.dn);
       // v(Qj) - v(Qi)
       I.vel =
-          (Pj.vel - cross(I.pos - (Pj.pos + I.jPeriodicShift), Pj.vrot)) -
+          ((Pj.vel + I.jPeriodicVelShift) - cross(I.pos - (Pj.pos + I.jPeriodicShift), Pj.vrot)) -
           (Pi.vel - cross(I.pos - Pi.pos, Pi.vrot));
       return true;
 #undef _EPSILON_VALUE_
