@@ -41,7 +41,7 @@
 setStiffnessRatioInterfaces::setStiffnessRatioInterfaces() { }
 
 void setStiffnessRatioInterfaces::addCommand() {  
-  box->parser.kwMap["randomlyOrientedVelocities"] = [this](std::istream& conf) {
+  box->parser.kwMap["setStiffnessRatioInterfaces"] = [this](std::istream& conf) {
     conf >> this->ratio;
     exec();
   };
