@@ -48,3 +48,7 @@ src/Apps/mini-imgui-implot/*.o
 
 # Tutorials: a local playground, deliberately not tracked
 tutorials/
+
+# Scratch simulation folder of Dear My Seer: 245 MB of conf files and
+# screenshots, duplicating examples/test_GeoVisc. Never to be tracked again.
+src/Apps/DearMySeer/test_GeoVisc/
