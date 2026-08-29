@@ -356,9 +356,12 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
     [](Interaction& I, Particle& Pi, Particle& Pj) -> bool {
       size_t v1 = Pj.shape->edge[I.jsub].first;
       size_t v2 = Pj.shape->edge[I.jsub].second;
-      vec3r posj1 = Pj.GlobVertex(v1);
-      vec3r posj2 = Pj.GlobVertex(v2);
-      vec3r posi = Pi.GlobVertex(I.isub) - I.jPeriodicShift;
+      // The image of j is brought next to i, so that I.pos ends up in the frame of i.
+      // This is the convention of UpdateVertexVertex, and the one assumed by
+      // Rockable::incrementResultants when it builds the two lever arms.
+      vec3r posj1 = Pj.GlobVertex(v1) + I.jPeriodicShift;
+      vec3r posj2 = Pj.GlobVertex(v2) + I.jPeriodicShift;
+      vec3r posi = Pi.GlobVertex(I.isub);
 
       vec3r E = posj2 - posj1;
       vec3r v = posi - posj1;
@@ -379,7 +382,8 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
       I.pos = posi - I.n * (Ri + 0.5 * I.dn);
       // v(Qj) - v(Qi)
       I.vel =
-          (Pj.vel - cross(I.pos - Pj.pos, Pj.vrot)) - (Pi.vel - cross(I.pos - (Pi.pos - I.jPeriodicShift), Pi.vrot));
+          (Pj.vel - cross(I.pos - (Pj.pos + I.jPeriodicShift), Pj.vrot)) -
+          (Pi.vel - cross(I.pos - Pi.pos, Pi.vrot));
 
       return true;
     },
@@ -390,10 +394,12 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
       // First, we project the node position onto the face plane.
       vec3r P;
       size_t nb_vertices = Pj.shape->face[I.jsub].size();
-      vec3r posNodeA_jv = Pj.GlobFaceVertex(I.jsub, 0);
-      vec3r posNodeB_jv = Pj.GlobFaceVertex(I.jsub, 1);
-      vec3r posNodeC_jv = Pj.GlobFaceVertex(I.jsub, nb_vertices - 1);
-      vec3r pos_iv = Pi.GlobVertex(I.isub) - I.jPeriodicShift;
+      // The image of j is brought next to i, so that I.pos ends up in the frame of i
+      // (the convention of UpdateVertexVertex, see the remark there)
+      vec3r posNodeA_jv = Pj.GlobFaceVertex(I.jsub, 0) + I.jPeriodicShift;
+      vec3r posNodeB_jv = Pj.GlobFaceVertex(I.jsub, 1) + I.jPeriodicShift;
+      vec3r posNodeC_jv = Pj.GlobFaceVertex(I.jsub, nb_vertices - 1) + I.jPeriodicShift;
+      vec3r pos_iv = Pi.GlobVertex(I.isub);
       vec3r v = pos_iv - posNodeA_jv;
       vec3r v1 = posNodeB_jv - posNodeA_jv;
       v1.normalize();
@@ -422,8 +428,8 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
       for (iva = 0; iva < nb_vertices; ++iva) {
         ivb = iva + 1;
         if (ivb == nb_vertices) ivb = 0;
-        posNodeA_jv = Pj.GlobFaceVertex(I.jsub, iva);
-        posNodeB_jv = Pj.GlobFaceVertex(I.jsub, ivb);
+        posNodeA_jv = Pj.GlobFaceVertex(I.jsub, iva) + I.jPeriodicShift;
+        posNodeB_jv = Pj.GlobFaceVertex(I.jsub, ivb) + I.jPeriodicShift;
         pa1 = posNodeA_jv * v1;
         pb1 = posNodeB_jv * v1;
         pa2 = posNodeA_jv * v2;
@@ -448,7 +454,8 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
         I.pos = pos_iv - I.n * (Ri + 0.5 * I.dn);
         // v(Qj) - v(Qi)
         I.vel =
-            (Pj.vel - cross(I.pos - Pj.pos, Pj.vrot)) - (Pi.vel - cross(I.pos - (Pi.pos - I.jPeriodicShift), Pi.vrot));
+            (Pj.vel - cross(I.pos - (Pj.pos + I.jPeriodicShift), Pj.vrot)) -
+            (Pi.vel - cross(I.pos - Pi.pos, Pi.vrot));
 
         return true;
       }
@@ -464,10 +471,12 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
       // Be carreful about this small value because, if it is not
       // sufficiently small, some edges (tubes) may not see them each other.
 
-      vec3r posi1 = Pi.GlobVertex(Pi.shape->edge[I.isub].first) - I.jPeriodicShift;
-      vec3r posi2 = Pi.GlobVertex(Pi.shape->edge[I.isub].second) - I.jPeriodicShift;
-      vec3r posj1 = Pj.GlobVertex(Pj.shape->edge[I.jsub].first);
-      vec3r posj2 = Pj.GlobVertex(Pj.shape->edge[I.jsub].second);
+      // The image of j is brought next to i, so that I.pos ends up in the frame of i
+      // (the convention of UpdateVertexVertex, see the remark there)
+      vec3r posi1 = Pi.GlobVertex(Pi.shape->edge[I.isub].first);
+      vec3r posi2 = Pi.GlobVertex(Pi.shape->edge[I.isub].second);
+      vec3r posj1 = Pj.GlobVertex(Pj.shape->edge[I.jsub].first) + I.jPeriodicShift;
+      vec3r posj2 = Pj.GlobVertex(Pj.shape->edge[I.jsub].second) + I.jPeriodicShift;
 
       vec3r Ei = posi2 - posi1;
       vec3r Ej = posj2 - posj1;
@@ -507,7 +516,8 @@ std::function<bool(Interaction&, Particle&, Particle&)> Interaction::UpdateDispa
       I.pos = posi1 + s * Ei - I.n * (Ri + 0.5 * I.dn);
       // v(Qj) - v(Qi)
       I.vel =
-          (Pj.vel - cross(I.pos - Pj.pos, Pj.vrot)) - (Pi.vel - cross(I.pos - (Pi.pos - I.jPeriodicShift), Pi.vrot));
+          (Pj.vel - cross(I.pos - (Pj.pos + I.jPeriodicShift), Pj.vrot)) -
+          (Pi.vel - cross(I.pos - Pi.pos, Pi.vrot));
       return true;
 #undef _EPSILON_VALUE_
     }};  // End of dispatching array of lambdas

@@ -1316,7 +1316,11 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
   auto addOrRemoveSingleInteraction =
       [&](size_t i_, size_t j_, size_t isub, size_t type, size_t nbj, const vec3r& jPeriodicShift,
           std::function<bool(Particle&, Particle&, size_t, size_t, double, const vec3r&)> func) {
-        std::scoped_lock lock{InteractionsMutex[i]};
+        // The set being modified below is Interactions[i_], and i_ is j when the
+        // sub-elements of j are tested against those of i. Locking the mutex of the
+        // enclosing i would leave Interactions[j] unprotected against the thread that
+        // handles a pair (j, k), and the two concurrent std::set insertions corrupt it.
+        std::scoped_lock lock{InteractionsMutex[i_]};
         Interaction to_find;
         to_find.i = i_;
         to_find.j = j_;
@@ -1439,8 +1443,10 @@ int Rockable::AddOrRemoveInteractions_bruteForce(size_t i, size_t j, double dmax
  */
 int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
 
-  static Interaction to_find;
-  static std::set<Interaction>::iterator exist_it;
+  // Remark: these two must stay local. Made static, they would be shared by every
+  // thread of the neighbour-list update.
+  Interaction to_find;
+  std::set<Interaction>::iterator exist_it;
 
   double Damp = 0.0;
   int nbAdd = 0;
@@ -1449,7 +1455,11 @@ int Rockable::AddOrRemoveInteractions_OBBtree(size_t i, size_t j, double dmax) {
   auto addOrRemoveSingleInteraction =
       [&](size_t i_, size_t j_, size_t isub, size_t type, size_t jsub, const vec3r& jPeriodicShift,
           std::function<bool(Particle&, Particle&, size_t, size_t, double, const vec3r&)> func) {
-        std::scoped_lock lock{InteractionsMutex[i]};
+        // The set being modified below is Interactions[i_], and i_ is j when the
+        // sub-elements of j are tested against those of i. Locking the mutex of the
+        // enclosing i would leave Interactions[j] unprotected against the thread that
+        // handles a pair (j, k), and the two concurrent std::set insertions corrupt it.
+        std::scoped_lock lock{InteractionsMutex[i_]};
         to_find.i = i_;
         to_find.j = j_;
         to_find.type = type;
@@ -3193,7 +3203,7 @@ void Rockable::updateForcesAndMoments() {
       const vec3r f = (I->fn * I->n) + I->ft;
       acc_force -= f;
       vec3r Cj;
-      Cj = (I->pos - myPos);
+      Cj = (I->pos - (myPos + I->jPeriodicShift));  // jPeriodicShift is zero without a periodic cell
       acc_moment += cross(Cj, -f) - I->mom;
     }
 
@@ -3586,7 +3596,7 @@ void Rockable::accelerations() {
     vec3r Ci, Cj;
 
     Ci = (I.pos - Pi.pos);
-    Cj = (I.pos - Pj.pos);
+    Cj = (I.pos - (Pj.pos + I.jPeriodicShift));  // jPeriodicShift is zero without a periodic cell
 
     mutexes[id_i].lock();
     Pi.force += f;
@@ -3613,7 +3623,7 @@ void Rockable::accelerations() {
     vec3r Ci, Cj;
 
     Ci = (I.pos - Pi.pos);
-    Cj = (I.pos - Pj.pos);
+    Cj = (I.pos - (Pj.pos + I.jPeriodicShift));  // jPeriodicShift is zero without a periodic cell
 
     Pi.force += f;
     Pi.moment += cross(Ci, f) + I.mom;
