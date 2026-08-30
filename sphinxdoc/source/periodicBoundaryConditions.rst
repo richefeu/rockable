@@ -90,6 +90,10 @@ Corrections and stress measurement
    * - ``cellRelattice`` (*int*)
      - ``1`` keeps the cell on a short basis under a large shear. Off by
        default.
+   * - ``cellDriveCauchy`` (*int*)
+     - ``1`` makes a stress-driven component of the cell reach equilibrium on
+       the corresponding component of the Cauchy stress. ``0``, the default, is
+       the exact Parrinello-Rahman conjugate of :math:`\mathbf{h}`.
 
 A fully periodic system has no boundary to anchor it, so nothing prevents the
 whole sample from drifting: any residual momentum is conserved for ever. The two
@@ -125,6 +129,50 @@ contacts is preserved.
    nothing. Switch it on when a run is meant to accumulate a shear strain of
    order one or more.
 
+``cellDriveCauchy`` matters as soon as the cell is sheared. The force that
+drives a stress-driven component of :math:`\mathbf{h}` is, by default and as in
+the Parrinello-Rahman formulation, the exact conjugate of that component,
+
+.. math::
+
+   F_{ij} = V \sum_k h^{-1}_{ik} \, \Delta\Sigma_{kj}
+
+The row of :math:`\mathbf{h}^{-1}` appearing here is a reciprocal cell vector,
+which leans as soon as the cell does. For a simple shear of amplitude
+:math:`\gamma`, row :math:`x` reads :math:`(1/h_{xx},\, -\gamma/h_{xx},\, 0)`
+and the :math:`xx` component therefore settles on
+
+.. math::
+
+   \Sigma_{xx} - \gamma\, \Sigma_{xy} = -p
+   \qquad\text{instead of}\qquad
+   \Sigma_{xx} = -p
+
+Stretching :math:`\mathbf{a}_1` along :math:`x` while :math:`\mathbf{a}_2` is
+tilted is not a pure normal strain, so the conjugate force legitimately mixes the
+two stress components. The trouble is that :math:`\gamma` is a property of the
+basis, not of the lattice: the very same physical state written on another basis
+of the same lattice is then held at another pressure. Measured on a shear at
+:math:`p = 100` with the re-lattice on, :math:`\Sigma_{xx}` swept from
+:math:`81.6` to :math:`120.0` in step with :math:`\gamma \in [-0.5, 0.5]`,
+while :math:`\Sigma_{yy}` and :math:`\Sigma_{zz}`, whose rows of
+:math:`\mathbf{h}^{-1}` do not lean, stayed at :math:`100.0`.
+
+This is a property of the loading rather than an implementation error, and it
+has a practical consequence: the mean pressure moves away from the setpoint as
+the shear accumulates, so a friction coefficient has to be normalised by the
+measured pressure and not by the setpoint. ``cellRelattice`` bounds the excursion
+instead of letting it grow, and averaging over one full period of the resulting
+sawtooth cancels it.
+
+``cellDriveCauchy 1`` departs from that formulation. Only the diagonal term of
+:math:`\mathbf{h}^{-1}` is kept, so a stress-driven component equilibrates on
+its own component of the Cauchy stress whatever the shape of the cell, and two
+bases of one lattice drive the cell identically. The driving force is then no
+longer the variational conjugate of :math:`\mathbf{h}`; it is the one that
+imposes what the loading says it imposes. Use it when the setpoint has to be
+held literally; leave it off to stay on the reference formulation.
+
 .. note::
 
    Kinematics are stored in the conf-files in **real** coordinates, and
@@ -152,11 +200,17 @@ for walls.
     as :math:`\dot{\varepsilon}\, h_{ii}`, so the **strain rate** stays
     constant as the cell shrinks, rather than the velocity.
 
-``PeriodicLoading SimpleShearDeformable`` (*string*) **XY|XZ|YX|YZ|ZX|ZY** (*double*) **pressure** (*double*) **shearRate**
+``PeriodicLoading SimpleShearDeformable`` (*string*) **XY|XZ|YX|YZ|ZX|ZY** (*double*) **pressure** (*double*) **shearRate** [``FixedTransverse``]
     Shear at a constant rate on the named component, the three normal components
     being stress-driven at ``pressure``. The two letters name the component of
     :math:`\mathbf{h}` that is sheared; the normal direction used to convert the
     rate into a velocity follows from it.
+
+    With the optional ``FixedTransverse``, only the dimension carrying the
+    normal stress is stress-driven; the two others are held at their initial
+    value, as in a shear box. The sample is then free to dilate only across the
+    shear planes, which is what a laboratory direct-shear test does, and the two
+    transverse dimensions can no longer respond to the stress at all.
 
 .. code-block:: text
    :caption: drivingSystem.txt

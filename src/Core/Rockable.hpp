@@ -139,6 +139,8 @@ class Rockable {
   double cellMassRatio{-1.0};           ///< Mass ratio override for the periodic cell (-1 = disabled)
   bool useKineticStress{true};          ///< Flag indicating if kinetic stress contribution is used
   int cellRelattice{0};                 ///< Keep the periodic cell reduced under a large shear (0 = off)
+  int cellDriveCauchy{0};               ///< Force-driven cell components target the Cauchy stress (1)
+                                        ///< instead of the Parrinello-Rahman conjugate of h (0, default)
 #endif
 
   int useSoftParticles{0};  ///< Flag indicating if soft particles are used

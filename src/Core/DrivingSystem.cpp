@@ -129,6 +129,16 @@ void DrivingSystem::read(bool allow_warn) {
         double pressure, shearRate;
         is >> dirStr >> pressure >> shearRate;
 
+        // The rest of the line may hold the option 'FixedTransverse', which keeps the
+        // two cell dimensions other than the one carrying the normal stress constant,
+        // as in a shear box. Without it, the three of them are stress-controlled.
+        bool fixedTransverse = false;
+        {
+          std::string rest;
+          std::getline(is, rest);
+          fixedTransverse = (rest.find("FixedTransverse") != std::string::npos);
+        }
+
         cellControl.Drive.xx = cellControl.Drive.yy = cellControl.Drive.zz = ForceDriven;
         cellControl.Sig.xx = cellControl.Sig.yy = cellControl.Sig.zz = -pressure;
 
@@ -161,6 +171,17 @@ void DrivingSystem::read(bool allow_warn) {
           normalIdx = 1;
         } else {
           std::cerr << "Error: Unknown shear direction '" << dirStr << "'." << std::endl;
+        }
+
+        if (fixedTransverse == true) {
+          for (size_t d = 0; d < 3; ++d) {
+            if (d != normalIdx) {
+              cellControl.Drive[4 * d] = VelocityDriven;  // v is already zero
+            }
+          }
+          if (allow_warn == true) {
+            Logger::info("SimpleShearDeformable: only the dimension {} is stress-controlled", normalIdx);
+          }
         }
 
         ServoFunction = [shearIdx, normalIdx, shearRate](Rockable& box) -> void {

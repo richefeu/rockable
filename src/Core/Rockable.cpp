@@ -490,6 +490,7 @@ void Rockable::saveConf(const char* fname) {
     conf << "cellVelocityCorrection " << cellVelocityCorrection << '\n';
     conf << "useKineticStress " << useKineticStress << '\n';
     conf << "cellRelattice " << cellRelattice << '\n';
+    conf << "cellDriveCauchy " << cellDriveCauchy << '\n';
   } else {
     conf << "usePeriodicCell 0\n";
   }
@@ -686,6 +687,7 @@ void Rockable::initParser() {
   parser.kwMap["cellVelocityCorrection"] = __GET__(conf, cellVelocityCorrection);
   parser.kwMap["useKineticStress"] = __GET__(conf, useKineticStress);
   parser.kwMap["cellRelattice"] = __GET__(conf, cellRelattice);
+  parser.kwMap["cellDriveCauchy"] = __GET__(conf, cellDriveCauchy);
 #else
   auto PERIODIC_NOT_ENABLED = __DO__(conf) {
     std::cout << "!!!!!! PERIODIC_NOT_ENABLED when Rockable was compiled" << std::endl;
@@ -700,6 +702,7 @@ void Rockable::initParser() {
   parser.kwMap["cellVelocityCorrection"] = PERIODIC_NOT_ENABLED;
   parser.kwMap["useKineticStress"] = PERIODIC_NOT_ENABLED;
   parser.kwMap["cellRelattice"] = PERIODIC_NOT_ENABLED;
+  parser.kwMap["cellDriveCauchy"] = PERIODIC_NOT_ENABLED;
 #endif
 
 #ifdef ROCKABLE_ENABLE_SOFT_PARTICLES
@@ -3459,8 +3462,24 @@ void Rockable::compute_accelerations_from_resultants() {
         size_t c = 3 * row + col;
         if (System.cellControl.Drive[c] == ForceDriven) {
           double drivingForce = 0.0;
-          for (size_t s = 0; s < 3; s++) {
-            drivingForce += Vhinv[3 * row + s] * deltaSig[3 * s + col];
+          if (cellDriveCauchy == 1) {
+            // Optional departure from the reference formulation. Only the diagonal
+            // term of hinv is kept, so that the component equilibrates at
+            // Sig[c] = SigExt[c] whatever the shape of the cell.
+            drivingForce = Vhinv[3 * row + row] * deltaSig[c];
+          } else {
+            // Reference formulation: the exact conjugate of the component of h, the
+            // force whose power against dot(h) is that of the stress. The row of hinv
+            // is a reciprocal cell vector, so it leans with the cell and drags the
+            // off-diagonal stress in: under a simple shear of amplitude gamma, row 0
+            // of hinv is (1/h.xx, -gamma/h.xx, 0) and the xx component equilibrates
+            // at Sig.xx - gamma Sig.xy = -p rather than Sig.xx = -p. That is a
+            // property of the loading, but gamma depends on which of the equivalent
+            // lattices describes the cell, so the pressure actually applied depends
+            // on it too.
+            for (size_t s = 0; s < 3; s++) {
+              drivingForce += Vhinv[3 * row + s] * deltaSig[3 * s + col];
+            }
           }
           Cell.ah[c] = (drivingForce - dampingForce[c]) * invMass;
         }
