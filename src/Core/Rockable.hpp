@@ -138,6 +138,7 @@ class Rockable {
   double cellVelocityCorrectionC{0.0};  ///< Counter for velocity correction
   double cellMassRatio{-1.0};           ///< Mass ratio override for the periodic cell (-1 = disabled)
   bool useKineticStress{true};          ///< Flag indicating if kinetic stress contribution is used
+  int cellRelattice{0};                 ///< Keep the periodic cell reduced under a large shear (0 = off)
 #endif
 
   int useSoftParticles{0};  ///< Flag indicating if soft particles are used
@@ -301,6 +302,7 @@ class Rockable {
   // =============================================================================================================
 
 #ifdef ROCKABLE_ENABLE_PERIODIC
+  void relatticeCell();                     ///< Re-express the periodic cell on a shorter basis of the same lattice
   void applyPeriodicCellDriftCorrection();  ///< Apply momentum/velocity drift correction for periodic cell
   void updateCellDamping();                 ///< Update Cell mass based on periodic mass ratio
   // TODO: VR-> rename updateCellDamping computePeriodicCellMass()

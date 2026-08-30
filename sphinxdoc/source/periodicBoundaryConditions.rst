@@ -87,6 +87,9 @@ Corrections and stress measurement
    * - ``useKineticStress`` (*int*)
      - Includes the kinetic (velocity fluctuation) term in the stress used to
        drive the cell.
+   * - ``cellRelattice`` (*int*)
+     - ``1`` keeps the cell on a short basis under a large shear. Off by
+       default.
 
 A fully periodic system has no boundary to anchor it, so nothing prevents the
 whole sample from drifting: any residual momentum is conserved for ever. The two
@@ -95,6 +98,32 @@ correction flags remove that drift, and are normally left on.
 ``useKineticStress`` matters as soon as the sample is not quasi-static. The
 stress of a granular assembly is the sum of a contact term and a kinetic term;
 for a slow compression the second is negligible, for a rapid flow it is not.
+
+``cellRelattice`` is only needed for large shear strains. A periodic system is
+defined by its lattice, not by the box used to draw it: any
+:math:`\mathbf{h}' = \mathbf{h}\,\mathbf{M}` with :math:`\mathbf{M}` an
+integer matrix of determinant one describes the same system. Under a shear the
+driven off-diagonal term of :math:`\mathbf{h}` grows without bound, the cell
+leans further and further, and the perpendicular width of the cell shrinks as
+
+.. math::
+
+   w = \frac{h_{xx}}{\sqrt{1 + \gamma^2}}
+
+Once :math:`w` falls below twice the interaction range, the nearest image found
+by rounding the reduced coordinates is no longer the nearest one in space, and
+contacts are silently missed. With ``cellRelattice 1``, whenever an off-diagonal
+term exceeds half of the diagonal it leans on, the cell is re-expressed on a
+shorter basis of the same lattice. Positions, velocities and accelerations
+follow the change of basis, so nothing moves and the tangential history of the
+contacts is preserved.
+
+.. tip::
+
+   For a cell of about seven grain diameters, the width criterion is only
+   reached around :math:`\gamma \approx 1.4`; below that the option changes
+   nothing. Switch it on when a run is meant to accumulate a shear strain of
+   order one or more.
 
 .. note::
 

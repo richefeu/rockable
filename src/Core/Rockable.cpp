@@ -489,6 +489,7 @@ void Rockable::saveConf(const char* fname) {
     conf << "cellMomentumCorrection " << cellMomentumCorrection << '\n';
     conf << "cellVelocityCorrection " << cellVelocityCorrection << '\n';
     conf << "useKineticStress " << useKineticStress << '\n';
+    conf << "cellRelattice " << cellRelattice << '\n';
   } else {
     conf << "usePeriodicCell 0\n";
   }
@@ -684,6 +685,7 @@ void Rockable::initParser() {
   parser.kwMap["cellMomentumCorrection"] = __GET__(conf, cellMomentumCorrection);
   parser.kwMap["cellVelocityCorrection"] = __GET__(conf, cellVelocityCorrection);
   parser.kwMap["useKineticStress"] = __GET__(conf, useKineticStress);
+  parser.kwMap["cellRelattice"] = __GET__(conf, cellRelattice);
 #else
   auto PERIODIC_NOT_ENABLED = __DO__(conf) {
     std::cout << "!!!!!! PERIODIC_NOT_ENABLED when Rockable was compiled" << std::endl;
@@ -697,6 +699,7 @@ void Rockable::initParser() {
   parser.kwMap["cellMomentumCorrection"] = PERIODIC_NOT_ENABLED;
   parser.kwMap["cellVelocityCorrection"] = PERIODIC_NOT_ENABLED;
   parser.kwMap["useKineticStress"] = PERIODIC_NOT_ENABLED;
+  parser.kwMap["cellRelattice"] = PERIODIC_NOT_ENABLED;
 #endif
 
 #ifdef ROCKABLE_ENABLE_SOFT_PARTICLES
@@ -2077,6 +2080,11 @@ void Rockable::velocityVerletStep() {
         Cell.ah[c] = 0.0;
       }
     }
+
+    if (cellRelattice == 1) {
+      relatticeCell();  // before precomputeInverse, and while the positions are still reduced
+    }
+
     Cell.precomputeInverse();  // because Cell.h has just been updated
 
     reducedToRealKinematics();
@@ -3750,10 +3758,85 @@ void Rockable::updateCellDamping() {
 }
 #endif
 
+#ifdef ROCKABLE_ENABLE_PERIODIC
+/**
+ * Re-express the periodic cell on a shorter basis of the same lattice.
+ *
+ * A periodic system is defined by its lattice, not by the box used to draw it:
+ * any h' = h.M with M an integer matrix of determinant one describes exactly
+ * the same system. Under a shear loading one off-diagonal entry of h grows
+ * without bound, the cell leans further and further, and two things degrade:
+ * the perpendicular width of the cell shrinks like 1 / sqrt(1 + gamma^2), and
+ * the image picked by rounding the reduced coordinates in
+ * PeriodicCell::getBranchCorrection eventually stops being the nearest one in
+ * space. Subtracting from column b an integer number of column a keeps the
+ * entry below half of the diagonal it leans on, and cures both.
+ *
+ * For the change of basis to leave the physics untouched, the reduced
+ * kinematics must follow M^-1, so that the real position h'.s' = h.s is
+ * preserved; the cell velocity and acceleration follow M, which leaves the
+ * affine velocity gradient vh.hinv seen by the grains invariant. The contact
+ * forces and moments are vectors of the real space and are not concerned, so
+ * the tangential history of the contacts survives the operation.
+ *
+ * @attention The positions must be in reduced coordinates when this is called,
+ *            that is, between the cell update and reducedToRealKinematics.
+ *
+ * @remark A single pass is enough for the shear loadings, which drive one
+ *         off-diagonal entry at a time. It is not a general lattice reduction.
+ */
+void Rockable::relatticeCell() {
+  START_TIMER("relatticeCell");
+
+  bool moved = false;
+  for (size_t a = 0; a < 3; ++a) {
+    for (size_t b = 0; b < 3; ++b) {
+      if (a == b) {
+        continue;
+      }
+      double diag = Cell.h[3 * a + a];
+      if (diag <= 0.0) {
+        continue;
+      }
+      double n = std::round(Cell.h[3 * a + b] / diag);
+      if (n == 0.0) {
+        continue;
+      }
+
+      // column b <- column b - n * column a
+      for (size_t r = 0; r < 3; ++r) {
+        Cell.h[3 * r + b] -= n * Cell.h[3 * r + a];
+        Cell.vh[3 * r + b] -= n * Cell.vh[3 * r + a];
+        Cell.ah[3 * r + b] -= n * Cell.ah[3 * r + a];
+      }
+
+      // the reduced kinematics follow M^-1, that is s_a <- s_a + n * s_b
+#pragma omp parallel for default(shared)
+      for (size_t i = 0; i < Particles.size(); ++i) {
+        Particles[i].pos[a] += n * Particles[i].pos[b];
+        Particles[i].vel[a] += n * Particles[i].vel[b];
+        Particles[i].acc[a] += n * Particles[i].acc[b];
+      }
+
+      moved = true;
+      Logger::info("Periodic cell re-latticed at t = {}: column {} -= {} x column {}", t, b, n, a);
+    }
+  }
+
+  if (moved == true) {
+#pragma omp parallel for default(shared)
+    for (size_t i = nDriven; i < Particles.size(); ++i) {
+      Cell.forceToStayInside(Particles[i].pos);
+    }
+    // The configuration is unchanged, but this is rare enough that rebuilding
+    // the neighbour list costs nothing and removes any doubt.
+    needUpdate = true;
+  }
+}
+
 /**
  * Apply optional periodic-cell drift correction to free-particle velocities.
  */
-#ifdef ROCKABLE_ENABLE_PERIODIC
 void Rockable::applyPeriodicCellDriftCorrection() {
   START_TIMER("applyPeriodicCellDriftCorrection");
 
