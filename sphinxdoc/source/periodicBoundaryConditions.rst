@@ -173,6 +173,19 @@ longer the variational conjugate of :math:`\mathbf{h}`; it is the one that
 imposes what the loading says it imposes. Use it when the setpoint has to be
 held literally; leave it off to stay on the reference formulation.
 
+.. warning::
+
+   ``UpdateNL linkCells`` must not be used together with ``usePeriodicCell 1``.
+   The grid of link cells is built over the bounding box of the sample, and two
+   cells are paired only when they touch in space. Two grains at opposite ends
+   of the periodic cell are neighbours through an image but land in cells at
+   opposite ends of the grid, which are never paired, so the contact between
+   them is never looked for: the branch correction applied inside the pair test
+   comes too late, the pair is already gone. Measured on a sample of 512
+   sphero-polyhedra, ``linkCells`` misses about one active contact in two
+   hundred. Use ``UpdateNL bruteForce``, whose cost is quadratic in the number
+   of bodies but which sees every pair.
+
 .. note::
 
    Kinematics are stored in the conf-files in **real** coordinates, and
