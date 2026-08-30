@@ -178,12 +178,19 @@ bool Particle::EdgeIsNearEdge(Particle& Pi, Particle& Pj, size_t isub, size_t js
   vec3r pos1_jv = Pj.GlobVertex(v2);
   v1 = Pi.shape->edge[isub].first;
   v2 = Pi.shape->edge[isub].second;
-  vec3r pos0_iv = Pi.GlobVertex(v1);
-  vec3r pos1_iv = Pi.GlobVertex(v2);
+  // Edge i is brought next to the image of j that was selected, exactly as in
+  // VertexIsNearEdge. Applying the shift to the two end points rather than to
+  // the single vector v below is what keeps the distance test at the bottom of
+  // this function in the same frame: with the shift applied to v only, s and t
+  // were located on the right image while the distance was measured to the
+  // original j, one cell away, so an edge-edge pair seen through a periodic
+  // image was never reported as near.
+  vec3r pos0_iv = Pi.GlobVertex(v1) - jPeriodicShift;
+  vec3r pos1_iv = Pi.GlobVertex(v2) - jPeriodicShift;
 
   vec3r Ei = pos1_iv - pos0_iv;
   vec3r Ej = pos1_jv - pos0_jv;
-  vec3r v = pos0_iv - pos0_jv - jPeriodicShift;
+  vec3r v = pos0_iv - pos0_jv;
 
   double c = Ei * Ei;
   double d = Ej * Ej;
