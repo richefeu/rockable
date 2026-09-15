@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Update APT
       run: |
         sudo apt-get update -y
@@ -37,7 +37,7 @@ jobs:
       run: |
         git clone https://github.com/g-truc/glm.git ${{github.workspace}}/glm
     - name: Configure CMake
-      run: cmake -DCMAKE_CXX_FLAGS="--coverage -g" -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      run: cmake -DCMAKE_CXX_FLAGS="--coverage -g" -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DROCKABLE_USE_TESTING=ON
 
     - name: Build
       # Build your program with the given configuration
@@ -45,7 +45,8 @@ jobs:
 
     - name: Test
       working-directory: ${{github.workspace}}/build
-      run: ctest -C --rerun-failed --output-on-failure ${{env.BUILD_TYPE}}
+      # --no-tests=error: a configuration without tests must not pass as green
+      run: ctest -C ${{env.BUILD_TYPE}} --output-on-failure --no-tests=error
 
     - name: Generate a code coverage report
       uses: threeal/gcovr-action@v1.0.0
