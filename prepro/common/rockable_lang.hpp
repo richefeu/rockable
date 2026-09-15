@@ -23,8 +23,10 @@
 
 namespace rockable_lang {
 
+// No enumerator may be named like an X11 macro (None, Status, Bool, True...):
+// with FLTK on Linux, <FL/x.H> includes <X11/X.h>, which defines them.
 enum class Kind {
-  None,     // unknown word, no highlighting
+  Unknown,  // unknown word, no highlighting
   Keyword,  // a command word
   Type,     // an enumerated value
   Doc       // documented, but not highlighted
@@ -151,7 +153,7 @@ class Language {
 
   Kind kindOf(const std::string& word) const {
     auto it = m_kinds.find(word);
-    return (it == m_kinds.end()) ? Kind::None : it->second;
+    return (it == m_kinds.end()) ? Kind::Unknown : it->second;
   }
 
   // Returns nullptr when the word is not documented.
