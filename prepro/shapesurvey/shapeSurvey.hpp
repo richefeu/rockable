@@ -5,6 +5,12 @@
 #define GL_SILENCE_DEPRECATION
 #endif
 
+// Declare the extension functions (framebuffer objects, used by the screenshot
+// mode) when <GL/gl.h> pulls in <GL/glext.h>, as it does with Mesa
+#ifndef GL_GLEXT_PROTOTYPES
+#define GL_GLEXT_PROTOTYPES
+#endif
+
 #include <GL/glut.h>
 
 #include "Core/Shape.hpp"
@@ -30,6 +36,9 @@ double shot_elev = 22.0;                   // camera elevation (deg), z is up
 double shot_azim = -55.0;                  // camera azimuth (deg)
 int shot_transparent = 0;                  // 1 => transparent background (alpha 0)
 int show_wire = 0;                         // 1 => overlay the mesh as black wireframe
+float wire_width = 0.7f;                   // line width of that wireframe (pixels)
+int shot_width = 800;                      // requested image size; the window itself
+int shot_height = 800;                     // may be clamped to the screen
 float shapeColor[3] = {0.761f, 0.733f, 0.976f};  // fill colour (RGB in [0,1])
 double radiusOverride = -1.0;              // >=0 => force the Minkowski radius R (0 => raw triangles)
 

@@ -33,6 +33,8 @@
 #include <FL/fl_draw.H>
 #include <FL/x.H>  // for fl_open_callback
 
+#include "rockable_lang.hpp"
+
 #include "quat.hpp"
 #include "transformation.hpp"
 Transformation<double> globalTransformation;
@@ -62,11 +64,9 @@ Fl_Text_Display::Style_Table_Entry styletable[] = {
     {FL_BLUE, TF, TS},        // D - Keywords
 };
 
-std::set<std::string> code_keywords;
-std::set<std::string> code_types;
-std::map<std::string, std::string> docu;  // documentation
-std::map<std::string, std::string> comp;  // completion
-
+// The language description (keywords, types, documentation, snippets) read from
+// rockable.lang; see init_language() in confedit.cpp.
+extern rockable_lang::Language language;
 
 //void cb(const char* fname);
 void save_cb();

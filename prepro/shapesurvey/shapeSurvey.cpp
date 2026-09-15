@@ -8,6 +8,10 @@
 #include <sstream>
 #include <vector>
 
+#ifdef __APPLE__
+#include <OpenGL/glext.h>
+#endif
+
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "toofus-gate/stb/stb_image_write.h"
 
@@ -401,7 +405,7 @@ static void wireOverlay(const std::function<void()>& emit) {
   GLboolean lit = glIsEnabled(GL_LIGHTING);
   glDisable(GL_LIGHTING);
   glColor3f(0.0f, 0.0f, 0.0f);
-  glLineWidth(0.7f);
+  glLineWidth(wire_width);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   glEnable(GL_POLYGON_OFFSET_LINE);
   glPolygonOffset(-1.0f, -1.0f);
@@ -681,15 +685,11 @@ void set_view(double elev_deg, double azim_deg) {
   up = worldUp;
 }
 
-// Read the rendered frame back and write it as a PNG (row-flipped). The size is
-// taken from the actual viewport, so it is correct even on a scaled framebuffer.
-void saveScreenshot(const char* filename) {
-  GLint vp[4];
-  glGetIntegerv(GL_VIEWPORT, vp);
-  int W = vp[2], H = vp[3];
+// Read the rendered frame (W x H pixels of the current read buffer) back and
+// write it as a PNG (row-flipped).
+void saveScreenshot(const char* filename, int W, int H) {
   std::vector<unsigned char> pix((size_t)W * H * 4);
   glPixelStorei(GL_PACK_ALIGNMENT, 1);
-  glReadBuffer(GL_BACK);
   glReadPixels(0, 0, W, H, GL_RGBA, GL_UNSIGNED_BYTE, pix.data());
   std::vector<unsigned char> flip((size_t)W * H * 4);
   for (int y = 0; y < H; ++y) {
@@ -702,9 +702,87 @@ void saveScreenshot(const char* filename) {
   }
 }
 
+#if defined(GL_EXT_framebuffer_object) && defined(GL_EXT_framebuffer_multisample) && \
+    defined(GL_EXT_framebuffer_blit)
+#define SHOT_OFFSCREEN 1
+
+// Off-screen render target of the screenshot: the frame is drawn into a
+// multisampled framebuffer object of the requested size, then resolved into a
+// plain one that is read back. The image size is thus not limited by the size of
+// the window, which the system clamps to the screen.
+struct OffscreenTarget {
+  GLuint msFbo{0}, msColor{0}, msDepth{0};  // multisampled, drawn into
+  GLuint fbo{0}, color{0};                  // single-sampled, read back
+};
+
+static GLuint attachRenderbuffer(GLenum attachment, GLenum format, GLsizei samples, int W, int H) {
+  GLuint rb = 0;
+  glGenRenderbuffersEXT(1, &rb);
+  glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, rb);
+  if (samples > 0) {
+    glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, samples, format, W, H);
+  } else {
+    glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, format, W, H);
+  }
+  glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, attachment, GL_RENDERBUFFER_EXT, rb);
+  return rb;
+}
+
+// Returns false when the driver cannot provide the buffers; the caller then
+// draws into the window instead
+static bool createOffscreen(OffscreenTarget& t, int W, int H) {
+  GLint maxSamples = 0;
+  glGetIntegerv(GL_MAX_SAMPLES_EXT, &maxSamples);
+  GLsizei samples = std::min(8, (int)maxSamples);
+
+  glGenFramebuffersEXT(1, &t.msFbo);
+  glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, t.msFbo);
+  t.msColor = attachRenderbuffer(GL_COLOR_ATTACHMENT0_EXT, GL_RGBA8, samples, W, H);
+  t.msDepth = attachRenderbuffer(GL_DEPTH_ATTACHMENT_EXT, GL_DEPTH_COMPONENT24, samples, W, H);
+  bool ok = (glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT);
+
+  glGenFramebuffersEXT(1, &t.fbo);
+  glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, t.fbo);
+  t.color = attachRenderbuffer(GL_COLOR_ATTACHMENT0_EXT, GL_RGBA8, 0, W, H);
+  ok = ok && (glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT);
+
+  glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, ok ? t.msFbo : 0);
+  return ok;
+}
+
+// Copy the multisampled frame into the plain buffer and make it the read buffer
+static void resolveOffscreen(const OffscreenTarget& t, int W, int H) {
+  glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, t.msFbo);
+  glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, t.fbo);
+  glBlitFramebufferEXT(0, 0, W, H, 0, 0, W, H, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+  glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, t.fbo);
+  glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
+}
+#endif
+
 // One-shot display callback used in screenshot mode: render a clean frame (just
 // the shape, no axes/OBB/text), save it, and quit.
 void screenshotDisplay() {
+#ifdef SHOT_OFFSCREEN
+  OffscreenTarget target;
+  bool offscreen = createOffscreen(target, shot_width, shot_height);
+#else
+  bool offscreen = false;
+#endif
+  if (offscreen) {
+    // Same aspect ratio and viewport as a window of the requested size
+    width = shot_width;
+    height = shot_height;
+    glViewport(0, 0, width, height);
+    glEnable(GL_MULTISAMPLE);
+  } else {
+    std::cout << "No off-screen buffer: the image is limited to the window size" << std::endl;
+    GLint vp[4];
+    glGetIntegerv(GL_VIEWPORT, vp);
+    width = vp[2];
+    height = vp[3];
+  }
+
   if (shot_transparent) {
     glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
   } else {
@@ -728,7 +806,16 @@ void screenshotDisplay() {
   }
 
   glFinish();
-  saveScreenshot(outputFile.c_str());
+#ifdef SHOT_OFFSCREEN
+  if (offscreen) {
+    resolveOffscreen(target, width, height);
+  } else {
+    glReadBuffer(GL_BACK);
+  }
+#else
+  glReadBuffer(GL_BACK);
+#endif
+  saveScreenshot(outputFile.c_str(), width, height);
   exit(0);
 }
 
@@ -746,6 +833,7 @@ void printCLIhelp() {
             << "      --skin   <file.rmsh> draw the skin mesh instead of the primitives\n"
             << "      --radius <R>         override the Minkowski radius (0 = raw triangles)\n"
             << "      --wire               overlay the mesh as a thin black wireframe\n"
+            << "      --line-width <px>    line width of that wireframe (default 0.7)\n"
             << "      --color  <r,g,b>     fill colour in [0,1] (default 0.761,0.733,0.976)\n"
             << "      --transparent        transparent background\n"
             << "  -h, --help               this help\n\n"
@@ -781,6 +869,7 @@ int main(int argc, char* argv[]) {
     else if (a == "--radius") radiusOverride = std::stod(next("-1"));
     else if (a == "--transparent") shot_transparent = 1;
     else if (a == "--wire") show_wire = 1;
+    else if (a == "--line-width") wire_width = std::stof(next("0.7"));
     else if (a == "--color") {
       std::string c = next("0.761,0.733,0.976");
       std::replace(c.begin(), c.end(), ',', ' ');
@@ -792,6 +881,11 @@ int main(int argc, char* argv[]) {
     else if (!a.empty() && a[0] != '-') inputFile = a;
     else { std::cout << "Unknown option: " << a << std::endl; printCLIhelp(); return 0; }
   }
+
+  // The window can be clamped to the screen (and its size is then overwritten by
+  // reshape), so the screenshot keeps the size that was asked for
+  shot_width = width;
+  shot_height = height;
 
   if (readShapeLib(inputFile.c_str()) == 0) {
     return 0;

@@ -40,11 +40,11 @@ option(ROCKABLE_USE_TESTING "Add tests" OFF)
 option(ROCKABLE_ENABLE_PROFILING "Enable the time profiling" OFF)
 option(ROCKABLE_ENABLE_BOUNDARY "Enable the special boundaries like Ball or Cylinder" OFF)
 option(ROCKABLE_ENABLE_SOFT_PARTICLES "Enable strainning of particles" OFF)
-option(ROCKABLE_ENABLE_PERIODIC "Enable full periodic boundary conditions" OFF)
+option(ROCKABLE_ENABLE_PERIODIC "Enable full periodic boundary conditions" ON)
 
 option(ROCKABLE_COMPILE_POSTPRO "Compile the application to run post-processing commands" ON)
 option(ROCKABLE_COMPILE_SEE "Compile the glut application to visualize the conf-files" ON)
-option(ROCKABLE_COMPILE_SEER "Compile Dear My Seer (and Dear My Shape)" ON)
+option(ROCKABLE_COMPILE_SEER "Compile Dear My Seer (and Dear My Shape)" OFF)
 option(ROCKABLE_COMPILE_PREPRO "Compile the preprocessing tools" ON)
 option(ROCKABLE_COMPILE_CONF2VTK "Convert conf files to VTK" ON)
 
