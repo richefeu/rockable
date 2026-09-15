@@ -57,6 +57,14 @@ bool strictlyInside(const V2& p, const V2& a, const V2& b, const V2& c, double e
   return cross2(a, b, p) > eps && cross2(b, c, p) > eps && cross2(c, a, p) > eps;
 }
 
+// Does p lie on the open segment (a,c)?
+bool onOpenSegment(const V2& p, const V2& a, const V2& c, double eps) {
+  if (std::fabs(cross2(a, c, p)) > eps) return false;
+  double along = (p.x - a.x) * (c.x - a.x) + (p.y - a.y) * (c.y - a.y);
+  double len2 = (c.x - a.x) * (c.x - a.x) + (c.y - a.y) * (c.y - a.y);
+  return along > 0.0 && along < len2;
+}
+
 // Ear-clip a simple polygon given as 2D points in order. Returns triangles as
 // triplets of indices into pts. Keeps every boundary vertex, so the shared edges
 // with neighbouring regions are preserved and the mesh stays watertight.
@@ -65,11 +73,16 @@ bool strictlyInside(const V2& p, const V2& a, const V2& b, const V2& c, double e
 // inside), so a triangle can never cross the polygon --- in particular it cannot
 // bridge a reentrant notch, which used to happen when the old "most convex"
 // fallback clipped without an emptiness check. Marching-cubes boundaries carry
-// long runs of collinear vertices; these are handled by (i) a strict emptiness
-// test that ignores on-edge points and (ii) a second pass that may clip a
-// non-reflex (possibly collinear) empty vertex to get past such a run. If no
-// valid ear remains, we stop and let the caller keep the region's original
-// triangles rather than emit anything unsafe.
+// long runs of collinear vertices, and on-edge points are ignored by the
+// emptiness test so that they do not block valid ears. Two kinds of ears are
+// refused, though, because their new edge (a,c) would run along such a run:
+//  - an apex that is not strictly convex, which gives a zero-area triangle;
+//  - an ear whose new edge passes through another vertex.
+// Such an edge lies on the boundary shared with the neighbouring region, which
+// may create the very same edge from its side: the edge then belongs to four
+// triangles and the mesh is no longer a manifold. If no valid ear remains, we
+// stop and let the caller keep the region's original triangles rather than emit
+// anything unsafe.
 std::vector<std::array<int, 3> > earClip(const std::vector<V2>& pts) {
   std::vector<std::array<int, 3> > tris;
   size_t n = pts.size();
@@ -90,35 +103,28 @@ std::vector<std::array<int, 3> > earClip(const std::vector<V2>& pts) {
   while (V.size() > 3 && guard++ < guardMax) {
     size_t m = V.size();
 
-    // Return the index (in V) of an ear to clip, or -1 if none. strictOnly means
-    // the apex must be strictly convex; otherwise a non-reflex (collinear) apex
-    // is also accepted, to advance along a straight run of vertices.
-    auto findEar = [&](bool strictOnly) -> int {
-      int best = -1;
-      double bestCr = 0.0;
-      for (size_t i = 0; i < m; ++i) {
-        int ip = V[(i + m - 1) % m], ic = V[i], in = V[(i + 1) % m];
-        const V2 &a = pts[ip], &b = pts[ic], &c = pts[in];
-        double cr = cross2(a, b, c);
-        if (strictOnly ? (cr <= eps) : (cr < -eps)) continue;  // reflex (or, in pass A, collinear)
-        bool empty = true;
-        for (size_t k = 0; k < m; ++k) {
-          int iv = V[k];
-          if (iv == ip || iv == ic || iv == in) continue;
-          if (strictlyInside(pts[iv], a, b, c, eps)) { empty = false; break; }
-        }
-        if (!empty) continue;
-        if (strictOnly) {
-          if (best < 0 || cr > bestCr) { best = (int)i; bestCr = cr; }  // largest ear first
-        } else {
-          return (int)i;  // any safe ear, to get past a collinear run
+    // Pick the largest valid ear
+    int i = -1;
+    double bestCr = 0.0;
+    for (size_t e = 0; e < m; ++e) {
+      int ip = V[(e + m - 1) % m], ic = V[e], in = V[(e + 1) % m];
+      const V2 &a = pts[ip], &b = pts[ic], &c = pts[in];
+      double cr = cross2(a, b, c);
+      if (cr <= eps) continue;  // reflex or collinear apex
+      bool empty = true;
+      for (size_t k = 0; k < m; ++k) {
+        int iv = V[k];
+        if (iv == ip || iv == ic || iv == in) continue;
+        if (strictlyInside(pts[iv], a, b, c, eps) || onOpenSegment(pts[iv], a, c, eps)) {
+          empty = false;
+          break;
         }
       }
-      return best;
-    };
-
-    int i = findEar(true);
-    if (i < 0) i = findEar(false);
+      if (empty && (i < 0 || cr > bestCr)) {
+        i = (int)e;
+        bestCr = cr;
+      }
+    }
     if (i < 0) break;  // no safe ear: stop (caller keeps the original triangles)
 
     size_t mm = V.size();
