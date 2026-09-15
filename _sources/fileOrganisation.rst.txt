@@ -15,8 +15,17 @@ Directory containing example simulations or processings. The example name **hell
 
 Some preprocessing applications.
 
+- 📁 ``common``
+  Shared between the editors: ``rockable.lang``, which describes the input-file
+  language (keywords, types, documentation and snippets), and the header that
+  reads it.
+
 - 📁 ``confedit``
-  Tool for editing configurations.
+  Graphical tool (FLTK) for editing configurations.
+
+- 📁 ``rockedit``
+  Terminal editor for the same files, with the same colouring and documentation.
+  No dependency, so it can be built and used over ssh.
 
 - 📁 ``converters``
   Conversion applications.

@@ -216,6 +216,15 @@ parameters, to be calibrated like <code class="docutils literal notranslate"><sp
 <td><p>Includes the kinetic (velocity fluctuation) term in the stress used to
 drive the cell.</p></td>
 </tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cellRelattice</span></code> (<em>int</em>)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1</span></code> keeps the cell on a short basis under a large shear. Off by
+default.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">cellDriveCauchy</span></code> (<em>int</em>)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1</span></code> makes a stress-driven component of the cell reach equilibrium on
+the corresponding component of the Cauchy stress. <code class="docutils literal notranslate"><span class="pre">0</span></code>, the default, is
+the exact Parrinello-Rahman conjugate of <span class="math notranslate nohighlight">\(\mathbf{h}\)</span>.</p></td>
+</tr>
 </tbody>
 </table>
 <p>A fully periodic system has no boundary to anchor it, so nothing prevents the
@@ -224,6 +233,76 @@ correction flags remove that drift, and are normally left on.</p>
 <p><code class="docutils literal notranslate"><span class="pre">useKineticStress</span></code> matters as soon as the sample is not quasi-static. The
 stress of a granular assembly is the sum of a contact term and a kinetic term;
 for a slow compression the second is negligible, for a rapid flow it is not.</p>
+<p><code class="docutils literal notranslate"><span class="pre">cellRelattice</span></code> is only needed for large shear strains. A periodic system is
+defined by its lattice, not by the box used to draw it: any
+<span class="math notranslate nohighlight">\(\mathbf{h}' = \mathbf{h}\,\mathbf{M}\)</span> with <span class="math notranslate nohighlight">\(\mathbf{M}\)</span> an
+integer matrix of determinant one describes the same system. Under a shear the
+driven off-diagonal term of <span class="math notranslate nohighlight">\(\mathbf{h}\)</span> grows without bound, the cell
+leans further and further, and the perpendicular width of the cell shrinks as</p>
+<div class="math notranslate nohighlight">
+\[w = \frac{h_{xx}}{\sqrt{1 + \gamma^2}}\]</div>
+<p>Once <span class="math notranslate nohighlight">\(w\)</span> falls below twice the interaction range, the nearest image found
+by rounding the reduced coordinates is no longer the nearest one in space, and
+contacts are silently missed. With <code class="docutils literal notranslate"><span class="pre">cellRelattice</span> <span class="pre">1</span></code>, whenever an off-diagonal
+term exceeds half of the diagonal it leans on, the cell is re-expressed on a
+shorter basis of the same lattice. Positions, velocities and accelerations
+follow the change of basis, so nothing moves and the tangential history of the
+contacts is preserved.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>For a cell of about seven grain diameters, the width criterion is only
+reached around <span class="math notranslate nohighlight">\(\gamma \approx 1.4\)</span>; below that the option changes
+nothing. Switch it on when a run is meant to accumulate a shear strain of
+order one or more.</p>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">cellDriveCauchy</span></code> matters as soon as the cell is sheared. The force that
+drives a stress-driven component of <span class="math notranslate nohighlight">\(\mathbf{h}\)</span> is, by default and as in
+the Parrinello-Rahman formulation, the exact conjugate of that component,</p>
+<div class="math notranslate nohighlight">
+\[F_{ij} = V \sum_k h^{-1}_{ik} \, \Delta\Sigma_{kj}\]</div>
+<p>The row of <span class="math notranslate nohighlight">\(\mathbf{h}^{-1}\)</span> appearing here is a reciprocal cell vector,
+which leans as soon as the cell does. For a simple shear of amplitude
+<span class="math notranslate nohighlight">\(\gamma\)</span>, row <span class="math notranslate nohighlight">\(x\)</span> reads <span class="math notranslate nohighlight">\((1/h_{xx},\, -\gamma/h_{xx},\, 0)\)</span>
+and the <span class="math notranslate nohighlight">\(xx\)</span> component therefore settles on</p>
+<div class="math notranslate nohighlight">
+\[\Sigma_{xx} - \gamma\, \Sigma_{xy} = -p
+\qquad\text{instead of}\qquad
+\Sigma_{xx} = -p\]</div>
+<p>Stretching <span class="math notranslate nohighlight">\(\mathbf{a}_1\)</span> along <span class="math notranslate nohighlight">\(x\)</span> while <span class="math notranslate nohighlight">\(\mathbf{a}_2\)</span> is
+tilted is not a pure normal strain, so the conjugate force legitimately mixes the
+two stress components. The trouble is that <span class="math notranslate nohighlight">\(\gamma\)</span> is a property of the
+basis, not of the lattice: the very same physical state written on another basis
+of the same lattice is then held at another pressure. Measured on a shear at
+<span class="math notranslate nohighlight">\(p = 100\)</span> with the re-lattice on, <span class="math notranslate nohighlight">\(\Sigma_{xx}\)</span> swept from
+<span class="math notranslate nohighlight">\(81.6\)</span> to <span class="math notranslate nohighlight">\(120.0\)</span> in step with <span class="math notranslate nohighlight">\(\gamma \in [-0.5, 0.5]\)</span>,
+while <span class="math notranslate nohighlight">\(\Sigma_{yy}\)</span> and <span class="math notranslate nohighlight">\(\Sigma_{zz}\)</span>, whose rows of
+<span class="math notranslate nohighlight">\(\mathbf{h}^{-1}\)</span> do not lean, stayed at <span class="math notranslate nohighlight">\(100.0\)</span>.</p>
+<p>This is a property of the loading rather than an implementation error, and it
+has a practical consequence: the mean pressure moves away from the setpoint as
+the shear accumulates, so a friction coefficient has to be normalised by the
+measured pressure and not by the setpoint. <code class="docutils literal notranslate"><span class="pre">cellRelattice</span></code> bounds the excursion
+instead of letting it grow, and averaging over one full period of the resulting
+sawtooth cancels it.</p>
+<p><code class="docutils literal notranslate"><span class="pre">cellDriveCauchy</span> <span class="pre">1</span></code> departs from that formulation. Only the diagonal term of
+<span class="math notranslate nohighlight">\(\mathbf{h}^{-1}\)</span> is kept, so a stress-driven component equilibrates on
+its own component of the Cauchy stress whatever the shape of the cell, and two
+bases of one lattice drive the cell identically. The driving force is then no
+longer the variational conjugate of <span class="math notranslate nohighlight">\(\mathbf{h}\)</span>; it is the one that
+imposes what the loading says it imposes. Use it when the setpoint has to be
+held literally; leave it off to stay on the reference formulation.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="docutils literal notranslate"><span class="pre">UpdateNL</span> <span class="pre">linkCells</span></code> must not be used together with <code class="docutils literal notranslate"><span class="pre">usePeriodicCell</span> <span class="pre">1</span></code>.
+The grid of link cells is built over the bounding box of the sample, and two
+cells are paired only when they touch in space. Two grains at opposite ends
+of the periodic cell are neighbours through an image but land in cells at
+opposite ends of the grid, which are never paired, so the contact between
+them is never looked for: the branch correction applied inside the pair test
+comes too late, the pair is already gone. Measured on a sample of 512
+sphero-polyhedra, <code class="docutils literal notranslate"><span class="pre">linkCells</span></code> misses about one active contact in two
+hundred. Use <code class="docutils literal notranslate"><span class="pre">UpdateNL</span> <span class="pre">bruteForce</span></code>, whose cost is quadratic in the number
+of bodies but which sees every pair.</p>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Kinematics are stored in the conf-files in <strong>real</strong> coordinates, and
@@ -237,7 +316,7 @@ read. A conf-file of a periodic simulation therefore remains readable, and
 <p>The loading is set in <code class="docutils literal notranslate"><span class="pre">drivingSystem.txt</span></code> (see <a class="reference internal" href="drivingSystem.html#drivingsystem"><span class="std std-ref">Driving the boundaries</span></a>), with the
 <code class="docutils literal notranslate"><span class="pre">PeriodicLoading</span></code> keyword instead of the <code class="docutils literal notranslate"><span class="pre">Control</span></code> and <code class="docutils literal notranslate"><span class="pre">Servo</span></code> entries used
 for walls.</p>
-<dl class="simple">
+<dl>
 <dt><code class="docutils literal notranslate"><span class="pre">PeriodicLoading</span> <span class="pre">IsotropicCompression</span></code> (<em>double</em>) <strong>pressure</strong></dt><dd><p>The three diagonal components of the cell are stress-driven at
 <span class="math notranslate nohighlight">\(-p\)</span>, and every shear component is held at zero velocity. This is the
 periodic equivalent of <code class="docutils literal notranslate"><span class="pre">tritriIsostaticCompression</span></code>, and the usual way of
@@ -248,10 +327,15 @@ being kept at <code class="docutils literal notranslate"><span class="pre">press
 as <span class="math notranslate nohighlight">\(\dot{\varepsilon}\, h_{ii}\)</span>, so the <strong>strain rate</strong> stays
 constant as the cell shrinks, rather than the velocity.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">PeriodicLoading</span> <span class="pre">SimpleShearDeformable</span></code> (<em>string</em>) <strong>XY|XZ|YX|YZ|ZX|ZY</strong> (<em>double</em>) <strong>pressure</strong> (<em>double</em>) <strong>shearRate</strong></dt><dd><p>Shear at a constant rate on the named component, the three normal components
+<dt><code class="docutils literal notranslate"><span class="pre">PeriodicLoading</span> <span class="pre">SimpleShearDeformable</span></code> (<em>string</em>) <strong>XY|XZ|YX|YZ|ZX|ZY</strong> (<em>double</em>) <strong>pressure</strong> (<em>double</em>) <strong>shearRate</strong> [<code class="docutils literal notranslate"><span class="pre">FixedTransverse</span></code>]</dt><dd><p>Shear at a constant rate on the named component, the three normal components
 being stress-driven at <code class="docutils literal notranslate"><span class="pre">pressure</span></code>. The two letters name the component of
 <span class="math notranslate nohighlight">\(\mathbf{h}\)</span> that is sheared; the normal direction used to convert the
 rate into a velocity follows from it.</p>
+<p>With the optional <code class="docutils literal notranslate"><span class="pre">FixedTransverse</span></code>, only the dimension carrying the
+normal stress is stress-driven; the two others are held at their initial
+value, as in a shear box. The sample is then free to dilate only across the
+shear planes, which is what a laboratory direct-shear test does, and the two
+transverse dimensions can no longer respond to the stress at all.</p>
 </dd>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id1">
