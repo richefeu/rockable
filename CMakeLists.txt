@@ -140,6 +140,11 @@ endif()
 
 # ##############################################################################
 # OpenGL and glut
+
+# On Linux, OpenGL::GL defaults to GLVND's libOpenGL, which does not export the
+# extension functions (glBindFramebufferEXT...) used by the glut applications;
+# the legacy libGL does. Ignored on macOS.
+set(OpenGL_GL_PREFERENCE LEGACY)
 find_package(OpenGL REQUIRED)
 if(OPENGL_FOUND)
   message(STATUS "OPENGL_INCLUDE_DIR = " ${OPENGL_INCLUDE_DIR})
