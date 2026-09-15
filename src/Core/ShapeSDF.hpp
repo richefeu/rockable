@@ -81,7 +81,7 @@ struct ClosestPoint {
    where p*(x) is the closest point of the skeleton. Surface normals obtained
    this way are exact, which is what makes a coarse skin mesh render well.
 
-   The queries are brute force for now: O(nv + ne + nf) per evaluation.
+   The queries use BVH.
 */
 class ShapeSDF {
  public:
