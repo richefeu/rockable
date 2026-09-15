@@ -34,8 +34,11 @@
 //  knowledge of the CeCILL-B license and that you accept its terms.
 #pragma once
 
+#include <algorithm>
+#include <cmath>
 #include <filesystem>
 #include <regex>
+#include <sstream>
 #include <stdexcept>
 
 #include "toofus-gate/tclap/CmdLine.h"
@@ -47,5 +50,6 @@
 #define GIT_TAG "unknown"
 #endif
 
+bool compareConf(const std::string& newFileName, const std::string& refFileName, double tolerance);
 void cleanSimulationFolder();
 

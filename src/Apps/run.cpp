@@ -35,58 +35,168 @@
 
 #include "run.hpp"
 
-bool compareConf(std::string a_newConf, std::string a_regConf) {
-  std::ifstream newConf(a_newConf);
-  std::ifstream regConf(a_regConf);
+using ConfRow = std::vector<std::string>;
 
-  if (!newConf.is_open()) {
-    Logger::warn("@compareConf, cannot read file {}", a_newConf);
+// One section of a conf-file: its header (e.g. "Interactions 192") and its rows.
+struct ConfSection {
+  ConfRow header;
+  std::vector<ConfRow> rows;
+};
+
+/**
+ *  @brief Reads a conf-file from its 'Particles' line on, cut into the sections
+ *         Particles, Interactions and Interfaces. Blank and '#' lines are skipped.
+ */
+static bool readConfSections(const std::string& fileName, std::vector<ConfSection>& sections) {
+  std::ifstream file(fileName);
+  if (!file.is_open()) {
+    Logger::warn("@compareConf, cannot read file {}", fileName);
     return false;
   }
 
-  if (!regConf.is_open()) {
-    Logger::warn("@compareConf, cannot read file {}", a_regConf);
+  std::string line;
+  while (std::getline(file, line)) {
+    std::istringstream iss(line);
+    ConfRow row;
+    std::string token;
+    while (iss >> token) {
+      row.push_back(token);
+    }
+    if (row.empty() || row[0][0] == '#') {
+      continue;
+    }
+    if (row[0] == "Particles" || row[0] == "Interactions" || row[0] == "Interfaces") {
+      sections.push_back({row, {}});
+    } else if (!sections.empty()) {
+      sections.back().rows.push_back(row);
+    }
+  }
+
+  if (sections.empty()) {
+    Logger::warn("@compareConf, no 'Particles' line in {}", fileName);
+    return false;
+  }
+  return true;
+}
+
+static bool toNumber(const std::string& token, double& value) {
+  char* end = nullptr;
+  value = std::strtod(token.c_str(), &end);
+  return end != token.c_str() && *end == '\0';
+}
+
+static std::string joinRow(const ConfRow& row) {
+  std::string s;
+  for (const auto& token : row) {
+    s += (s.empty() ? "" : " ") + token;
+  }
+  return s;
+}
+
+/**
+ *  @brief Compares a new conf-file with a reference one, from the 'Particles' line on.
+ *
+ *  Non-numeric tokens (shape names) and the section headers (hence the numbers of
+ *  particles, interactions and interfaces) must be identical. Two numbers a (new)
+ *  and b (reference) in column j of a section match when
+ *
+ *      |a - b| <= tolerance * max(|a|, |b|, S_j)
+ *
+ *  where S_j is the largest magnitude found in column j of the reference section.
+ *  S_j keeps the comparison meaningful for values that are the small difference of
+ *  large ones, such as the resultant force on a grain at equilibrium, whose
+ *  round-off error scales with the contact forces and not with the resultant.
+ *
+ *  Interactions are saved in the order of their addresses in memory, which is not
+ *  reproducible, so they are matched by their key (i, j, type, isub, jsub).
+ */
+bool compareConf(const std::string& newFileName, const std::string& refFileName, double tolerance) {
+  std::vector<ConfSection> newSections, refSections;
+  if (!readConfSections(newFileName, newSections) || !readConfSections(refFileName, refSections)) {
     return false;
   }
 
-  std::string lineNewConf = std::string();
-  std::string lineRegConf = std::string();
-
-  // catch the reference line that includes starter
-  std::string starter = "Particles";
-
-  // get the first line
-  std::getline(regConf, lineRegConf);
-  // test each line until we get a good catch
-  while (lineRegConf.find(starter) == std::string::npos) {
-    if (!(std::getline(regConf, lineRegConf))) break;
-  }
-  // checking step
-  if (lineRegConf.find(starter) == std::string::npos) {
-    std::cout << " The regression file doesn't contain Particles field" << std::endl;
+  if (newSections.size() != refSections.size()) {
+    Logger::error("@compareConf, {} sections in {} but {} in {}", newSections.size(), newFileName,
+                  refSections.size(), refFileName);
     return false;
   }
 
-  // get the first line
-  std::getline(newConf, lineNewConf);
-  // test each line until we get a good catch
-  while (lineNewConf.find(starter) == std::string::npos) {
-    if (!(std::getline(newConf, lineNewConf))) break;
-  }
-  // checking step
-  if (lineNewConf.find(starter) == std::string::npos) {
-    std::cout << " The new file doesn't contain Particles field" << std::endl;
+  auto byInteractionKey = [](const ConfRow& a, const ConfRow& b) {
+    for (size_t k = 0; k < 5 && k < a.size() && k < b.size(); k++) {
+      long ka = std::stol(a[k]), kb = std::stol(b[k]);
+      if (ka != kb) {
+        return ka < kb;
+      }
+    }
     return false;
-  }
+  };
 
-  while (std::getline(regConf, lineRegConf)) {
-    std::getline(newConf, lineNewConf);
-    if (lineRegConf != lineNewConf) {
+  const size_t maxReported = 10;
+  size_t nbMismatches = 0;
+  double worstDeviation = 0.0;
 
-      std::cout << " error " << lineRegConf << " != " << lineNewConf << std::endl;
-      return false;
+  for (size_t s = 0; s < refSections.size(); s++) {
+    ConfSection& newSec = newSections[s];
+    ConfSection& refSec = refSections[s];
+    const std::string& name = refSec.header[0];
+
+    if (newSec.header != refSec.header || newSec.rows.size() != refSec.rows.size()) {
+      Logger::error("@compareConf, section '{}' ({} rows) != '{}' ({} rows)", joinRow(newSec.header),
+                    newSec.rows.size(), joinRow(refSec.header), refSec.rows.size());
       return false;
     }
+
+    if (name == "Interactions") {
+      std::sort(newSec.rows.begin(), newSec.rows.end(), byInteractionKey);
+      std::sort(refSec.rows.begin(), refSec.rows.end(), byInteractionKey);
+    }
+
+    std::vector<double> columnScale;
+    for (const auto& row : refSec.rows) {
+      columnScale.resize(std::max(columnScale.size(), row.size()), 0.0);
+      for (size_t j = 0; j < row.size(); j++) {
+        double value;
+        if (toNumber(row[j], value)) {
+          columnScale[j] = std::max(columnScale[j], std::fabs(value));
+        }
+      }
+    }
+
+    for (size_t r = 0; r < refSec.rows.size(); r++) {
+      const ConfRow& newRow = newSec.rows[r];
+      const ConfRow& refRow = refSec.rows[r];
+      bool rowMatches = (newRow.size() == refRow.size());
+
+      for (size_t j = 0; rowMatches && j < refRow.size(); j++) {
+        double a, b;
+        if (toNumber(newRow[j], a) && toNumber(refRow[j], b)) {
+          double scale = std::max({std::fabs(a), std::fabs(b), columnScale[j]});
+          double deviation = (scale > 0.0) ? std::fabs(a - b) / scale : 0.0;
+          worstDeviation = std::max(worstDeviation, deviation);
+          rowMatches = (deviation <= tolerance);
+        } else {
+          rowMatches = (newRow[j] == refRow[j]);
+        }
+        if (!rowMatches && nbMismatches < maxReported) {
+          Logger::error("@compareConf, {} row {} column {}: {} (new) != {} (reference)", name, r, j, newRow[j],
+                        refRow[j]);
+        }
+      }
+      if (!rowMatches) {
+        if (newRow.size() != refRow.size() && nbMismatches < maxReported) {
+          Logger::error("@compareConf, {} row {}: '{}' (new) != '{}' (reference)", name, r, joinRow(newRow),
+                        joinRow(refRow));
+        }
+        nbMismatches++;
+      }
+    }
+  }
+
+  Logger::info("@compareConf, largest relative deviation: {:.3e} (tolerance {:.1e})", worstDeviation, tolerance);
+  if (nbMismatches > 0) {
+    Logger::error("@compareConf, {} rows differ beyond the tolerance", nbMismatches);
+    return false;
   }
   return true;
 }
@@ -141,6 +251,7 @@ int main(int argc, char const* argv[]) {
   bool printBannerAndLeave = false;
   std::string newconf = "";
   std::string regconf = "";
+  double tolerance = 1e-5;
 
   try {
 
@@ -155,6 +266,9 @@ int main(int argc, char const* argv[]) {
     TCLAP::ValueArg<std::string> regConfArg("r", "regressionFile", "archive conf", false, "",
                                             "regression-conf-file");
     TCLAP::ValueArg<std::string> newConfArg("n", "newFile", "New conf file to check", false, "", "new-conf-file");
+    TCLAP::ValueArg<double> toleranceArg("t", "tolerance",
+                                         "Relative tolerance of the comparison between -n and -r files", false,
+                                         tolerance, "double");
 
     cmd.add(nameArg);
     cmd.add(nbThreadsArg);
@@ -163,6 +277,7 @@ int main(int argc, char const* argv[]) {
     cmd.add(bannerArg);
     cmd.add(newConfArg);
     cmd.add(regConfArg);
+    cmd.add(toleranceArg);
 
     cmd.parse(argc, argv);
 
@@ -173,6 +288,7 @@ int main(int argc, char const* argv[]) {
     printBannerAndLeave = bannerArg.getValue();
     newconf = newConfArg.getValue();
     regconf = regConfArg.getValue();
+    tolerance = toleranceArg.getValue();
 
   } catch (TCLAP::ArgException& e) {
     std::cerr << "TCLAP error: " << e.error() << " for argument " << e.argId() << std::endl;
@@ -199,7 +315,7 @@ int main(int argc, char const* argv[]) {
 
   // In case -r and -n arguments have been used
   if (!(newconf == "") && !(regconf == "")) {
-    bool succeed = compareConf(newconf, regconf);
+    bool succeed = compareConf(newconf, regconf, tolerance);
     if (succeed) {
       Logger::info("{} and {} are the same", newconf, regconf);
     } else {
