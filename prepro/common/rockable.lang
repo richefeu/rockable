@@ -1,0 +1,886 @@
+# rockable.lang -- syntax highlighting, inline documentation and snippets
+# for the Rockable input files (conf, shapes, drivingSystem, postpro).
+#
+# Read at start-up by the editors in prepro/; edit it to document a new
+# keyword, no recompilation needed.
+#
+# Format
+#   [keyword] name    a command word, highlighted as a keyword
+#   [type] name       an enumerated value, highlighted as a type
+#   [snippet] Title   a template; its body is every line up to the next [ ]
+#   doc: first line   documentation of the entry just above; continuation
+#     lines are indented by two spaces, blank lines are kept
+#
+# Outside of a doc or a snippet body, a line starting with '#' is a comment
+# and blank lines are ignored.
+
+
+# ===========================================================================
+# Keywords
+# ===========================================================================
+
+[keyword] Rockable
+doc: A conf-file always starts with the header: Rockable dd-mm-yyyy (e.g., Rockable 20-02-2017).
+  Each time a noticeable change is made in the format, the date of this change is also changed
+  in the header of the file. It has to be understood as the version of the format.
+
+[keyword] t
+doc: t [(double) value]
+
+  Current time
+
+[keyword] tmax
+doc: tmax [(double) value]
+
+  Maximum time (at the end of a simulation)
+
+[keyword] dt
+doc: dt [(double) value]
+
+  Time step increment
+
+[keyword] interVerlet
+doc: interVerlet [(double) duration]
+
+  Elapsed time between each update of the neighbor list (NL)
+
+[keyword] interConf
+doc: interConf [(double) duration]
+
+  Elapsed time between each backup of the configuration
+
+[keyword] DVerlet
+doc: DVerlet [(double) distance]
+
+  Increment size of the OBBs surrounding the rigid bodies
+
+[keyword] dVerlet
+doc: dVerlet [(double) distance]
+
+  Increment size of the OBBs surrounding the sub-elements of the rigid bodies
+
+[keyword] density
+doc: density [(int)groupNumber] [(double) density]
+
+  Set the density of all particles belonging to the group groupNumber
+
+[keyword] gravity
+doc: gravity [(vec3r) value]
+
+   value = components of the gravity
+
+[keyword] ParamsInInterfaces
+doc: ParamsInInterfaces [0/1]
+
+  States wether the parameters are embedded in the glued interfaces
+
+[keyword] dynamicUpdateNL
+doc: dynamicUpdateNL [0/1]
+
+  If the dynamic update of the neighbor list is activated (set to 1), then an update will be made
+  if the maximum distance of a body, since the last update, becomes larger than 'dispUpdateNL'.
+  An update will also be made when the maximum rotation becomes larger than 'angleUpdateNL'
+
+[keyword] dispUpdateNL
+doc: dispUpdateNL [(double) distance]
+
+  The maximum distance that any body is allowed to move without updating the NL
+
+[keyword] angleUpdateNL
+doc: angleUpdateNL [(double) angleDegree]
+
+  The maximum angle that any body is allowed to rotate without updating the NL
+
+[keyword] numericalDampingCoeff
+doc: numericalDampingCoeff [(double) value]
+
+  Cundall non-viscous numerical damping coefficient (typically between 0 and 1).
+  At each step the accelerations are scaled by (1 - value) or (1 + value) depending
+  on whether they oppose or follow the velocity, which damps the motion.
+  Set to 0 to disable.
+
+[keyword] VelocityBarrier
+doc: VelocityBarrier [(double) value]
+
+  Reference translational velocity above which a barrier force progressively slows
+  the bodies down. The opposing force grows like (|v|/VelocityBarrier)^VelocityBarrierExponent.
+  Set to 0 (default) to disable.
+
+[keyword] AngularVelocityBarrier
+doc: AngularVelocityBarrier [(double) value]
+
+  Same as VelocityBarrier but applied to the angular velocity of the bodies.
+  Set to 0 (default) to disable.
+
+[keyword] VelocityBarrierExponent
+doc: VelocityBarrierExponent [(double) value]
+
+  Exponent used by the translational velocity barrier (see VelocityBarrier).
+  The larger the exponent, the sharper the barrier.
+
+[keyword] AngularVelocityBarrierExponent
+doc: AngularVelocityBarrierExponent [(double) value]
+
+  Exponent used by the angular velocity barrier (see AngularVelocityBarrier).
+
+[keyword] Tempo
+doc: Tempo [(string) target] ...
+
+  Defines a time-evolving ('tempo') parameter interpolated between two times.
+  Three forms are available:
+
+    Tempo NDCoeff [command] [t1] [t2] [val1] [val2]
+        drives the numericalDampingCoeff
+    Tempo Inter [paramName] [group1] [group2] [command] [t1] [t2] [val1] [val2]
+        drives an interaction parameter (e.g. knContact) between two groups
+    Tempo Body [paramName] [group] [command] [t1] [t2] [val1] [val2]
+        drives a body property (e.g. density) of a group
+
+  'command' selects the interpolation profile between (t1,val1) and (t2,val2).
+
+[keyword] forceLaw
+doc: forceLaw [(string)Name]
+
+  Select a model for the computation of forces.
+  Possible Names are: 'Default', 'Avalanche', 'StickedLinks', 'GeoVisc' or 'BCM'.
+
+[keyword] AddOrRemoveInteractions
+doc: AddOrRemoveInteractions [(string) Name]
+
+  Strategy used to detect which interactions must be created or deleted.
+  Possible Names are: 'bruteForce' (default) or 'OBBtree'.
+
+[keyword] UpdateNL
+doc: UpdateNL [(string) Name]
+
+  Strategy used to rebuild the neighbor list (NL).
+  Possible Names are: 'bruteForce' (default) or 'linkCells'.
+
+[keyword] Integrator
+doc: Integrator [(string) Name]
+
+  Time-integration scheme.
+  Possible Names are: 'velocityVerlet' (default), 'Euler', 'Beeman' or 'RungeKutta4'.
+
+[keyword] cellMinSizes
+doc: cellMinSizes [(double) value]
+
+  Minimum size of the cells used by the 'linkCells' neighbor-list strategy.
+
+[keyword] boxForLinkCellsOpt
+doc: boxForLinkCellsOpt [(int) 0/1]
+
+  Selects the bounding box used to build the link-cells grid.
+  0 (default): box surrounding all particles;
+  1: box surrounding only the free (non-driven) bodies.
+
+[keyword] ContactPartnership
+doc: ContactPartnership [(string) Name]
+
+  Model used to weight the contact stiffnesses when several sub-elements of two
+  bodies interact at once (used by some force laws).
+  Possible Names are: 'None' (default), 'NumberWeight', 'OverlapWeight' or 'SurfaceWeight'.
+
+[keyword] preventCrossingLength
+doc: preventCrossingLength [(double) value]
+
+  If positive, enables a safeguard that prevents bodies from crossing/tunneling
+  through each other when the overlap would exceed this characteristic length.
+
+[keyword] initSpringJoint
+doc: initSpringJoint [(int) ibody] [(vec3r) ipos0] [(int) jbody] [(vec3r) jpos0] [(double) stiffness]
+
+  Create a linear spring joint between bodies ibody and jbody, anchored at the
+  local positions ipos0 and jpos0, with the given stiffness.
+
+# --- periodic cell (requires Rockable compiled with ROCKABLE_ENABLE_PERIODIC)
+
+[keyword] usePeriodicCell
+doc: usePeriodicCell [0/1]
+
+  Enable (1) or disable (0) the periodic boundary cell.
+  Requires Rockable compiled with ROCKABLE_ENABLE_PERIODIC.
+
+[keyword] h
+doc: h [(mat9r) matrix]
+
+  The 3x3 matrix (9 components) defining the periodic cell (column vectors are the
+  periodicity vectors).
+
+[keyword] vh
+doc: vh [(mat9r) matrix]
+
+  Time derivative (velocity) of the periodic cell matrix 'h'.
+
+[keyword] ah
+doc: ah [(mat9r) matrix]
+
+  Second time derivative (acceleration) of the periodic cell matrix 'h'.
+
+[keyword] mh
+doc: mh [(double) value]
+
+  Mass ratio assigned to the periodic cell degrees of freedom.
+
+[keyword] dh
+doc: dh [(double) value]
+
+  Numerical damping applied to the periodic cell.
+
+[keyword] cellMomentumCorrection
+doc: cellMomentumCorrection [0/1]
+
+  Enable correction of the total momentum within the periodic cell.
+
+[keyword] cellVelocityCorrection
+doc: cellVelocityCorrection [0/1]
+
+  Enable correction of the velocities within the periodic cell.
+
+[keyword] useKineticStress
+doc: useKineticStress [0/1]
+
+  Include the kinetic (velocity fluctuation) contribution in the stress of the periodic cell.
+
+# --- soft particles (requires Rockable compiled with ROCKABLE_ENABLE_SOFT_PARTICLES)
+
+[keyword] useSoftParticles
+doc: useSoftParticles [(double) Young] [(double) Poisson]
+
+  Enable deformable (soft) particles with the given Young modulus and Poisson ratio.
+  Requires Rockable compiled with ROCKABLE_ENABLE_SOFT_PARTICLES.
+
+[keyword] knContact
+doc: knContact [(int) group1] [(int) group2] [(double) value]
+
+[keyword] en2Contact
+doc: en2Contact [(int) group1] [(int) group2] [(double) value]
+
+[keyword] en2ContactFromViscRate
+doc: en2ContactFromViscRate [(int) group1] [(int) group2] [(double) value]
+
+[keyword] ktContact
+doc: ktContact [(int) group1] [(int) group2] [(double) value]
+
+[keyword] muContact
+doc: muContact [(int) group1] [(int) group2] [(double) value]
+
+[keyword] krContact
+doc: krContact [(int) group1] [(int) group2] [(double) value]
+
+[keyword] murContact
+doc: murContact [(int) group1] [(int) group2] [(double) value]
+
+[keyword] viscTContact
+
+[keyword] knInnerBond
+doc: knInnerBond [(int) group1] [(int) group2] [(double) value]
+
+[keyword] en2InnerBond
+doc: en2InnerBond [(int) group1] [(int) group2] [(double) value]
+
+[keyword] ktInnerBond
+doc: ktInnerBond [(int) group1] [(int) group2] [(double) value]
+
+[keyword] krInnerBond
+doc: krInnerBond [(int) group1] [(int) group2] [(double) value]
+
+[keyword] fn0InnerBond
+doc: fn0InnerBond [(int) group1] [(int) group2] [(double) value]
+
+[keyword] ft0InnerBond
+doc: ft0InnerBond [(int) group1] [(int) group2] [(double) value]
+
+[keyword] mom0InnerBond
+doc: mom0InnerBond [(int) group1] [(int) group2] [(double) value]
+
+[keyword] powInnerBond
+doc: powInnerBond [(int) group1] [(int) group2] [(double) value]
+
+[keyword] gcInnerBond
+doc: gcInnerBond [(int) group1] [(int) group2] [(double) value]
+
+  Critical fracture energy (energy release rate Gc) of the inner bonds,
+  used by the BCM (Bonded Cell Model) force law.
+
+[keyword] knOuterBond
+doc: knOuterBond [(int) group1] [(int) group2] [(double) value]
+
+[keyword] ktOuterBond
+doc: ktOuterBond [(int) group1] [(int) group2] [(double) value]
+
+[keyword] krOuterBond
+doc: krOuterBond [(int) group1] [(int) group2] [(double) value]
+
+[keyword] fn0OuterBond
+doc: fn0OuterBond [(int) group1] [(int) group2] [(double) value]
+
+[keyword] ft0OuterBond
+doc: ft0OuterBond [(int) group1] [(int) group2] [(double) value]
+
+[keyword] mom0OuterBond
+doc: mom0OuterBond [(int) group1] [(int) group2] [(double) value]
+
+[keyword] powOuterBond
+doc: powOuterBond [(int) group1] [(int) group2] [(double) value]
+
+[keyword] en2OuterBond
+doc: en2OuterBond [(int) group1] [(int) group2] [(double) value]
+
+[keyword] gcOuterBond
+doc: gcOuterBond [(int) group1] [(int) group2] [(double) value]
+
+  Critical fracture energy (energy release rate Gc) of the outer bonds,
+  used by the BCM (Bonded Cell Model) force law.
+
+[keyword] iconf
+doc: iconf [(int) value]Number of the current configuration
+
+[keyword] nDriven
+doc: nDriven [(int) value]
+
+  The value is the number of bodies, at the beginning of the list, that nDriven first bodies
+  are fixed (all velocities imposed to zero), but if we want to set a velocity or a force/moment,
+  some commands have to be added in a file named drivingSystem.txt
+
+[keyword] shapeFile
+doc: shapeFile [(string) path]
+
+  Paths of the file that defines the shapes used.
+
+[keyword] separator
+doc: By default, the separator character in a conf-file is the 'space'
+  but it can be changed to 'tab' or 'semicolon'
+
+[keyword] glue_with_walls
+doc: glue_with_walls [0/1]
+
+  State wether the glue will be activated between driven and not-driven bodies
+  when the command 'stickClusters' will be invoked
+
+[keyword] precision
+doc: precision [(int) value]
+
+  Set the number of digits to be used in the conf-files
+
+[keyword] Particles
+doc: Particles [(int) numberOfParticles]
+
+  REPEAT FOR EACH PARTICLE {
+     [(string) shapeName] [(int) group] [(int) cluster] [(double) homothety]
+     [(vec3r) position] [(vec3r) velocity] [(vec3r) acceleration]
+     [(quat) angularPosition] [(vec3r) angularVelocity] [(vec3r) angularAcceleration]
+  }
+
+[keyword] Interactions
+doc: Interactions [(int) numberOfInteractions]
+
+  REPEAT FOR EACH INTERACTION {
+     [(int) i] [(int) j] [(int) type] [(int) isub] [(int) jsub] [(vec3r) n] [(double) dn] [(vec3r) position]
+     [(vec3r) relativeVelocity] [(double) fn] [(vec3r) ft] [(vec3r) mom] [(double) viscousDampingValue]
+  }
+
+[keyword] Interfaces
+doc: Interfaces [(int)numberOfInterfaces]
+
+  REPEAT FOR EACH INTERFACE {
+     [(int) i] [(int) j] [(int) nbBonds]
+     IF (ParamsInInterfaces is not 0) {
+        [(double) kn] [(double) kt] [(double) kr] [(double) fn0] [(double) ft0] [(double) mom0] [(double) power]
+     }
+     REPEAT FOR EACH BOND { [(int) type] [(int) isub] [(int) jsub] }
+  }
+
+[keyword] DataExtractor
+doc: DataExtractor [(string) Name] ...
+
+  Adds a data extractor that records quantities during the simulation.
+  Possible Names are: 'ClusterAABB', 'dnStat', 'DuoBalance', 'MeanVelocity' or 'TrackBody'.
+  The remaining parameters depend on the chosen extractor.
+  Kept for compatibility: prefer defining them in a file named 'dataExtractors.txt'.
+
+[keyword] BodyForce
+doc: BodyForce [(string) Name] ...
+
+  Activates a body force applied to the particles.
+  Possible Names are: 'AttractingPoint', 'PreferredDirection' or 'ViscousFluid'.
+  The remaining parameters depend on the chosen body force.
+
+# --- processing
+
+[keyword] stickVerticesInClusters
+doc: stickVerticesInClusters [(double) Epsilon]
+
+  This command will add glued interfaces between bodies having
+  the same cluster identifier. Only bonds between vertices (spheres)
+  are added when the distance is less than Epsilon.
+
+[keyword] stickVerticesInClustersMoments
+doc: stickVerticesInClustersMoments [(double) Epsilon]
+
+  Like stickVerticesInClusters, but the created bonds also transmit moments.
+  Bonds between vertices (spheres) of a same cluster are added when the distance
+  is less than Epsilon.
+
+[keyword] stickClusters
+doc: stickClusters [(double) Epsilon]
+
+  This command will add glued interfaces between bodies having different cluster identifiers.
+  Bonds are added when the distance is less than Epsilon.
+
+[keyword] stickBCM
+doc: stickBCM [(double) Epsilon]
+
+  Create the bonded interfaces required by the BCM (Bonded Cell Model) force law
+  between neighboring sub-elements closer than Epsilon.
+
+[keyword] copyParamsToInterfaces
+doc: copyParamsToInterfaces [(string) isInnerStr]
+
+[keyword] setStiffnessRatioInterfaces
+doc: setStiffnessRatioInterfaces [(double) ratio]
+
+  Set the tangential-to-normal stiffness ratio kt/kn for every bond stored in the
+  glued interfaces (only for parameters that are embedded in the Interfaces).
+
+[keyword] setVariableStickParams
+doc: setVariableStickParams [(string) paramName] [(string) isInnerStr] [(double) lambda] [(double) m] [(int) timeSeeded]
+
+[keyword] randomlyOrientedVelocities
+doc: randomlyOrientedVelocities [(double) velocity]
+
+[keyword] randomlyOrientedVelocitiesClusters
+doc: randomlyOrientedVelocitiesClusters [(double) velocity] [(int) option]
+
+[keyword] setAllVelocities
+doc: setAllVelocities [(vec3r) velocity]
+
+  Set the same velocity vector to ALL free (non-driven) bodies.
+
+[keyword] homothetyRange
+doc: homothetyRange [(int) idFirst] [(int) idLast] [(double) hmin] [(double) hmax] [(int) timeSeeded]
+
+  Assign to the bodies idFirst..idLast a homothety drawn from a uniform distribution
+  in [hmin, hmax]. If timeSeeded is 1, the random generator is seeded with the current time.
+
+[keyword] particlesClonage
+doc: particlesClonage [(int) idFirst] [(int) idLast] [(vec3r) translation]
+
+  Duplicate the bodies idFirst..idLast, shifting the clones by the translation vector.
+  The clones receive new cluster identifiers.
+
+# --- driving system
+
+[keyword] Control
+doc: Control [(string) mode] [(int) bodyNumber] [(double) value]
+
+  where mode is either:
+                       _x_Vel_, _y_Vel_, _z_Vel_,
+                       _xrot_Vel_, _yrot_Vel_, _zrot_Vel_,
+                       _x_For_, _y_For_, _z_For_,
+                       _xrot_Mom_, _yrot_Mom_, _zrot_Mom_,
+                       _xyzrot_Vel_, or _xyzrot_Mom_
+
+  This is a simple solution to impose a constant velocity or force/moment to a body.
+  Notice that bodyNumber needs to be lower than 'nDriven'
+
+[keyword] Servo
+doc: Servo [(string) Name] ...
+
+  Activates a predefined servo-controller that drives a set of walls/bodies.
+  The 'tritri*' servos (e.g. tritriIsostaticCompression, tritriBiaxialCompression,
+  tritriCustom, tritriLodeAngle) expect the 6 wall body numbers
+  (idXmin idXmax idYmin idYmax idZmin idZmax) followed by servo-specific parameters.
+  Other servos: shaker, triangle_shaker, sawtooth_shaker, ramp.
+  Servo commands are defined in the file 'drivingSystem.txt'.
+
+[keyword] PeriodicLoading
+doc: PeriodicLoading [(string) Name] ...
+
+  Drive the periodic cell with a predefined loading.
+  Example: 'PeriodicLoading IsotropicCompression [(double) pressure]'.
+  Defined in the file 'drivingSystem.txt'.
+
+# --- post-processing (postpro tool input files)
+
+[keyword] PostProcessor
+doc: PostProcessor [(string) Name] ...
+
+  Adds a post-processor (used by the 'postpro' tool).
+  Possible Names are: 'ClusterGranulo' or 'ParticleStress'.
+
+[keyword] firstConf
+doc: firstConf [(int) value]
+
+  Number of the first conf-file to post-process.
+
+[keyword] lastConf
+doc: lastConf [(int) value]
+
+  Number of the last conf-file to post-process.
+
+[keyword] stepConf
+doc: stepConf [(int) value]
+
+  Step between two processed conf-files.
+
+[keyword] ConfVolumes
+doc: ConfVolumes [(int) nb]
+  REPEAT nb TIMES { [(int) iconf] [(double) volume] }
+
+  Per-conf reference volumes used by the ParticleStress post-processor.
+
+[keyword] SievingSizes
+doc: SievingSizes [(int) nb] [(double) size1] [(double) size2] ...
+
+  List of nb sieving sizes used by the ClusterGranulo post-processor.
+
+[keyword] Volume
+doc: Volume [(double) value]
+
+  Reference volume used by the ParticleStress post-processor.
+
+# --- shapes
+
+[keyword] name
+doc: name [(string) shapeName]
+
+  Set the name of the shape
+
+[keyword] radius
+doc: radius [(double) value]
+
+  set the radius of the rounded edges of the shape
+
+[keyword] preCompDone
+doc: preCompDone [y/n]
+
+  If yes, the computation of mass properties will not be run
+  at the beginning of a computation in Rockable (or in the program shapeSurvey)
+
+[keyword] volume
+doc: volume [(double) V]
+
+[keyword] I/m
+doc: I/m [(double) I1/m] [(double) I2/m] [(double) I3/m]
+
+[keyword] obb.extent
+doc: obb.extent [(double)extent1] [(double)extent2] [(double)extent3]
+
+  The 3 components of the extents in the 3 directions defined by obb.e1, obb.e2 and obb.e3
+
+[keyword] obb.center
+doc: obb.center [(vec3r) center]
+
+  Position of the OBB center relative to the mass center of the shape,
+  given in the framework (principal direction of inertia) of the shape.
+
+[keyword] obb.e1
+doc: obb.e1 [(vec3r) e1]
+
+  Extent unit vector in the first direction
+
+[keyword] obb.e2
+doc: obb.e2 [(vec3r) e2]
+
+  Extent unit vector in the second direction
+
+[keyword] obb.e3
+doc: obb.e3 [(vec3r) e3]
+
+  Extent unit vector in the third direction
+
+[keyword] fibObbOption
+doc: fibObbOption [(int) option]
+
+  Algorithm used to build the OBB of the shape:
+    0: covariance-based orientation
+    1: minimum-volume strategy
+    2: OBB aligned with the axes (AABB) [default]
+    3: imposed axis
+
+[keyword] OBBtreeLevel
+doc: DEPRECATED!!
+
+[keyword] position
+doc: position [(vec3r) center]
+
+  Position of the mass center of the shape, expressed in the local frame of the shape.
+  Usually computed automatically (Monte-Carlo integration) when preCompDone is 'n'.
+
+[keyword] orientation
+doc: orientation [(quat) Q]
+
+  Angular position (quaternion) of the principal-inertia frame of the shape.
+  Usually computed automatically when preCompDone is 'n'.
+
+[keyword] isSurface
+doc: isSurface
+
+  Flag (no value) marking the shape as an open surface rather than a closed volume.
+
+[keyword] MCnstep
+doc: MCnstep [(int) value]
+
+  Number of steps used in the Monte-Carlo integration of the mass properties
+  (volume, mass center, inertia). Clamped internally to the range [1000, 10000000].
+
+[keyword] nv
+doc: nv [(int) numberOfVertices]
+
+  REPEAT FOR EACH VERTEX { [(vec3r) position] }
+  List of the vertices (sphero-points) of the shape, in the local frame.
+
+[keyword] ne
+doc: ne [(int) numberOfEdges]
+
+  REPEAT FOR EACH EDGE { [(int) fromVertex] [(int) toVertex] }
+  List of the edges (sphero-segments) connecting two vertices.
+
+[keyword] nf
+doc: nf [(int) numberOfFaces]
+
+  REPEAT FOR EACH FACE { [(int) nbNodes] [(int) node1] [(int) node2] ... }
+  List of the faces (sphero-polygons), each given by its number of nodes
+  followed by the corresponding vertex indices.
+
+
+# ===========================================================================
+# Types and enumerated values
+# ===========================================================================
+
+# --- yes/no
+
+[type] y
+
+[type] n
+
+# --- tempo
+
+[type] NDCoeff
+
+[type] Inter
+
+[type] Body
+
+# --- force laws
+
+[type] Default
+
+[type] Avalanche
+
+[type] StickedLinks
+
+[type] GeoVisc
+
+[type] BCM
+
+# --- add or remove interaction
+
+[type] bruteForce
+
+[type] OBBtree
+
+# --- updateNL
+
+[type] linkCells
+
+# --- contact partnership models
+
+[type] None
+
+[type] NumberWeight
+
+[type] OverlapWeight
+
+[type] SurfaceWeight
+
+# --- integrator
+
+[type] velocityVerlet
+
+[type] Euler
+
+[type] Beeman
+
+[type] RungeKutta4
+
+# --- body forces
+
+[type] AttractingPoint
+
+[type] PreferredDirection
+
+[type] ViscousFluid
+
+# --- data extractor
+
+[type] ClusterAABB
+
+[type] dnStat
+
+[type] DuoBalance
+
+[type] MeanVelocity
+
+[type] TrackBody
+
+[type] TrackDamage
+
+[type] TrackRockfall
+
+# --- post-processors
+
+[type] ClusterGranulo
+
+[type] ParticleStress
+
+# --- controls (driving system)
+
+[type] _x_Vel_
+
+[type] _y_Vel_
+
+[type] _z_Vel_
+
+[type] _xrot_Vel_
+
+[type] _yrot_Vel_
+
+[type] _zrot_Vel_
+
+[type] _x_For_
+
+[type] _y_For_
+
+[type] _z_For_
+
+[type] _xrot_Mom_
+
+[type] _yrot_Mom_
+
+[type] _zrot_Mom_
+
+[type] _xyzrot_Vel_
+
+[type] _xyzrot_Mom_
+
+# --- servo names (driving system)
+
+[type] tritriIsostaticCompression
+
+[type] tritriBiaxialCompression
+
+[type] tritriCustom
+
+[type] tritriLodeAngle
+
+[type] shaker
+
+[type] triangle_shaker
+
+[type] sawtooth_shaker
+
+[type] ramp
+
+
+# ===========================================================================
+# Snippets
+# ===========================================================================
+
+[snippet] Time
+t _value_
+
+[snippet] End time
+tmax _value_
+
+[snippet] Time step
+dt _value_
+
+[snippet] Elapsed time between NL updates
+interVerlet _duration_
+
+[snippet] Elapsed time between conf files
+interConf _duration_
+
+[snippet] Proximity distance for rigid bodies
+DVerlet _distance_
+
+[snippet] Proximity distance for sub-elements
+dVerlet _distance_
+
+[snippet] Density of all bodies
+density _groupNumber_ _density_
+
+[snippet] Gravity
+gravity _value_
+
+[snippet] Parameters stored in the interfaces
+ParamsInInterfaces _0/1_
+
+[snippet] Update NL dynamically
+dynamicUpdateNL _0/1_
+dispUpdateNL _distance_
+angleUpdateNL _angleDegree_
+
+[snippet] numericalDampingCoeff
+numericalDampingCoeff _value_
+
+[snippet] Velocity barriers
+VelocityBarrier _value_
+AngularVelocityBarrier _value_
+VelocityBarrierExponent _value_
+AngularVelocityBarrierExponent _value_
+
+[snippet] Tempo
+Tempo NDCoeff _command_ _t1_ _t2_ _val1_ _val2_
+
+[snippet] force law
+forceLaw _Default/Avalanche/StickedLinks/GeoVisc/BCM_
+
+[snippet] Contact Parameters
+knContact _group1_ _group2_ _value_
+en2Contact _group1_ _group2_ _value_
+ktContact _group1_ _group2_ _value_
+muContact _group1_ _group2_ _value_
+krContact _group1_ _group2_ _value_
+murContact _group1_ _group2_ _value_
+
+[snippet] InnerBond Parameters
+knInnerBond _group1_ _group2_ _value_
+en2InnerBond _group1_ _group2_ _value_
+ktInnerBond _group1_ _group2_ _value_
+fn0InnerBond _group1_ _group2_ _value_
+ft0InnerBond _group1_ _group2_ _value_
+powInnerBond _group1_ _group2_ _value_
+
+[snippet] OuterBond Parameters
+knOuterBond _group1_ _group2_ _value_
+en2OuterBond _group1_ _group2_ _value_
+ktOuterBond _group1_ _group2_ _value_
+krOuterBond _group1_ _group2_ _value_
+fn0OuterBond _group1_ _group2_ _value_
+ft0OuterBond _group1_ _group2_ _value_
+mom0OuterBond _group1_ _group2_ _value_
+powOuterBond _group1_ _group2_ _value_
+
+[snippet] BCM bond fracture energy
+gcInnerBond _group1_ _group2_ _value_
+gcOuterBond _group1_ _group2_ _value_
+
+[snippet] Periodic cell
+usePeriodicCell 1
+h _xx_ _xy_ _xz_ _yx_ _yy_ _yz_ _zx_ _zy_ _zz_
+vh 0 0 0 0 0 0 0 0 0
+ah 0 0 0 0 0 0 0 0 0
+mh _massRatio_
+dh _damping_
+
+[snippet] Soft particles
+useSoftParticles _Young_ _Poisson_
+
+[snippet] Spring joint
+initSpringJoint _ibody_ _ix_ _iy_ _iz_ _jbody_ _jx_ _jy_ _jz_ _stiffness_
+
+[snippet] Prevent crossing
+preventCrossingLength _length_
