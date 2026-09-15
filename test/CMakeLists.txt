@@ -1,42 +1,30 @@
-
 ## tests
-#enable_testing()
+
 set(TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-#add_executable(rockable_test run_regression_test.cpp)
-#target_link_libraries(rockable_test PUBLIC Rockable_core)
+# The references hold for every build type and platform: rockable compares
+# conf-files with a relative tolerance (see compareConf in src/Apps/run.cpp).
+set(REGRESSION_DIR ${TEST_DIR}/regression)
 
-##add_test(NAME rockable_brute_force COMMAND run ${TEST_DIR}/redirection_test_brute_force.conf)
-set(WORK_DIR ${CMAKE_CURRENT_BINARY_DIR})
-set(INPUT_512_PARTICLES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/input/512_particles)
-set(TMP_COPY_INPUT_512_PARTICLES_DIR ${WORK_DIR}/input/) 
-set(INPUT_518_POLY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/input/518_poly)
-set(TMP_COPY_INPUT_518_POLY_DIR ${WORK_DIR}/input/) 
-set(INPUT_50_PRISMES_GRAVITY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/input/50_prismes_gravity)
-set(TMP_COPY_50_PRISMES_GRAVITY_DIR ${WORK_DIR}/input/)
-set(INPUT_2_PRISMES_GRAVITY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/input/2_prismes_gravity)
-set(TMP_COPY_2_PRISMES_GRAVITY_DIR ${WORK_DIR}/input) 
+# add_regression_test(<name> <case> <conf> <result> <reference>)
+#
+# Runs rockable on input/<case>/<conf> in a folder of its own, BUILD/test/<name>,
+# and compares the conf-file <result> it writes with regression/<reference>.
+# A setup test first removes the conf-files of a previous run, so that a
+# simulation stopping early cannot be compared with a stale result.
+function(add_regression_test NAME CASE CONF RESULT REFERENCE)
+  set(RUN_DIR ${CMAKE_CURRENT_BINARY_DIR}/${NAME})
+  file(COPY ${TEST_DIR}/input/${CASE} DESTINATION ${RUN_DIR}/input)
+  file(WRITE ${RUN_DIR}/redirection.txt "redirection\ninput/${CASE}/\n${CONF}\n")
 
+  add_test(NAME ${NAME}_clean COMMAND rockable -c WORKING_DIRECTORY ${RUN_DIR})
+  set_tests_properties(${NAME}_clean PROPERTIES FIXTURES_SETUP ${NAME})
 
-if(CMAKE_BUILD_TYPE MATCHES "Release")
-	message("-- The regression tests used are in regression/release")
-	set(REGRESSION_DIR ${CMAKE_CURRENT_SOURCE_DIR}/regression/release)
-elseif(CMAKE_BUILD_TYPE MATCHES "Debug")
-	message("-- The regression tests used are in regression/debug")
-	set(REGRESSION_DIR ${CMAKE_CURRENT_SOURCE_DIR}/regression/debug)
-elseif()
-	message("-- Error: this mode is not supported by our non-regresssion tests")
-endif()
-
-file(COPY ${INPUT_512_PARTICLES_DIR}  DESTINATION ${TMP_COPY_INPUT_512_PARTICLES_DIR})
-file(COPY ${INPUT_518_POLY_DIR}  DESTINATION ${TMP_COPY_INPUT_518_POLY_DIR})
-file(COPY ${INPUT_50_PRISMES_GRAVITY_DIR}  DESTINATION ${TMP_COPY_50_PRISMES_GRAVITY_DIR})
-file(COPY ${INPUT_2_PRISMES_GRAVITY_DIR}  DESTINATION ${TMP_COPY_2_PRISMES_GRAVITY_DIR})
-
-if (ROCKABLE_ENABLE_PERIODIC)
-  add_test(NAME 2_prismes_gravity_exec COMMAND rockable ${TEST_DIR}/redirection_2_prismes_gravity.conf)
-  add_test(NAME 2_prismes_gravity_reg COMMAND rockable ${TEST_DIR}/redirection_2_prismes_gravity.conf -n ${WORK_DIR}/conf1 -r ${REGRESSION_DIR}/regression_2_prismes_gravity.conf)
-endif()
+  add_test(NAME ${NAME}
+           COMMAND rockable redirection.txt -n ${RESULT} -r ${REGRESSION_DIR}/${REFERENCE}
+           WORKING_DIRECTORY ${RUN_DIR})
+  set_tests_properties(${NAME} PROPERTIES FIXTURES_REQUIRED ${NAME})
+endfunction()
 
 # Unit test of the r-shape signed distance function (skin-mesh, phase 0)
 add_executable(test_ShapeSDF ${TEST_DIR}/ShapeSDF/test_ShapeSDF.cpp)
@@ -48,10 +36,15 @@ add_executable(test_ShapeMesh ${TEST_DIR}/ShapeSDF/test_ShapeMesh.cpp)
 target_link_libraries(test_ShapeMesh PUBLIC Rockable_core)
 add_test(NAME ShapeMesh COMMAND test_ShapeMesh ${TEST_DIR}/input/518_poly/shape.shp)
 
-add_test(NAME 50_prismes_gravity_reg COMMAND rockable ${TEST_DIR}/redirection_50_prismes_gravity.conf -n ${WORK_DIR}/conf1 -r ${REGRESSION_DIR}/regression_50_prismes_gravity.conf)
-add_test(NAME 518_poly_bruteforce_default_noPeriodicity COMMAND rockable ${TEST_DIR}/redirection_test_518_poly_bruteforce_default_noperiod.conf -n ${WORK_DIR}/conf3001 -r ${REGRESSION_DIR}/regression_518_poly_default_noperiod.conf)
-add_test(NAME 518_poly_bruteforce_avalanches_noPeriodicity COMMAND rockable ${TEST_DIR}/redirection_test_518_poly_bruteforce_avalanches_noperiod.conf -n ${WORK_DIR}/conf3001 -r ${REGRESSION_DIR}/regression_518_poly_avalanches_noperiod.conf)
-add_test(NAME 512_particles_bruteforce_LawDefault_noPeriodicity COMMAND rockable ${TEST_DIR}/redirection_test_512_particles_bruteforce_LawDefault_noPeriodicity.conf -n ${WORK_DIR}/conf101 -r ${REGRESSION_DIR}/regression_512_particles_LawDefault_noPeriodicity.conf)
-add_test(NAME 512_particles_bruteforce_LawAvalanche_noPeriodicity COMMAND rockable ${TEST_DIR}/redirection_test_512_particles_bruteforce_LawAvalanche_noPeriodicity.conf -n ${WORK_DIR}/conf101 -r ${REGRESSION_DIR}/regression_512_particles_LawAvalanche_noPeriodicity.conf)
-
-
+add_regression_test(2_prismes_gravity
+  2_prismes_gravity 2_prismes_gravity.conf conf1 regression_2_prismes_gravity.conf)
+add_regression_test(50_prismes_gravity
+  50_prismes_gravity 50_prismes_gravity.conf conf1 regression_50_prismes_gravity.conf)
+add_regression_test(518_poly_bruteforce_default_noPeriodicity
+  518_poly 518_poly_bruteforce_default_noperiod.conf conf3001 regression_518_poly_default_noperiod.conf)
+add_regression_test(512_particles_bruteforce_LawDefault_noPeriodicity
+  512_particles 512_particles_bruteforce_LawDefault_noPeriodicity.conf conf101
+  regression_512_particles_LawDefault_noPeriodicity.conf)
+add_regression_test(512_particles_bruteforce_LawAvalanche_noPeriodicity
+  512_particles 512_particles_bruteforce_LawAvalanche_noPeriodicity.conf conf101
+  regression_512_particles_LawAvalanche_noPeriodicity.conf)
