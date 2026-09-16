@@ -195,11 +195,19 @@ struct GridSampler {
 
 // A grid edge is identified by its lower corner (i,j,k) and its axis (0,1,2).
 // This gives every edge one global key, so that a marching-cubes vertex placed
-// on a shared edge is created once and the mesh comes out watertight
+// on a shared edge is created once and the mesh comes out watertight.
+//
+// The radix must exceed the number of grid nodes on any axis: with a radix of
+// n, the index pair (i, j = n) packs to the same key as (i + 1, j = 0), two
+// distinct edges would share a vertex and the mesh would be silently wrong.
+// 2^20 nodes per axis is far beyond any grid that fits in memory (2^60 nodes),
+// and 3 * 20 + 2 bits still fit in the uint64 key
+static const uint64_t EDGE_KEY_RADIX = 1048576;  // 2^20
+
 uint64_t edgeKey(int i, int j, int k, int axis) {
   uint64_t key = (uint64_t)(uint32_t)i;
-  key = key * 2048 + (uint64_t)(uint32_t)j;
-  key = key * 2048 + (uint64_t)(uint32_t)k;
+  key = key * EDGE_KEY_RADIX + (uint64_t)(uint32_t)j;
+  key = key * EDGE_KEY_RADIX + (uint64_t)(uint32_t)k;
   key = key * 4 + (uint64_t)axis;
   return key;
 }

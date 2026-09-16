@@ -36,8 +36,8 @@ message(STATUS "Installation prefix: ${CMAKE_INSTALL_PREFIX}")
 
 option(ROCKABLE_USE_FT_CORR "Add objectivity correction to tangent forces" OFF)
 option(ROCKABLE_USE_TESTING "Add tests" OFF)
-
 option(ROCKABLE_ENABLE_PROFILING "Enable the time profiling" OFF)
+
 option(ROCKABLE_ENABLE_BOUNDARY "Enable the special boundaries like Ball or Cylinder" OFF)
 option(ROCKABLE_ENABLE_SOFT_PARTICLES "Enable strainning of particles" OFF)
 option(ROCKABLE_ENABLE_PERIODIC "Enable full periodic boundary conditions" ON)
