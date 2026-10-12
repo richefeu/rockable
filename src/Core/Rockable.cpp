@@ -46,6 +46,8 @@
 #include "DataExtractors/DataExtractor_TrackBody.hpp"
 #include "DataExtractors/DataExtractor_TrackDamage.hpp"
 #include "DataExtractors/DataExtractor_TrackRockfall.hpp"
+#include "DataExtractors/DataExtractor_TrackSoftParticle.hpp"
+#include "DataExtractors/DataExtractor_TrackStress.hpp"
 #include "DataExtractors/DataExtractor_dnStat.hpp"
 
 #include "ForceLaws/ForceLaw_Avalanche.hpp"
@@ -146,6 +148,8 @@ void Rockable::ExplicitRegistrations() {
   REGISTRER_BASE_DERIVED(DataExtractor, TrackBody);
   REGISTRER_BASE_DERIVED(DataExtractor, TrackRockfall);
   REGISTRER_BASE_DERIVED(DataExtractor, TrackDamage);
+  REGISTRER_BASE_DERIVED(DataExtractor, TrackSoftParticle);
+  REGISTRER_BASE_DERIVED(DataExtractor, TrackStress);
 
   // ForceLaws
   REGISTRER_BASE_DERIVED(ForceLaw, Default);

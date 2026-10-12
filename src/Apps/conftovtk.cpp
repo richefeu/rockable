@@ -612,11 +612,8 @@ void writeVTKOBB(int num) {
 
   for (size_t i = 0; i < box.Particles.size(); i++) {
 
-    obbi = box.Particles[i].shape->obb;
-    obbi.rotate(box.Particles[i].Q);
-    obbi.extent *= box.Particles[i].homothety;
-    obbi.center *= box.Particles[i].homothety;
-    obbi.center += box.Particles[i].pos;
+    box.Particles[i].updateObb();  // it accounts for the deformation of the soft particles
+    obbi = box.Particles[i].obb;
     // if (enlarged_obb) obbi.enlarge(0.5 * box.DVerlet);
 
     // je vais écrire les 8 sommets

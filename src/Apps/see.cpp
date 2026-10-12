@@ -456,6 +456,16 @@ void keyboard(unsigned char Key, int x, int y) {
       params["colorMode"] = 3;
       resetColors(params["colorMode"].get<int>(), 1);
     } break;
+
+    case '4': {
+      params["colorMode"] = 4;
+      resetColors(params["colorMode"].get<int>(), 1);
+    } break;
+
+    case '5': {
+      params["colorMode"] = 5;
+      resetColors(params["colorMode"].get<int>(), 1);
+    } break;
   };
 
   glutPostRedisplay();
@@ -513,7 +523,49 @@ void resetColors(int mode, int rescale) {
         pcolors.push_back(col);
       }
     } break;
+
+    case 4:    // volume change of the soft particles, det(F) - 1
+    case 5: {  // mean stress of the soft particles, trace(stress) / 3
+#ifndef ROCKABLE_ENABLE_SOFT_PARTICLES
+      std::cout << "This coloring needs soft particles (ROCKABLE_ENABLE_SOFT_PARTICLES)\n";
+#endif
+      if (rescale == 1) {  // symmetric range around zero
+        double absMax = 0.0;
+        for (size_t i = box.nDriven; i < box.Particles.size(); ++i) {
+          absMax = std::max(absMax, fabs(softParticleColorValue(box.Particles[i], mode)));
+        }
+        params["colorRangeMin"] = -absMax;
+        params["colorRangeMax"] = absMax;
+        std::cout << "colorRangeMin = " << params["colorRangeMin"] << '\n';
+        std::cout << "colorRangeMax = " << params["colorRangeMax"] << '\n';
+      }
+
+      CT.setTableID(MATLAB_JET);
+      CT.setSize(128);
+      CT.setMinMax(params["colorRangeMin"].get<float>(), params["colorRangeMax"].get<float>());
+      CT.Rebuild();
+      pcolors.clear();
+      colorRGBA col;
+      for (size_t i = 0; i < box.Particles.size(); ++i) {
+        CT.getRGB(softParticleColorValue(box.Particles[i], mode), &col);
+        pcolors.push_back(col);
+      }
+    } break;
   }
+}
+
+// The value used to color a particle in the modes 4 (det(F) - 1) and 5 (trace(stress) / 3).
+// It is zero for a rigid particle.
+double softParticleColorValue([[maybe_unused]] const Particle& P, [[maybe_unused]] int mode) {
+#ifdef ROCKABLE_ENABLE_SOFT_PARTICLES
+  if (P.SPP != nullptr) {
+    if (mode == 4) {
+      return P.SPP->F.det() - 1.0;
+    }
+    return P.SPP->stress.trace() / 3.0;
+  }
+#endif
+  return 0.0;
 }
 
 #define BUFSIZE 1024
@@ -559,7 +611,7 @@ void selection(int x, int y) {
       glTranslatef(pos.x, pos.y, pos.z);
       quat2GLMatrix<GLfloat>(box.Particles[i].Q, Rot_Matrix);
       glMultMatrixf(Rot_Matrix);
-      drawShapeOrMesh(box.Particles[i].shape, box.Particles[i].homothety);
+      drawParticleShape(box.Particles[i]);
       glPopMatrix();
     }
   }
@@ -828,6 +880,19 @@ void drawShapeOrMesh(Shape* s, double homothety) {
   }
 }
 
+// Draw a particle in its own framework (already on the GL stack).
+// A soft particle is drawn with its deformation gradient; the skin mesh, if any, is not used for it.
+void drawParticleShape(const Particle& P) {
+#ifdef ROCKABLE_ENABLE_SOFT_PARTICLES
+  if (P.SPP != nullptr) {
+    drawShape(P.shape, P.homothety, P.SPP->F);
+    return;
+  }
+#endif
+  drawShapeOrMesh(P.shape, P.homothety);
+}
+
+// The transformation T (deformation gradient of a soft particle) applies to the vertices, but not to the radius
 void drawShape(Shape* s, double homothety, const mat9r& T) {
   double R = homothety * s->radius;
   int nbLevelSphere = 2;
@@ -854,41 +919,48 @@ void drawShape(Shape* s, double homothety, const mat9r& T) {
       glShape::tube(orig, arrow, 2.0 * R);
     }
 
-    // faces (3D polygones)
+    // faces (3D polygones), offset by the radius along the normal of the (transformed) face
+    std::vector<vec3r> fv;
     for (size_t f = 0; f < s->face.size(); ++f) {
       if (s->face[f].size() < 3) continue;  // At least 3 pts!
-      vec3r N = cross(s->vertex[s->face[f][1]] - s->vertex[s->face[f][0]],
-                      s->vertex[s->face[f][2]] - s->vertex[s->face[f][0]]);
+      fv.clear();
+      for (size_t v = 0; v < s->face[f].size(); ++v) {
+        fv.push_back(T * (homothety * s->vertex[s->face[f][v]]));
+      }
+      vec3r N = cross(fv[1] - fv[0], fv[2] - fv[0]);
       N.normalize();
 
       glBegin(GL_TRIANGLE_FAN);
       glNormal3f(N.x, N.y, N.z);
-      for (size_t v = 0; v < s->face[f].size(); ++v) {
-        glVertex3f(homothety * s->vertex[s->face[f][v]].x + N.x * R, homothety * s->vertex[s->face[f][v]].y + N.y * R,
-                   homothety * s->vertex[s->face[f][v]].z + N.z * R);
+      for (size_t v = 0; v < fv.size(); ++v) {
+        vert = fv[v] + R * N;
+        glVertex3f(vert.x, vert.y, vert.z);
       }
       glEnd();
 
       glBegin(GL_TRIANGLE_FAN);
       glNormal3f(-N.x, -N.y, -N.z);
-      for (size_t v = 0; v < s->face[f].size(); ++v) {
-        glVertex3f(homothety * s->vertex[s->face[f][v]].x - N.x * R, homothety * s->vertex[s->face[f][v]].y - N.y * R,
-                   homothety * s->vertex[s->face[f][v]].z - N.z * R);
+      for (size_t v = 0; v < fv.size(); ++v) {
+        vert = fv[v] - R * N;
+        glVertex3f(vert.x, vert.y, vert.z);
       }
       glEnd();
     }
   } else {
+    std::vector<vec3r> fv;
     for (size_t f = 0; f < s->face.size(); ++f) {
       if (s->face[f].size() < 3) continue;  // At least 3 pts!
-      vec3r N = cross(s->vertex[s->face[f][1]] - s->vertex[s->face[f][0]],
-                      s->vertex[s->face[f][2]] - s->vertex[s->face[f][0]]);
+      fv.clear();
+      for (size_t v = 0; v < s->face[f].size(); ++v) {
+        fv.push_back(T * (homothety * s->vertex[s->face[f][v]]));
+      }
+      vec3r N = cross(fv[1] - fv[0], fv[2] - fv[0]);
       N.normalize();
 
       glBegin(GL_TRIANGLE_FAN);
       glNormal3f(N.x, N.y, N.z);
-      for (size_t v = 0; v < s->face[f].size(); ++v) {
-        glVertex3f(homothety * s->vertex[s->face[f][v]].x, homothety * s->vertex[s->face[f][v]].y,
-                   homothety * s->vertex[s->face[f][v]].z);
+      for (size_t v = 0; v < fv.size(); ++v) {
+        glVertex3f(fv[v].x, fv[v].y, fv[v].z);
       }
       glEnd();
     }
@@ -903,6 +975,15 @@ void drawColorBar() {
       CB.setPos(15, 30);
       CB.setSize(20, 150);
       CB.setTitle("Velocity");
+      CB.show(width, height, CT);
+    } break;
+
+    case 4:
+    case 5: {
+      glColorBar CB;
+      CB.setPos(15, 30);
+      CB.setSize(20, 150);
+      CB.setTitle((mode == 4) ? "det(F) - 1" : "Mean stress");
       CB.show(width, height, CT);
     } break;
 
@@ -963,7 +1044,7 @@ void drawParticles() {
       glTranslatef(pos.x, pos.y, pos.z);
       quat2GLMatrix<GLfloat>(box.Particles[i].Q, Rot_Matrix);
       glMultMatrixf(Rot_Matrix);
-      drawShapeOrMesh(box.Particles[i].shape, box.Particles[i].homothety);
+      drawParticleShape(box.Particles[i]);
       glPopMatrix();
     }
   }
@@ -1001,7 +1082,7 @@ void drawParticles() {
     glTranslatef(pos.x, pos.y, pos.z);
     quat2GLMatrix<GLfloat>(box.Particles[i].Q, Rot_Matrix);
     glMultMatrixf(Rot_Matrix);
-    drawShapeOrMesh(box.Particles[i].shape, box.Particles[i].homothety);
+    drawParticleShape(box.Particles[i]);
     glPopMatrix();
   }
 
@@ -1116,11 +1197,8 @@ void drawOBBs() {
   OBB obbi, obbj;
   for (size_t i = 0; i < box.Particles.size(); i++) {
 
-    obbi = box.Particles[i].shape->obb;
-    obbi.rotate(box.Particles[i].Q);
-    obbi.extent *= box.Particles[i].homothety;
-    obbi.center *= box.Particles[i].homothety;
-    obbi.center += box.Particles[i].pos;
+    box.Particles[i].updateObb();  // it accounts for the deformation of the soft particles
+    obbi = box.Particles[i].obb;
     if (params["enlarged_obb"].get<int>() == 1) {
       obbi.enlarge(0.5 * box.DVerlet);
     }
@@ -1834,6 +1912,14 @@ void menu(int num) {
       params["colorMode"] = 3;
       resetColors(params["colorMode"].get<int>(), 1);
     } break;
+    case 204: {
+      params["colorMode"] = 4;
+      resetColors(params["colorMode"].get<int>(), 1);
+    } break;
+    case 205: {
+      params["colorMode"] = 5;
+      resetColors(params["colorMode"].get<int>(), 1);
+    } break;
 
     case 300: {
       params["show_forces"] = 0;
@@ -1869,6 +1955,8 @@ void buildMenu() {
   glutAddMenuEntry("Random Colors", 201);
   glutAddMenuEntry("Velocity Magnitude", 202);
   glutAddMenuEntry("Particle Shape", 203);
+  glutAddMenuEntry("Volume Change of Soft Particles", 204);
+  glutAddMenuEntry("Mean Stress of Soft Particles", 205);
 
   int submenu300 = glutCreateMenu(menu);
   glutAddMenuEntry("None", 300);

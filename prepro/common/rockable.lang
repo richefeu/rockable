@@ -451,7 +451,8 @@ doc: bondStiffnessPerInterface [(int) 0 or 1]
 doc: DataExtractor [(string) Name] ...
 
   Adds a data extractor that records quantities during the simulation.
-  Possible Names are: 'ClusterAABB', 'dnStat', 'DuoBalance', 'MeanVelocity' or 'TrackBody'.
+  Possible Names are: 'ClusterAABB', 'dnStat', 'DuoBalance', 'MeanVelocity', 'TrackBody',
+  'TrackDamage', 'TrackRockfall', 'TrackSoftParticle' or 'TrackStress'.
   The remaining parameters depend on the chosen extractor.
   Kept for compatibility: prefer defining them in a file named 'dataExtractors.txt'.
 
@@ -784,6 +785,10 @@ doc: nf [(int) numberOfFaces]
 [type] TrackDamage
 
 [type] TrackRockfall
+
+[type] TrackSoftParticle
+
+[type] TrackStress
 
 # --- post-processors
 
