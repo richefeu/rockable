@@ -91,9 +91,6 @@ reviewed, and possibly removed.
 | [`test_GeoVisc`](test_GeoVisc)| A test of the force law `GeoVisc` (2 758 particles), without explanations. To be reviewed.                                                            |
 | [`test_mukesh`](test_mukesh)  | Development tests of the `BCM` law (22 MB, with result files). **Superseded** by `softParticles`; candidate for removal.                               |
 
-In `helloworld`, the file `hello.chai` is obsolete for the same reason as
-`input.chai` (ChaiScript is no longer supported).
-
 
 ## How each example is documented
 

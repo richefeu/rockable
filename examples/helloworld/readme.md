@@ -26,7 +26,6 @@ every computation needs, how to run it, and how to look at the result.
 | `input.txt`   | The conf-file: the system at the initial time, and all the parameters          |
 | `shapes.shp`  | The library of shapes: `Plan`, `Sphere` and `Rice` (a sphero-segment)          |
 | `see_input.png` | What `see input.txt` shows                                                    |
-| `hello.chai`  | **Obsolete** (ChaiScript is no longer supported); ignore it                     |
 
 ### Run it
 
