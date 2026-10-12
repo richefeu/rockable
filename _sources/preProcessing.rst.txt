@@ -58,12 +58,16 @@ number, and **outer** otherwise. This is what selects the ``*InnerBond`` or
     bonds, it computes the **area** of each interface, which is what the
     energy-based rupture criterion needs, and copies ``knInnerBond``,
     ``ktInnerBond`` and ``gcInnerBond`` into each interface. All the interfaces
-    it creates are flagged as inner.
+    it creates are flagged as inner. A bond joins two vertices whose spheres
+    are less than **Epsilon** apart, and it records this initial distance
+    :math:`d_n^0`: it carries no force as long as the distance does not change.
 
 .. tip::
 
-   ``glue_with_walls yes``, placed before these commands, extends them to the
-   driven bodies, so that a sample can be glued to its container.
+   ``glue_with_walls yes``, placed before ``stickClusters`` or
+   ``stickVerticesInClustersMoments``, extends them to the driven bodies, so
+   that a sample can be glued to its container. ``stickVerticesInClusters`` and
+   ``stickBCM`` ignore it: they never glue a free body to a driven one.
 
 .. note::
 

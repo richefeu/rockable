@@ -207,6 +207,15 @@ Particles
   (*vec3r*) **velocity** (*vec3r*) **acceleration** (*quat*) **angularPosition** (*vec3r*) **angularVelocity** 
   (*vec3r*) **angularAcceleration**
 
+- ``SoftParticles`` (*int*) **numberOfSoftParticles**
+
+  Written after the particles when some of them are soft (deformable). The
+  following entries are repeated for each soft particle, on one line:
+  (*int*) **id** (*double*) **young** (*double*) **poisson**
+  (*double*) **shearViscosity** (*double*) **bulkViscosity**
+  (*mat9r*) **F** (*mat9r*) **stress** (*mat9r*) **strain**.
+  The viscosities are zero for an elastic particle. See :ref:`softParticles`.
+
 
 Interactions
 ------------
@@ -327,14 +336,26 @@ Interfaces and bonds
 
   Opens the list of glued interfaces. Each entry holds, on one line:
 
-  ``<i> <j> <nbBonds> <dn0>``
+  ``<i> <j> <nbBonds> <dn0> <area>``
 
   then, only when ``ParamsInInterfaces`` is 1,
 
   ``<kn> <kt> <kr> <fn0> <ft0> <mom0> <power> <Gc>``
 
-  and finally ``nbBonds`` triplets ``<type> <isub> <jsub>`` identifying the
-  bonded sub-interactions among those already read in ``Interactions``.
+  and finally, for each of the ``nbBonds`` bonds, ``<type> <isub> <jsub>``,
+  identifying the bonded sub-interaction among those already read in
+  ``Interactions``, followed by ``<dn0> <ds>``: the normal distance of the bond
+  when it was created (it carries no normal force there, see
+  :ref:`Force-laws`) and its cumulated tangential displacement (*vec3r*), used
+  by the breakage criterion. The ``area`` of the interface is used by the same
+  criterion.
+
+  .. note::
+
+     The conf-files written before these values were saved (with neither
+     ``area`` nor the bond ``dn0`` and ``ds``) are still read: the bonds then
+     take the ``dn0`` of their interface, and the area is computed from the
+     positions of the bonds.
 
   .. warning::
 
@@ -342,11 +363,25 @@ Interfaces and bonds
      warning and the **whole interface** is dropped. This is why ``Interactions``
      must be read before ``Interfaces``.
 
+- ``bondStiffnessPerInterface`` (*int*) **0|1**
+
+  With the force law ``BCM``, the bond stiffnesses (``knInnerBond``,
+  ``ktInnerBond``, and their ``Outer`` counterparts) are given for **each bond**
+  (0, the default), or for the **whole interface** (1). In the latter case, each
+  of the ``n`` bonds of an interface takes ``1/n`` of the stiffness, and the
+  breakage energy and the damping of the bonds follow. The keyword is written in
+  the conf-files only when it is not 0.
+
 - ``glue_with_walls`` (*string*) **yes|no**
 
-  When set to yes, the sticking pre-processing commands also glue the free
-  bodies to the driven ones. Accepted affirmative forms are ``yes``, ``YES``,
-  ``y``, ``Y`` and ``1``.
+  When set to yes, the pre-processing commands ``stickClusters`` and
+  ``stickVerticesInClustersMoments`` also glue the free bodies to the driven
+  ones. Accepted affirmative forms are ``yes``, ``YES``, ``y``, ``Y`` and ``1``.
+
+  .. note::
+
+     ``stickVerticesInClusters`` and ``stickBCM`` ignore this keyword: they
+     only glue free bodies together, never a free body to a driven one.
 
 - ``initSpringJoint`` (*int*) **ibody** (*vec3r*) **ipos0** (*int*) **jbody** (*vec3r*) **jpos0** (*double*) **stiffness**
 
@@ -501,7 +536,9 @@ saying the feature was not enabled; see :ref:`commandLine`.
   ``cellVelocityCorrection``, ``cellMomentumCorrection``, ``useKineticStress``.
   See :ref:`periodicBoundaryConditions`.
 
-- Deformable particles: ``useSoftParticles``. See :ref:`softParticles`.
+- Deformable particles: ``useSoftParticles``, ``defineElasticParticles``,
+  ``defineViscousParameters``, ``defineViscousTime``, ``useViscousTime``, and the
+  sections ``SoftParticles`` and ``Transformations``. See :ref:`softParticles`.
 
 
 Deprecated keywords

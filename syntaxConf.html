@@ -98,7 +98,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="periodicBoundaryConditions.html">Periodic boundary conditions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="softParticles.html">Deformable particles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="softParticles.html">Deformable particles (DCEM)</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Results</span></p>
 <ul>
@@ -328,6 +328,14 @@ The format to define a shape is explained here: <a class="reference internal" hr
 (<em>vec3r</em>) <strong>velocity</strong> (<em>vec3r</em>) <strong>acceleration</strong> (<em>quat</em>) <strong>angularPosition</strong> (<em>vec3r</em>) <strong>angularVelocity</strong>
 (<em>vec3r</em>) <strong>angularAcceleration</strong></p>
 </li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SoftParticles</span></code> (<em>int</em>) <strong>numberOfSoftParticles</strong></p>
+<p>Written after the particles when some of them are soft (deformable). The
+following entries are repeated for each soft particle, on one line:
+(<em>int</em>) <strong>id</strong> (<em>double</em>) <strong>young</strong> (<em>double</em>) <strong>poisson</strong>
+(<em>double</em>) <strong>shearViscosity</strong> (<em>double</em>) <strong>bulkViscosity</strong>
+(<em>mat9r</em>) <strong>F</strong> (<em>mat9r</em>) <strong>stress</strong> (<em>mat9r</em>) <strong>strain</strong>.
+The viscosities are zero for an elastic particle. See <a class="reference internal" href="softParticles.html#softparticles"><span class="std std-ref">Deformable particles (DCEM)</span></a>.</p>
+</li>
 </ul>
 </section>
 <section id="interactions">
@@ -437,11 +445,23 @@ scatter the bond properties (see <a class="reference internal" href="preProcessi
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Interfaces</span></code> (<em>int</em>) <strong>numberOfInterfaces</strong></p>
 <p>Opens the list of glued interfaces. Each entry holds, on one line:</p>
-<p><code class="docutils literal notranslate"><span class="pre">&lt;i&gt;</span> <span class="pre">&lt;j&gt;</span> <span class="pre">&lt;nbBonds&gt;</span> <span class="pre">&lt;dn0&gt;</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;i&gt;</span> <span class="pre">&lt;j&gt;</span> <span class="pre">&lt;nbBonds&gt;</span> <span class="pre">&lt;dn0&gt;</span> <span class="pre">&lt;area&gt;</span></code></p>
 <p>then, only when <code class="docutils literal notranslate"><span class="pre">ParamsInInterfaces</span></code> is 1,</p>
 <p><code class="docutils literal notranslate"><span class="pre">&lt;kn&gt;</span> <span class="pre">&lt;kt&gt;</span> <span class="pre">&lt;kr&gt;</span> <span class="pre">&lt;fn0&gt;</span> <span class="pre">&lt;ft0&gt;</span> <span class="pre">&lt;mom0&gt;</span> <span class="pre">&lt;power&gt;</span> <span class="pre">&lt;Gc&gt;</span></code></p>
-<p>and finally <code class="docutils literal notranslate"><span class="pre">nbBonds</span></code> triplets <code class="docutils literal notranslate"><span class="pre">&lt;type&gt;</span> <span class="pre">&lt;isub&gt;</span> <span class="pre">&lt;jsub&gt;</span></code> identifying the
-bonded sub-interactions among those already read in <code class="docutils literal notranslate"><span class="pre">Interactions</span></code>.</p>
+<p>and finally, for each of the <code class="docutils literal notranslate"><span class="pre">nbBonds</span></code> bonds, <code class="docutils literal notranslate"><span class="pre">&lt;type&gt;</span> <span class="pre">&lt;isub&gt;</span> <span class="pre">&lt;jsub&gt;</span></code>,
+identifying the bonded sub-interaction among those already read in
+<code class="docutils literal notranslate"><span class="pre">Interactions</span></code>, followed by <code class="docutils literal notranslate"><span class="pre">&lt;dn0&gt;</span> <span class="pre">&lt;ds&gt;</span></code>: the normal distance of the bond
+when it was created (it carries no normal force there, see
+<a class="reference internal" href="forceLaws.html#force-laws"><span class="std std-ref">Force laws</span></a>) and its cumulated tangential displacement (<em>vec3r</em>), used
+by the breakage criterion. The <code class="docutils literal notranslate"><span class="pre">area</span></code> of the interface is used by the same
+criterion.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The conf-files written before these values were saved (with neither
+<code class="docutils literal notranslate"><span class="pre">area</span></code> nor the bond <code class="docutils literal notranslate"><span class="pre">dn0</span></code> and <code class="docutils literal notranslate"><span class="pre">ds</span></code>) are still read: the bonds then
+take the <code class="docutils literal notranslate"><span class="pre">dn0</span></code> of their interface, and the area is computed from the
+positions of the bonds.</p>
+</div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>A bond that cannot be matched with an existing interaction produces a
@@ -449,10 +469,23 @@ warning and the <strong>whole interface</strong> is dropped. This is why <code c
 must be read before <code class="docutils literal notranslate"><span class="pre">Interfaces</span></code>.</p>
 </div>
 </li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bondStiffnessPerInterface</span></code> (<em>int</em>) <strong>0|1</strong></p>
+<p>With the force law <code class="docutils literal notranslate"><span class="pre">BCM</span></code>, the bond stiffnesses (<code class="docutils literal notranslate"><span class="pre">knInnerBond</span></code>,
+<code class="docutils literal notranslate"><span class="pre">ktInnerBond</span></code>, and their <code class="docutils literal notranslate"><span class="pre">Outer</span></code> counterparts) are given for <strong>each bond</strong>
+(0, the default), or for the <strong>whole interface</strong> (1). In the latter case, each
+of the <code class="docutils literal notranslate"><span class="pre">n</span></code> bonds of an interface takes <code class="docutils literal notranslate"><span class="pre">1/n</span></code> of the stiffness, and the
+breakage energy and the damping of the bonds follow. The keyword is written in
+the conf-files only when it is not 0.</p>
+</li>
 <li><p><code class="docutils literal notranslate"><span class="pre">glue_with_walls</span></code> (<em>string</em>) <strong>yes|no</strong></p>
-<p>When set to yes, the sticking pre-processing commands also glue the free
-bodies to the driven ones. Accepted affirmative forms are <code class="docutils literal notranslate"><span class="pre">yes</span></code>, <code class="docutils literal notranslate"><span class="pre">YES</span></code>,
-<code class="docutils literal notranslate"><span class="pre">y</span></code>, <code class="docutils literal notranslate"><span class="pre">Y</span></code> and <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
+<p>When set to yes, the pre-processing commands <code class="docutils literal notranslate"><span class="pre">stickClusters</span></code> and
+<code class="docutils literal notranslate"><span class="pre">stickVerticesInClustersMoments</span></code> also glue the free bodies to the driven
+ones. Accepted affirmative forms are <code class="docutils literal notranslate"><span class="pre">yes</span></code>, <code class="docutils literal notranslate"><span class="pre">YES</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code>, <code class="docutils literal notranslate"><span class="pre">Y</span></code> and <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">stickVerticesInClusters</span></code> and <code class="docutils literal notranslate"><span class="pre">stickBCM</span></code> ignore this keyword: they
+only glue free bodies together, never a free body to a driven one.</p>
+</div>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">initSpringJoint</span></code> (<em>int</em>) <strong>ibody</strong> (<em>vec3r</em>) <strong>ipos0</strong> (<em>int</em>) <strong>jbody</strong> (<em>vec3r</em>) <strong>jpos0</strong> (<em>double</em>) <strong>stiffness</strong></p>
 <p>Add a linear spring joining two bodies. The anchor points <code class="docutils literal notranslate"><span class="pre">ipos0</span></code> and
@@ -634,7 +667,9 @@ saying the feature was not enabled; see <a class="reference internal" href="comm
 <li><p>Periodic cell: <code class="docutils literal notranslate"><span class="pre">usePeriodicCell</span></code>, <code class="docutils literal notranslate"><span class="pre">h</span></code>, <code class="docutils literal notranslate"><span class="pre">vh</span></code>, <code class="docutils literal notranslate"><span class="pre">ah</span></code>, <code class="docutils literal notranslate"><span class="pre">mh</span></code>, <code class="docutils literal notranslate"><span class="pre">dh</span></code>,
 <code class="docutils literal notranslate"><span class="pre">cellVelocityCorrection</span></code>, <code class="docutils literal notranslate"><span class="pre">cellMomentumCorrection</span></code>, <code class="docutils literal notranslate"><span class="pre">useKineticStress</span></code>.
 See <a class="reference internal" href="periodicBoundaryConditions.html#periodicboundaryconditions"><span class="std std-ref">Periodic boundary conditions</span></a>.</p></li>
-<li><p>Deformable particles: <code class="docutils literal notranslate"><span class="pre">useSoftParticles</span></code>. See <a class="reference internal" href="softParticles.html#softparticles"><span class="std std-ref">Deformable particles</span></a>.</p></li>
+<li><p>Deformable particles: <code class="docutils literal notranslate"><span class="pre">useSoftParticles</span></code>, <code class="docutils literal notranslate"><span class="pre">defineElasticParticles</span></code>,
+<code class="docutils literal notranslate"><span class="pre">defineViscousParameters</span></code>, <code class="docutils literal notranslate"><span class="pre">defineViscousTime</span></code>, <code class="docutils literal notranslate"><span class="pre">useViscousTime</span></code>, and the
+sections <code class="docutils literal notranslate"><span class="pre">SoftParticles</span></code> and <code class="docutils literal notranslate"><span class="pre">Transformations</span></code>. See <a class="reference internal" href="softParticles.html#softparticles"><span class="std std-ref">Deformable particles (DCEM)</span></a>.</p></li>
 </ul>
 </section>
 <section id="deprecated-keywords">

@@ -71,7 +71,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="periodicBoundaryConditions.html">Periodic boundary conditions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="softParticles.html">Deformable particles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="softParticles.html">Deformable particles (DCEM)</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Results</span></p>
 <ul>
@@ -263,8 +263,11 @@ cannot change the <code class="docutils literal notranslate"><span class="pre">P
 </section>
 <section id="compilation-options">
 <h2><a class="toc-backref" href="#id4" role="doc-backlink">Compilation options</a><a class="headerlink" href="#compilation-options" title="Link to this heading"></a></h2>
-<p>Options that change the physics, or the set of keywords understood. All default
-to <code class="docutils literal notranslate"><span class="pre">OFF</span></code>.</p>
+<p>Options that change the physics, or the set of keywords understood.
+<code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_PERIODIC</span></code> and <code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_SOFT_PARTICLES</span></code> default to
+<code class="docutils literal notranslate"><span class="pre">ON</span></code>, so that a default build, and the continuous integration, compiles and
+tests them; the others default to <code class="docutils literal notranslate"><span class="pre">OFF</span></code>. Each enabled feature has a small cost
+even when a computation does not use it, so disable the ones you do not need.</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 40.0%" />
@@ -282,8 +285,9 @@ to <code class="docutils literal notranslate"><span class="pre">OFF</span></code
 <a class="reference internal" href="periodicBoundaryConditions.html#periodicboundaryconditions"><span class="std std-ref">Periodic boundary conditions</span></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_SOFT_PARTICLES</span></code></p></td>
-<td><p>Homogeneous straining of the particles, keyword <code class="docutils literal notranslate"><span class="pre">useSoftParticles</span></code>.
-See <a class="reference internal" href="softParticles.html#softparticles"><span class="std std-ref">Deformable particles</span></a>.</p></td>
+<td><p>Homogeneous deformation of the particles (DCEM), keywords
+<code class="docutils literal notranslate"><span class="pre">useSoftParticles</span></code>, <code class="docutils literal notranslate"><span class="pre">defineElasticParticles</span></code>, <code class="docutils literal notranslate"><span class="pre">useViscousTime</span></code>…
+See <a class="reference internal" href="softParticles.html#softparticles"><span class="std std-ref">Deformable particles (DCEM)</span></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_BOUNDARY</span></code></p></td>
 <td><p>The special boundary shapes, <code class="docutils literal notranslate"><span class="pre">Ball</span></code> and <code class="docutils literal notranslate"><span class="pre">Cylinder</span></code>.</p></td>

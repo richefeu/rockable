@@ -22,7 +22,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Post-processing (postpro)" href="postProcessing.html" />
-    <link rel="prev" title="Deformable particles" href="softParticles.html" /> 
+    <link rel="prev" title="Deformable particles (DCEM)" href="softParticles.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -65,7 +65,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="periodicBoundaryConditions.html">Periodic boundary conditions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="softParticles.html">Deformable particles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="softParticles.html">Deformable particles (DCEM)</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Results</span></p>
 <ul class="current">
@@ -251,6 +251,28 @@ interface area present initially.</p>
 a sticking pre-processing command.</p>
 </div>
 </dd>
+<dt><code class="docutils literal notranslate"><span class="pre">TrackSoftParticle</span></code> (<em>int</em>) <strong>ibody</strong> (<em>string</em>) <strong>filename</strong> (<em>int</em>) <strong>nrec</strong></dt><dd><p>State of a soft particle (see <a class="reference internal" href="softParticles.html#softparticles"><span class="std std-ref">Deformable particles (DCEM)</span></a>): its homogeneous
+deformation, and its mean stress and strain, expressed in the frame of the
+body.</p>
+<p>Columns: <code class="docutils literal notranslate"><span class="pre">t</span></code>, <span class="math notranslate nohighlight">\(\det \mathbf{F}\)</span> (the ratio of the current volume to
+the initial one), <span class="math notranslate nohighlight">\(\operatorname{tr}\boldsymbol{\sigma}\)</span>,
+<span class="math notranslate nohighlight">\(\operatorname{tr}\boldsymbol{\varepsilon}\)</span> (the volumetric strain),
+then the 9 components of <span class="math notranslate nohighlight">\(\mathbf{F}\)</span>, of
+<span class="math notranslate nohighlight">\(\boldsymbol{\sigma}\)</span> and of <span class="math notranslate nohighlight">\(\boldsymbol{\varepsilon}\)</span>, each in
+the order <code class="docutils literal notranslate"><span class="pre">xx</span> <span class="pre">xy</span> <span class="pre">xz</span> <span class="pre">yx</span> <span class="pre">yy</span> <span class="pre">yz</span> <span class="pre">zx</span> <span class="pre">zy</span> <span class="pre">zz</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Nothing is recorded when the particle is not soft, or when Rockable was
+compiled without <code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_SOFT_PARTICLES</span></code>; a warning says so.</p>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">TrackStress</span></code> (<em>int</em>) <strong>istart</strong> (<em>string</em>) <strong>filename</strong> (<em>int</em>) <strong>nrec</strong></dt><dd><p>Component <span class="math notranslate nohighlight">\(\sigma_{xx}\)</span> of the mean stress (frame of the body) of all
+the particles from <strong>istart</strong> to the last one, one column per particle. A
+rigid particle is recorded with a zero stress.</p>
+<p>Columns: <code class="docutils literal notranslate"><span class="pre">t</span></code>, then <span class="math notranslate nohighlight">\(\sigma_{xx}\)</span> of the particles <strong>istart</strong>,
+<strong>istart</strong> + 1, …</p>
+<p>For the whole stress tensor of one particle, use <code class="docutils literal notranslate"><span class="pre">TrackSoftParticle</span></code>.</p>
+</dd>
 </dl>
 </section>
 <section id="declaring-an-extractor-inside-a-conf-file">
@@ -287,7 +309,7 @@ script <code class="docutils literal notranslate"><span class="pre">checkplots.t
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="softParticles.html" class="btn btn-neutral float-left" title="Deformable particles" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="softParticles.html" class="btn btn-neutral float-left" title="Deformable particles (DCEM)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="postProcessing.html" class="btn btn-neutral float-right" title="Post-processing (postpro)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

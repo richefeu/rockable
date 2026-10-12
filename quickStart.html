@@ -72,7 +72,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="periodicBoundaryConditions.html">Periodic boundary conditions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="softParticles.html">Deformable particles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="softParticles.html">Deformable particles (DCEM)</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Results</span></p>
 <ul>
@@ -152,10 +152,10 @@
 <p>All the options are listed below:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_USE_FT_CORR</span></code> (default is <code class="docutils literal notranslate"><span class="pre">OFF</span></code>): add objectivity correction to tangent forces.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_PROFILING</span></code> (default is <code class="docutils literal notranslate"><span class="pre">ON</span></code>): enable time profiling.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_PROFILING</span></code> (default is <code class="docutils literal notranslate"><span class="pre">OFF</span></code>): enable time profiling.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_BOUNDARY</span></code> (default is <code class="docutils literal notranslate"><span class="pre">OFF</span></code>): enable the special boundaries like Ball or Cylinder.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_SOFT_PARTICLES`</span></code> (default is <code class="docutils literal notranslate"><span class="pre">OFF</span></code>): enable straining of particles.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_PERIODIC</span></code> (default is <code class="docutils literal notranslate"><span class="pre">OFF</span></code>): enable full periodic boundary conditions.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_SOFT_PARTICLES</span></code> (default is <code class="docutils literal notranslate"><span class="pre">ON</span></code>): enable the homogeneous deformation of particles (DCEM), see <a class="reference internal" href="softParticles.html#softparticles"><span class="std std-ref">Deformable particles (DCEM)</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_PERIODIC</span></code> (default is <code class="docutils literal notranslate"><span class="pre">ON</span></code>): enable full periodic boundary conditions.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_COMPILE_SEE</span></code> (default is <code class="docutils literal notranslate"><span class="pre">ON</span></code>): compile the application to visualize the conf-files.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_COMPILE_SEE3</span></code> (default is <code class="docutils literal notranslate"><span class="pre">OFF</span></code>): compile the application to edit graphically the input files.</p></li>
 </ul>

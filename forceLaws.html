@@ -83,7 +83,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="periodicBoundaryConditions.html">Periodic boundary conditions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="softParticles.html">Deformable particles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="softParticles.html">Deformable particles (DCEM)</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Results</span></p>
 <ul>
@@ -304,30 +304,32 @@ parameters.</p>
 </div>
 <section id="cohesive-bond">
 <h3>Cohesive bond<a class="headerlink" href="#cohesive-bond" title="Link to this heading"></a></h3>
-<p>The stiffnesses of an interface are shared between the sub-bonds it holds. If
-the interface carries <span class="math notranslate nohighlight">\(N_b\)</span> bonds, each of them uses</p>
+<p>The values of <span class="math notranslate nohighlight">\(k_n\)</span> and <span class="math notranslate nohighlight">\(k_t\)</span> come from <code class="docutils literal notranslate"><span class="pre">knInnerBond</span></code> and
+<code class="docutils literal notranslate"><span class="pre">ktInnerBond</span></code>, or from the interface itself when <code class="docutils literal notranslate"><span class="pre">ParamsInInterfaces</span></code> is 1.
+By default, they are the stiffnesses of <strong>each bond</strong>. With
+<code class="docutils literal notranslate"><span class="pre">bondStiffnessPerInterface</span> <span class="pre">1</span></code>, they are the stiffnesses of the <strong>whole
+interface</strong>, shared between its <span class="math notranslate nohighlight">\(N_b\)</span> bonds:</p>
 <div class="math notranslate nohighlight">
 \[k_n \leftarrow \frac{k_n}{N_b} \qquad k_t \leftarrow \frac{k_t}{N_b}\]</div>
 <p>so that refining the discretisation of an interface does not stiffen it. The
-values of <span class="math notranslate nohighlight">\(k_n\)</span> and <span class="math notranslate nohighlight">\(k_t\)</span> come from <code class="docutils literal notranslate"><span class="pre">knInnerBond</span></code> and
-<code class="docutils literal notranslate"><span class="pre">ktInnerBond</span></code>, or from the interface itself when <code class="docutils literal notranslate"><span class="pre">ParamsInInterfaces</span></code> is 1.</p>
+damping coefficient of the bonds and the breakage energy below use the same
+weighted stiffnesses. For the cubic cells of <a class="reference internal" href="softParticles.html#softparticles"><span class="std std-ref">Deformable particles (DCEM)</span></a>, which have
+4 bonds per face, <code class="docutils literal notranslate"><span class="pre">knInnerBond</span> <span class="pre">0</span> <span class="pre">0</span> <span class="pre">1e5</span></code> per bond and <code class="docutils literal notranslate"><span class="pre">knInnerBond</span> <span class="pre">0</span> <span class="pre">0</span> <span class="pre">4e5</span></code>
+per interface give the same result.</p>
 <p>The normal force combines the elastic response, measured from the distance
-<span class="math notranslate nohighlight">\(d_n^0\)</span> recorded at gluing, with the viscous damping:</p>
+<span class="math notranslate nohighlight">\(d_n^0\)</span> of the bond when it was created by <code class="docutils literal notranslate"><span class="pre">stickBCM</span></code> (each bond has its
+own, so that a bond carries no force in its initial position), with the viscous
+damping:</p>
 <div class="math notranslate nohighlight">
 \[f_n = -k_n \left( d_n - d_n^0 \right) + c\, v_n\]</div>
-<p>and the tangential force is accumulated incrementally, then completed by a
-viscous term:</p>
+<p>and the tangential force is the sum of an elastic part, accumulated
+incrementally, and of a viscous part:</p>
 <div class="math notranslate nohighlight">
-\[\Delta \underline{f}_t = k_t\, \underline{v}_t \Delta t
-\qquad\text{then}\qquad
-\underline{f}_t \leftarrow \underline{f}_t + c\, \underline{v}_t\]</div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>As in <code class="docutils literal notranslate"><span class="pre">StickedLinks</span></code>, the tangential viscous term is added to the
-<em>accumulated</em> force rather than to its elastic part alone, so the viscosity
-piles up over time. Keep this in mind when interpreting the tangential
-response of a bond.</p>
-</div>
+\[\underline{f}_t^e \leftarrow \underline{f}_t^e + k_t\, \underline{v}_t \Delta t
+\qquad
+\underline{f}_t = \underline{f}_t^e + c\, \underline{v}_t\]</div>
+<p>The viscous part of the previous step is removed before the elastic increment
+is added, so that the viscosity is not cumulated over time.</p>
 <p>Neither the tangential force nor the moment is capped while the bond holds: the
 bond is elastic until it breaks.</p>
 </section>
@@ -338,7 +340,7 @@ its individual bonds. At each step, the elastic energy stored in the interface
 is summed over its bonds. Only the bonds in <em>tension</em> contribute to the normal
 part:</p>
 <div class="math notranslate nohighlight">
-\[E_n = \sum_{b\,\mid\, d_n^b &gt; d_n^0} \frac{1}{2} k_n \left( d_n^b - d_n^0 \right)^2
+\[E_n = \sum_{b\,\mid\, d_n^b &gt; d_n^{0,b}} \frac{1}{2} k_n \left( d_n^b - d_n^{0,b} \right)^2
 \qquad
 E_t = \sum_{b} \frac{1}{2} k_t \left\Vert \underline{s}_b \right\Vert^2\]</div>
 <p>where <span class="math notranslate nohighlight">\(\underline{s}_b\)</span> is the accumulated tangential sliding of the bond.
@@ -348,12 +350,13 @@ The whole interface breaks as soon as</p>
 <p>with <span class="math notranslate nohighlight">\(A\)</span> the area of the interface and <span class="math notranslate nohighlight">\(G_c\)</span> the fracture energy
 (keyword <code class="docutils literal notranslate"><span class="pre">gcInnerBond</span></code>, or <code class="docutils literal notranslate"><span class="pre">gcOuterBond</span></code> for an outer interface). The factor
 2 accounts for the two surfaces created by the crack.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The stiffnesses used in this energy balance are the ones read from the
-group-pair table, <em>not</em> the per-bond values divided by <span class="math notranslate nohighlight">\(N_b\)</span> that the
-force computation uses.</p>
-</div>
+<p>The stiffnesses and <span class="math notranslate nohighlight">\(G_c\)</span> are those of the force computation: per bond or
+per interface (<code class="docutils literal notranslate"><span class="pre">bondStiffnessPerInterface</span></code>), and taken from the interface
+itself when <code class="docutils literal notranslate"><span class="pre">ParamsInInterfaces</span></code> is 1.</p>
+<p>The area, and the <span class="math notranslate nohighlight">\(d_n^0\)</span> and <span class="math notranslate nohighlight">\(\underline{s}_b\)</span> of each bond, are
+saved in the conf-files (see <a class="reference internal" href="syntaxConf.html#syntaxconf"><span class="std std-ref">Format of configuration files (conf-file)</span></a>), so that a computation restarted
+from a conf-file breaks its interfaces at the same time as the uninterrupted
+one.</p>
 <p>When the criterion is met the interface is not broken immediately: it is added
 to a list and all its bonds are released once every force has been computed.
 This postponement avoids introducing an asymmetry in the incrementally computed

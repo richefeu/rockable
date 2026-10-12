@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Deformable particles &mdash; Rockable 1.0.0 documentation</title>
+  <title>Deformable particles (DCEM) &mdash; Rockable 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
@@ -65,9 +65,21 @@
 <li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="periodicBoundaryConditions.html">Periodic boundary conditions</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Deformable particles</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#activating-the-feature">Activating the feature</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#current-status">Current status</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Deformable particles (DCEM)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#compilation">Compilation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-model">The model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#kinematics">Kinematics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stress">Stress</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#elastic-material">Elastic material</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#viscoelastic-material">Viscoelastic material</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#stability-of-the-elastic-update">Stability of the elastic update</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#keywords">Keywords</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#bonded-soft-cells">Bonded soft cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#conf-files-and-restart">Conf-files and restart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#output-and-visualisation">Output and visualisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
 </ul>
 </li>
 </ul>
@@ -100,7 +112,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Deformable particles</li>
+      <li class="breadcrumb-item active">Deformable particles (DCEM)</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/softParticles.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -110,74 +122,251 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="deformable-particles">
-<span id="softparticles"></span><h1>Deformable particles<a class="headerlink" href="#deformable-particles" title="Link to this heading"></a></h1>
+  <section id="deformable-particles-dcem">
+<span id="softparticles"></span><h1>Deformable particles (DCEM)<a class="headerlink" href="#deformable-particles-dcem" title="Link to this heading"></a></h1>
 <p>By default a Rockable particle is rigid: it has six degrees of freedom, three of
-translation and three of rotation. The <em>soft particles</em> extension adds a
-<strong>homogeneous deformation</strong> to each body, so that a particle can change shape
-under load without being discretised into a mesh.</p>
-<p>The intent, stated in the design of the feature, is not to resolve a full
-kinematic field with many degrees of freedom, but to make a few of them
-possible: enough to model soft grains, polymers or biological tissues, while
-keeping the cost of a discrete element method.</p>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p>This feature requires</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>..<span class="w"> </span>-DROCKABLE_ENABLE_SOFT_PARTICLES<span class="o">=</span>ON
-</pre></div>
-</div>
-<p>Without it, the keyword is accepted but only prints
-<code class="docutils literal notranslate"><span class="pre">SOFT_PARTICLES_NOT_ENABLED</span> <span class="pre">when</span> <span class="pre">Rockable</span> <span class="pre">was</span> <span class="pre">compiled</span></code>.</p>
-</div>
-<section id="activating-the-feature">
-<h2>Activating the feature<a class="headerlink" href="#activating-the-feature" title="Link to this heading"></a></h2>
+translation and three of rotation. The <em>soft particles</em> extension gives some of
+the particles a <strong>uniform deformation</strong>, so that they can change shape under
+load without being discretised into a mesh. This is the discrete
+compliant-element method (DCEM), described in the paper <em>The Discrete
+Compliant-Element Method in Rockable framework</em>. It was developed in the
+postdoctoral work of <em>Mukesh Singh Bisht</em>.</p>
+<p>The intent is not to resolve a full kinematic field with many degrees of
+freedom, but to give each particle the few that matter when the deformation of
+the particles is part of the physics: soft grains, cells of a bonded material
+whose fracture depends on the elastic energy they store, polymers or biological
+tissues.</p>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#compilation" id="id2">Compilation</a></p></li>
+<li><p><a class="reference internal" href="#the-model" id="id3">The model</a></p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">useSoftParticles</span></code> (<em>double</em>) <strong>Young</strong> (<em>double</em>) <strong>Poisson</strong></p>
-<p>Activates the homogeneous straining of the particles and builds the
-compliance from the Young modulus <span class="math notranslate nohighlight">\(E\)</span> and the Poisson ratio
-<span class="math notranslate nohighlight">\(\nu\)</span> of the material the bodies are made of.</p>
-</li>
+<li><p><a class="reference internal" href="#kinematics" id="id4">Kinematics</a></p></li>
+<li><p><a class="reference internal" href="#stress" id="id5">Stress</a></p></li>
+<li><p><a class="reference internal" href="#elastic-material" id="id6">Elastic material</a></p></li>
+<li><p><a class="reference internal" href="#viscoelastic-material" id="id7">Viscoelastic material</a></p></li>
 </ul>
-<div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">input.txt</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>useSoftParticles 1e6 0.0
+</li>
+<li><p><a class="reference internal" href="#stability-of-the-elastic-update" id="id8">Stability of the elastic update</a></p></li>
+<li><p><a class="reference internal" href="#keywords" id="id9">Keywords</a></p></li>
+<li><p><a class="reference internal" href="#bonded-soft-cells" id="id10">Bonded soft cells</a></p></li>
+<li><p><a class="reference internal" href="#conf-files-and-restart" id="id11">Conf-files and restart</a></p></li>
+<li><p><a class="reference internal" href="#output-and-visualisation" id="id12">Output and visualisation</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id13">Examples</a></p></li>
+</ul>
+</nav>
+<section id="compilation">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Compilation</a><a class="headerlink" href="#compilation" title="Link to this heading"></a></h2>
+<p>The feature is enabled by the CMake option <code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_SOFT_PARTICLES</span></code>,
+which is <code class="docutils literal notranslate"><span class="pre">ON</span></code> by default. It can be disabled when it is not needed:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>..<span class="w"> </span>-DROCKABLE_ENABLE_SOFT_PARTICLES<span class="o">=</span>OFF
 </pre></div>
 </div>
-</div>
-<p>Both parameters are global: all the bodies share the same compliance, whatever
-their group. A Poisson ratio of zero, as above, means the body shortens along
-the loading direction without bulging sideways, which is the simplest case to
-interpret.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The compliance relates the average stress carried by a body to its uniform
-strain. The stiffness of the <strong>contacts</strong> is a different matter, set by
-<code class="docutils literal notranslate"><span class="pre">knContact</span></code> and <code class="docutils literal notranslate"><span class="pre">ktContact</span></code> as usual: a soft particle in a stiff contact
-and a stiff particle in a soft contact are two different models, and both
-are available.</p>
-</div>
-</section>
-<section id="current-status">
-<h2>Current status<a class="headerlink" href="#current-status" title="Link to this heading"></a></h2>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>The extension is under active development, in the postdoctoral work of
-<em>Mukesh Singh Bisht</em>, and it is not yet complete. In particular, the uniform
-transformation of the particles is <strong>not written to the conf-files</strong>: the
-code that saved it is commented out, and the corresponding field is not read
-back either.</p>
-<p>The practical consequence is that a computation using soft particles cannot
-be restarted exactly from a dump. The positions, velocities and orientations
-are restored, but the accumulated deformation of each body is lost, and the
-bodies restart undeformed. Run such a simulation in one go, or check the
-state of the feature in the source before relying on a restart.</p>
-</div>
+<p>Without it, the keywords below are accepted but only print
+<code class="docutils literal notranslate"><span class="pre">SOFT_PARTICLES_NOT_ENABLED</span> <span class="pre">when</span> <span class="pre">Rockable</span> <span class="pre">was</span> <span class="pre">compiled</span></code>.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p><code class="docutils literal notranslate"><span class="pre">rockable</span> <span class="pre">-b</span></code> prints <code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_SOFT_PARTICLES</span></code> among the
 compilation options, which is the quickest way to tell whether the binary at
 hand supports the feature.</p>
 </div>
+</section>
+<section id="the-model">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">The model</a><a class="headerlink" href="#the-model" title="Link to this heading"></a></h2>
+<section id="kinematics">
+<h3><a class="toc-backref" href="#id4" role="doc-backlink">Kinematics</a><a class="headerlink" href="#kinematics" title="Link to this heading"></a></h3>
+<p>Each soft particle <span class="math notranslate nohighlight">\(i\)</span> carries a deformation gradient
+<span class="math notranslate nohighlight">\(\mathbf{F}_i\)</span>, expressed in the frame of the body. A vertex
+<span class="math notranslate nohighlight">\(\underline{v}\)</span> of the shape is placed at</p>
+<div class="math notranslate nohighlight">
+\[\underline{x} = \underline{x}_i + \mathbf{Q}_i \left( \mathbf{F}_i \, h_i \underline{v} \right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\underline{x}_i\)</span> is the position of the particle,
+<span class="math notranslate nohighlight">\(\mathbf{Q}_i\)</span> its orientation and <span class="math notranslate nohighlight">\(h_i\)</span> its homothety. The
+deformation acts on the polyhedral core only: the Minkowski radius (the
+thickness of the sphero-polyhedron) is <strong>not</strong> deformed. The contact detection,
+the oriented bounding boxes, <code class="docutils literal notranslate"><span class="pre">see</span></code> and <code class="docutils literal notranslate"><span class="pre">conftovtk</span></code> all use the deformed
+vertices. The mass and the inertia of the particle are not changed by the
+deformation.</p>
+</section>
+<section id="stress">
+<h3><a class="toc-backref" href="#id5" role="doc-backlink">Stress</a><a class="headerlink" href="#stress" title="Link to this heading"></a></h3>
+<p>At each computation of the forces, the mean (Love–Weber) stress in the
+particle is computed from the forces <span class="math notranslate nohighlight">\(\underline{f}_c\)</span> it receives at its
+contacts and bonds <span class="math notranslate nohighlight">\(c\)</span>, at the points <span class="math notranslate nohighlight">\(\underline{x}_c\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\boldsymbol{\sigma}_i = \frac{1}{V_i} \sum_c \underline{f}_c \otimes \left( \underline{x}_c - \underline{x}_i \right),
+\qquad V_i = h_i^3 \, V^\text{shape} \det \mathbf{F}_i\]</div>
+<p>symmetrised, and expressed in the frame of the body. With this convention, a
+compressive stress is negative.</p>
+</section>
+<section id="elastic-material">
+<h3><a class="toc-backref" href="#id6" role="doc-backlink">Elastic material</a><a class="headerlink" href="#elastic-material" title="Link to this heading"></a></h3>
+<p>The material is linear, isotropic and elastic, with a Young modulus <span class="math notranslate nohighlight">\(E\)</span>
+and a Poisson ratio <span class="math notranslate nohighlight">\(\nu\)</span>, and <span class="math notranslate nohighlight">\(\mathbb{C}^{-1}\)</span> its compliance. The
+increment of stress since the last update gives an increment of strain, which is
+applied exactly to the deformation gradient:</p>
+<div class="math notranslate nohighlight">
+\[\Delta \boldsymbol{\varepsilon} = \mathbb{C}^{-1} : \left( \boldsymbol{\sigma}^{n} - \boldsymbol{\sigma}^{n-1} \right),
+\qquad
+\mathbf{F}^{n} = \exp \left( \Delta \boldsymbol{\varepsilon} \right) \mathbf{F}^{n-1}\]</div>
+<p>The strain follows the stress without delay, so the update does not depend on
+the time step.</p>
+</section>
+<section id="viscoelastic-material">
+<h3><a class="toc-backref" href="#id7" role="doc-backlink">Viscoelastic material</a><a class="headerlink" href="#viscoelastic-material" title="Link to this heading"></a></h3>
+<p>A Kelvin–Voigt material adds a viscosity <span class="math notranslate nohighlight">\(\mathbb{D}\)</span>,
+<span class="math notranslate nohighlight">\(\boldsymbol{\sigma} = \mathbb{C} : \boldsymbol{\varepsilon} + \mathbb{D} : \dot{\boldsymbol{\varepsilon}}\)</span>.
+The strain is then integrated explicitly,</p>
+<div class="math notranslate nohighlight">
+\[\boldsymbol{\varepsilon}^{n} = \boldsymbol{\varepsilon}^{n-1}
++ \Delta t \, \mathbb{D}^{-1} : \left( \boldsymbol{\sigma}^{n} - \mathbb{C} : \boldsymbol{\varepsilon}^{n-1} \right),
+\qquad
+\mathbf{F}^{n} = \exp \left( \boldsymbol{\varepsilon}^{n} - \boldsymbol{\varepsilon}^{n-1} \right) \mathbf{F}^{n-1}\]</div>
+<p><span class="math notranslate nohighlight">\(\mathbb{D}^{-1}\)</span> has the same form as the compliance, built from a shear
+viscosity <span class="math notranslate nohighlight">\(\eta_s\)</span> and a bulk viscosity <span class="math notranslate nohighlight">\(\eta_b\)</span> (in place of
+<span class="math notranslate nohighlight">\(G\)</span> and <span class="math notranslate nohighlight">\(K\)</span>). The simplest choice is a viscosity proportional to the
+stiffness, <span class="math notranslate nohighlight">\(\mathbb{D} = \tau \, \mathbb{C}\)</span>, that is
+<span class="math notranslate nohighlight">\(\eta_s = \tau G\)</span> and <span class="math notranslate nohighlight">\(\eta_b = \tau K\)</span>: the strain then relaxes
+towards its elastic value over the time <span class="math notranslate nohighlight">\(\tau\)</span>. The viscous stress
+vanishes at equilibrium, so the quasi-static response is the elastic one.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The viscoelastic strain is integrated over <span class="math notranslate nohighlight">\(\Delta t\)</span> each time the
+forces are computed. The integrators <code class="docutils literal notranslate"><span class="pre">Beeman</span></code> and <code class="docutils literal notranslate"><span class="pre">RungeKutta4</span></code> compute
+them more than once per time step, so the viscoelastic particles are only
+correct with <code class="docutils literal notranslate"><span class="pre">Euler</span></code> and <code class="docutils literal notranslate"><span class="pre">velocityVerlet</span></code> (the default). A warning is
+printed otherwise.</p>
+</div>
+</section>
+</section>
+<section id="stability-of-the-elastic-update">
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">Stability of the elastic update</a><a class="headerlink" href="#stability-of-the-elastic-update" title="Link to this heading"></a></h2>
+<p>The deformation gradient is updated once per computation of the forces,
+without any relaxation. This explicit iteration converges only if the
+interfaces of a particle (contacts or bonds) are <strong>softer</strong> than the particle
+itself. Otherwise, the particle shortens so much within one step that it loses
+its contacts, recovers its shape, touches again, and so on: the computation
+oscillates from one time step to the next, whatever the time step. In the DCEM
+paper, the limit is written with the stiffness partition ratio</p>
+<div class="math notranslate nohighlight">
+\[\eta = \frac{K_n (1 - 2\nu)}{E\, h} &lt; \eta_\text{lim} = (1 - 2\nu) \frac{\zeta h}{\ell}\]</div>
+<p>where <span class="math notranslate nohighlight">\(K_n\)</span> is the normal stiffness of a whole interface (the sum of its
+bonds or contacts), <span class="math notranslate nohighlight">\(h\)</span> the size of the particle, <span class="math notranslate nohighlight">\(\ell\)</span> the size of
+its core and <span class="math notranslate nohighlight">\(\zeta\)</span> the ratio of its volume to <span class="math notranslate nohighlight">\(h^3\)</span>. In short, the
+contact stiffness must stay below about <span class="math notranslate nohighlight">\(E h\)</span>.</p>
+<p>A small viscosity of the particles removes this limit, without changing the
+quasi-static response. The paper finds the update stable when</p>
+<div class="math notranslate nohighlight">
+\[\tau &gt; \frac{1 + \xi}{2} \Delta t\]</div>
+<p>where <span class="math notranslate nohighlight">\(\xi\)</span> is the loop gain between the stiffness of the interfaces and
+that of the particle. A viscosity of a few tens of time steps is usually enough,
+and is recommended whenever interfaces can break: a broken bond turns into a
+contact, which can be much stiffer.</p>
+</section>
+<section id="keywords">
+<h2><a class="toc-backref" href="#id9" role="doc-backlink">Keywords</a><a class="headerlink" href="#keywords" title="Link to this heading"></a></h2>
+<p>The particles have to be read before these keywords, which therefore come after
+<code class="docutils literal notranslate"><span class="pre">Particles</span></code> in the input file.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">useSoftParticles</span></code> (<em>double</em>) <strong>Young</strong> (<em>double</em>) <strong>Poisson</strong></p>
+<p>All the free particles (the ones that are not driven) become elastic, with the
+given material.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">defineElasticParticles</span></code> (<em>double</em>) <strong>Young</strong> (<em>double</em>) <strong>Poisson</strong> (<em>int</em>) <strong>number</strong> (<em>int</em>) <strong>id1</strong> <strong>id2</strong> …</p>
+<p>The listed particles (identified by their rank in <code class="docutils literal notranslate"><span class="pre">Particles</span></code>) become
+elastic, with the given material. A particle that is already soft keeps its
+deformation and only changes its material.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">useViscousTime</span></code> (<em>double</em>) <strong>tau</strong></p>
+<p>All the soft particles become viscoelastic, with
+<span class="math notranslate nohighlight">\(\mathbb{D} = \tau \mathbb{C}\)</span>. It must come after the elasticity has
+been set.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">defineViscousTime</span></code> (<em>double</em>) <strong>tau</strong> (<em>int</em>) <strong>number</strong> (<em>int</em>) <strong>id1</strong> <strong>id2</strong> …</p>
+<p>The same, for the listed particles.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">defineViscousParameters</span></code> (<em>double</em>) <strong>shearViscosity</strong> (<em>double</em>) <strong>bulkViscosity</strong> (<em>int</em>) <strong>number</strong> (<em>int</em>) <strong>id1</strong> <strong>id2</strong> …</p>
+<p>The listed soft particles become viscoelastic, with the given shear and bulk
+viscosities. This is the keyword used in the simulations of the DCEM paper,
+with <span class="math notranslate nohighlight">\(\eta_s = \tau G\)</span> and <span class="math notranslate nohighlight">\(\eta_b = \tau K\)</span>.</p>
+</li>
+</ul>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">input.txt</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>nDriven 2
+Particles 3
+Platen_b 1 1 1   0 -1.1 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
+Platen_t 1 1 1   0  0.1 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
+c        0 0 1   0 -0.5 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
+
+useSoftParticles 1e6 0.3
+useViscousTime 1e-2
+</pre></div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The stiffness of the <strong>contacts</strong> is a different matter, set by
+<code class="docutils literal notranslate"><span class="pre">knContact</span></code> and <code class="docutils literal notranslate"><span class="pre">ktContact</span></code> as usual: a soft particle in a stiff contact
+and a stiff particle in a soft contact are two different models, and both are
+available within the stability limit above.</p>
+</div>
+</section>
+<section id="bonded-soft-cells">
+<h2><a class="toc-backref" href="#id10" role="doc-backlink">Bonded soft cells</a><a class="headerlink" href="#bonded-soft-cells" title="Link to this heading"></a></h2>
+<p>Soft particles can be glued together by the pre-processing command
+<code class="docutils literal notranslate"><span class="pre">stickBCM</span></code> and the force law <code class="docutils literal notranslate"><span class="pre">BCM</span></code> (see <a class="reference internal" href="forceLaws.html#force-laws"><span class="std std-ref">Force laws</span></a>), to model a
+material made of cells that deform and whose interfaces can break. In the DCEM
+paper, the stiffnesses of the bonds are given for <strong>each bond</strong>, which is the
+default; <code class="docutils literal notranslate"><span class="pre">bondStiffnessPerInterface</span> <span class="pre">1</span></code> gives them for a whole interface
+instead.</p>
+<p>The bonds and the cells represent the same material: their stiffnesses must be
+chosen together, and both count in the effective modulus of the assembly. The
+paper gives the relations to use.</p>
+</section>
+<section id="conf-files-and-restart">
+<h2><a class="toc-backref" href="#id11" role="doc-backlink">Conf-files and restart</a><a class="headerlink" href="#conf-files-and-restart" title="Link to this heading"></a></h2>
+<p>The state of the soft particles is written in the conf-files, right after the
+particles:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>SoftParticles 1
+#id young poisson shearViscosity bulkViscosity F(9) stress(9) strain(9)
+2 1e+06 0 0 0 1 0 0 0 0.98999 0 0 0 1 ...
+</pre></div>
+</div>
+<p>The material, the deformation gradient, and the stress and strain (in the frame
+of the body) are kept, so a computation restarted from a conf-file follows the
+uninterrupted one. The viscosities are zero for an elastic particle. The
+section <code class="docutils literal notranslate"><span class="pre">Transformations</span></code>, with only the deformation gradients, written by the
+first versions of the feature, is still read.</p>
+</section>
+<section id="output-and-visualisation">
+<h2><a class="toc-backref" href="#id12" role="doc-backlink">Output and visualisation</a><a class="headerlink" href="#output-and-visualisation" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>The data extractor <code class="docutils literal notranslate"><span class="pre">TrackSoftParticle</span></code> records the deformation gradient,
+the stress and the strain of one particle, and <code class="docutils literal notranslate"><span class="pre">TrackStress</span></code> the component
+<span class="math notranslate nohighlight">\(\sigma_{xx}\)</span> of many (see <a class="reference internal" href="dataExtractors.html#dataextractors"><span class="std std-ref">Data extractors</span></a>).</p></li>
+<li><p>In <code class="docutils literal notranslate"><span class="pre">see</span></code>, the soft particles are drawn deformed, and the keys <code class="docutils literal notranslate"><span class="pre">4</span></code> and
+<code class="docutils literal notranslate"><span class="pre">5</span></code> color them by their volume change <span class="math notranslate nohighlight">\(\det \mathbf{F} - 1\)</span> and by
+their mean stress <span class="math notranslate nohighlight">\(\operatorname{tr} \boldsymbol{\sigma} / 3\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">conftovtk</span></code> writes the deformed shapes.</p></li>
+</ul>
+</section>
+<section id="examples">
+<h2><a class="toc-backref" href="#id13" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<p>The folder <code class="docutils literal notranslate"><span class="pre">examples/softParticles</span></code> holds examples that run in a few seconds,
+each with a <code class="docutils literal notranslate"><span class="pre">readme.md</span></code> that tells what to check:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">elasticCube</span></code>: an elastic cube squeezed between two platens; the computed
+strain is <span class="math notranslate nohighlight">\(\sigma / E\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">viscousCube</span></code>: the same with contacts a hundred times stiffer, beyond the
+stability limit of the elastic update, stabilised by a viscosity.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bondedBeam</span></code>: a beam of bonded soft cubes bent by its weight, compared with
+rigid cells.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">softBallImpact</span></code>: a ball of soft, viscous, bonded cells hitting a plate,
+with unbreakable or breakable interfaces.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">softBallImpactVoronoi</span></code>: the illustration of the DCEM paper, with 200
+Voronoi cells (about 12 minutes).</p></li>
+</ul>
 </section>
 </section>
 

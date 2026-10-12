@@ -72,7 +72,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dissipation.html">Global dissipation features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="integrationSchemes.html">Integration schemes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="periodicBoundaryConditions.html">Periodic boundary conditions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="softParticles.html">Deformable particles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="softParticles.html">Deformable particles (DCEM)</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Results</span></p>
 <ul>
@@ -167,13 +167,17 @@ created, not only vertex-vertex, when the distance is less than
 bonds, it computes the <strong>area</strong> of each interface, which is what the
 energy-based rupture criterion needs, and copies <code class="docutils literal notranslate"><span class="pre">knInnerBond</span></code>,
 <code class="docutils literal notranslate"><span class="pre">ktInnerBond</span></code> and <code class="docutils literal notranslate"><span class="pre">gcInnerBond</span></code> into each interface. All the interfaces
-it creates are flagged as inner.</p>
+it creates are flagged as inner. A bond joins two vertices whose spheres
+are less than <strong>Epsilon</strong> apart, and it records this initial distance
+<span class="math notranslate nohighlight">\(d_n^0\)</span>: it carries no force as long as the distance does not change.</p>
 </dd>
 </dl>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p><code class="docutils literal notranslate"><span class="pre">glue_with_walls</span> <span class="pre">yes</span></code>, placed before these commands, extends them to the
-driven bodies, so that a sample can be glued to its container.</p>
+<p><code class="docutils literal notranslate"><span class="pre">glue_with_walls</span> <span class="pre">yes</span></code>, placed before <code class="docutils literal notranslate"><span class="pre">stickClusters</span></code> or
+<code class="docutils literal notranslate"><span class="pre">stickVerticesInClustersMoments</span></code>, extends them to the driven bodies, so
+that a sample can be glued to its container. <code class="docutils literal notranslate"><span class="pre">stickVerticesInClusters</span></code> and
+<code class="docutils literal notranslate"><span class="pre">stickBCM</span></code> ignore it: they never glue a free body to a driven one.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
