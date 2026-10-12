@@ -47,6 +47,7 @@
 #include <map>
 #include <memory>
 #include <set>
+#include <sstream>
 #include <unordered_map>
 #include <utility>
 #include <vector>

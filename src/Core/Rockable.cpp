@@ -566,14 +566,14 @@ void Rockable::saveConf(const char* fname) {
       }
     }
     conf << "SoftParticles " << nbSoft << '\n';
-    conf << "#id young poisson F(9) stress(9) strain(9)\n";
+    conf << "#id young poisson shearViscosity bulkViscosity F(9) stress(9) strain(9)\n";
     for (size_t i = 0; i < Particles.size(); i++) {
       const auto& SPP = Particles[i].SPP;
       if (SPP == nullptr) {
         continue;
       }
-      conf << i << ' ' << SPP->young << ' ' << SPP->poisson << ' ' << SPP->F << ' ' << SPP->stress << ' '
-           << SPP->strain << '\n';
+      conf << i << ' ' << SPP->young << ' ' << SPP->poisson << ' ' << SPP->shearViscosity << ' '
+           << SPP->bulkViscosity << ' ' << SPP->F << ' ' << SPP->stress << ' ' << SPP->strain << '\n';
     }
   }
 #endif
@@ -748,6 +748,56 @@ void Rockable::initParser() {
     }
     Logger::info("{} soft particles (E = {}, nu = {})", nb, Young, Poisson);
   };
+  // Viscoelastic (Kelvin-Voigt) soft particles, with given shear and bulk viscosities.
+  // The particles have to be made soft before.
+  parser.kwMap["defineViscousParameters"] = __DO__(conf) {
+    double ShearVis, BulkVis;
+    size_t nb;
+    conf >> ShearVis >> BulkVis >> nb;
+    for (size_t i = 0; i < nb; i++) {
+      size_t id;
+      conf >> id;
+      if (id >= Particles.size() || Particles[id].SPP == nullptr) {
+        Logger::warn("defineViscousParameters: the particle {} is not a soft particle", id);
+        continue;
+      }
+      Particles[id].SPP->setViscosity(ShearVis, BulkVis);
+    }
+    Logger::info("{} viscoelastic particles (shear viscosity = {}, bulk viscosity = {})", nb, ShearVis, BulkVis);
+  };
+  // Viscoelastic soft particles, with a viscosity proportional to the stiffness (D = tau C).
+  // The particles have to be made soft before.
+  parser.kwMap["defineViscousTime"] = __DO__(conf) {
+    double tau;
+    size_t nb;
+    conf >> tau >> nb;
+    for (size_t i = 0; i < nb; i++) {
+      size_t id;
+      conf >> id;
+      if (id >= Particles.size() || Particles[id].SPP == nullptr) {
+        Logger::warn("defineViscousTime: the particle {} is not a soft particle", id);
+        continue;
+      }
+      Particles[id].SPP->setViscousTime(tau);
+    }
+    Logger::info("{} viscoelastic particles (tau = {})", nb, tau);
+  };
+  // All the soft particles become viscoelastic, with D = tau C
+  parser.kwMap["useViscousTime"] = __DO__(conf) {
+    double tau;
+    conf >> tau;
+    size_t nb = 0;
+    for (size_t i = 0; i < Particles.size(); i++) {
+      if (Particles[i].SPP != nullptr) {
+        Particles[i].SPP->setViscousTime(tau);
+        nb++;
+      }
+    }
+    if (nb == 0) {
+      Logger::warn("useViscousTime: there is no soft particle (it has to be placed after useSoftParticles)");
+    }
+    Logger::info("{} viscoelastic particles (tau = {})", nb, tau);
+  };
   // The state of the soft particles, as saved in the conf-files
   parser.kwMap["SoftParticles"] = __DO__(conf) {
     size_t nb;
@@ -761,10 +811,32 @@ void Rockable::initParser() {
         continue;
       }
       size_t id = std::stoul(token);
-      double Young, Poisson;
-      conf >> Young >> Poisson;
-      setSoftParticle(id, Young, Poisson);
-      conf >> Particles[id].SPP->F >> Particles[id].SPP->stress >> Particles[id].SPP->strain;
+
+      // The viscosities were not written by the first version of this section,
+      // so the number of values on the line tells which version it is
+      std::string line;
+      getline(conf, line);
+      std::istringstream is(line);
+      std::vector<double> values;
+      double value;
+      while (is >> value) {
+        values.push_back(value);
+      }
+      if (values.size() != 29 && values.size() != 31) {
+        Logger::warn("SoftParticles: unexpected number of values for the particle {}", id);
+        continue;
+      }
+      setSoftParticle(id, values[0], values[1]);
+      size_t k = 2;
+      if (values.size() == 31) {
+        Particles[id].SPP->setViscosity(values[2], values[3]);
+        k = 4;
+      }
+      std::istringstream rest(line);
+      for (size_t skip = 0; skip < k; skip++) {
+        rest >> value;
+      }
+      rest >> Particles[id].SPP->F >> Particles[id].SPP->stress >> Particles[id].SPP->strain;
     }
   };
   // Deformation gradients written by the first versions of the soft particles (rockable-deformable).
@@ -777,7 +849,7 @@ void Rockable::initParser() {
       mat9r F;
       conf >> id >> F;
       if (Particles[id].SPP == nullptr) {
-        Particles[id].SPP = std::make_shared<SoftParticlePhysics>();
+        Particles[id].SPP.create();
         useSoftParticles = 1;
       }
       Particles[id].SPP->F = F;
@@ -791,6 +863,9 @@ void Rockable::initParser() {
   };
   parser.kwMap["useSoftParticles"] = SOFT_PARTICLES_NOT_ENABLED;
   parser.kwMap["defineElasticParticles"] = SOFT_PARTICLES_NOT_ENABLED;
+  parser.kwMap["defineViscousParameters"] = SOFT_PARTICLES_NOT_ENABLED;
+  parser.kwMap["defineViscousTime"] = SOFT_PARTICLES_NOT_ENABLED;
+  parser.kwMap["useViscousTime"] = SOFT_PARTICLES_NOT_ENABLED;
 #endif
 
   parser.kwMap["numericalDampingCoeff"] = __GET__(conf, numericalDampingCoeff);
@@ -1936,6 +2011,19 @@ void Rockable::initIntegrator() {
       Particles[i].RK4Data = std::make_shared<RK4MoreData>();
     }
   }
+
+#ifdef ROCKABLE_ENABLE_SOFT_PARTICLES
+  // The viscoelastic strain is integrated over dt each time the accelerations are computed,
+  // which happens more than once per time step with these integrators
+  if (optionNames["Integrator"] == "Beeman" || optionNames["Integrator"] == "RungeKutta4") {
+    for (size_t i = 0; i < Particles.size(); ++i) {
+      if (Particles[i].SPP != nullptr && Particles[i].SPP->useVisco) {
+        Logger::warn("The viscoelastic soft particles are only correct with the integrators Euler and velocityVerlet");
+        break;
+      }
+    }
+  }
+#endif
 }
 
 /**
@@ -3354,7 +3442,7 @@ void Rockable::compute_resultants() {
  */
 void Rockable::setSoftParticle(size_t id, double Young, double Poisson) {
   if (Particles[id].SPP == nullptr) {
-    Particles[id].SPP = std::make_shared<SoftParticlePhysics>();
+    Particles[id].SPP.create();
   }
   Particles[id].SPP->setElasticity(Young, Poisson);
   useSoftParticles = 1;
@@ -3401,7 +3489,7 @@ void Rockable::compute_SoftParticles_transformation() {
       continue;
     }
     double h = Particles[i].homothety;
-    Particles[i].SPP->updateTransformation(Particles[i].Q, h * h * h * Particles[i].shape->volume);
+    Particles[i].SPP->updateTransformation(Particles[i].Q, h * h * h * Particles[i].shape->volume, dt);
   }
 }
 #endif

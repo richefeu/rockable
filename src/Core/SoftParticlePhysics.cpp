@@ -46,18 +46,45 @@ void SoftParticlePhysics::setElasticity(double Young, double Poisson) {
   young = Young;
   poisson = Poisson;
   Cinv.set(Young, Poisson);
+  C.set(Young, Poisson);
+}
+
+/**
+ * @brief Makes the material viscoelastic (Kelvin-Voigt) with the given shear and bulk viscosities.
+ *        Zero viscosities give back the elastic material.
+ */
+void SoftParticlePhysics::setViscosity(double ShearVis, double BulkVis) {
+  shearViscosity = ShearVis;
+  bulkViscosity = BulkVis;
+  useVisco = (ShearVis > 0.0 && BulkVis > 0.0);
+  if (useVisco) {
+    Dinv.set(ShearVis, BulkVis);
+  }
+}
+
+/**
+ * @brief Makes the material viscoelastic with a viscosity proportional to the stiffness, D = tau C.
+ *        The elasticity has to be set before.
+ */
+void SoftParticlePhysics::setViscousTime(double tau) {
+  double G = young / (2.0 * (1.0 + poisson));
+  double K = young / (3.0 * (1.0 - 2.0 * poisson));
+  setViscosity(tau * G, tau * K);
 }
 
 /**
  * @brief Turns the accumulated stressSum into the mean stress of the body, and updates the deformation gradient.
  *
- * The stress increment since the last update gives a strain increment, which is applied exactly as
- * F <- exp(dEps) F. The update only depends on the stress increment, so that it is not affected by the time step.
+ * Elastic material: the stress increment since the last update gives a strain increment, so that the update
+ * does not depend on the time step.
+ * Viscoelastic material (Kelvin-Voigt): the strain is integrated explicitly, eps += dt Dinv (sigma - C eps).
+ * In both cases, the strain increment is applied exactly as F <- exp(dEps) F.
  *
  * @param Q                 Orientation of the body
  * @param undeformedVolume  Volume of the body before its deformation (homothety included)
+ * @param dt                Time increment since the last update (used by the viscoelastic material only)
  */
-void SoftParticlePhysics::updateTransformation(const quat& Q, double undeformedVolume) {
+void SoftParticlePhysics::updateTransformation(const quat& Q, double undeformedVolume, double dt) {
   mat9r sig = stressSum / (undeformedVolume * F.det());
   sig.symmetrize();
 
@@ -66,8 +93,14 @@ void SoftParticlePhysics::updateTransformation(const quat& Q, double undeformedV
   Q.get_rot_matrix(R);
   mat9r stressBody = R.transposed() * sig * R;
 
-  mat9r dEps = Cinv.getStrain(stressBody - stress);
+  mat9r dEps;
+  if (useVisco) {
+    dEps = dt * Dinv.getStrainRate(stressBody - C.getStress(strain));
+    strain += dEps;
+  } else {
+    dEps = Cinv.getStrain(stressBody - stress);
+    strain = Cinv.getStrain(stressBody);
+  }
   F = dEps.exp() * F;
-  strain = Cinv.getStrain(stressBody);
   stress = stressBody;
 }

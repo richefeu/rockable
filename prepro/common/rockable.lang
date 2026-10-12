@@ -258,12 +258,34 @@ doc: defineElasticParticles [(double) Young] [(double) Poisson] [(int) number] [
   To be placed after the particles.
   Requires Rockable compiled with ROCKABLE_ENABLE_SOFT_PARTICLES.
 
+[keyword] defineViscousParameters
+doc: defineViscousParameters [(double) shearViscosity] [(double) bulkViscosity] [(int) number] [(int) id1] [(int) id2] ...
+
+  Make the listed soft particles viscoelastic (Kelvin-Voigt), with the given shear and bulk viscosities.
+  To be placed after defineElasticParticles or useSoftParticles.
+  Requires Rockable compiled with ROCKABLE_ENABLE_SOFT_PARTICLES.
+
+[keyword] defineViscousTime
+doc: defineViscousTime [(double) tau] [(int) number] [(int) id1] [(int) id2] ...
+
+  Make the listed soft particles viscoelastic, with a viscosity proportional to their stiffness (D = tau C).
+  To be placed after defineElasticParticles or useSoftParticles.
+  Requires Rockable compiled with ROCKABLE_ENABLE_SOFT_PARTICLES.
+
+[keyword] useViscousTime
+doc: useViscousTime [(double) tau]
+
+  Make all the soft particles viscoelastic, with a viscosity proportional to their stiffness (D = tau C).
+  To be placed after defineElasticParticles or useSoftParticles.
+  Requires Rockable compiled with ROCKABLE_ENABLE_SOFT_PARTICLES.
+
 [keyword] SoftParticles
 doc: SoftParticles [(int) numberOfSoftParticles]
 
   State of the soft particles, as written in the conf-files (strain and stress in the body frame).
+  The viscosities are zero for an elastic particle.
   REPEAT FOR EACH SOFT PARTICLE {
-     [(int) id] [(double) Young] [(double) Poisson]
+     [(int) id] [(double) Young] [(double) Poisson] [(double) shearViscosity] [(double) bulkViscosity]
      [(mat9r) deformationGradient] [(mat9r) stress] [(mat9r) strain]
   }
 
@@ -901,6 +923,10 @@ dh _damping_
 
 [snippet] Soft particles
 useSoftParticles _Young_ _Poisson_
+
+[snippet] Viscoelastic soft particles
+useSoftParticles _Young_ _Poisson_
+useViscousTime _tau_
 
 [snippet] Spring joint
 initSpringJoint _ibody_ _ix_ _iy_ _iz_ _jbody_ _jx_ _jy_ _jz_ _stiffness_

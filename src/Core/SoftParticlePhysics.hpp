@@ -36,21 +36,35 @@
 #ifndef SOFTPARTICLEPHYSICS_HPP
 #define SOFTPARTICLEPHYSICS_HPP
 
+#include <cstddef>
+#include <memory>
+
 // toofus
 #include "Compliance.hpp"
+#include "Rigidity.hpp"
 #include "mat9.hpp"
 #include "quat.hpp"
+
+#include "VisDamping.hpp"
 
 /// The homogeneous deformation of a soft particle.
 ///
 /// The deformation gradient F maps the shape (body frame) onto the deformed body, so that a vertex is placed at
 /// pos + Q * (F * (homothety * vertex)). The Minkowski radius is not deformed.
 /// The stress and the strain are expressed in the body frame.
+///
+/// The material is linear elastic, or viscoelastic (Kelvin-Voigt: sigma = C eps + D deps/dt) when a viscosity is set.
 class SoftParticlePhysics {
  public:
-  double young{0.0};    ///< Young modulus
-  double poisson{0.0};  ///< Poisson ratio
-  Compliance Cinv;      ///< Elastic compliance built from young and poisson
+  double young{0.0};          ///< Young modulus
+  double poisson{0.0};        ///< Poisson ratio
+  double shearViscosity{0.0}; ///< Shear viscosity (0 for an elastic material)
+  double bulkViscosity{0.0};  ///< Bulk viscosity (0 for an elastic material)
+  bool useVisco{false};       ///< Viscoelastic (Kelvin-Voigt) update instead of the elastic one
+
+  Compliance Cinv;  ///< Elastic compliance built from young and poisson
+  Rigidity C;       ///< Elastic stiffness built from young and poisson
+  VisDamping Dinv;  ///< Inverse viscosity built from shearViscosity and bulkViscosity
 
   mat9r F;          ///< Deformation gradient (body frame)
   mat9r stress;     ///< Mean stress in the body (body frame), at the last update
@@ -60,7 +74,34 @@ class SoftParticlePhysics {
   SoftParticlePhysics();  // Ctor
 
   void setElasticity(double Young, double Poisson);
-  void updateTransformation(const quat& Q, double undeformedVolume);
+  void setViscosity(double ShearVis, double BulkVis);
+  void setViscousTime(double tau);
+  void updateTransformation(const quat& Q, double undeformedVolume, double dt);
+};
+
+/// Owning pointer to the SoftParticlePhysics of a particle.
+/// Copying a particle copies its deformation state, so that each particle has its own one.
+class SoftParticlePhysicsPtr {
+  std::unique_ptr<SoftParticlePhysics> ptr;
+
+ public:
+  SoftParticlePhysicsPtr() = default;
+  SoftParticlePhysicsPtr(const SoftParticlePhysicsPtr& other)
+      : ptr(other.ptr ? std::make_unique<SoftParticlePhysics>(*other.ptr) : nullptr) {}
+  SoftParticlePhysicsPtr(SoftParticlePhysicsPtr&&) = default;
+  SoftParticlePhysicsPtr& operator=(const SoftParticlePhysicsPtr& other) {
+    if (this != &other) {
+      ptr = other.ptr ? std::make_unique<SoftParticlePhysics>(*other.ptr) : nullptr;
+    }
+    return *this;
+  }
+  SoftParticlePhysicsPtr& operator=(SoftParticlePhysicsPtr&&) = default;
+
+  void create() { ptr = std::make_unique<SoftParticlePhysics>(); }
+  SoftParticlePhysics* operator->() const { return ptr.get(); }
+  SoftParticlePhysics& operator*() const { return *ptr; }
+  bool operator==(std::nullptr_t) const { return ptr == nullptr; }
+  bool operator!=(std::nullptr_t) const { return ptr != nullptr; }
 };
 
 #endif /* end of include guard: SOFTPARTICLEPHYSICS_HPP */

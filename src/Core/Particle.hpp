@@ -96,7 +96,7 @@ class Particle {
   double mass{0.0};       ///< The particle mass
 
 #ifdef ROCKABLE_ENABLE_SOFT_PARTICLES
-  std::shared_ptr<SoftParticlePhysics> SPP;  ///< Homogeneous deformation (when SPP == nullptr, the particle is rigid)
+  SoftParticlePhysicsPtr SPP;  ///< Homogeneous deformation (when SPP == nullptr, the particle is rigid)
 #endif
 
   vec3r force;   ///< Resultant force acting on the particle
