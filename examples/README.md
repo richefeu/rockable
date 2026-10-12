@@ -108,7 +108,7 @@ repository clean during a training day, the folder can also be copied first:
 | 8  | [`PerioPoly`](PerioPoly)                               | A periodic sample of polyhedra: isotropic compression of the cell              | TBD     |
 | 9  | [`softParticles`](softParticles)                       | Deformable particles (DCEM), bonded cells (`BCM`)                                | 1-5 s   |
 | 10 | [`sweepable`](sweepable)                               | Parametric studies: many computations from one script                            | 10 s    |
-| 11 | [`complexShape`](complexShape)                         | From an STL mesh to a shape: `stl2shape`, `shapeSurvey`                          | short   |
+| 11 | [`complexShape`](complexShape)                         | From an STL mesh to a shape: `stl2shape`, `shapeSurvey`                          | 20 s    |
 
 The times are those of the whole computation on a laptop, with one thread.
 

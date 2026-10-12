@@ -53,7 +53,7 @@
       library.],
     command("sweepable [script]"), [Generate a tree of input files for a
       parameter sweep.],
-    command("stl2shape -i <f.stl> -r <R>"), [Convert a *binary* STL into a
+    command("stl2shape -r <R> <f.stl>"), [Convert a *binary* STL into a
       shape.],
   )
 ])

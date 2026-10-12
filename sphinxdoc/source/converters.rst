@@ -20,7 +20,10 @@ skeleton of a sphero-polyhedron and dilating it by a Minkowski radius.
 
 .. code-block:: sh
 
-   stl2shape -i file.stl -r 0.01 -c
+   stl2shape -r 0.01 -c file.stl
+
+The shape is written in the file ``mesh.shp`` of the current folder (an existing
+``mesh.shp`` is overwritten), and is named after the STL file (``file.stl``).
 
 .. list-table::
    :header-rows: 1
@@ -28,7 +31,7 @@ skeleton of a sphero-polyhedron and dilating it by a Minkowski radius.
 
    * - Option
      - Description
-   * - ``-i``, ``--input`` (*string*)
+   * - *file.stl* (last argument)
      - Input STL file. Required, and it must be the **binary** flavour of STL.
    * - ``-r``, ``--radius`` (*double*)
      - Minkowski radius of the resulting shape. Required.

@@ -167,12 +167,12 @@
 = `stl2shape`
 
 #concept-block(body: [
-  #align(center, command("stl2shape -i <file.stl> -r <radius> [options]"))
+  #align(center, command("stl2shape -r <radius> [options] <file.stl>"))
 
   Converts a *binary* STL mesh into one shape.
 
   #kwtable(
-    command("-i, --input <string>"), [Input STL file. Required.],
+    command("<file.stl>"), [Input STL file (last argument). Required. The shape goes to `mesh.shp`.],
     command("-r, --radius <double>"), [Minkowski radius of the result. Required.],
     command("-s, --scaleFactor <double>"), [Rescale the object.],
     command("-m, --maxLength <double>"), [Maximum length (sieving size) of the
