@@ -238,14 +238,16 @@ doc: dh [(double) value]
   Numerical damping applied to the periodic cell.
 
 [keyword] cellMomentumCorrection
-doc: cellMomentumCorrection [0/1]
+doc: cellMomentumCorrection [interval]
 
-  Enable correction of the total momentum within the periodic cell.
+  Time interval between two removals of the total momentum of the particles
+  (periodic cell). 0, the default, disables it; dt corrects at every step.
 
 [keyword] cellVelocityCorrection
-doc: cellVelocityCorrection [0/1]
+doc: cellVelocityCorrection [interval]
 
-  Enable correction of the velocities within the periodic cell.
+  Time interval between two removals of the mean velocity of the particles
+  (periodic cell). 0, the default, disables it; dt corrects at every step.
 
 [keyword] useKineticStress
 doc: useKineticStress [0/1]

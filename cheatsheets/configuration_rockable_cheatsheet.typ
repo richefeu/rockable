@@ -177,8 +177,8 @@
     the cell matrix.
   - #command("mh <value>") ~Mass ratio used to build the inertia of the cell.
   - #command("dh <value>") ~Numerical damping of the cell degrees of freedom.
-  - #command("cellVelocityCorrection <0|1>") ~Remove the mean velocity drift.
-  - #command("cellMomentumCorrection <0|1>") ~Remove the total momentum drift.
+  - #command("cellVelocityCorrection <interval>") ~Remove the mean velocity drift (0: off).
+  - #command("cellMomentumCorrection <interval>") ~Remove the total momentum drift (0: off).
   - #command("useKineticStress <0|1>") ~Include the kinetic (fluctuation) term
     in the stress used by the cell servo-control.
 
