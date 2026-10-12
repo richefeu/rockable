@@ -12,6 +12,8 @@ dVerlet 0.001
 density 0 2700
 density 1 2700
 
+# numerical damping, to reach the equilibrium faster
+numericalDampingCoeff 0.1
 forceLaw Default
 gravity 0 0 0
 
@@ -35,7 +37,8 @@ usePeriodicCell 1
 h   0.05 0 0    0 0.05 0    0 0 0.05
 vh   0 0 0    0 0 0    0 0 0
 ah   0 0 0    0 0 0    0 0 0
-mh .02
+# mass of the cell degrees of freedom (a smaller value, such as 0.02, makes the computation diverge)
+mh 1
 
 iconf 0
 nDriven 0
