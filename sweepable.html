@@ -145,17 +145,19 @@
            <div itemprop="articleBody">
              
   <section id="application-sweepable">
-<h1>Application <cite>sweepable</cite><a class="headerlink" href="#application-sweepable" title="Link to this heading"></a></h1>
+<span id="sweepable"></span><h1>Application <cite>sweepable</cite><a class="headerlink" href="#application-sweepable" title="Link to this heading"></a></h1>
 <p><code class="docutils literal notranslate"><span class="pre">sweepable</span></code> is a lightweight command-line tool for simulation parameter sweeps.
 It reads a script file and generates a tree of input files — one per parameter
 combination — ready to be launched in parallel with the companion script
 <code class="docutils literal notranslate"><span class="pre">batchable.sh</span></code>.</p>
-<p>Both tools ship as a single self-contained file:</p>
+<p>The tool lives in <code class="docutils literal notranslate"><span class="pre">prepro/sweepable</span></code> and is made of two files:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">simuFileManips.hpp</span></code> — header-only C++ library (the engine)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">sweepable.cpp</span></code> — the script interpreter (build with <code class="docutils literal notranslate"><span class="pre">make</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sweepable.cpp</span></code> — the script interpreter</p></li>
 </ul>
-<p>No external dependencies. Requires C++17.</p>
+<p>No external dependencies. Requires C++17. It is built and installed by CMake
+along with the other pre-processing tools (<code class="docutils literal notranslate"><span class="pre">ROCKABLE_COMPILE_PREPRO</span></code>, on by
+default); the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> of its folder builds it on its own.</p>
 <nav class="contents local" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#quick-start" id="id1">Quick Start</a></p>
@@ -198,6 +200,8 @@ combination — ready to be launched in parallel with the companion script
 <h2><a class="toc-backref" href="#id1" role="doc-backlink">Quick Start</a><a class="headerlink" href="#quick-start" title="Link to this heading"></a></h2>
 <section id="build">
 <h3><a class="toc-backref" href="#id2" role="doc-backlink">Build</a><a class="headerlink" href="#build" title="Link to this heading"></a></h3>
+<p>With CMake, <code class="docutils literal notranslate"><span class="pre">sweepable</span></code> is built with the rest of Rockable. On its own, in
+<code class="docutils literal notranslate"><span class="pre">prepro/sweepable</span></code>:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>make
 </pre></div>
 </div>

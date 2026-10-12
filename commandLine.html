@@ -160,14 +160,21 @@ then exit.</p></td>
 compilation options actually used, then exit.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-n</span></code> (<em>string</em>) <code class="docutils literal notranslate"><span class="pre">-r</span></code> (<em>string</em>)</p></td>
-<td><p>Non-regression check. After the run, compare the two conf-files line by
-line from their <code class="docutils literal notranslate"><span class="pre">Particles</span></code> section onwards, and exit with an error if
-they differ.</p></td>
+<td><p>Non-regression check. After the run, compare the conf-file given by
+<code class="docutils literal notranslate"><span class="pre">-n</span></code> with the reference given by <code class="docutils literal notranslate"><span class="pre">-r</span></code>, from their <code class="docutils literal notranslate"><span class="pre">Particles</span></code>
+section onwards, and exit with an error if they differ beyond the
+tolerance. The numbers are compared with a relative tolerance, and the
+interactions are matched by their key, since their order in the file is
+not reproducible (<code class="docutils literal notranslate"><span class="pre">test/README.md</span></code> details the comparison).</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-h</span></code>, <code class="docutils literal notranslate"><span class="pre">--help</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-t</span></code>, <code class="docutils literal notranslate"><span class="pre">--tolerance</span></code> (<em>double</em>)</p></td>
+<td><p>Relative tolerance of the comparison between the <code class="docutils literal notranslate"><span class="pre">-n</span></code> and <code class="docutils literal notranslate"><span class="pre">-r</span></code>
+files, <code class="docutils literal notranslate"><span class="pre">1e-5</span></code> by default.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-h</span></code>, <code class="docutils literal notranslate"><span class="pre">--help</span></code></p></td>
 <td><p>The usual help.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--version</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--version</span></code></p></td>
 <td><p>The git tag the binary was built from.</p></td>
 </tr>
 </tbody>
@@ -296,15 +303,18 @@ See <a class="reference internal" href="softParticles.html#softparticles"><span 
 <td><p>Objectivity correction of the tangential forces under large rotations.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_PROFILING</span></code></p></td>
-<td><p>Time profiling of the main routines, reported into <code class="docutils literal notranslate"><span class="pre">perf.txt</span></code>.</p></td>
+<td><p>Time profiling of the main routines with MATools (fetched by CMake),
+which reports the timers at the end of the run. The file <code class="docutils literal notranslate"><span class="pre">perf.txt</span></code> is
+written in any case.</p></td>
 </tr>
 </tbody>
 </table>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_BOUNDARY</span></code> compiles the <code class="docutils literal notranslate"><span class="pre">Ball</span></code> and <code class="docutils literal notranslate"><span class="pre">Cylinder</span></code>
-boundaries, but their <code class="docutils literal notranslate"><span class="pre">read</span></code> methods are still empty stubs in the source.
-Enabling the option therefore does not yet give a usable feature.</p>
+<p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_BOUNDARY</span></code> is not usable yet. With this option, the
+current sources do <strong>not compile</strong> (<code class="docutils literal notranslate"><span class="pre">InteractionBoundary</span></code> is used in
+<code class="docutils literal notranslate"><span class="pre">Rockable.hpp</span></code> without being declared), and the <code class="docutils literal notranslate"><span class="pre">read</span></code> methods of the
+<code class="docutils literal notranslate"><span class="pre">Ball</span></code> and <code class="docutils literal notranslate"><span class="pre">Cylinder</span></code> boundaries are still empty stubs. Keep it <code class="docutils literal notranslate"><span class="pre">OFF</span></code>.</p>
 </div>
 <p>Options that select what gets compiled:</p>
 <table class="docutils align-default">
@@ -325,7 +335,7 @@ Enabling the option therefore does not yet give a usable feature.</p>
 <td><p><code class="docutils literal notranslate"><span class="pre">see</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_COMPILE_SEER</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">ON</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">OFF</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">seer</span></code> (Dear My Seer) and <code class="docutils literal notranslate"><span class="pre">shape</span></code> (Dear My Shape)</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ROCKABLE_COMPILE_CONF2VTK</span></code></p></td>

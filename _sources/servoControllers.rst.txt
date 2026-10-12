@@ -15,6 +15,12 @@ the wall, which changes as the sample deforms.
    Only one servo can be active at a time. The servo function is stored as a
    single callback, so a second ``Servo`` entry silently replaces the first.
 
+.. note::
+
+   A misspelt servo name whose name starts with ``tritri`` prints an error, but
+   any other unknown name is **silently ignored**: check the spelling when a
+   servo seems to do nothing.
+
 .. contents::
    :local:
    :depth: 2
@@ -252,6 +258,11 @@ along a linear ramp:
    Servo ramp _y_For_ 3 0.0 -5000.0 0.1 0.6
 
 This is the way to avoid the shock of a load applied abruptly at the first step.
+
+.. note::
+
+   ``drivingSystem.txt`` is re-read at every conf-file, so the parameters of a
+   ramp can be changed while the computation runs.
 
 .. tip::
 

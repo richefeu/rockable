@@ -143,9 +143,11 @@ knContact 0 2 1e8
 </div>
 <section id="default-model-keyword-default">
 <h2>Default model (keyword <code class="docutils literal notranslate"><span class="pre">Default</span></code>)<a class="headerlink" href="#default-model-keyword-default" title="Link to this heading"></a></h2>
-<p>This is the force law to be used in most cases.
-In short, the model includes elastic linear normal force for contact, normal viscosity force, constant normal cohesion force at contact,
-Coulomb friction tangent force, and rolling resistance moment</p>
+<p>This is the force law to be used in most cases. In short, the model includes a
+linear elastic normal force, a normal viscous damping, a Coulomb friction, and
+a rolling resistance moment. There is no cohesion: the interaction exists only
+while the bodies overlap (<span class="math notranslate nohighlight">\(d_n \leq 0\)</span>), and all its forces are reset to
+zero as soon as the contact is lost.</p>
 <ol class="arabic simple">
 <li><p><strong>Normal component</strong></p></li>
 </ol>
@@ -155,70 +157,122 @@ Coulomb friction tangent force, and rolling resistance moment</p>
 </ol>
 <div class="math notranslate nohighlight">
 \[f_n^\text{elas} = -k_n d_n\]</div>
-<p>where <span class="math notranslate nohighlight">\(d_n \leq 0\)</span> is the normal distance, so <span class="math notranslate nohighlight">\(f_n^\text{elas} \geq 0\)</span>. When <span class="math notranslate nohighlight">\(d_n &gt; 0\)</span>, this force is zero. The value of <span class="math notranslate nohighlight">\(k_n\)</span> can be set with the keyword <code class="docutils literal notranslate"><span class="pre">knContact</span></code></p>
+<p>where <span class="math notranslate nohighlight">\(d_n \leq 0\)</span> is the normal distance, so <span class="math notranslate nohighlight">\(f_n^\text{elas} \geq 0\)</span>. The value of <span class="math notranslate nohighlight">\(k_n\)</span> is set with the keyword <code class="docutils literal notranslate"><span class="pre">knContact</span></code>.</p>
 <ol class="loweralpha simple" start="2">
-<li><p>The viscuous part of the normal contact force is</p></li>
+<li><p>The viscous part of the normal contact force is</p></li>
 </ol>
 <div class="math notranslate nohighlight">
 \[f_n^\text{visc} = 2 \alpha_n \sqrt{k_n m_\text{eff}} \, v_n\]</div>
-<p>where <span class="math notranslate nohighlight">\(v_n\)</span> is the relative normal velocity, <span class="math notranslate nohighlight">\(m_\text{eff}=(m_i m_j)/(m_i+m_j)\)</span> is the effective mass, and <span class="math notranslate nohighlight">\(\alpha_n \in [0, 1[\)</span> is the rate of normal viscuous damping. There are two ways to set the value of <span class="math notranslate nohighlight">\(\alpha_n\)</span>:</p>
+<p>where <span class="math notranslate nohighlight">\(v_n\)</span> is the relative normal velocity, <span class="math notranslate nohighlight">\(m_\text{eff}=(m_i m_j)/(m_i+m_j)\)</span> is the effective mass, and <span class="math notranslate nohighlight">\(\alpha_n \in [0, 1[\)</span> is the rate of normal viscous damping. There are two ways to set the value of <span class="math notranslate nohighlight">\(\alpha_n\)</span>:</p>
 <blockquote>
 <div><ol class="lowerroman simple">
-<li><p>The keyword <code class="docutils literal notranslate"><span class="pre">en2Contact</span></code> that is the energy normal restitution rate (<span class="math notranslate nohighlight">\(e_n^2\)</span>). In this case, the viscuous damping rate will be set associated</p></li>
+<li><p>The keyword <code class="docutils literal notranslate"><span class="pre">en2Contact</span></code>, which is the squared normal restitution coefficient (<span class="math notranslate nohighlight">\(e_n^2\)</span>). The viscous damping rate is then</p></li>
 </ol>
 <div class="math notranslate nohighlight">
 \[\alpha_n = \frac{- \ln e_n}{\sqrt{\ln^2 e_n + \pi^2}}\]</div>
 <ol class="lowerroman simple" start="2">
-<li><p>The keyword <code class="docutils literal notranslate"><span class="pre">en2ContactFromViscRate</span></code> that will</p></li>
+<li><p>The keyword <code class="docutils literal notranslate"><span class="pre">en2ContactFromViscRate</span></code>, which gives <span class="math notranslate nohighlight">\(\alpha_n\)</span> directly; the corresponding restitution is</p></li>
 </ol>
 <div class="math notranslate nohighlight">
-\[e_n^2 = \exp \left(-\frac{\alpha_n \pi}{\sqrt{1 - \alpha_n^2}}\right)\]</div>
+\[e_n^2 = \exp \left(-\frac{2 \alpha_n \pi}{\sqrt{1 - \alpha_n^2}}\right)\]</div>
 </div></blockquote>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Because of the viscuous part of the normal force, the total normal force <span class="math notranslate nohighlight">\(f_n = f_n^\text{elas} + f_n^\text{visc}\)</span> can be negative. Although the physical meaning of this negative value is arguable, the normal force is by default restricted to remain positive or zero.</p>
+<p>Because of the viscous part, the total normal force <span class="math notranslate nohighlight">\(f_n = f_n^\text{elas} + f_n^\text{visc}\)</span> could be negative. It is restricted to remain positive or zero.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>With <code class="docutils literal notranslate"><span class="pre">preventCrossingLength</span></code> <span class="math notranslate nohighlight">\(L &gt; 0\)</span>, the elastic part is
+multiplied by <span class="math notranslate nohighlight">\(L / (L + d_n)\)</span>, which stiffens the repulsion at large
+overlap and prevents the bodies from crossing each other. The factor is
+capped at 100. This holds for <code class="docutils literal notranslate"><span class="pre">Default</span></code> and <code class="docutils literal notranslate"><span class="pre">GeoVisc</span></code>.</p>
 </div>
 </div></blockquote>
 <ol class="arabic simple" start="2">
 <li><p><strong>Tangential component</strong></p></li>
 </ol>
-<p>The tangential force represents the frictional resistance between particles when they slide against each other. It is calculated based on the relative tangential velocity (<span class="math notranslate nohighlight">\(v_t\)</span>) and a tangential stiffness parameter (<span class="math notranslate nohighlight">\(k_t\)</span>, keyword <code class="docutils literal notranslate"><span class="pre">ktContact</span></code>). The Coulomb friction model is used to limit the tangential force, ensuring that it does not exceed the product of the friction coefficient (<span class="math notranslate nohighlight">\(\mu\)</span>, keyword <code class="docutils literal notranslate"><span class="pre">muContact</span></code>) and the normal elastic force (<span class="math notranslate nohighlight">\(f_n^\text{elas}\)</span>). The tangential force is incrementally updated with the following relation, at each time step <span class="math notranslate nohighlight">\(\Delta t\)</span>, since the onset of contact:</p>
+<p>The tangential force is accumulated incrementally from the relative tangential
+velocity <span class="math notranslate nohighlight">\(\underline{v}_t\)</span>, with the tangential stiffness <span class="math notranslate nohighlight">\(k_t\)</span>
+(keyword <code class="docutils literal notranslate"><span class="pre">ktContact</span></code>), and projected onto the Coulomb cone defined by the
+friction coefficient <span class="math notranslate nohighlight">\(\mu\)</span> (keyword <code class="docutils literal notranslate"><span class="pre">muContact</span></code>) and the <strong>elastic</strong>
+part of the normal force:</p>
 <div class="math notranslate nohighlight">
-\[\Delta f_t = \left [ k_t v_t \Delta t \right ]_{\pm \mu f_n^\text{elas}}\]</div>
-<p>The friction force <span class="math notranslate nohighlight">\(f_t\)</span> is cancelled as soon as contact is lost.</p>
+\[\underline{f}_t \leftarrow \underline{f}_t + k_t \underline{v}_t \Delta t,
+\qquad
+\left\Vert \underline{f}_t \right\Vert \leq \mu f_n^\text{elas}\]</div>
+<p>Compiling with <code class="docutils literal notranslate"><span class="pre">ALLOW_NEGATIVE_THRESHOLDS</span></code> uses the total normal force
+<span class="math notranslate nohighlight">\(f_n\)</span> instead of <span class="math notranslate nohighlight">\(f_n^\text{elas}\)</span> in the threshold.</p>
 <ol class="arabic simple" start="3">
-<li><p><strong>Moment  vector</strong></p></li>
+<li><p><strong>Moment vector</strong></p></li>
 </ol>
-<p>The resistant moment (<span class="math notranslate nohighlight">\(\underline{M}\)</span>) accounts for rotational resistance between particles. It is calculated based on the rotational velocity difference (<span class="math notranslate nohighlight">\(\underline{\omega}_i - \underline{\omega}_j\)</span>) and the rotational stiffness parameter (<span class="math notranslate nohighlight">\(k_r\)</span>, keyword <code class="docutils literal notranslate"><span class="pre">krContact</span></code>). Additionally, the moment is limited by the product of the moment length coefficient (<span class="math notranslate nohighlight">\(\mu_r\)</span>, keyword <code class="docutils literal notranslate"><span class="pre">murContact</span></code>), the normal force (<span class="math notranslate nohighlight">\(f_n\)</span>), and the length of the branch vector (<span class="math notranslate nohighlight">\(\ell\)</span>). The resistant moment is updated, similarly to the friction force, as follows:</p>
+<p>When the rolling stiffness <span class="math notranslate nohighlight">\(k_r\)</span> (keyword <code class="docutils literal notranslate"><span class="pre">krContact</span></code>) is strictly
+positive, a resistant moment is accumulated from the relative rotation velocity,
+and capped by the rolling resistance <span class="math notranslate nohighlight">\(\mu_r\)</span> (keyword <code class="docutils literal notranslate"><span class="pre">murContact</span></code>),
+which is a <strong>length</strong>, times the normal force:</p>
 <div class="math notranslate nohighlight">
-\[\Delta \underline{M} = \left [ k_r (\underline{\omega}_i - \underline{\omega}_j) \Delta t \right ]_{\pm \mu_r \ell f_n^\text{elas}}\]</div>
+\[\underline{M} \leftarrow \underline{M} + k_r \left( \underline{\omega}_j - \underline{\omega}_i \right) \Delta t,
+\qquad
+\left\Vert \underline{M} \right\Vert \leq \mu_r f_n\]</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The moment resistance is applied only when <span class="math notranslate nohighlight">\(k_r &gt; 0\)</span>.</p>
+<p>When <span class="math notranslate nohighlight">\(k_r = 0\)</span>, no moment is computed.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When a contact partnership is active (keyword <code class="docutils literal notranslate"><span class="pre">ContactPartnership</span></code>), the
+stiffnesses <span class="math notranslate nohighlight">\(k_n\)</span>, <span class="math notranslate nohighlight">\(k_t\)</span>, <span class="math notranslate nohighlight">\(k_r\)</span> of each sub-contact are
+multiplied by its weight <span class="math notranslate nohighlight">\(w\)</span>, and the damping coefficient by
+<span class="math notranslate nohighlight">\(\sqrt{w}\)</span>.</p>
 </div>
 </section>
 <section id="law-for-rock-avalanches-keyword-avalanche">
 <h2>Law for rock avalanches (keyword <code class="docutils literal notranslate"><span class="pre">Avalanche</span></code>)<a class="headerlink" href="#law-for-rock-avalanches-keyword-avalanche" title="Link to this heading"></a></h2>
-<p>This is historically the first law that has been implemented in <code class="docutils literal notranslate"><span class="pre">Rockable</span></code> (actually in <code class="docutils literal notranslate"><span class="pre">DEMbox</span></code>, its ancestor).</p>
-<p>The force-law implemented is specifically designed for simulating rock avalanches at Laboratoire 3SR. It governs the interactions between particles or bodies in a granular material, considering both normal and tangential forces as well as resistant moments due to rotational motion.</p>
+<p>This is historically the first law that has been implemented in <code class="docutils literal notranslate"><span class="pre">Rockable</span></code>
+(actually in <code class="docutils literal notranslate"><span class="pre">DEMbox</span></code>, its ancestor), to simulate rock avalanches at
+Laboratoire 3SR. It differs from <code class="docutils literal notranslate"><span class="pre">Default</span></code> by the way the energy is
+dissipated at the contacts: there is no viscous damping, but a hysteretic
+normal force.</p>
 <ol class="arabic">
 <li><p><strong>Normal component</strong></p>
-<p>The normal force (<cite>I.fn</cite>) between particles is calculated to represent the contact forces that resist compression and prevent interpenetration. The calculation involves considering the change in the normal displacement (<cite>I.dn</cite>) and the normal stiffness parameter (<cite>kn</cite>). The normal force may also undergo unloading or loading depending on the change in normal displacement.</p>
+<p>The normal force is computed incrementally while the bodies get closer
+(loading), and follows a softer unloading branch when they separate:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}f_n \leftarrow
+\begin{cases}
+  f_n - k_n \, \Delta d_n &amp; \text{if } \Delta d_n &lt; 0 \text{ (loading)} \\
+  - e_n^2 \, k_n \, d_n &amp; \text{if } \Delta d_n &gt; 0 \text{ (unloading)}
+\end{cases}
+\qquad f_n \geq 0\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Delta d_n\)</span> is the change of the normal distance since the
+previous step. The unloading stiffness is <span class="math notranslate nohighlight">\(e_n^2 k_n\)</span>, so that the
+ratio of the energy given back to the energy stored is <span class="math notranslate nohighlight">\(e_n^2\)</span>
+(keyword <code class="docutils literal notranslate"><span class="pre">en2Contact</span></code>). The force is kept positive or zero.</p>
 </li>
 <li><p><strong>Tangential component</strong></p>
-<p>The tangential force (<cite>I.ft</cite>) represents the frictional resistance between particles when they slide against each other. The calculation considers the tangential velocity (<cite>vt</cite>) and a tangential stiffness parameter (<cite>kt</cite>). Frictional forces are limited by the friction coefficient (<cite>mu</cite>) and the normal force (<cite>I.fn</cite>).</p>
+<p>As in <code class="docutils literal notranslate"><span class="pre">Default</span></code>, accumulated incrementally with <span class="math notranslate nohighlight">\(k_t\)</span> and capped by
+the Coulomb cone, here with the total normal force:
+<span class="math notranslate nohighlight">\(\Vert \underline{f}_t \Vert \leq \mu f_n\)</span>.</p>
 </li>
 <li><p><strong>Resistant moment</strong></p>
-<p>The resistant moment (<cite>I.mom</cite>) accounts for the rotational resistance between particles. The calculation considers the rotational velocity difference (<cite>box-&gt;Particles[I.j].vrot - box-&gt;Particles[I.i].vrot</cite>) and the rotational stiffness parameter (<cite>kr</cite>). Additionally, there is a correction applied to the branch vector (<cite>branch</cite>) to account for different scenarios when the free body is either particle <cite>i</cite> or particle <cite>j</cite>.</p>
+<p>Accumulated as in <code class="docutils literal notranslate"><span class="pre">Default</span></code>,
+<span class="math notranslate nohighlight">\(\underline{M} \leftarrow \underline{M} + k_r (\underline{\omega}_j - \underline{\omega}_i) \Delta t\)</span>
+(even when <span class="math notranslate nohighlight">\(k_r = 0\)</span>, which then gives no moment), and capped by</p>
+<div class="math notranslate nohighlight">
+\[\left\Vert \underline{M} \right\Vert \leq \mu_r \, \ell \, f_n\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mu_r\)</span> (keyword <code class="docutils literal notranslate"><span class="pre">murContact</span></code>) is here <strong>dimensionless</strong>, and
+<span class="math notranslate nohighlight">\(\ell\)</span> is the distance from the contact point to the rotation axis of
+the free body (a rock block), that is, the length of the branch vector from
+its centre to the contact point once its component along the rotation
+vector is removed. When body <span class="math notranslate nohighlight">\(i\)</span> is driven, the free body is
+<span class="math notranslate nohighlight">\(j\)</span>; otherwise it is <span class="math notranslate nohighlight">\(i\)</span>. When the free body does not rotate at
+all, the whole branch vector is used.</p>
 </li>
 </ol>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Weighted Interaction Parameters. The force-law allows for adjusting the interaction parameters (<cite>kn</cite>, <cite>kt</cite>, <cite>kr</cite>) based on a weight factor (<cite>w</cite>). This weighting is determined by the function <cite>box-&gt;ctcPartnership.getWeight</cite>, which can influence the forces and moments between the particles.</p>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The code includes conditional blocks for certain options (<cite>FT_CORR</cite>) which may affect the actual computations. Additionally, the equations use specific parameters (<cite>en2</cite> and <cite>mur</cite>), which should be defined and obtained from relevant data sources in the simulation setup.</p>
+<p>The contact partnership weights <span class="math notranslate nohighlight">\(k_n\)</span>, <span class="math notranslate nohighlight">\(k_t\)</span> and <span class="math notranslate nohighlight">\(k_r\)</span> as
+in <code class="docutils literal notranslate"><span class="pre">Default</span></code>. <code class="docutils literal notranslate"><span class="pre">FT_CORR</span></code> applies the objectivity correction to the
+tangential force, as in the other laws.</p>
 </div>
 </section>
 <section id="breakable-elastic-solid-bonds-keyword-stickedlinks">
@@ -228,27 +282,36 @@ Coulomb friction tangent force, and rolling resistance moment</p>
 <ol class="arabic">
 <li><p><strong>Cohesive bond</strong></p>
 <blockquote>
-<div><p>When a cohesive bond exists between two particles, the force-law employs the following equations:</p>
+<div><p>The parameters are those of the interface when <code class="docutils literal notranslate"><span class="pre">ParamsInInterfaces</span></code> is 1.
+Otherwise, they are read in the group-pair table, as <code class="docutils literal notranslate"><span class="pre">*InnerBond</span></code> when
+the two bodies share the same cluster and <code class="docutils literal notranslate"><span class="pre">*OuterBond</span></code> otherwise.</p>
 <ol class="loweralpha">
 <li><p><strong>Normal component</strong></p>
 <p>The normal force (<span class="math notranslate nohighlight">\(f_n = f_n^\text{elas} + f_n^\text{visc}\)</span>) between the particles is calculated using
 Hooke’s elastic contact, combined with viscous damping:</p>
 <div class="math notranslate nohighlight">
 \[f_n^\text{elas} = -k_n (d_n - d_n^0)\]</div>
-<p>where <span class="math notranslate nohighlight">\(d_n^0\)</span> is the initial normal distance. This time, the parameter <span class="math notranslate nohighlight">\(k_n\)</span> is set with the keyword <code class="docutils literal notranslate"><span class="pre">knInnerBond</span></code> or <code class="docutils literal notranslate"><span class="pre">knOuterBond</span></code>.
-The viscous normal force is:</p>
+<p>where <span class="math notranslate nohighlight">\(d_n^0\)</span> is the normal distance of the interface when it was
+created. The parameter <span class="math notranslate nohighlight">\(k_n\)</span> is set with the keyword
+<code class="docutils literal notranslate"><span class="pre">knInnerBond</span></code> or <code class="docutils literal notranslate"><span class="pre">knOuterBond</span></code>. The viscous normal force is:</p>
 <div class="math notranslate nohighlight">
 \[f_n^\text{visc} = 2 \alpha_n \sqrt{k_n m_\text{eff}} \, v_n\]</div>
-<p>where <span class="math notranslate nohighlight">\(\alpha_n\)</span> is indirectly set with the keyword <code class="docutils literal notranslate"><span class="pre">en2InnerBond</span></code> or <code class="docutils literal notranslate"><span class="pre">en2OuterBond</span></code>.</p>
+<p>where <span class="math notranslate nohighlight">\(\alpha_n\)</span> is indirectly set with the keyword <code class="docutils literal notranslate"><span class="pre">en2InnerBond</span></code> or <code class="docutils literal notranslate"><span class="pre">en2OuterBond</span></code>.
+The normal force is not clamped: a bond can carry a tensile force.</p>
 </li>
 <li><p><strong>Tangential component</strong></p>
-<p>The tangential elastic force (<span class="math notranslate nohighlight">\(f_t\)</span>) is incrementally calculated based on the relative tangential velocity (<span class="math notranslate nohighlight">\(v_t\)</span>) and a tangential stiffness parameter (<span class="math notranslate nohighlight">\(k_t\)</span>, keyword <code class="docutils literal notranslate"><span class="pre">ktInnerBond</span></code> or <code class="docutils literal notranslate"><span class="pre">ktOuterBond</span></code>):</p>
+<p>The tangential force is the sum of an elastic part, incrementally
+calculated from the relative tangential velocity <span class="math notranslate nohighlight">\(\underline{v}_t\)</span>
+and the tangential stiffness <span class="math notranslate nohighlight">\(k_t\)</span> (keyword <code class="docutils literal notranslate"><span class="pre">ktInnerBond</span></code> or
+<code class="docutils literal notranslate"><span class="pre">ktOuterBond</span></code>), and of a viscous part, with the damping coefficient of
+the normal force:</p>
 <div class="math notranslate nohighlight">
-\[\Delta f_t = k_t (v_t \Delta t)\]</div>
+\[\underline{f}_t^e \leftarrow \underline{f}_t^e + k_t \underline{v}_t \Delta t,
+\qquad
+\underline{f}_t = \underline{f}_t^e + 2 \alpha_n \sqrt{k_n m_\text{eff}} \, \underline{v}_t\]</div>
+<p>As in <code class="docutils literal notranslate"><span class="pre">BCM</span></code>, the viscous part of the previous step is removed before
+the elastic increment is added, so that it is not cumulated.</p>
 </li>
-</ol>
-<p>Optionally, an additional term for tangential viscosity (<span class="math notranslate nohighlight">\(f_t^\text{visc} = 2 \alpha_n \sqrt{k_n m_\text{eff}} \, v_t\)</span>) can be added to the elastic part of the tangential force. However, this approach accumulates viscosity over time and may not be accurate:</p>
-<ol class="loweralpha" start="3">
 <li><p><strong>Moment vector</strong></p>
 <p>The moment carried by the bond is accumulated incrementally from the
 relative rotation velocity, with the rolling stiffness <span class="math notranslate nohighlight">\(k_r\)</span>
@@ -262,31 +325,25 @@ rupture criterion below that limits it through <span class="math notranslate noh
 <li><p><strong>Rupture criterion</strong></p>
 <p>The rupture criterion determines if the cohesive bond should break. If the yield value is greater than 0, the bond is irreversibly broken (actually, the breakage of the whole interface is scheduled as soon as possible). The yield function reads:</p>
 <div class="math notranslate nohighlight">
-\[\varphi = \left( \frac{\vert f_t \vert}{f_t^0} \right)^p + \left(\frac{\Vert\underline{M}\Vert}{M_0}\right)^p - \frac{f_n}{f_n^0} - 1\]</div>
+\[\varphi = \left( \frac{\Vert \underline{f}_t \Vert}{f_t^0} \right)^p + \left(\frac{\Vert\underline{M}\Vert}{M_0}\right)^p - \frac{f_n}{f_n^0} - 1\]</div>
+<p>with the strengths <span class="math notranslate nohighlight">\(f_n^0\)</span>, <span class="math notranslate nohighlight">\(f_t^0\)</span>, <span class="math notranslate nohighlight">\(M_0\)</span> and the
+exponent <span class="math notranslate nohighlight">\(p\)</span> (keywords <code class="docutils literal notranslate"><span class="pre">fn0*Bond</span></code>, <code class="docutils literal notranslate"><span class="pre">ft0*Bond</span></code>, <code class="docutils literal notranslate"><span class="pre">mom0*Bond</span></code>
+and <code class="docutils literal notranslate"><span class="pre">pow*Bond</span></code>). The breakage is postponed until all the forces of
+the step are computed, to avoid an asymmetry in the tangential forces.</p>
 </li>
 </ol>
 </div></blockquote>
 </li>
 <li><p><strong>Contact</strong></p>
 <blockquote>
-<div><p>When particles are in contact (no cohesive bond), the force-law employs the following equations:</p>
-<ol class="loweralpha">
-<li><p><strong>Normal component</strong></p>
-<p>The normal force (<cite>I.fn</cite>) between the particles is calculated similar to the cohesive bond case, but with different interaction parameters (<cite>kn</cite>, <cite>kt</cite>, <cite>damp</cite>, etc.):</p>
-<div class="math notranslate nohighlight">
-\[ \begin{align}\begin{aligned}\text{vn} = \mathbf{I.vel} \cdot \mathbf{I.n}\\\text{fne} = -\text{kn} \cdot \text{I.dn}\\\text{fnv} = \text{damp} \cdot \text{vn}\\\text{I.fn} = \text{fne} + \text{fnv}\end{aligned}\end{align} \]</div>
-</li>
-<li><p><strong>Tangential component</strong> (Friction)</p>
-<p>The tangential force (<cite>I.ft</cite>) due to friction between the particles is calculated in a similar manner to the cohesive bond case but with different interaction parameters (<cite>kt</cite>, <cite>mu</cite>, etc.).</p>
-</li>
-<li><p><strong>Resistant moment vector</strong></p>
-<p>If the contact allows for rotational motion (<cite>kr</cite> parameter), a resistant moment (<cite>I.mom</cite>) is calculated based on the relative rotational velocity of the particles.</p>
-</li>
-</ol>
+<div><p>When the bodies are not bonded (or once their bond is broken), the law is
+that of <code class="docutils literal notranslate"><span class="pre">Default</span></code>, with the <code class="docutils literal notranslate"><span class="pre">*Contact</span></code> parameters and the contact
+partnership, with two differences: the Coulomb threshold uses the total
+normal force, <span class="math notranslate nohighlight">\(\Vert \underline{f}_t \Vert \leq \mu f_n\)</span>, and the
+moment is computed even when <span class="math notranslate nohighlight">\(k_r = 0\)</span>.</p>
 </div></blockquote>
 </li>
 </ol>
-<p>Note: The code includes conditional blocks for certain options (<cite>FT_CORR</cite> and <cite>box-&gt;ctcPartnership.getWeight != nullptr</cite>) which may affect the actual computations.</p>
 </section>
 <section id="bonded-cell-method-keyword-bcm">
 <h2>Bonded Cell Method (keyword <code class="docutils literal notranslate"><span class="pre">BCM</span></code>)<a class="headerlink" href="#bonded-cell-method-keyword-bcm" title="Link to this heading"></a></h2>
@@ -468,14 +525,28 @@ static shear. It is meant for creeping motion, not for equilibrium.</p>
 <td><p>no</p></td>
 <td><p>yes</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">kn/kt/krInnerBond</span></code>, <code class="docutils literal notranslate"><span class="pre">kn/kt/krOuterBond</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">kn/ktInnerBond</span></code>, <code class="docutils literal notranslate"><span class="pre">kn/ktOuterBond</span></code></p></td>
 <td><p>no</p></td>
 <td><p>no</p></td>
 <td><p>yes</p></td>
 <td><p>inner only</p></td>
 <td><p>no</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">fn0/ft0/mom0/pow*Bond</span></code>, <code class="docutils literal notranslate"><span class="pre">en2*Bond</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">krInnerBond</span></code>, <code class="docutils literal notranslate"><span class="pre">krOuterBond</span></code></p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">en2InnerBond</span></code>, <code class="docutils literal notranslate"><span class="pre">en2OuterBond</span></code></p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+<td><p>inner only (damping set by <code class="docutils literal notranslate"><span class="pre">stickBCM</span></code>)</p></td>
+<td><p>no</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">fn0/ft0/mom0/pow*Bond</span></code></p></td>
 <td><p>no</p></td>
 <td><p>no</p></td>
 <td><p>yes</p></td>

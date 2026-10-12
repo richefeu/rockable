@@ -13,10 +13,11 @@ The conf-files are the files that hold the whole configuration at a given time. 
 Header
 ------
 
-A conf-file always starts with the following header format: ``Rockable dd-mm-yyyy`` (e.g., ``Rockable 29-11-2018``). 
+A conf-file always starts with the following header format: ``Rockable dd-mm-yyyy`` (e.g., ``Rockable 21-08-2022``). 
 The header includes the date (``dd-mm-yyyy``) corresponding to the version of the format. 
 Whenever a noticeable change is made in the format, the date in the header is updated to reflect the new version. 
-The version date is defined in the preprocessor define of ``CONF_VERSION_DATE`` in the source code.
+The version date is defined in the preprocessor define of ``CONF_VERSION_DATE`` in the source code (``21-08-2022`` at present).
+A file with another date is still read, with a warning: in most cases, this is not a problem.
 
 
 Keywords
@@ -100,8 +101,8 @@ Available options
 ~~~~~~~~~~~~~~~~~
 
 ``DefaultParallelMode``
-    Uses the default execution strategy defined by Rockable.  
-    Typically mapped to the most stable or recommended mode depending on the build configuration.
+    The default. The forces of the active interactions are computed in
+    parallel, and the resultants on the bodies are then summed sequentially.
 
 ``InteractionBuffer``
     Uses an intermediate buffer to store interactions before applying updates.  
@@ -123,7 +124,9 @@ Input keyword
 
 The input parameter ``parallel_mode`` is parsed from string values.
 
-Accepted keywords are **exactly identical** to the enum names:
+Accepted keywords are **exactly identical** to the enum names (``Default`` is also
+accepted for ``DefaultParallelMode``). An unknown name silently selects
+``DefaultParallelMode``.
 
 - ``DefaultParallelMode``
 - ``InteractionBuffer``
@@ -134,7 +137,7 @@ Accepted keywords are **exactly identical** to the enum names:
 Example
 ~~~~~~~
 
-.. code-block:: yaml
+.. code-block:: text
 
     parallel_mode WaveMethodBlock
 
@@ -149,7 +152,7 @@ The format described here can be used as both input and output of a simulation.
 
   Elapsed time between each backup of the configuration.
 
-- ``iconf`` (*double*) **value**
+- ``iconf`` (*int*) **value**
 
   Number of the current configuration. This number is used to name the conf-file.
 
@@ -464,8 +467,9 @@ A bond is **inner** when the two bodies share the same ``cluster`` number, and
 - ``preventCrossingLength`` (*double*) **value**
 
   When strictly positive, stiffens the normal repulsion at large overlap, to
-  prevent bodies from crossing each other. It is written in the conf-files only
-  when it is non-zero.
+  prevent bodies from crossing each other: with the force laws ``Default`` and
+  ``GeoVisc``, the elastic normal force is multiplied by :math:`L / (L + d_n)`,
+  capped at 100. It is written in the conf-files only when it is non-zero.
 
 
 Time-dependent parameters
@@ -533,7 +537,8 @@ corresponding CMake option. Otherwise they are accepted but print a message
 saying the feature was not enabled; see :ref:`commandLine`.
 
 - Periodic cell: ``usePeriodicCell``, ``h``, ``vh``, ``ah``, ``mh``, ``dh``,
-  ``cellVelocityCorrection``, ``cellMomentumCorrection``, ``useKineticStress``.
+  ``cellVelocityCorrection``, ``cellMomentumCorrection``, ``useKineticStress``,
+  ``cellRelattice``, ``cellDriveCauchy``.
   See :ref:`periodicBoundaryConditions`.
 
 - Deformable particles: ``useSoftParticles``, ``defineElasticParticles``,

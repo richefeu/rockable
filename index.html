@@ -115,7 +115,7 @@
 </ol>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>It is designed and developed meanly for academic use.</p>
+<p>It is designed and developed mainly for academic use.</p>
 </div>
 <a class="reference internal image-reference" href="_images/RockableRocks.png"><img alt="_images/RockableRocks.png" class="align-center" src="_images/RockableRocks.png" style="width: 192px;" />
 </a>
@@ -146,7 +146,7 @@ with energy-based criteria.</p>
 <li><p><strong>Particle Shapes</strong>: the code uses only one 3D shape: sphero-polyhedra or R-shapes. These shapes can be non-convex (with holes if necessary) and have rounded edges and corners (uniform radius per shape).</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Some other shapes are currently considered for special boundary shapes (sphere, cylinder…) and specifique loadings.</p>
+<p>Some other shapes are currently considered for special boundary shapes (sphere, cylinder…) and specific loadings.</p>
 </div>
 </li>
 <li><p><strong>Boundary Conditions</strong>: any rigid element can be used to apply boundary conditions. It is possible to impose velocity, force, or moment component by component. Some predefined systems with servo-control are also available for complex loading conditions (e.g., loading cycles or controlled pressure).</p></li>
@@ -171,13 +171,13 @@ such as MPI + OpenMP and GPU acceleration using CUDA or HIP backends.</p>
 <p>This task is currently handled with Saeid Nezamabadi and Farhang Radjai.</p>
 </div>
 </li>
-<li><p><strong>Homogeneously compliant particles</strong>: Expanding the framework to handle flexible particles is a significant advancement. This allows simulation of particle materials that can deform under various conditions, such as soft particles, polymers, or biological tissues. The objective is not to determine the kinematic field with a large quantity of degrees of freedom but rather to make certain ones possible.</p>
+<li><p><strong>Homogeneously compliant particles</strong>: a particle can be given a uniform, linear isotropic elastic or viscoelastic deformation, driven by its mean stress: the Discrete Compliant-Element Method (DCEM). This allows simulation of particle materials that can deform, such as soft particles, polymers, biological tissues, or cells of a bonded material whose fracture depends on the elastic energy they store. The objective is not to determine the kinematic field with a large quantity of degrees of freedom but rather to make certain ones possible. See <a class="reference internal" href="softParticles.html#softparticles"><span class="std std-ref">Deformable particles (DCEM)</span></a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This task is currently handled in the posdoc of Mukesh Singh Bisht.</p>
+<p>This was developed in the postdoc of Mukesh Singh Bisht.</p>
 </div>
 </li>
-<li><p><strong>Documentation</strong>: there is little documentation, although efforts are being made to address this.</p></li>
+<li><p><strong>Documentation</strong>: these pages describe what the code does, and are checked against the source code (see the file <code class="docutils literal notranslate"><span class="pre">sphinxdoc/README.md</span></code> of the repository for how they are maintained).</p></li>
 </ul>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
@@ -196,6 +196,9 @@ such as MPI + OpenMP and GPU acceleration using CUDA or HIP backends.</p>
 <li class="toctree-l2"><a class="reference internal" href="fileOrganisation.html#prepro">📁 <code class="docutils literal notranslate"><span class="pre">prepro</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="fileOrganisation.html#src">📁 <code class="docutils literal notranslate"><span class="pre">src</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="fileOrganisation.html#test">📁 <code class="docutils literal notranslate"><span class="pre">test</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="fileOrganisation.html#sphinxdoc">📁 <code class="docutils literal notranslate"><span class="pre">sphinxdoc</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="fileOrganisation.html#cheatsheets">📁 <code class="docutils literal notranslate"><span class="pre">cheatsheets</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="fileOrganisation.html#deps">📁 <code class="docutils literal notranslate"><span class="pre">deps</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="commandLine.html">Command line and build options</a><ul>
@@ -341,6 +344,7 @@ such as MPI + OpenMP and GPU acceleration using CUDA or HIP backends.</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="visualisation.html">Visualisation tools</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="visualisation.html#application-see">Application <cite>see</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualisation.html#application-conftovtk">Application <cite>conftovtk</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="visualisation.html#application-seer-dear-my-seer">Application <cite>seer</cite> (Dear My Seer)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="visualisation.html#application-shape-dear-my-shape">Application <cite>shape</cite> (Dear My Shape)</a></li>
 </ul>
@@ -370,6 +374,7 @@ such as MPI + OpenMP and GPU acceleration using CUDA or HIP backends.</p>
 <li class="toctree-l2"><a class="reference internal" href="developerGuide.html#adding-a-pre-processing-command">Adding a pre-processing command</a></li>
 <li class="toctree-l2"><a class="reference internal" href="developerGuide.html#adding-a-post-processor">Adding a post-processor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="developerGuide.html#where-things-live">Where things live</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developerGuide.html#keeping-restarts-exact">Keeping restarts exact</a></li>
 <li class="toctree-l2"><a class="reference internal" href="developerGuide.html#testing-a-change">Testing a change</a></li>
 </ul>
 </li>

@@ -149,10 +149,11 @@
 </ol>
 <section id="header">
 <h2>Header<a class="headerlink" href="#header" title="Link to this heading"></a></h2>
-<p>A conf-file always starts with the following header format: <code class="docutils literal notranslate"><span class="pre">Rockable</span> <span class="pre">dd-mm-yyyy</span></code> (e.g., <code class="docutils literal notranslate"><span class="pre">Rockable</span> <span class="pre">29-11-2018</span></code>).
+<p>A conf-file always starts with the following header format: <code class="docutils literal notranslate"><span class="pre">Rockable</span> <span class="pre">dd-mm-yyyy</span></code> (e.g., <code class="docutils literal notranslate"><span class="pre">Rockable</span> <span class="pre">21-08-2022</span></code>).
 The header includes the date (<code class="docutils literal notranslate"><span class="pre">dd-mm-yyyy</span></code>) corresponding to the version of the format.
 Whenever a noticeable change is made in the format, the date in the header is updated to reflect the new version.
-The version date is defined in the preprocessor define of <code class="docutils literal notranslate"><span class="pre">CONF_VERSION_DATE</span></code> in the source code.</p>
+The version date is defined in the preprocessor define of <code class="docutils literal notranslate"><span class="pre">CONF_VERSION_DATE</span></code> in the source code (<code class="docutils literal notranslate"><span class="pre">21-08-2022</span></code> at present).
+A file with another date is still read, with a warning: in most cases, this is not a problem.</p>
 </section>
 <section id="keywords">
 <h2>Keywords<a class="headerlink" href="#keywords" title="Link to this heading"></a></h2>
@@ -224,8 +225,8 @@ It defines how work is distributed across threads and how memory conflicts are h
 <section id="available-options">
 <h3>Available options<a class="headerlink" href="#available-options" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt><code class="docutils literal notranslate"><span class="pre">DefaultParallelMode</span></code></dt><dd><p>Uses the default execution strategy defined by Rockable.
-Typically mapped to the most stable or recommended mode depending on the build configuration.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">DefaultParallelMode</span></code></dt><dd><p>The default. The forces of the active interactions are computed in
+parallel, and the resultants on the bodies are then summed sequentially.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">InteractionBuffer</span></code></dt><dd><p>Uses an intermediate buffer to store interactions before applying updates.</p>
 </dd>
@@ -243,7 +244,9 @@ Uses an 8-wave decomposition and improves cache efficiency while maintaining loc
 <section id="input-keyword">
 <h3>Input keyword<a class="headerlink" href="#input-keyword" title="Link to this heading"></a></h3>
 <p>The input parameter <code class="docutils literal notranslate"><span class="pre">parallel_mode</span></code> is parsed from string values.</p>
-<p>Accepted keywords are <strong>exactly identical</strong> to the enum names:</p>
+<p>Accepted keywords are <strong>exactly identical</strong> to the enum names (<code class="docutils literal notranslate"><span class="pre">Default</span></code> is also
+accepted for <code class="docutils literal notranslate"><span class="pre">DefaultParallelMode</span></code>). An unknown name silently selects
+<code class="docutils literal notranslate"><span class="pre">DefaultParallelMode</span></code>.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">DefaultParallelMode</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">InteractionBuffer</span></code></p></li>
@@ -254,7 +257,7 @@ Uses an 8-wave decomposition and improves cache efficiency while maintaining loc
 </section>
 <section id="example">
 <h3>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h3>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">parallel_mode WaveMethodBlock</span>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>parallel_mode WaveMethodBlock
 </pre></div>
 </div>
 </section>
@@ -267,7 +270,7 @@ The format described here can be used as both input and output of a simulation.<
 <li><p><code class="docutils literal notranslate"><span class="pre">interConf</span></code> (<em>double</em>) <strong>value</strong></p>
 <p>Elapsed time between each backup of the configuration.</p>
 </li>
-<li><p><code class="docutils literal notranslate"><span class="pre">iconf</span></code> (<em>double</em>) <strong>value</strong></p>
+<li><p><code class="docutils literal notranslate"><span class="pre">iconf</span></code> (<em>int</em>) <strong>value</strong></p>
 <p>Number of the current configuration. This number is used to name the conf-file.</p>
 </li>
 </ul>
@@ -593,8 +596,9 @@ than two bodies touching through one. <strong>model</strong> is <code class="doc
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">preventCrossingLength</span></code> (<em>double</em>) <strong>value</strong></p>
 <p>When strictly positive, stiffens the normal repulsion at large overlap, to
-prevent bodies from crossing each other. It is written in the conf-files only
-when it is non-zero.</p>
+prevent bodies from crossing each other: with the force laws <code class="docutils literal notranslate"><span class="pre">Default</span></code> and
+<code class="docutils literal notranslate"><span class="pre">GeoVisc</span></code>, the elastic normal force is multiplied by <span class="math notranslate nohighlight">\(L / (L + d_n)\)</span>,
+capped at 100. It is written in the conf-files only when it is non-zero.</p>
 </li>
 </ul>
 </section>
@@ -665,7 +669,8 @@ corresponding CMake option. Otherwise they are accepted but print a message
 saying the feature was not enabled; see <a class="reference internal" href="commandLine.html#commandline"><span class="std std-ref">Command line and build options</span></a>.</p>
 <ul class="simple">
 <li><p>Periodic cell: <code class="docutils literal notranslate"><span class="pre">usePeriodicCell</span></code>, <code class="docutils literal notranslate"><span class="pre">h</span></code>, <code class="docutils literal notranslate"><span class="pre">vh</span></code>, <code class="docutils literal notranslate"><span class="pre">ah</span></code>, <code class="docutils literal notranslate"><span class="pre">mh</span></code>, <code class="docutils literal notranslate"><span class="pre">dh</span></code>,
-<code class="docutils literal notranslate"><span class="pre">cellVelocityCorrection</span></code>, <code class="docutils literal notranslate"><span class="pre">cellMomentumCorrection</span></code>, <code class="docutils literal notranslate"><span class="pre">useKineticStress</span></code>.
+<code class="docutils literal notranslate"><span class="pre">cellVelocityCorrection</span></code>, <code class="docutils literal notranslate"><span class="pre">cellMomentumCorrection</span></code>, <code class="docutils literal notranslate"><span class="pre">useKineticStress</span></code>,
+<code class="docutils literal notranslate"><span class="pre">cellRelattice</span></code>, <code class="docutils literal notranslate"><span class="pre">cellDriveCauchy</span></code>.
 See <a class="reference internal" href="periodicBoundaryConditions.html#periodicboundaryconditions"><span class="std std-ref">Periodic boundary conditions</span></a>.</p></li>
 <li><p>Deformable particles: <code class="docutils literal notranslate"><span class="pre">useSoftParticles</span></code>, <code class="docutils literal notranslate"><span class="pre">defineElasticParticles</span></code>,
 <code class="docutils literal notranslate"><span class="pre">defineViscousParameters</span></code>, <code class="docutils literal notranslate"><span class="pre">defineViscousTime</span></code>, <code class="docutils literal notranslate"><span class="pre">useViscousTime</span></code>, and the

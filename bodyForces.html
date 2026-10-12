@@ -130,6 +130,11 @@ other cases.</p>
 <code class="docutils literal notranslate"><span class="pre">BodyForce</span></code> replaces the first. Unlike the data extractors, the active body
 force <em>is</em> written back into the conf-files, so it survives a restart.</p>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A body force acts on the free bodies only, not on the <code class="docutils literal notranslate"><span class="pre">nDriven</span></code> driven
+ones.</p>
+</div>
 <section id="viscousfluid-double-fluiddensity">
 <h2><code class="docutils literal notranslate"><span class="pre">ViscousFluid</span></code> (<em>double</em>) <strong>fluidDensity</strong><a class="headerlink" href="#viscousfluid-double-fluiddensity" title="Link to this heading"></a></h2>
 <p>Drag exerted by a surrounding fluid of density <span class="math notranslate nohighlight">\(\rho\)</span>. The intended model
@@ -221,8 +226,10 @@ meaning.</p></td>
 deposition, leaves the contact law untouched.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">BodyForce</span> <span class="pre">ViscousFluid</span></code></p></td>
-<td><p>A real drag force, with a physical parameter. The only one of the three
-that can be defended in a published result as part of the model.</p></td>
+<td><p>Meant as a real drag force, with a physical parameter, which would make
+it the only one of the three that can be defended in a published result
+as part of the model. In its current state, it does not oppose the
+motion (see the warning above).</p></td>
 </tr>
 </tbody>
 </table>

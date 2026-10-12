@@ -17,6 +17,7 @@
       <script src="_static/documentation_options.js?v=8d563738"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -181,8 +182,26 @@ twice, with two command files, to obtain two different analyses.</p>
 </section>
 <section id="particlestress">
 <h2><code class="docutils literal notranslate"><span class="pre">ParticleStress</span></code><a class="headerlink" href="#particlestress" title="Link to this heading"></a></h2>
-<p>Computes the stress tensor of the sample from the contact forces and the branch
-vectors, for each processed configuration.</p>
+<p>Computes, for each processed configuration, the tensorial moment of each
+particle,</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{M}_i = \sum_c \underline{f}_c \otimes \underline{x}_c\]</div>
+<p>where the sum runs over the interactions of the particle, <span class="math notranslate nohighlight">\(\underline{f}_c\)</span>
+is the <strong>opposite</strong> of the force it receives (so that a compression is
+positive) and
+<span class="math notranslate nohighlight">\(\underline{x}_c\)</span> the position of the contact point. For a particle in
+equilibrium, this is the usual sum of the forces times the branch vectors. The
+driven bodies are skipped.</p>
+<p>The results are written into <code class="docutils literal notranslate"><span class="pre">ParticleStress-conf&lt;iconf&gt;.txt</span></code>, one line per
+particle: the 9 components of <span class="math notranslate nohighlight">\(\mathbf{M}_i\)</span> (they are <strong>not</strong> divided
+by the volume of the particle), then four values that separate an axial part,
+along the axis <span class="math notranslate nohighlight">\(z\)</span> of the body (<span class="math notranslate nohighlight">\(\underline{u}\)</span>), from a radial
+part: <span class="math notranslate nohighlight">\(a = \underline{u} \cdot \mathbf{M}_i \underline{u}\)</span>,
+<span class="math notranslate nohighlight">\(r = \sqrt{r_1^2 + r_2^2}\)</span> with <span class="math notranslate nohighlight">\(r_k = \underline{t}_k \cdot \mathbf{M}_i \underline{t}_k\)</span>
+for two unit vectors <span class="math notranslate nohighlight">\(\underline{t}_1, \underline{t}_2\)</span> perpendicular to
+<span class="math notranslate nohighlight">\(\underline{u}\)</span>, then the trace of the axial part and the trace of the
+radial part. The stress of the whole sample, <span class="math notranslate nohighlight">\(\sum_i \mathbf{M}_i / V\)</span>, is
+printed on the terminal.</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 30.0%" />
@@ -195,8 +214,8 @@ vectors, for each processed configuration.</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Volume</span> <span class="pre">&lt;double&gt;</span></code></p></td>
-<td><p>Total volume used to normalise the stress. This is the default value,
-used for every configuration that is not listed below.</p></td>
+<td><p>Total volume used to normalise the stress of the sample. This is the
+default value, used for every configuration that is not listed below.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ConfVolumes</span> <span class="pre">&lt;nb&gt;</span></code></p></td>
 <td><p>Followed by <code class="docutils literal notranslate"><span class="pre">nb</span></code> lines <code class="docutils literal notranslate"><span class="pre">&lt;iconf&gt;</span> <span class="pre">&lt;volume&gt;</span></code>, giving the volume of
@@ -229,12 +248,18 @@ ConfVolumes 3
 <p>The six bounds of a box of driven walls are printed by <code class="docutils literal notranslate"><span class="pre">see</span></code> with the key
 <code class="docutils literal notranslate"><span class="pre">x</span></code>, which gives a quick way of building this list for a triaxial cell.</p>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For the stress of the soft particles themselves, which Rockable computes
+during the run, use the data extractors <code class="docutils literal notranslate"><span class="pre">TrackSoftParticle</span></code> or
+<code class="docutils literal notranslate"><span class="pre">TrackStress</span></code> (see <a class="reference internal" href="dataExtractors.html#dataextractors"><span class="std std-ref">Data extractors</span></a>).</p>
+</div>
 </section>
 <section id="clustergranulo">
 <h2><code class="docutils literal notranslate"><span class="pre">ClusterGranulo</span></code><a class="headerlink" href="#clustergranulo" title="Link to this heading"></a></h2>
-<p>Grain-size distribution of the clusters, obtained by sieving. It is meant for
-fragmentation studies: as the interfaces break, an initial cluster splits into
-sub-clusters, and this post-processor counts how many pass through each sieve.</p>
+<p>Distribution of the sizes of the sub-clusters, for fragmentation studies: as
+the interfaces break, an initial cluster splits into sub-clusters, and this
+post-processor counts them.</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 30.0%" />
@@ -247,8 +272,7 @@ sub-clusters, and this post-processor counts how many pass through each sieve.</
 </thead>
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SievingSizes</span> <span class="pre">&lt;nb&gt;</span></code></p></td>
-<td><p>Followed by <code class="docutils literal notranslate"><span class="pre">nb</span></code> sieve sizes, given as plain numbers on the following
-lines.</p></td>
+<td><p>Followed by <code class="docutils literal notranslate"><span class="pre">nb</span></code> values, one per class.</p></td>
 </tr>
 </tbody>
 </table>
@@ -260,15 +284,28 @@ stepConf 10
 
 PostProcessor ClusterGranulo
 SievingSizes 5
-0.001 0.002 0.005 0.01 0.02
+1 2 3 4 5
 </pre></div>
 </div>
+</div>
+<p>The results are written into <code class="docutils literal notranslate"><span class="pre">ClusterGranulo-conf&lt;iconf&gt;.txt</span></code>, one line per
+class: the value given in <code class="docutils literal notranslate"><span class="pre">SievingSizes</span></code>, and the fraction (in number) of the
+sub-clusters in that class.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Despite their name, the values of <code class="docutils literal notranslate"><span class="pre">SievingSizes</span></code> are not sizes that the
+sub-clusters are compared with: they are only written as labels. The class
+of a sub-cluster is its <strong>number of particles</strong> minus one (a single particle
+is in the first class, two particles in the second, …), and the larger
+sub-clusters all go into the last class. It is therefore a distribution of
+the number of particles per sub-cluster, not a grain-size distribution.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The sub-clusters are identified from the interfaces that are still intact,
 so this analysis is only meaningful together with a force law that breaks
-interfaces (<code class="docutils literal notranslate"><span class="pre">StickedLinks</span></code> or <code class="docutils literal notranslate"><span class="pre">BCM</span></code>).</p>
+interfaces (<code class="docutils literal notranslate"><span class="pre">StickedLinks</span></code> or <code class="docutils literal notranslate"><span class="pre">BCM</span></code>). The file of a configuration
+without any sub-cluster is left empty.</p>
 </div>
 </section>
 <section id="post-processing-without-postpro">

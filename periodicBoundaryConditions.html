@@ -122,13 +122,12 @@ a finite sample, and it is what makes concurrent double-scale simulations
 possible.</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
-<p>These keywords are only understood when Rockable has been compiled with</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>..<span class="w"> </span>-DROCKABLE_ENABLE_PERIODIC<span class="o">=</span>ON
-</pre></div>
-</div>
-<p>Without that option the keywords are still accepted, but each of them only
-prints <code class="docutils literal notranslate"><span class="pre">PERIODIC_NOT_ENABLED</span> <span class="pre">when</span> <span class="pre">Rockable</span> <span class="pre">was</span> <span class="pre">compiled</span></code> and does nothing.
-<code class="docutils literal notranslate"><span class="pre">rockable</span> <span class="pre">-b</span></code> tells you which options a binary was built with.</p>
+<p>These keywords are only understood when Rockable has been compiled with the
+CMake option <code class="docutils literal notranslate"><span class="pre">ROCKABLE_ENABLE_PERIODIC</span></code>, which is <code class="docutils literal notranslate"><span class="pre">ON</span></code> by default. With
+<code class="docutils literal notranslate"><span class="pre">-DROCKABLE_ENABLE_PERIODIC=OFF</span></code>, the keywords are still accepted, but
+each of them only prints <code class="docutils literal notranslate"><span class="pre">PERIODIC_NOT_ENABLED</span> <span class="pre">when</span> <span class="pre">Rockable</span> <span class="pre">was</span> <span class="pre">compiled</span></code>
+and does nothing. <code class="docutils literal notranslate"><span class="pre">rockable</span> <span class="pre">-b</span></code> tells you which options a binary was built
+with.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>

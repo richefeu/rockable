@@ -172,8 +172,12 @@ evaluates them.</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;filename&gt;</span></code></p></td>
-<td><p>Name of the text file to write. It is opened at start-up and flushed
-after each record, so it can be plotted while the computation runs.</p></td>
+<td><p>Name of the text file to write. It is opened at start-up and, for most
+extractors, flushed after each record, so it can be plotted while the
+computation runs (<code class="docutils literal notranslate"><span class="pre">TrackDamage</span></code> writes it by blocks, and completes it
+at the end of the run). The file is <strong>emptied</strong> when it is opened: a
+computation restarted from a conf-file overwrites what the previous run
+recorded, so rename the file, or copy it, before restarting.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;nrec&gt;</span></code></p></td>
 <td><p>Number of <strong>time steps</strong> between two records. This is a step count, not

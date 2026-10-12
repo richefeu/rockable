@@ -149,6 +149,12 @@ Transformations
 A global transformation is maintained throughout script execution and applied
 by packing commands when placing particles.
 
+.. note::
+
+   The first versions of ``generator`` spelt these commands
+   ``tranformation:...``, without the first ``s``. This spelling is still
+   accepted, so that the old command files keep working.
+
 ``transformation:add_translation <x> <y> <z>``
    Add a translation to the current transformation.
 

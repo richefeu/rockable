@@ -51,6 +51,9 @@
 <li class="toctree-l2"><a class="reference internal" href="#prepro">📁 <code class="docutils literal notranslate"><span class="pre">prepro</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#src">📁 <code class="docutils literal notranslate"><span class="pre">src</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#test">📁 <code class="docutils literal notranslate"><span class="pre">test</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sphinxdoc">📁 <code class="docutils literal notranslate"><span class="pre">sphinxdoc</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cheatsheets">📁 <code class="docutils literal notranslate"><span class="pre">cheatsheets</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#deps">📁 <code class="docutils literal notranslate"><span class="pre">deps</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="commandLine.html">Command line and build options</a></li>
@@ -115,7 +118,7 @@
 <span id="file-organisation"></span><h1>Organisation of the files<a class="headerlink" href="#organisation-of-the-files" title="Link to this heading"></a></h1>
 <section id="examples">
 <h2>📁 <code class="docutils literal notranslate"><span class="pre">examples</span></code><a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
-<p>Directory containing example simulations or processings. The example name <strong>helloworld</strong> can be a starting point but the reste of the folder is a kind of sand-box the developers use to test their features.</p>
+<p>Directory containing example simulations or processings. The example named <strong>helloworld</strong> can be a starting point. The examples of <strong>softParticles</strong> run in a few seconds and each has a <code class="docutils literal notranslate"><span class="pre">readme.md</span></code> telling what to check (see <a class="reference internal" href="softParticles.html#softparticles"><span class="std std-ref">Deformable particles (DCEM)</span></a>). The rest of the folder is a kind of sandbox the developers use to test their features.</p>
 </section>
 <section id="prepro">
 <h2>📁 <code class="docutils literal notranslate"><span class="pre">prepro</span></code><a class="headerlink" href="#prepro" title="Link to this heading"></a></h2>
@@ -133,6 +136,8 @@ No dependency, so it can be built and used over ssh.</p></li>
 <li><p>📁 <code class="docutils literal notranslate"><span class="pre">converters</span></code>
 Conversion applications.</p>
 <ul>
+<li><p>📁 <code class="docutils literal notranslate"><span class="pre">shape2mesh</span></code>
+Builds the skin mesh (<code class="docutils literal notranslate"><span class="pre">.rmsh</span></code>) of the shapes, used by <code class="docutils literal notranslate"><span class="pre">see</span></code> to draw them.</p></li>
 <li><p>📁 <code class="docutils literal notranslate"><span class="pre">stl2shape</span></code>
 Converter for STL files to shape format.</p></li>
 <li><p>📁 <code class="docutils literal notranslate"><span class="pre">tess2shape</span></code>
@@ -154,6 +159,8 @@ Tool for tube packing.</p></li>
 </li>
 <li><p>📁 <code class="docutils literal notranslate"><span class="pre">shapesurvey</span></code>
 Tool for shape analysis.</p></li>
+<li><p>📁 <code class="docutils literal notranslate"><span class="pre">sweepable</span></code>
+Tool to run parametric studies (see <a class="reference internal" href="sweepable.html#sweepable"><span class="std std-ref">Application sweepable</span></a>).</p></li>
 </ul>
 </section>
 <section id="src">
@@ -182,7 +189,26 @@ Processing tools.</p></li>
 </section>
 <section id="test">
 <h2>📁 <code class="docutils literal notranslate"><span class="pre">test</span></code><a class="headerlink" href="#test" title="Link to this heading"></a></h2>
-<p>Directory containing non-regression tests for the project. It would be nice to add more tests.</p>
+<p>Directory containing the tests of the project: unit tests of the skin mesh, and
+non-regression tests that run short simulations and compare their last
+conf-file with a reference. They are built with <code class="docutils literal notranslate"><span class="pre">-DROCKABLE_USE_TESTING=ON</span></code>
+and run with <code class="docutils literal notranslate"><span class="pre">ctest</span></code>; the file <code class="docutils literal notranslate"><span class="pre">test/README.md</span></code> explains how they work and
+how to add one.</p>
+</section>
+<section id="sphinxdoc">
+<h2>📁 <code class="docutils literal notranslate"><span class="pre">sphinxdoc</span></code><a class="headerlink" href="#sphinxdoc" title="Link to this heading"></a></h2>
+<p>The sources of this documentation. The file <code class="docutils literal notranslate"><span class="pre">sphinxdoc/README.md</span></code> explains how
+it is written and maintained.</p>
+</section>
+<section id="cheatsheets">
+<h2>📁 <code class="docutils literal notranslate"><span class="pre">cheatsheets</span></code><a class="headerlink" href="#cheatsheets" title="Link to this heading"></a></h2>
+<p>One-page reference sheets, written with Typst, for the conf-files, the companion
+files, the physics, the command lines, <code class="docutils literal notranslate"><span class="pre">see</span></code> and the other tools.</p>
+</section>
+<section id="deps">
+<h2>📁 <code class="docutils literal notranslate"><span class="pre">deps</span></code><a class="headerlink" href="#deps" title="Link to this heading"></a></h2>
+<p>The libraries fetched by CMake at the configuration step (<code class="docutils literal notranslate"><span class="pre">toofus</span></code>, <code class="docutils literal notranslate"><span class="pre">fmt</span></code>,
+…). It is not part of the repository.</p>
 </section>
 </section>
 

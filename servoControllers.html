@@ -138,6 +138,12 @@ the wall, which changes as the sample deforms.</p>
 <p>Only one servo can be active at a time. The servo function is stored as a
 single callback, so a second <code class="docutils literal notranslate"><span class="pre">Servo</span></code> entry silently replaces the first.</p>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A misspelt servo name whose name starts with <code class="docutils literal notranslate"><span class="pre">tritri</span></code> prints an error, but
+any other unknown name is <strong>silently ignored</strong>: check the spelling when a
+servo seems to do nothing.</p>
+</div>
 <nav class="contents local" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#the-tritri-family" id="id6">The <code class="docutils literal notranslate"><span class="pre">tritri</span></code> family</a></p>
@@ -373,6 +379,11 @@ Servo ramp _y_For_ 3 0.0 -5000.0 0.1 0.6
 </div>
 </div>
 <p>This is the way to avoid the shock of a load applied abruptly at the first step.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">drivingSystem.txt</span></code> is re-read at every conf-file, so the parameters of a
+ramp can be changed while the computation runs.</p>
+</div>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>A ramp on a <em>material parameter</em> rather than on a boundary is a different

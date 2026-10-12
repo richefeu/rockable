@@ -124,8 +124,8 @@
   <section id="converters">
 <span id="id1"></span><h1>Converters<a class="headerlink" href="#converters" title="Link to this heading"></a></h1>
 <p>Three converters bridge Rockable’s shape format and the usual geometry formats.
-They live in <code class="docutils literal notranslate"><span class="pre">prepro/converters</span></code> and are built with
-<code class="docutils literal notranslate"><span class="pre">ROCKABLE_COMPILE_PREPRO</span></code>.</p>
+They live in <code class="docutils literal notranslate"><span class="pre">prepro/converters</span></code>. <code class="docutils literal notranslate"><span class="pre">stl2shape</span></code> and <code class="docutils literal notranslate"><span class="pre">shape2mesh</span></code> are built
+by CMake with <code class="docutils literal notranslate"><span class="pre">ROCKABLE_COMPILE_PREPRO</span></code>; <code class="docutils literal notranslate"><span class="pre">tess2shape</span></code> is not (see below).</p>
 <nav class="contents local" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#stl2shape-from-a-triangulated-mesh" id="id3"><code class="docutils literal notranslate"><span class="pre">stl2shape</span></code>: from a triangulated mesh</a></p></li>
@@ -203,6 +203,15 @@ space-filling grains, of the kind used for the bonded models.</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>tess2shape<span class="w"> </span>command.txt
 </pre></div>
 </div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="docutils literal notranslate"><span class="pre">tess2shape</span></code> is <strong>not built by CMake</strong>: its line is commented out in
+<code class="docutils literal notranslate"><span class="pre">prepro/converters/CMakeLists.txt</span></code>. It has its own <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> in
+<code class="docutils literal notranslate"><span class="pre">prepro/converters/tess2shape</span></code>, which expects <code class="docutils literal notranslate"><span class="pre">toofus</span></code> in <code class="docutils literal notranslate"><span class="pre">~/toofus</span></code>
+and compiles in C++11; it may need to be updated to build against the
+current sources of Rockable, which are C++17. The same holds for
+<code class="docutils literal notranslate"><span class="pre">tif2rockable</span></code>, in the same folder.</p>
+</div>
 <p>The command file is a list of keywords:</p>
 <div class="literal-block-wrapper docutils container" id="id2">
 <div class="code-block-caption"><span class="caption-text">command.txt</span><a class="headerlink" href="#id2" title="Link to this code"></a></div>
@@ -250,9 +259,9 @@ MCnstep             50000
 </table>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>The keyword is <code class="docutils literal notranslate"><span class="pre">MinkowskiRadius</span></code>. Some example files shipped with the
-repository spell it <code class="docutils literal notranslate"><span class="pre">MinskowskiRadius</span></code>, which is <strong>not</strong> recognised: the
-line is ignored and the radius silently keeps its default value.</p>
+<p>The keyword is <code class="docutils literal notranslate"><span class="pre">MinkowskiRadius</span></code>. Older command files may spell it
+<code class="docutils literal notranslate"><span class="pre">MinskowskiRadius</span></code>, which is <strong>not</strong> recognised: the line is ignored and
+the radius silently keeps its default value.</p>
 </div>
 <p>Generating the tessellation itself is a Neper matter:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>neper<span class="w"> </span>-T<span class="w"> </span>-n<span class="w"> </span><span class="m">100</span><span class="w"> </span>-domain<span class="w"> </span><span class="s2">"cube(1,1,1)"</span><span class="w"> </span>-o<span class="w"> </span>tessel
@@ -314,6 +323,9 @@ When that file sits next to the shape file, <code class="docutils literal notran
 skin mesh instead of the overlapping spheres, tubes and slabs it normally uses.
 The difference is purely visual, but on a rounded polyhedron it is the
 difference between a figure that reads and one that does not.</p>
+<p>The skin mesh cannot follow the deformation of a soft particle (see
+<a class="reference internal" href="softParticles.html#softparticles"><span class="std std-ref">Deformable particles (DCEM)</span></a>): the soft particles are always drawn with the overlapping
+primitives, deformed.</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>shape2mesh<span class="w"> </span>shapes.txt<span class="w"> </span>--rmsh<span class="w">       </span><span class="c1"># -&gt; shapes.rmsh</span>
 shape2mesh<span class="w"> </span>shapes.txt<span class="w"> </span>--rmsh<span class="w"> </span>-s<span class="w">    </span><span class="c1"># smaller, flat faces merged</span>
 </pre></div>

@@ -69,7 +69,9 @@ Computing the mass properties
        recomputation.
    * - ``N`` / ``n``
      - Multiply / divide by ten the number of Monte-Carlo samples
-       (``MCnstep``), between :math:`10^3` and :math:`10^8`.
+       (``MCnstep``), between :math:`10^3` and :math:`10^8`. Note that a value
+       above :math:`10^7` saved in the file is brought back to :math:`10^7`
+       when the file is read again.
    * - ``d``
      - Clean every shape, removing the duplicated entities.
 

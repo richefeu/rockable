@@ -7,7 +7,7 @@ Organisation of the files
 📁 ``examples``
 ---------------
 
-Directory containing example simulations or processings. The example name **helloworld** can be a starting point but the reste of the folder is a kind of sand-box the developers use to test their features.
+Directory containing example simulations or processings. The example named **helloworld** can be a starting point. The examples of **softParticles** run in a few seconds and each has a ``readme.md`` telling what to check (see :ref:`softParticles`). The rest of the folder is a kind of sandbox the developers use to test their features.
 
 
 📁 ``prepro``
@@ -29,6 +29,9 @@ Some preprocessing applications.
 
 - 📁 ``converters``
   Conversion applications.
+
+  - 📁 ``shape2mesh``
+    Builds the skin mesh (``.rmsh``) of the shapes, used by ``see`` to draw them.
 
   - 📁 ``stl2shape``
     Converter for STL files to shape format.
@@ -53,6 +56,9 @@ Some preprocessing applications.
 
 - 📁 ``shapesurvey``
   Tool for shape analysis.
+
+- 📁 ``sweepable``
+  Tool to run parametric studies (see :ref:`sweepable`).
 
 
 
@@ -91,4 +97,29 @@ Main source directory containing the source code of ``Rockable``.
 📁 ``test``
 -----------
 
-Directory containing non-regression tests for the project. It would be nice to add more tests.
+Directory containing the tests of the project: unit tests of the skin mesh, and
+non-regression tests that run short simulations and compare their last
+conf-file with a reference. They are built with ``-DROCKABLE_USE_TESTING=ON``
+and run with ``ctest``; the file ``test/README.md`` explains how they work and
+how to add one.
+
+
+📁 ``sphinxdoc``
+----------------
+
+The sources of this documentation. The file ``sphinxdoc/README.md`` explains how
+it is written and maintained.
+
+
+📁 ``cheatsheets``
+------------------
+
+One-page reference sheets, written with Typst, for the conf-files, the companion
+files, the physics, the command lines, ``see`` and the other tools.
+
+
+📁 ``deps``
+-----------
+
+The libraries fetched by CMake at the configuration step (``toofus``, ``fmt``,
+...). It is not part of the repository.

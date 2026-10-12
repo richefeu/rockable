@@ -213,18 +213,31 @@ Control _xyzrot_Vel_ 2 0 0 1.5
 </pre></div>
 </div>
 </div>
-<p>A component that is <strong>not</strong> controlled stays free: the body is integrated along
-that degree of freedom like any other one. A body listed in <code class="docutils literal notranslate"><span class="pre">drivingSystem.txt</span></code>
-with a single <code class="docutils literal notranslate"><span class="pre">_y_Vel_</span></code> control therefore falls under gravity along <span class="math notranslate nohighlight">\(x\)</span>
-and <span class="math notranslate nohighlight">\(z\)</span> while its vertical motion is imposed. To keep a wall completely
-fixed, either give it no control at all, or control all of its components.</p>
+<p>A component of a driven body that is <strong>not</strong> controlled is not integrated at
+all: the body keeps its position along that degree of freedom. A wall listed in
+<code class="docutils literal notranslate"><span class="pre">drivingSystem.txt</span></code> with a single <code class="docutils literal notranslate"><span class="pre">_y_Vel_</span></code> control therefore moves
+vertically at the imposed velocity, and stays where it is along <span class="math notranslate nohighlight">\(x\)</span> and
+<span class="math notranslate nohighlight">\(z\)</span>, whatever the forces it receives.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Velocity-driven and force-driven components are not integrated in the same
-way. A force-driven component is integrated like a free body, with the
-imposed force added to the resultant; a velocity-driven component is simply
-translated at the imposed velocity, which makes it exactly kinematic. See
+way. A velocity-driven component is simply translated at the imposed
+velocity, which makes it exactly kinematic. A force-driven component is
+integrated like a free body, with the imposed force added to the resultant
+of the contact forces. <strong>Gravity is not applied</strong> to it: the imposed force is
+the only external force along that component, so the weight of a heavy
+piston has to be included in the imposed force if it matters. See
 <a class="reference internal" href="integrationSchemes.html#integrationschemes"><span class="std std-ref">Integration schemes</span></a>.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>A <code class="docutils literal notranslate"><span class="pre">Control</span></code> can also be given to a <strong>free</strong> body (one that is not among the
+<code class="docutils literal notranslate"><span class="pre">nDriven</span></code> first ones), for instance to hold the ends of a beam. The
+controlled velocity component is then reset at every step, but the body is
+still integrated as a free one, so it moves by <span class="math notranslate nohighlight">\(a\,\Delta t^2/2\)</span>
+per step along that component, <span class="math notranslate nohighlight">\(a\)</span> being its acceleration. Such a
+control holds the body only as long as the forces on it are nearly balanced;
+to impose a motion exactly, make the body a driven one.</p>
 </div>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>

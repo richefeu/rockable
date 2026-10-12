@@ -17,6 +17,7 @@
       <script src="_static/documentation_options.js?v=8d563738"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -72,6 +73,7 @@
 <li class="toctree-l1"><a class="reference internal" href="postProcessing.html">Post-processing (<code class="docutils literal notranslate"><span class="pre">postpro</span></code>)</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Visualisation tools</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#application-see">Application <cite>see</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#application-conftovtk">Application <cite>conftovtk</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#application-seer-dear-my-seer">Application <cite>seer</cite> (Dear My Seer)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#application-shape-dear-my-shape">Application <cite>shape</cite> (Dear My Shape)</a></li>
 </ul>
@@ -154,12 +156,57 @@ Where:
 </pre></div>
 </div>
 <p>or simply invoke <code class="docutils literal notranslate"><span class="pre">see</span></code> with no other argument, and the default one will be <code class="docutils literal notranslate"><span class="pre">conf0</span></code>.</p>
+<p>In the window, the key <code class="docutils literal notranslate"><span class="pre">k</span></code> lists all the key bindings, and <code class="docutils literal notranslate"><span class="pre">h</span></code> the use of the
+mouse. The keys <code class="docutils literal notranslate"><span class="pre">0</span></code> to <code class="docutils literal notranslate"><span class="pre">5</span></code> choose how the particles are colored: uniform,
+random, by velocity, by shape, and, for soft particles (see
+<a class="reference internal" href="softParticles.html#softparticles"><span class="std std-ref">Deformable particles (DCEM)</span></a>), by their volume change <span class="math notranslate nohighlight">\(\det \mathbf{F} - 1\)</span> and
+by their mean stress. The soft particles are drawn with their deformation. The
+cheatsheet <code class="docutils literal notranslate"><span class="pre">see_rockable_cheatsheet</span></code> (folder <code class="docutils literal notranslate"><span class="pre">cheatsheets</span></code>) describes every
+key and the settings of <code class="docutils literal notranslate"><span class="pre">see.json</span></code>.</p>
+</section>
+<section id="application-conftovtk">
+<h2>Application <cite>conftovtk</cite><a class="headerlink" href="#application-conftovtk" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">conftovtk</span></code> converts the conf-files into VTK files, to be visualised with
+ParaView. It converts <strong>every</strong> file named <code class="docutils literal notranslate"><span class="pre">conf&lt;number&gt;</span></code> of the current
+folder (the conf-file given on the command line is not used, and a file such as
+<code class="docutils literal notranslate"><span class="pre">conf10.txt</span></code> is not converted), and writes, for each of them:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 34.0%" />
+<col style="width: 66.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>File</p></th>
+<th class="head"><p>Content</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Shepres####.vtk</span></code></p></td>
+<td><p>The particles whose shape is a single vertex (spheres). The name is
+spelt this way in the source.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Polyr####.vtk</span></code></p></td>
+<td><p>The particles with more than two vertices (polyhedra), with their faces.
+The soft particles are written with their deformation.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Forces####.vtk</span></code></p></td>
+<td><p>The contact forces.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">OBB####.vtk</span></code></p></td>
+<td><p>The oriented bounding boxes of the particles.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The particles with exactly two vertices (sticks) are not written.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>conftovtk
+</pre></div>
+</div>
 </section>
 <section id="application-seer-dear-my-seer">
 <h2>Application <cite>seer</cite> (Dear My Seer)<a class="headerlink" href="#application-seer-dear-my-seer" title="Link to this heading"></a></h2>
 <a class="reference internal image-reference" href="_images/GPT_DearMySeer_logo_white.png"><img alt="_images/GPT_DearMySeer_logo_white.png" class="align-center" src="_images/GPT_DearMySeer_logo_white.png" style="width: 250px;" />
 </a>
-<p><strong>Dear My Seer</strong> is the visualization application that replaces <code class="docutils literal notranslate"><span class="pre">see</span></code> in <strong>Rockable</strong>.
+<p><strong>Dear My Seer</strong> is the visualization application meant to replace <code class="docutils literal notranslate"><span class="pre">see</span></code> in <strong>Rockable</strong>. It is built with the CMake option <code class="docutils literal notranslate"><span class="pre">ROCKABLE_COMPILE_SEER</span></code>, which is <strong>off</strong> by default, so <code class="docutils literal notranslate"><span class="pre">see</span></code> remains the default viewer.
 The old <code class="docutils literal notranslate"><span class="pre">see</span></code> application uses <code class="docutils literal notranslate"><span class="pre">freeglut</span></code> and thus <strong>X11</strong>, which made maintenance difficult, especially on Apple computers. The console-name <code class="docutils literal notranslate"><span class="pre">seer</span></code> stands for <strong>see-rockable</strong>, and since this new version uses <strong>Dear ImGui</strong>, it has been named <strong>Dear My Seer</strong> as a playful wordplay.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -179,7 +226,7 @@ its shapes, and lets them be inspected one by one.</p>
 </div>
 <p>The argument is optional and defaults to <code class="docutils literal notranslate"><span class="pre">shapes.txt</span></code>.</p>
 <p>It is built by the same CMake option as <code class="docutils literal notranslate"><span class="pre">seer</span></code>, <code class="docutils literal notranslate"><span class="pre">ROCKABLE_COMPILE_SEER</span></code>,
-which is on by default. The two applications share the vendored Dear ImGui and
+which is off by default. The two applications share the vendored Dear ImGui and
 ImPlot sources, compiled once into a static library.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -190,7 +237,8 @@ SDL2 and Dear ImGui instead of <code class="docutils literal notranslate"><span 
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Both <strong>Dear My Seer</strong> and <strong>Dear My Shape</strong> are under active development and
-their feature sets are not frozen.</p>
+their feature sets are not frozen. In particular, <strong>Dear My Seer</strong> does not
+draw the deformation of the soft particles yet: use <code class="docutils literal notranslate"><span class="pre">see</span></code> for them.</p>
 <p><code class="docutils literal notranslate"><span class="pre">shape</span></code> already fits the bounding box, toggles <code class="docutils literal notranslate"><span class="pre">preCompDone</span></code> and computes
 the mass properties of the displayed shape, but it has <strong>no save</strong>: nothing
 it computes can be written back to the library. Until that lands, use

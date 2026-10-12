@@ -10,7 +10,7 @@ The specificities of the code are to handle:
 
 .. note::
 
-   It is designed and developed meanly for academic use.
+   It is designed and developed mainly for academic use.
 
 .. image:: images/RockableRocks.png
    :width: 192px
@@ -48,7 +48,7 @@ Features
 - **Particle Shapes**: the code uses only one 3D shape: sphero-polyhedra or R-shapes. These shapes can be non-convex (with holes if necessary) and have rounded edges and corners (uniform radius per shape).
 
   .. note:: 
-     Some other shapes are currently considered for special boundary shapes (sphere, cylinder...) and specifique loadings.
+     Some other shapes are currently considered for special boundary shapes (sphere, cylinder...) and specific loadings.
 
 - **Boundary Conditions**: any rigid element can be used to apply boundary conditions. It is possible to impose velocity, force, or moment component by component. Some predefined systems with servo-control are also available for complex loading conditions (e.g., loading cycles or controlled pressure).
 
@@ -71,12 +71,12 @@ Features
   .. note:: 
      This task is currently handled with Saeid Nezamabadi and Farhang Radjai.
 
-- **Homogeneously compliant particles**: Expanding the framework to handle flexible particles is a significant advancement. This allows simulation of particle materials that can deform under various conditions, such as soft particles, polymers, or biological tissues. The objective is not to determine the kinematic field with a large quantity of degrees of freedom but rather to make certain ones possible.
+- **Homogeneously compliant particles**: a particle can be given a uniform, linear isotropic elastic or viscoelastic deformation, driven by its mean stress: the Discrete Compliant-Element Method (DCEM). This allows simulation of particle materials that can deform, such as soft particles, polymers, biological tissues, or cells of a bonded material whose fracture depends on the elastic energy they store. The objective is not to determine the kinematic field with a large quantity of degrees of freedom but rather to make certain ones possible. See :ref:`softParticles`.
 
   .. note:: 
-     This task is currently handled in the posdoc of Mukesh Singh Bisht.
+     This was developed in the postdoc of Mukesh Singh Bisht.
    
-- **Documentation**: there is little documentation, although efforts are being made to address this.
+- **Documentation**: these pages describe what the code does, and are checked against the source code (see the file ``sphinxdoc/README.md`` of the repository for how they are maintained).
 
 
 .. toctree::

@@ -207,7 +207,9 @@ recomputation.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">N</span></code> / <code class="docutils literal notranslate"><span class="pre">n</span></code></p></td>
 <td><p>Multiply / divide by ten the number of Monte-Carlo samples
-(<code class="docutils literal notranslate"><span class="pre">MCnstep</span></code>), between <span class="math notranslate nohighlight">\(10^3\)</span> and <span class="math notranslate nohighlight">\(10^8\)</span>.</p></td>
+(<code class="docutils literal notranslate"><span class="pre">MCnstep</span></code>), between <span class="math notranslate nohighlight">\(10^3\)</span> and <span class="math notranslate nohighlight">\(10^8\)</span>. Note that a value
+above <span class="math notranslate nohighlight">\(10^7\)</span> saved in the file is brought back to <span class="math notranslate nohighlight">\(10^7\)</span>
+when the file is read again.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">d</span></code></p></td>
 <td><p>Clean every shape, removing the duplicated entities.</p></td>
