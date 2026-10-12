@@ -58,6 +58,7 @@
 
 #include "PostProcessors/PostProcessor_ClusterGranulo.hpp"
 #include "PostProcessors/PostProcessor_ParticleStress.hpp"
+#include "PostProcessors/PostProcessor_SampleState.hpp"
 
 #include "PreproCommands/PreproCommand_copyParamsToInterfaces.hpp"
 #include "PreproCommands/PreproCommand_homothetyRange.hpp"
@@ -178,6 +179,7 @@ void Rockable::ExplicitRegistrations() {
   // PostProcessors (used by the application postpro)
   REGISTRER_BASE_DERIVED(PostProcessor, ClusterGranulo);
   REGISTRER_BASE_DERIVED(PostProcessor, ParticleStress);
+  REGISTRER_BASE_DERIVED(PostProcessor, SampleState);
 }
 
 /**
