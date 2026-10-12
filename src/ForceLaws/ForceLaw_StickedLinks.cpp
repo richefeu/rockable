@@ -151,7 +151,9 @@ bool StickedLinks::computeInteraction(Interaction& I) {
     if (yield > 0.0) {
       // All the bonds (Interactions) of the interface are broken.
       // The Interactions pointer inserted in this std::set
-      // will be 'broken' just after all the forces are computed
+      // will be 'broken' just after all the forces are computed.
+      // The forces are computed in parallel: the std::set must not be modified by two threads at once
+#pragma omp critical(interfacesToBreak)
       box->interfacesToBreak.insert(I.stick);
       // The breakage is postponed to avoid assymetry in the tangential forces
       // that are computed incrementally
