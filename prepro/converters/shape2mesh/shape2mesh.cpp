@@ -147,7 +147,17 @@ int main(int argc, char** argv) {
     if (tok != "<") continue;  // Shape::read consumes the block up to '>'
     Shape shape;
     shape.read(is);
-    if (!shape.vertex.empty()) shapes.push_back(shape);
+    if (shape.vertex.empty()) continue;
+    // A shape not pre-computed is not yet in its body frame (mass centre, principal axes),
+    // whereas Rockable and see put it there when they read it: mesh it in that frame,
+    // otherwise its skin would be drawn shifted and turned with respect to the particle
+    if (shape.preCompDone == 'n') {
+      std::printf("%s is not pre-computed (preCompDone n): computing its mass properties first\n",
+                  shape.name.c_str());
+      shape.massProperties();
+      shape.preCompDone = 'y';
+    }
+    shapes.push_back(shape);
   }
 
   if (shapes.empty()) {

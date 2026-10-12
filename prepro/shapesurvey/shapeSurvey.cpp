@@ -823,6 +823,9 @@ void printCLIhelp() {
   std::cout << "shapeSurvey - inspect r-shapes, or render one to an image (CLI)\n\n"
             << "Usage: shapeSurvey <shapeFile> [options]\n\n"
             << "  -o, --output <file.png>  render one clean frame to <file.png> and exit\n"
+            << "  -P, --precompute <out.shp> compute the mass properties of the shapes marked\n"
+            << "                           preCompDone n, write the library to <out.shp> (it can\n"
+            << "                           be the input file itself) and exit, without window\n"
             << "  -i, --index  <n>         shape to render (0-based, default 0)\n"
             << "  -N, --name   <name>      shape to render, by name\n"
             << "  -W, --width  <px>        image width  (default 800)\n"
@@ -837,7 +840,7 @@ void printCLIhelp() {
             << "      --color  <r,g,b>     fill colour in [0,1] (default 0.761,0.733,0.976)\n"
             << "      --transparent        transparent background\n"
             << "  -h, --help               this help\n\n"
-            << "With no --output, shapeSurvey opens the interactive viewer.\n";
+            << "With neither --output nor --precompute, shapeSurvey opens the interactive viewer.\n";
 }
 
 // =====================================================================
@@ -866,6 +869,7 @@ int main(int argc, char* argv[]) {
     else if (a == "--elev") shot_elev = std::stod(next("22"));
     else if (a == "--azim") shot_azim = std::stod(next("-55"));
     else if (a == "--skin") skinFile = next("");
+    else if (a == "-P" || a == "--precompute") precomputeFile = next("");
     else if (a == "--radius") radiusOverride = std::stod(next("-1"));
     else if (a == "--transparent") shot_transparent = 1;
     else if (a == "--wire") show_wire = 1;
@@ -888,6 +892,29 @@ int main(int argc, char* argv[]) {
   shot_height = height;
 
   if (readShapeLib(inputFile.c_str()) == 0) {
+    return 0;
+  }
+
+  // ---- Pre-computation from the command line (what the keys C then s do), no window ----
+  if (!precomputeFile.empty()) {
+    size_t nbComputed = 0;
+    for (size_t i = 0; i < Shapes.size(); i++) {
+      if (Shapes[i].preCompDone == 'n') {
+        Shapes[i].massProperties();
+        Shapes[i].preCompDone = 'y';
+        nbComputed++;
+      }
+    }
+    std::ofstream os(precomputeFile);
+    if (!os) {
+      std::cout << "Cannot write " << precomputeFile << std::endl;
+      return 1;
+    }
+    for (size_t s = 0; s < Shapes.size(); s++) {
+      Shapes[s].write(os);
+    }
+    std::cout << nbComputed << " shape(s) pre-computed, " << Shapes.size() << " shape(s) written in " << precomputeFile
+              << std::endl;
     return 0;
   }
 

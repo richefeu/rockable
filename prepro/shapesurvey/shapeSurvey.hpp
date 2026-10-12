@@ -31,6 +31,7 @@ std::string shapeFileName = "shapes";
 // exits, instead of opening the interactive window.
 std::string outputFile = "";              // empty => interactive mode
 std::string skinFile = "";                // optional .rmsh: draw the skin mesh instead of primitives
+std::string precomputeFile = "";          // non-empty => pre-compute the shapes, write them there, and exit
 std::map<std::string, ShapeMesh> skinMeshes;  // keyed by shape name
 double shot_elev = 22.0;                   // camera elevation (deg), z is up
 double shot_azim = -55.0;                  // camera azimuth (deg)
