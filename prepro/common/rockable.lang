@@ -578,7 +578,7 @@ doc: PeriodicLoading [(string) Name] ...
 doc: PostProcessor [(string) Name] ...
 
   Adds a post-processor (used by the 'postpro' tool).
-  Possible Names are: 'ClusterGranulo' or 'ParticleStress'.
+  Possible Names are: 'ClusterGranulo', 'ParticleStress' or 'SampleState'.
 
 [keyword] firstConf
 doc: firstConf [(int) value]
@@ -609,7 +609,14 @@ doc: SievingSizes [(int) nb] [(double) size1] [(double) size2] ...
 [keyword] Volume
 doc: Volume [(double) value]
 
-  Reference volume used by the ParticleStress post-processor.
+  Reference volume used by the ParticleStress post-processor. With SampleState, a volume
+  imposed for every conf-file (otherwise from WallBox or the periodic cell).
+
+[keyword] WallBox
+doc: WallBox [(int) xmin] [(int) xmax] [(int) ymin] [(int) ymax] [(int) zmin] [(int) zmax]
+
+  The six walls of a box (body numbers), used by the SampleState post-processor
+  to measure the sizes and the volume of the sample.
 
 # --- shapes
 
@@ -809,6 +816,8 @@ doc: nf [(int) numberOfFaces]
 [type] ClusterGranulo
 
 [type] ParticleStress
+
+[type] SampleState
 
 # --- controls (driving system)
 

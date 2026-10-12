@@ -210,6 +210,9 @@
     command("ParticleStress"), [Per-particle stress tensor. #command("Volume")
       gives the default total volume, and #command("ConfVolumes <nb>") followed
       by `nb` pairs #command("<iconf> <volume>") overrides it conf by conf.],
+    command("SampleState"), [One line per dump in `SampleState.txt`: sizes,
+      volume, solid fraction, coordination number, stress tensor.
+      #command("WallBox <6 walls>") for a box; nothing for a periodic cell.],
     command("ClusterGranulo"), [Size distribution of the (possibly broken)
       clusters. #command("SievingSizes <nb>") followed by `nb` sieve sizes.],
   )

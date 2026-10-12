@@ -137,6 +137,97 @@ during the run, its volume changes from one configuration to the next, and
    ``TrackStress`` (see :ref:`dataExtractors`).
 
 
+``SampleState``
+---------------
+
+The state of the whole sample, one line per processed configuration, in the
+file ``SampleState.txt``: the time, the sizes and the volume of the sample, the
+solid fraction, the coordination number, the number of contacts, and the stress
+tensor computed from the contact forces.
+
+.. code-block:: text
+   :caption: commands.txt
+
+   firstConf 0
+   lastConf 100
+   stepConf 1
+
+   PostProcessor SampleState
+   WallBox 0 1 2 3 4 5
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - Keyword
+     - Description
+   * - ``WallBox <xmin> <xmax> <ymin> <ymax> <zmin> <zmax>``
+     - The numbers of the six walls of a box. The sizes of the sample are the
+       distances between their inner faces (the position of each wall, minus
+       or plus its Minkowski radius times its homothety).
+   * - ``Volume <double>``
+     - A volume imposed for every configuration (the sizes are then written
+       as 0, or taken from the box or the cell if there is one).
+
+With a periodic cell, nothing has to be given: the volume is
+:math:`\det \mathbf{h}`, and the sizes are the lengths of the three vectors of
+the cell.
+
+The columns of ``SampleState.txt`` are:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 80
+
+   * - Column
+     - Content
+   * - 1
+     - time
+   * - 2-4
+     - sizes :math:`L_x`, :math:`L_y`, :math:`L_z` of the sample
+   * - 5
+     - volume :math:`V`
+   * - 6
+     - solid fraction: the volume of the free particles (the volume of their
+       shape times the cube of their homothety) divided by :math:`V`
+   * - 7
+     - coordination number :math:`Z`: twice the number of contacts between
+       free bodies plus the number of contacts with driven bodies, divided by
+       the number of free bodies. Two bodies touching at several points
+       (vertex-face, edge-edge...) make **one** contact.
+   * - 8
+     - number of contacts (pairs of bodies)
+   * - 9, 10
+     - mean stress :math:`p = \operatorname{tr}\boldsymbol{\sigma}/3` and von
+       Mises stress :math:`q`
+   * - 11-16
+     - :math:`\sigma_{xx}`, :math:`\sigma_{yy}`, :math:`\sigma_{zz}`,
+       :math:`\sigma_{xy}`, :math:`\sigma_{xz}`, :math:`\sigma_{yz}`
+
+The stress is
+
+.. math::
+
+   \boldsymbol{\sigma} = \frac{1}{V} \sum_{p} \sum_{c} \underline{F}_c \otimes
+   \left( \underline{x}_p - \underline{x}_c \right)
+
+where the first sum runs over the free bodies, the second over their contacts,
+:math:`\underline{F}_c` is the force received by the body :math:`p` at the
+contact point :math:`\underline{x}_c`. It is **positive in compression**, and
+only its symmetric part is written. It does not include the kinetic
+contribution of the velocity fluctuations, negligible in a quasi-static state.
+With a periodic cell, it is the opposite of the stress that Rockable computes
+during the computation to drive the cell (which is positive in tension).
+
+.. note::
+
+   With walls, the contact forces with the walls are included through the
+   free bodies that touch them: the stress is that of the sample. In a box
+   driven by a servo-control, :math:`\sigma_{xx}`, :math:`\sigma_{yy}` and
+   :math:`\sigma_{zz}` match the imposed pressure once the sample is at
+   equilibrium.
+
+
 ``ClusterGranulo``
 ------------------
 

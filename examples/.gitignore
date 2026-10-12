@@ -45,3 +45,5 @@ prepro_cpptools/sample.txt
 DominoFun/input.txt
 DominoFun/shapes.txt
 complexShape/*.obj
+postProcessing/fn.txt
+SampleState.txt
