@@ -192,7 +192,16 @@ doc: preventCrossingLength [(double) value]
 doc: initSpringJoint [(int) ibody] [(vec3r) ipos0] [(int) jbody] [(vec3r) jpos0] [(double) stiffness]
 
   Create a linear spring joint between bodies ibody and jbody, anchored at the
-  local positions ipos0 and jpos0, with the given stiffness.
+  local positions ipos0 and jpos0, with the given stiffness. Its length at rest
+  is the current distance between the two anchors.
+
+[keyword] SpringJoints
+doc: SpringJoints [(int) numberOfJoints]
+
+  The spring joints, as written in the conf-files.
+  REPEAT FOR EACH JOINT {
+     [(int) ibody] [(vec3r) ipos0] [(int) jbody] [(vec3r) jpos0] [(double) stiffness] [(double) l0]
+  }
 
 # --- periodic cell (requires Rockable compiled with ROCKABLE_ENABLE_PERIODIC)
 

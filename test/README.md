@@ -91,7 +91,7 @@ Since each test has its own folder, tests can run in parallel.
 
 `compareConf` reads both files from the `Particles` line on (the header holds
 paths and options that may legitimately differ) and cuts them into the sections
-`Particles`, `Interactions` and `Interfaces`.
+`Particles`, `SoftParticles`, `SpringJoints`, `Interactions` and `Interfaces`.
 
 - Section headers, hence the numbers of particles, interactions and interfaces,
   must be identical, and so must non-numeric tokens (shape names).

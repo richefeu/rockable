@@ -390,7 +390,17 @@ Interfaces and bonds
 
   Add a linear spring joining two bodies. The anchor points ``ipos0`` and
   ``jpos0`` are given in the **body frames**, so they follow the bodies as they
-  rotate. Unlike an interface, a spring joint never breaks.
+  rotate. The length of the spring at rest is the distance between the two
+  anchors when the keyword is read. Unlike an interface, a spring joint never
+  breaks.
+
+- ``SpringJoints`` (*int*) **numberOfJoints**
+
+  The spring joints, as written in the conf-files, one per line:
+  (*int*) **ibody** (*vec3r*) **ipos0** (*int*) **jbody** (*vec3r*) **jpos0**
+  (*double*) **stiffness** (*double*) **l0**, where **l0** is the length at
+  rest. A computation restarted from a conf-file therefore keeps its springs
+  unchanged.
 
 
 Interaction parameters

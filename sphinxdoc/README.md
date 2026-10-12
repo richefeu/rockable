@@ -57,6 +57,11 @@ the following:
   a conf-file could no longer break, their area was lost, and so was the
   tangential displacement of their bonds. *Fixed.*
 - `TrackDamage` never flushed its file, which lost its end. *Fixed.*
+- The spring joints (`initSpringJoint`) were not written in the conf-files, so
+  a restarted computation lost them. *Fixed* (section `SpringJoints`).
+- The controls of angular velocity (`_zrot_Vel_`...) rotated the body but left
+  its angular velocity at zero, so the contacts did not see the motion of a
+  rotating drum or blade. *Fixed.*
 - `ROCKABLE_ENABLE_BOUNDARY=ON` does not compile (to be adapted from an older
   version of the code).
 - `postpro` crashed whatever its command file: the post-processors registered
