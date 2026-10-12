@@ -1,5 +1,7 @@
 ## Viscoelastic cube between two platens
 
+<p align="center"><img src="animation.gif" alt="animation of the example"/></p>
+
 The same test as `elasticCube`, but with contacts a hundred times stiffer
 (`knContact 0 1 1e7`). With the elastic update, the cube then oscillates from
 one time step to the next and never settles (see the readme of `elasticCube`).

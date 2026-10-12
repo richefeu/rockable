@@ -1,5 +1,7 @@
 ## 3. Preparing a sample: isotropic compression
 
+<p align="center"><img src="animation.gif" alt="animation of the example"/></p>
+
 ### Goal
 
 125 spheres, placed on a loose grid in a box of six walls, are compressed

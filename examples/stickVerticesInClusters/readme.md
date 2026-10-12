@@ -1,5 +1,7 @@
 ## How to build a breakable cluster?
 
+<p align="center"><img src="animation.gif" alt="animation of the example"/></p>
+
 This example was set as a benchmark for PhD Thesis of Marta Stasiak.
 
 

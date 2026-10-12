@@ -1,5 +1,7 @@
 ## Elastic cube between two platens
 
+<p align="center"><img src="animation.gif" alt="animation of the example"/></p>
+
 A soft cube (Young modulus 1e6, Poisson ratio 0) is squeezed between a fixed
 bottom platen and a top platen pushed down by a force of 1e4. It runs in less
 than a second.

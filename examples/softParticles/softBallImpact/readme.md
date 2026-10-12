@@ -1,5 +1,7 @@
 ## Impact of a ball of soft cells
 
+<p align="center"><img src="animation.gif" alt="animation of the example"/></p>
+
 A ball of 123 sphero-cubic cells (edge 0.3 mm), glued face to face by
 `stickBCM`, hits a rigid plate at 5 m/s. The cells are very soft
 (`E = 1 MPa`, `nu = 0.3`) and viscoelastic, so the ball flattens on the plate,

@@ -1,5 +1,7 @@
 ## 1b. Hello world, continued: more of the conf-file
 
+<p align="center"><img src="animation.gif" alt="animation of the example"/></p>
+
 ### Goal
 
 The system of [`helloworld`](../helloworld), with two more grains and a few

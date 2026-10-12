@@ -1,5 +1,7 @@
 # `batchable.sh`
 
+<p align="center"><img src="animation.gif" alt="animation of the example"/></p>
+
 Portable shell script to launch simulation jobs in parallel from a list of input files.
 
 Works on:

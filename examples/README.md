@@ -11,6 +11,39 @@ formats) is the Sphinx documentation, in `sphinxdoc`, also published at
 `cheatsheets` are handy to keep at hand during a tutorial.
 
 
+## Gallery
+
+Each animation links to its example. They were made with `see`, from the
+conf-files of the computation (sometimes shortened, or with more conf-files).
+
+<table>
+<tr>
+<td align="center"><a href="helloworld"><img src="helloworld/animation.gif" width="200" alt="helloworld"/></a><br/><code>helloworld</code></td>
+<td align="center"><a href="helloworldPlus"><img src="helloworldPlus/animation.gif" width="200" alt="helloworldPlus"/></a><br/><code>helloworldPlus</code></td>
+<td align="center"><a href="driving"><img src="driving/animation.gif" width="200" alt="driving"/></a><br/><code>driving</code></td>
+<td align="center"><a href="isoComprSpheres"><img src="isoComprSpheres/animation.gif" width="200" alt="isoComprSpheres"/></a><br/><code>isoComprSpheres</code></td>
+</tr>
+<tr>
+<td align="center"><a href="prepro_cpptools"><img src="prepro_cpptools/animation.gif" width="200" alt="prepro_cpptools"/></a><br/><code>prepro_cpptools</code></td>
+<td align="center"><a href="DominoFun"><img src="DominoFun/animation.gif" width="200" alt="DominoFun"/></a><br/><code>DominoFun</code></td>
+<td align="center"><a href="stickVerticesInClusters"><img src="stickVerticesInClusters/animation.gif" width="200" alt="stickVerticesInClusters"/></a><br/><code>stickVerticesInClusters</code></td>
+<td align="center"><a href="isoComprSpheresPeriodic"><img src="isoComprSpheresPeriodic/animation.gif" width="200" alt="isoComprSpheresPeriodic"/></a><br/><code>isoComprSpheresPeriodic</code></td>
+</tr>
+<tr>
+<td align="center"><a href="PerioPoly"><img src="PerioPoly/animation.gif" width="200" alt="PerioPoly"/></a><br/><code>PerioPoly</code></td>
+<td align="center"><a href="softParticles/softBallImpact"><img src="softParticles/softBallImpact/animation.gif" width="200" alt="softBallImpact"/></a><br/><code>softBallImpact</code></td>
+<td align="center"><a href="softParticles/softBallImpactVoronoi"><img src="softParticles/softBallImpactVoronoi/animation.gif" width="200" alt="softBallImpactVoronoi"/></a><br/><code>softBallImpactVoronoi</code></td>
+<td align="center"><a href="softParticles/bondedBeam"><img src="softParticles/bondedBeam/animation.gif" width="200" alt="bondedBeam"/></a><br/><code>bondedBeam</code></td>
+</tr>
+<tr>
+<td align="center"><a href="softParticles/elasticCube"><img src="softParticles/elasticCube/animation.gif" width="200" alt="elasticCube"/></a><br/><code>elasticCube</code></td>
+<td align="center"><a href="softParticles/viscousCube"><img src="softParticles/viscousCube/animation.gif" width="200" alt="viscousCube"/></a><br/><code>viscousCube</code></td>
+<td align="center"><a href="sweepable"><img src="sweepable/animation.gif" width="200" alt="sweepable"/></a><br/><code>sweepable</code></td>
+<td align="center"><a href="complexShape"><img src="complexShape/animation.gif" width="200" alt="complexShape"/></a><br/><code>complexShape</code></td>
+</tr>
+</table>
+
+
 ## Before starting
 
 Build and install Rockable from the root of the repository, then make the
@@ -72,7 +105,7 @@ repository clean during a training day, the folder can also be copied first:
 | 5  | [`DominoFun`](DominoFun)                               | A complete system built with `generator`                                         | TBD     |
 | 6  | [`stickVerticesInClusters`](stickVerticesInClusters)   | Breakable bonds: clusters, the `StickedLinks` law                                | 4 s     |
 | 7  | [`isoComprSpheresPeriodic`](isoComprSpheresPeriodic)   | Periodic boundary conditions                                                     | 20 s    |
-| 8  | [`PerioPoly`](PerioPoly)                               | A periodic sample of polyhedra under shear                                       | TBD     |
+| 8  | [`PerioPoly`](PerioPoly)                               | A periodic sample of polyhedra: isotropic compression of the cell              | TBD     |
 | 9  | [`softParticles`](softParticles)                       | Deformable particles (DCEM), bonded cells (`BCM`)                                | 1-5 s   |
 | 10 | [`sweepable`](sweepable)                               | Parametric studies: many computations from one script                            | short   |
 | 11 | [`complexShape`](complexShape)                         | From an STL mesh to a shape: `stl2shape`, `shapeSurvey`                          | short   |

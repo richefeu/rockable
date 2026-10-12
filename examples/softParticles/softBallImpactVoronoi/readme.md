@@ -1,5 +1,7 @@
 ## Impact of a ball of soft Voronoi cells (DCEM paper)
 
+<p align="center"><img src="animation.gif" alt="animation of the example"/></p>
+
 The illustration of the DCEM paper (Figure "soft cells", case (a)): a sphere
 made of 200 Voronoi cells, glued by `stickBCM`, hits a rigid plate at 5 m/s.
 The cells are very soft (`E = 1 MPa`, `nu = 0.3`) and viscoelastic

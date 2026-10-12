@@ -1,5 +1,7 @@
 ## 1. Hello world: a first simulation
 
+<p align="center"><img src="animation.gif" alt="animation of the example"/></p>
+
 ### Goal
 
 Two grains, a sphere and an elongated grain, fall on a fixed plane and come to

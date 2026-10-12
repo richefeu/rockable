@@ -1,5 +1,7 @@
 ## Beam of bonded soft cubes
 
+<p align="center"><img src="animation.gif" alt="animation of the example"/></p>
+
 A simply supported beam made of 21 x 3 sphero-cubes (edge 1 cm, radius 1 mm),
 glued face to face by `stickBCM` and bent by its own weight. It is a shorter
 version (span 0.2 m instead of 0.6 m) of the beam of the DCEM paper, with the

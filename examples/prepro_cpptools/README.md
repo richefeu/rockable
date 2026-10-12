@@ -1,5 +1,7 @@
 ## `cpptools` & the application `generator`
 
+<p align="center"><img src="animation.gif" alt="animation of the example"/></p>
+
 In the folder `prepro/genesis/cpptools`, there are some C++ pieces of code that can be used to generate shapes, packings ro entire systems. They are in the form of C++ header files, and they can be used as such.
 
 It is possible also to use the application `generator`. This tutorial gives some examples.

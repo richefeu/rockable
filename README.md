@@ -93,6 +93,39 @@ Here is the non-exhaustive list of involved persons with their main mission:
 <img src="./gif-doc/gen-doc-rockable.gif" width="90%"/>
 </p>
 
+## Examples
+
+The folder [`examples`](examples) holds small simulations, most of them written as
+tutorials to be followed in order (see [`examples/README.md`](examples/README.md)).
+Each animation links to its example.
+
+<table>
+<tr>
+<td align="center"><a href="examples/helloworld"><img src="examples/helloworld/animation.gif" width="200" alt="helloworld"/></a><br/><code>helloworld</code></td>
+<td align="center"><a href="examples/helloworldPlus"><img src="examples/helloworldPlus/animation.gif" width="200" alt="helloworldPlus"/></a><br/><code>helloworldPlus</code></td>
+<td align="center"><a href="examples/driving"><img src="examples/driving/animation.gif" width="200" alt="driving"/></a><br/><code>driving</code></td>
+<td align="center"><a href="examples/isoComprSpheres"><img src="examples/isoComprSpheres/animation.gif" width="200" alt="isoComprSpheres"/></a><br/><code>isoComprSpheres</code></td>
+</tr>
+<tr>
+<td align="center"><a href="examples/prepro_cpptools"><img src="examples/prepro_cpptools/animation.gif" width="200" alt="prepro_cpptools"/></a><br/><code>prepro_cpptools</code></td>
+<td align="center"><a href="examples/DominoFun"><img src="examples/DominoFun/animation.gif" width="200" alt="DominoFun"/></a><br/><code>DominoFun</code></td>
+<td align="center"><a href="examples/stickVerticesInClusters"><img src="examples/stickVerticesInClusters/animation.gif" width="200" alt="stickVerticesInClusters"/></a><br/><code>stickVerticesInClusters</code></td>
+<td align="center"><a href="examples/isoComprSpheresPeriodic"><img src="examples/isoComprSpheresPeriodic/animation.gif" width="200" alt="isoComprSpheresPeriodic"/></a><br/><code>isoComprSpheresPeriodic</code></td>
+</tr>
+<tr>
+<td align="center"><a href="examples/PerioPoly"><img src="examples/PerioPoly/animation.gif" width="200" alt="PerioPoly"/></a><br/><code>PerioPoly</code></td>
+<td align="center"><a href="examples/softParticles/softBallImpact"><img src="examples/softParticles/softBallImpact/animation.gif" width="200" alt="softBallImpact"/></a><br/><code>softBallImpact</code></td>
+<td align="center"><a href="examples/softParticles/softBallImpactVoronoi"><img src="examples/softParticles/softBallImpactVoronoi/animation.gif" width="200" alt="softBallImpactVoronoi"/></a><br/><code>softBallImpactVoronoi</code></td>
+<td align="center"><a href="examples/softParticles/bondedBeam"><img src="examples/softParticles/bondedBeam/animation.gif" width="200" alt="bondedBeam"/></a><br/><code>bondedBeam</code></td>
+</tr>
+<tr>
+<td align="center"><a href="examples/softParticles/elasticCube"><img src="examples/softParticles/elasticCube/animation.gif" width="200" alt="elasticCube"/></a><br/><code>elasticCube</code></td>
+<td align="center"><a href="examples/softParticles/viscousCube"><img src="examples/softParticles/viscousCube/animation.gif" width="200" alt="viscousCube"/></a><br/><code>viscousCube</code></td>
+<td align="center"><a href="examples/sweepable"><img src="examples/sweepable/animation.gif" width="200" alt="sweepable"/></a><br/><code>sweepable</code></td>
+<td align="center"><a href="examples/complexShape"><img src="examples/complexShape/animation.gif" width="200" alt="complexShape"/></a><br/><code>complexShape</code></td>
+</tr>
+</table>
+
 ## How to install
 
 The source code can be cloned from github repository:

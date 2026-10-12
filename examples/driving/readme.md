@@ -1,5 +1,7 @@
 ## 2. Driving a body
 
+<p align="center"><img src="animation.gif" alt="animation of the example"/></p>
+
 ### Goal
 
 A plate rotates at one turn per second, like a flipper, and hits three grains
