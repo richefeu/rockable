@@ -326,6 +326,17 @@ When that file sits next to the shape file, <code class="docutils literal notran
 skin mesh instead of the overlapping spheres, tubes and slabs it normally uses.
 The difference is purely visual, but on a rounded polyhedron it is the
 difference between a figure that reads and one that does not.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The mesh is built in the body frame of the shape: its mass centre and its
+principal axes, where Rockable and <code class="docutils literal notranslate"><span class="pre">see</span></code> put a shape when they read it.
+A shape still marked <code class="docutils literal notranslate"><span class="pre">preCompDone</span> <span class="pre">n</span></code>, such as the output of
+<code class="docutils literal notranslate"><span class="pre">stl2shape</span></code>, is first pre-computed by <code class="docutils literal notranslate"><span class="pre">shape2mesh</span></code> (it says so, and it
+takes the time of a Monte-Carlo integration). The shape file itself is not
+modified: pre-compute it once with <code class="docutils literal notranslate"><span class="pre">shapeSurvey</span> <span class="pre">shapes.shp</span> <span class="pre">-P</span> <span class="pre">shapes.shp</span></code>
+(see <a class="reference internal" href="shapeSurvey.html#shapesurvey"><span class="std std-ref">Application shapeSurvey</span></a>) to save that time, here and at each start of a
+computation.</p>
+</div>
 <p>The skin mesh cannot follow the deformation of a soft particle (see
 <a class="reference internal" href="softParticles.html#softparticles"><span class="std std-ref">Deformable particles (DCEM)</span></a>): the soft particles are always drawn with the overlapping
 primitives, deformed.</p>
