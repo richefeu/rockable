@@ -87,9 +87,9 @@ folder (the conf-file given on the command line is not used, and a file such as
        The soft particles are written with their deformation.
    * - ``Forces####.vtk``
      - The contact forces, at the contact points: the vectors ``Fn`` (normal
-       force) and ``Ft`` (tangential force). Despite its name, the vector
-       ``F_Fmax`` holds, along ``z``, half the sum of the Minkowski radii of
-       the two bodies: use ``Fn`` to scale the glyphs by the force.
+       force) and ``Ft`` (tangential force), and ``MeanRadius``, which holds,
+       along ``z``, half the sum of the Minkowski radii of the two bodies (it
+       was named ``F_Fmax`` before October 2026, although it is not a force).
    * - ``OBB####.vtk``
      - The oriented bounding boxes of the particles.
 

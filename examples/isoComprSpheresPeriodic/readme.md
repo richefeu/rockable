@@ -29,6 +29,7 @@ and no wall effect.
 | `shapes.txt`        | The shape `Sphere` (unit radius) and the shapes of walls (unused) |
 | `drivingSystem.txt` | The loading of the cell                                       |
 | `solidFraction.sh`  | Computes the size of the cell and the solid fraction          |
+| `state.txt`         | Command file of `postpro`: the same, and more                 |
 
 ### Run it
 
@@ -96,6 +97,17 @@ are a large part of that sample. The periodic cell has no such layer.
   ```sh
   sh solidFraction.sh > phi.txt
   gnuplot -p -e "plot 'phi.txt' using 1:5 with lines title 'solid fraction'"
+  ```
+- The same with `postpro`: `postpro state.txt` runs the post-processor
+  `SampleState` (see [`postProcessing`](../postProcessing)) on `conf0` to
+  `conf30`, and writes `SampleState.txt`: the sizes of the cell (columns 2 to
+  4), the solid fraction (6), the coordination number (7), and the mean stress
+  `p` (9), close to the 100 Pa imposed on the cell. With a periodic cell,
+  `state.txt` needs no volume: `det(h)` is used.
+
+  ```sh
+  postpro state.txt
+  gnuplot -p -e "plot 'SampleState.txt' using 1:6 with lines title 'solid fraction'"
   ```
 - The line `h` of the conf-files: the off-diagonal terms stay at zero.
 

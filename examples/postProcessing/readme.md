@@ -114,9 +114,6 @@ points, with the normal force `Fn` and the tangential force `Ft`), and
    the opacity of the spheres to see the forces inside the sample.
 4. The play button of ParaView goes through the conf-files.
 
-Despite its name, the array `F_Fmax` of the files `Forces` is not a force (it
-is a mean radius of the two bodies): scale the forces by `Fn`.
-
 ### What to look at
 
 - The solid fraction, the coordination number and the mean stress against
@@ -147,6 +144,10 @@ is a mean radius of the two bodies): scale the forces by `Fn`.
    reach a coordination number of about 6.7, much more than the spheres.
 5. Run `forceDistribution.sh` on the last conf-file of `PerioPoly` (512
    particles, more contacts): the distribution is smoother.
+6. The post-processor `ParticleStress` writes the tensorial moment of each
+   particle in `ParticleStress-conf60.txt`, and prints their sum divided by
+   the volume given with `Volume` (take it in the 5th column of
+   `SampleState.txt`): it is the stress tensor of `SampleState`.
 
 ### Going further
 

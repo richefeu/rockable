@@ -31,6 +31,7 @@ then serves as the initial state of the real test.
 | `genShapes.txt`      | Commands of `generator` that write `shapes.txt`                      |
 | `genSample.txt`      | Commands of `generator` that write the walls and the spheres         |
 | `solidFraction.sh`   | Computes the solid fraction from the recorded wall positions         |
+| `state.txt`          | Command file of `postpro`: the same, and more, from the conf-files   |
 
 ### Run it
 
@@ -100,6 +101,17 @@ friction and of the fast compression.
   ```sh
   sh solidFraction.sh > phi.txt
   gnuplot -p -e "plot 'phi.txt' using 1:5 with lines title 'solid fraction'"
+  ```
+- The same with `postpro`, from the conf-files: `postpro state.txt` runs the
+  post-processor `SampleState` (see [`postProcessing`](../postProcessing)) on
+  `conf0` to `conf100`, and writes `SampleState.txt`: the sizes of the box
+  (columns 2 to 4), the solid fraction (6), the coordination number (7), and
+  the mean stress `p` (9), close to the 1000 Pa imposed on the walls at the
+  end. `WallBox 0 1 2 3 4 5`, in `state.txt`, gives the six walls.
+
+  ```sh
+  postpro state.txt
+  gnuplot -p -e "plot 'SampleState.txt' using 1:6 with lines title 'solid fraction'"
   ```
 - `gnuplot checkplots.txt`: the kinetic energy drops by several orders of
   magnitude once the sample is compressed.

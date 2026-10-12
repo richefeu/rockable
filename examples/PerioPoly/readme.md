@@ -26,6 +26,7 @@ particles: they pack differently, and they cost much more to compute.
 | `shape.shp`         | The shapes `POLYR0` (a rounded dodecahedron) and `SPHERE0`        |
 | `drivingSystem.txt` | `PeriodicLoading IsotropicCompression 100`                        |
 | `solidFraction.sh`  | Computes the size of the cell and the solid fraction              |
+| `state.txt`         | Command file of `postpro`: the same, and more                     |
 
 ### Run it
 
@@ -72,6 +73,10 @@ value twice either. A result has to be checked on several samples.
 - `sh solidFraction.sh` prints the time, the three sizes of the cell and the
   solid fraction. It reads the volume of each shape in `shape.shp`, and
   multiplies it by the cube of the homothety of each particle.
+- The same with `postpro`: `postpro state.txt` runs the post-processor
+  `SampleState` (see [`postProcessing`](../postProcessing)) and writes
+  `SampleState.txt`, with also the coordination number (column 7, about 6.7)
+  and the mean stress (column 9, close to 100).
 - `perf.txt` (second column): the number of seconds of simulation computed per
   second of real time. Compare it with that of `isoComprSpheresPeriodic`.
 

@@ -72,14 +72,22 @@ particle,
 
 .. math::
 
-   \mathbf{M}_i = \sum_c \underline{f}_c \otimes \underline{x}_c
+   \mathbf{M}_i = \sum_c \underline{F}_c \otimes \left( \underline{x}_i - \underline{x}_c \right)
 
-where the sum runs over the interactions of the particle, :math:`\underline{f}_c`
-is the **opposite** of the force it receives (so that a compression is
-positive) and
-:math:`\underline{x}_c` the position of the contact point. For a particle in
-equilibrium, this is the usual sum of the forces times the branch vectors. The
-driven bodies are skipped.
+where the sum runs over the interactions of the particle, :math:`\underline{F}_c`
+is the force it receives at the contact point :math:`\underline{x}_c`, and
+:math:`\underline{x}_i` is its centre (the nearest image with a periodic cell).
+It is positive in compression. The driven bodies are skipped. The sum of the
+:math:`\mathbf{M}_i` divided by the volume is the stress tensor of the sample,
+the same as the one of ``SampleState``.
+
+.. note::
+
+   Up to October 2026, the absolute position :math:`\underline{x}_c` was used
+   instead of :math:`\underline{x}_i - \underline{x}_c`. The result was the
+   same for a particle in equilibrium only, and depended on the origin
+   otherwise: on a sample compressed by a servo-control, the stress of the
+   whole sample could be wrong by a factor of two.
 
 The results are written into ``ParticleStress-conf<iconf>.txt``, one line per
 particle: the 9 components of :math:`\mathbf{M}_i` (they are **not** divided
