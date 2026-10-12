@@ -6,7 +6,9 @@
 
 A rock scanned as a triangulated mesh (`rock.stl`) is converted into a
 Rockable shape with `stl2shape`, checked and pre-computed with `shapeSurvey`,
-then used in a computation: the rock spins freely in space.
+then used in a computation: the rock spins freely in space. Finally, a
+watertight skin mesh of the shape is made with `shape2mesh`, for a smooth and
+fast drawing in `see`.
 
 ### Notions
 
@@ -17,6 +19,8 @@ then used in a computation: the rock spins freely in space.
   ([shapeSurvey](https://richefeu.github.io/rockable/shapeSurvey.html)).
 - The **homothety**, to change the unit of a shape.
 - A library of shapes made of several files put together.
+- The **skin mesh** of a shape (`shape2mesh`, the `.rmsh` companion file)
+  ([converters](https://richefeu.github.io/rockable/converters.html)).
 
 ### Files
 
@@ -31,8 +35,9 @@ then used in a computation: the rock spins freely in space.
 ```sh
 stl2shape -r 0.5 -c rock.stl     # writes mesh.shp
 mv mesh.shp rock.shp
-shapeSurvey rock.shp             # optional: look at it, press C then s
-rockable input.txt               # about 20 seconds, less than 1 s once pre-computed
+shapeSurvey rock.shp             # look at it, press C then s (pre-computation)
+rockable input.txt               # less than 1 s once pre-computed (20 s otherwise)
+shape2mesh rock.shp --rmsh       # writes rock.rmsh, the skin mesh
 see
 ```
 
@@ -85,11 +90,27 @@ angular momentum is kept, but not its angular velocity: the components of
 `vrot` in the conf-files vary along the rotation, because the inertia of the
 rock is not the same about all its axes.
 
+**The skin.** `see` normally draws a shape as it is made: a sphere at each
+vertex, a tube along each edge and a slab on each face, all of the Minkowski
+radius. For this rock, 12 113 spheres, 36 347 tubes and 24 236 slabs per
+frame: slow, and the facets of the scan show. `shape2mesh rock.shp --rmsh`
+meshes the exact surface of the rounded shape (the skeleton dilated by the
+radius) into a closed, watertight mesh of 16 204 triangles with exact normals,
+and writes it in `rock.rmsh`. When a `.rmsh` file with the same stem as the
+shape file (`rock.shp` and `rock.rmsh`) is next to it, `see` loads it
+(`Loaded 1 skin mesh(es) from rock.rmsh`) and draws each particle with its
+skin: the drawing is smooth, and about six times faster here. The skin is
+only a drawing: the computation does not use it.
+
+The mesh is built in the frame stored in the shape file. **Pre-compute the
+shape before meshing it** (`C` then `s` in `shapeSurvey`): the pre-computation
+moves the shape to its mass centre and turns it to its principal axes, and a
+skin made from a shape still marked `preCompDone n` is drawn shifted and
+turned with respect to the particle.
 ### What to look at
 
-- In `see`, the rock and its rotation. The drawing of a mesh of this size is
-  slow; `shape2mesh rock.shp --rmsh` writes a skin mesh, `rock.rmsh`, that `see`
-  uses for a smoother drawing.
+- In `see`, the rock and its rotation, with its skin. Rename `rock.rmsh` and
+  open `see` again to compare with the drawing by spheres, tubes and slabs.
 - The line of the rock in the conf-files: `Q` (the orientation) and `vrot`.
 - The cost of a shape grows with its number of vertices, edges and faces. A
   mesh of 12 000 vertices is fine for one particle, much too heavy for a
@@ -123,7 +144,15 @@ rock is not the same about all its axes.
    ```
 
    The plane is scaled down to 40 × 10 cm. The rock lands at `t = 0.1 s`, and
-   is at rest from about `t = 0.6 s`.
+   is at rest from about `t = 0.6 s`. For the skins, run
+   `shape2mesh shapes.shp --rmsh` on the new library: it writes `shapes.rmsh`,
+   with the skins of the two shapes.
+4. Export the skin for another program (ParaView, Blender, a 3D printer):
+   `shape2mesh rock.shp -e 0.05` writes `rock.obj`, with a sag (the largest
+   distance between the mesh and the exact surface) of 0.05 mm: 104 684
+   triangles, and a volume of 42 863 mm³, close to the 42 878 mm³ of the
+   Monte-Carlo integration. Without `-e`, the sag is 1 % of the radius, and
+   the file is seven times larger.
 
 ### Going further
 

@@ -181,6 +181,16 @@ skin mesh instead of the overlapping spheres, tubes and slabs it normally uses.
 The difference is purely visual, but on a rounded polyhedron it is the
 difference between a figure that reads and one that does not.
 
+.. warning::
+
+   The mesh is built in the frame stored in the shape file, as it is.
+   Pre-compute the shapes **before** meshing them (keys ``C`` then ``s`` of
+   :ref:`shapeSurvey`). The pre-computation of a shape marked
+   ``preCompDone n`` moves it to its mass centre and turns it to its principal
+   axes, which Rockable and ``see`` do when they read it, but ``shape2mesh``
+   does not: the skin of a shape still marked ``n``, such as the output of
+   ``stl2shape``, is drawn shifted and turned with respect to the particle.
+
 The skin mesh cannot follow the deformation of a soft particle (see
 :ref:`softParticles`): the soft particles are always drawn with the overlapping
 primitives, deformed.

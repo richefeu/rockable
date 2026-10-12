@@ -44,3 +44,4 @@ prepro_cpptools/shapes.txt
 prepro_cpptools/sample.txt
 DominoFun/input.txt
 DominoFun/shapes.txt
+complexShape/*.obj
