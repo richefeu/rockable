@@ -1,6 +1,7 @@
 ## 11. From an STL mesh to a shape
 
-<p align="center"><img src="animation.gif" alt="animation of the example"/></p>
+<p align="center"><img src="animation.gif" alt="the rock drawn by see, without and with its skin mesh"/><br/>
+<em>The spinning rock in <code>see</code>: drawn with spheres, tubes and slabs (left), and with its skin mesh <code>rock.rmsh</code> (right).</em></p>
 
 ### Goal
 

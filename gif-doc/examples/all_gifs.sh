@@ -8,7 +8,8 @@
 # sheet work/<name>.png. Copy the GIFs into the examples once checked:
 #   sh all_gifs.sh install
 #
-# Needs: Rockable built in ../../BUILD (with see), see_auto (build_see_auto.sh),
+# Needs: Rockable built in ../../BUILD, or in the folder given by the variable BIN
+# (with see), see_auto (build_see_auto.sh),
 # ffmpeg, gifsicle, ImageMagick (magick).
 # Times on a laptop: a few seconds to a few minutes per example, except
 # softBallImpactVoronoi (~4 min with 4 threads), DominoFun (~12 min),
@@ -17,6 +18,8 @@ set -e
 H=$(cd "$(dirname "$0")" && pwd)
 X=$(cd "$H/../../examples" && pwd)
 W=$H/work
+BIN=$(cd "${BIN:-$H/../../BUILD}" && pwd)
+export ROCKABLE=${ROCKABLE:-$BIN/rockable}
 mkdir -p "$W"
 
 # camera: json <name> '<center>' '<eye>' [extra json]
@@ -51,7 +54,7 @@ isoComprSpheres() {
 prepro_cpptools() {
   # the input file and the shapes are written by generator (genAll.txt)
   json prepro_cpptools '0.125, 0.125, 0.125' '0.3541, 0.3312, 0.5832' '"show_driven": 0'
-  PRE="$H/../../BUILD/generator genAll.txt > gen.log 2>&1" JOBS=4 \
+  PRE="$BIN/generator genAll.txt > gen.log 2>&1" JOBS=4 \
     sh "$H/run_example.sh" "$X/prepro_cpptools" "$W/prepro_cpptools" 0.01 0.3
   LAST=30 FRAMES=30 WIDTH=220 FPS=10 COLORS=12 DITHER=none LOSSY=150 \
     sh "$H/render.sh" "$W/prepro_cpptools" "$W/prepro_cpptools.json" "$W/prepro_cpptools.gif"
@@ -60,7 +63,7 @@ prepro_cpptools() {
 DominoFun() {
   json DominoFun '0.36, 0.06, 0' '0.65, 0.62, 0.95' '"alpha_fixparticles": 0.5'
   # the input file and the shapes are written by generator (generate.txt)
-  PRE="$H/../../BUILD/generator generate.txt > gen.log 2>&1" \
+  PRE="$BIN/generator generate.txt > gen.log 2>&1" \
     JOBS=4 COLORS=32 LOSSY=80 std DominoFun "$X/DominoFun" 0.025 2.5
 }
 stickVerticesInClusters() {
@@ -128,13 +131,38 @@ sweepable() {
   echo "  sweepable.gif: $(($(wc -c < "$W/sweepable.gif") / 1024)) KB"
 }
 complexShape() {
-  # the shape of rock.stl (stl2shape), spinning freely: the input.txt of the example
+  # the rock of rock.stl spinning freely (the input.txt of the example), drawn twice side by side:
+  # with spheres, tubes and slabs (left), and with its skin mesh, rock.rmsh (right)
   json complexShape '0, 0, 0' '0, 0.03, 0.1'
-  PRE="$H/../../BUILD/stl2shape -r 0.5 -c rock.stl > stl2shape.log && mv mesh.shp rock.shp" \
-    sh "$H/run_example.sh" "$X/complexShape" "$W/complexShape" '' ''
-  STEP=2 LAST=49 FILTER='crop=iw*0.8:ih*0.8' WIDTH=200 FPS=7 COLORS=16 DITHER=none LOSSY=100 \
-    sh "$H/render.sh" "$W/complexShape" "$W/complexShape.json" "$W/complexShape.gif"
-  sh "$H/sheet.sh" "$W/complexShape" "$W/complexShape.png"
+  D=$W/complexShape
+  PRE="$BIN/stl2shape -r 0.5 -c rock.stl > stl2shape.log && mv mesh.shp rock.shp && $BIN/shapeSurvey rock.shp -P rock.shp > ss.log" \
+    sh "$H/run_example.sh" "$X/complexShape" "$D" '' ''
+  F=/System/Library/Fonts/Supplemental/Arial.ttf
+  [ -f "$F" ] || F=$(fc-match -f '%{file}' sans 2>/dev/null || true)
+  for v in primitives skin; do
+    rm -rf "$D/$v"; mkdir -p "$D/$v"
+    (cd "$D" && cp conf* rock.shp "$v/")
+    [ $v = skin ] && (cd "$D/$v" && "$BIN/shape2mesh" rock.shp --rmsh > shape2mesh.log)
+    (cd "$D/$v" && cp "$W/complexShape.json" see.json && AUTOSHOT_STEP=4 AUTOSHOT_LAST=49 "$H/see_auto" conf0 > see.log 2>&1)
+  done
+  mkdir -p "$D/tiles"; rm -f "$D"/tiles/*
+  n=$(ls "$D/skin" | grep -c '^frame')
+  i=0
+  while [ $i -lt "$n" ]; do
+    f=$(printf frame%04d.tga $i)
+    for v in primitives skin; do
+      l="spheres, tubes, slabs"; [ $v = skin ] && l="skin (rock.rmsh)"
+      magick "$D/$v/$f" -crop 768x708+0+0 +repage -gravity center -crop 52%x56%+0+0 +repage -resize 230x \
+        ${F:+-font "$F"} -gravity north -pointsize 14 -fill black -undercolor "#ffffffb0" -annotate +0+4 " $l " "$D/tiles/$v.png"
+    done
+    magick "$D/tiles/primitives.png" "$D/tiles/skin.png" +append "$D/tiles/$(printf m%04d.png $i)"
+    i=$((i + 1))
+  done
+  ffmpeg -loglevel error -y -framerate 4 -i "$D/tiles/m%04d.png" \
+    -vf "split[a][b];[a]palettegen=max_colors=24:stats_mode=diff[p];[b][p]paletteuse=dither=none" "$D/tmp.gif"
+  gifsicle -O3 --lossy=200 --loopcount=forever "$D/tmp.gif" -o "$W/complexShape.gif"
+  cp "$D/tiles/m0006.png" "$W/complexShape.png"
+  echo "  complexShape.gif: $n frames, $(($(wc -c < "$W/complexShape.gif") / 1024)) KB"
 }
 
 # where each GIF goes in the examples
