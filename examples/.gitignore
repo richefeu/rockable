@@ -39,3 +39,8 @@ sweepable/simulations/
 sweepable/all_inputs.txt
 sweepable/results.txt
 complexShape/*.shp
+prepro_cpptools/input.txt
+prepro_cpptools/shapes.txt
+prepro_cpptools/sample.txt
+DominoFun/input.txt
+DominoFun/shapes.txt

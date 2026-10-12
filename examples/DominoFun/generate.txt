@@ -27,10 +27,10 @@ print Rockable 21-08-2022
 print 
 print #### time #############################
 print t 0
-print tmax 5.0
-print dt 1e-6
+print tmax 2.5
+print dt 2e-6
 print interVerlet 1e-4
-print interConf 0.05
+print interConf 0.02
 print 
 print #### proximity of the particles #######
 print DVerlet .0025
@@ -59,7 +59,7 @@ print krContact 1 1 1e7
 print murContact 1 1 0.0
 print 
 print knInnerBond 1 1 1e7
-print en2InnerBond 1 1 0.02
+print en2InnerBond 1 1 0.5
 print ktInnerBond 1 1 1e7
 print fn0InnerBond 1 1 5.
 print ft0InnerBond 1 1 5.0

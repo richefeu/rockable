@@ -101,8 +101,8 @@ repository clean during a training day, the folder can also be copied first:
 | 1b | [`helloworldPlus`](helloworldPlus)                     | A shape from an STL mesh, the homothety, a spring joint, an expression          | 4 s     |
 | 2  | [`driving`](driving)                                   | Driving a body with `drivingSystem.txt`                                          | 1 s     |
 | 3  | [`isoComprSpheres`](isoComprSpheres)                   | Preparing a sample: a box of walls, a servo-controlled isotropic compression     | 20 s    |
-| 4  | [`prepro_cpptools`](prepro_cpptools)                   | Generating shapes and packings with `generator`                                  | short   |
-| 5  | [`DominoFun`](DominoFun)                               | A complete system built with `generator`                                         | TBD     |
+| 4  | [`prepro_cpptools`](prepro_cpptools)                   | Generating shapes and packings with `generator`                                  | 15 min  |
+| 5  | [`DominoFun`](DominoFun)                               | A complete system built with `generator`                                         | 5 min (4 threads) |
 | 6  | [`stickVerticesInClusters`](stickVerticesInClusters)   | Breakable bonds: clusters, the `StickedLinks` law                                | 2 s     |
 | 7  | [`isoComprSpheresPeriodic`](isoComprSpheresPeriodic)   | Periodic boundary conditions                                                     | 6 s     |
 | 8  | [`PerioPoly`](PerioPoly)                               | A periodic sample of polyhedra: isotropic compression of the cell              | TBD     |
@@ -110,7 +110,8 @@ repository clean during a training day, the folder can also be copied first:
 | 10 | [`sweepable`](sweepable)                               | Parametric studies: many computations from one script                            | 10 s    |
 | 11 | [`complexShape`](complexShape)                         | From an STL mesh to a shape: `stl2shape`, `shapeSurvey`                          | 20 s    |
 
-The times are those of the whole computation on a laptop, with one thread.
+The times are those of the whole computation on a laptop, with one thread
+unless stated otherwise.
 
 
 ## Status of the other folders

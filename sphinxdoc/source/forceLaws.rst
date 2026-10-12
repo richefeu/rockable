@@ -221,6 +221,24 @@ Two states can exist: cohesive bond and contact.
        As in ``BCM``, the viscous part of the previous step is removed before
        the elastic increment is added, so that it is not cumulated.
 
+       .. warning::
+
+          The viscous part is explicit, and :math:`m_\text{eff}` is built from
+          the masses of the bodies, whereas a bond placed at a vertex also
+          acts on their **rotation**. For flat or slender bodies held by many
+          bonds, the effective inertia seen by a bond is much smaller than
+          :math:`m_\text{eff}`, and a strong damping (a small ``en2*Bond``,
+          close to 0) makes the integration unstable: the angular velocities
+          grow exponentially from round-off, and the bonds break within a few
+          hundred time steps, without any load. A larger ``en2*Bond`` or a
+          smaller time step removes the problem. In ``examples/DominoFun``
+          (bricks of 5 x 40 x 20 mm, ``kn = kt = 1e7``, ``dt = 1e-6``),
+          ``en2InnerBond 0.02`` breaks the wall at once, ``0.5`` does not.
+
+          Before the viscous part stopped being cumulated, this instability
+          did not show: the cumulated term acted as an extra stiffness, not
+          as a damping.
+
     c. **Moment vector**
 
        The moment carried by the bond is accumulated incrementally from the

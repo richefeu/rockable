@@ -1,141 +1,147 @@
-## `cpptools` & the application `generator`
+## 4. Generating shapes and packings with `generator`
 
 <p align="center"><img src="animation.gif" alt="animation of the example"/></p>
 
-In the folder `prepro/genesis/cpptools`, there are some C++ pieces of code that can be used to generate shapes, packings ro entire systems. They are in the form of C++ header files, and they can be used as such.
+### Goal
 
-It is possible also to use the application `generator`. This tutorial gives some examples.
+3375 small cubes, placed on a grid with random orientations, fall into a box
+of 25 cm. Nothing is written by hand: the shapes, the walls, the cubes and the
+whole input file are produced by the application `generator`, from short
+command files.
 
-## Defining a cubic shape
+### Notions
 
-To define a sphero-polyhedron that is a cube, we may write the following command in a text-file named e.g. `genCube.txt`:
+- The application **`generator`** and its commands `generateShape:...`,
+  `generatePacking:...` ([generator](https://richefeu.github.io/rockable/generator.html)).
+- Its commands `open`, `print`, `close` and `Particles:placeHolder`, which
+  write a complete input file.
+- Several shape files, or several pieces of an input file, put together.
+
+### Files
+
+| File              | Content                                                          |
+|-------------------|------------------------------------------------------------------|
+| `genCube.txt`     | Command of `generator` that writes the shape of a cube            |
+| `genBox.txt`      | Command that writes the shapes of the walls of a box              |
+| `genPacking.txt`  | Commands that place the 6 walls and the 3375 cubes                |
+| `input_head.txt`  | The beginning of the input file, without the particles            |
+| `genAll.txt`      | All of the above in a single command file                         |
+
+### Run it
+
+Either step by step:
+
+```sh
+generator genCube.txt > shapes.txt
+generator genBox.txt >> shapes.txt
+generator genPacking.txt > sample.txt
+sed 's/^Particles XXXX/Particles 3381/' input_head.txt > input.txt
+cat sample.txt >> input.txt
+rockable input.txt -j 4          # about 15 minutes on one thread, less with -j 4
+see
+```
+
+or all at once:
+
+```sh
+generator genAll.txt             # writes shapes.txt and input.txt
+rockable input.txt -j 4
+```
+
+### What happens
+
+**The cube.** `genCube.txt` holds a single command:
 
 ```
 generateShape:cube Cube 0.0005 0.01
 ```
 
-It means: generate a cubic shape with name `Cube`, a Minkowski radius of 5 mm, and an external size of 1 cm. To generate the shape, the application `generator` is used, and from the current working directory the command is:
+a cube named `Cube`, of side 1 cm (the outer size, the rounding included),
+with a Minkowski radius of 0.5 mm. `generator` writes the shape on its
+standard output, with its volume and inertia (`preCompDone y`).
 
-```
-../../prepro/genesis/cpptools/generator genCube.txt > shapes.txt
-```
-
-As a result, the file `shapes.txt` should be:
-
-```
-<
-name Cube
-radius 0.0005
-preCompDone y
-nv 8
-0.0045 0.0045 -0.0045
--0.0045 0.0045 -0.0045
--0.0045 -0.0045 -0.0045
-0.0045 -0.0045 -0.0045
-0.0045 0.0045 0.0045
--0.0045 0.0045 0.0045
--0.0045 -0.0045 0.0045
-0.0045 -0.0045 0.0045
-ne 12
-0 1
-1 2
-2 3
-3 0
-4 5
-5 6
-6 7
-7 4
-0 4
-1 5
-2 6
-3 7
-nf 6
-4 0 1 2 3
-4 4 5 6 7
-4 0 1 5 4
-4 2 3 7 6
-4 1 2 6 5
-4 0 4 7 3
-obb.extent 0.005 0.005 0.005
-obb.e1 1 0 0
-obb.e2 0 1 0
-obb.e3 0 0 1
-obb.center 0 0 0
-volume 9.78318e-07
-I/m 1.66667e-05 1.66667e-05 1.66667e-05
->
-```
-
-## Defining the wall shapes
-
-We would like to deposite a number of cubes inside a box. So a box needs to be defined, and something similar to the cube can be done to generate a 6-wall box. Here is the file `genBox.txt`:
+**The walls.** `genBox.txt`,
 
 ```
 generateShape:xyz_walls   0.25 0.25 0.25   0.0005
-``` 
-
-
-It means: generate 3 walls that form a cubic box with all inner sizes equal to 25 cm, and a Minkowski radius of 5 mm. The normal vector to each wall is oriented towards x, y and z, and the name of the walls are respectively `x-wall`, `y-wall` and `z-wall`.  To generate the shape and to **append** it in the file `shapes.txt`, the command is:
-
-```
-../../prepro/genesis/cpptools/generator genBox.txt >> shapes.txt
 ```
 
-## Packing the cubes inside the box
+writes three wall shapes, `x-wall`, `y-wall` and `z-wall`, normal to `x`, `y`
+and `z`, for a box of 25 cm, with a radius (half-thickness) of 0.5 mm. `>>`
+appends them to `shapes.txt`.
 
-Now that the shapes are defined, the initial packing can be constructed. Here is the generation script in file `genPacking.txt`:
+**The packing.** `genPacking.txt` holds two commands, whose arguments are
+given on the following lines:
 
 ```
 generatePacking:wallBox
-1
-0.25 0.25 0.25
-0.0005
+1                  group of the walls
+0.25 0.25 0.25     inner size of the box
+0.0005             half-thickness (the radius of the wall shapes)
 
 generatePacking:grid
-Cube
-0 0 0
-0.25 0.25 0.25
-15 15 15
-0
-0
-1.0
-1
+Cube               shape
+0 0 0              corner of the grid
+0.25 0.25 0.25     size of the grid
+15 15 15           number of particles along x, y, z
+0                  group
+0                  cluster
+1.0                homothety
+1                  1: random orientations, 0: all aligned
 ```
 
-The first command place the 6 walls that form the box, where group is 1, size is 25^3 cm^3, and half-thickness is 5 mm (this latter value needs to be consistent with the one used to generate the wall shapes).
-
-The second command place 15^3 particles of shape named `Cube` inside a box (25x25x25 cm^2), from origin point (0, 0, 0). The group of the added particles is 0, the size factor (homothety) is 1.0, and the last value says that the cubes will have random orientations.
-
-The generator is invoked that way:
-
-```
-../../prepro/genesis/cpptools/generator genPacking.txt > sample.txt
-```
-
-And we get in the terminal the number of added bodies for each command:
+The six walls come first: with `nDriven 6`, they are the driven bodies, and
+since nothing drives them, they stay fixed. The cubes, on a grid of
+15 × 15 × 15, are 1.67 cm apart. `generator` tells how many bodies each command
+added (on the error output, so that it does not end up in the file):
 
 ```
-@wallBox, Number of added bodies: 6
-@grid, Number of added bodies: 3375
+@generatePacking:wallBox, Number of added bodies: 6
+@generatePacking:grid, Number of added bodies: 3375
 ```
 
-## Assembling the input conf-file
+**The input file.** `input_head.txt` holds the parameters of the computation
+and ends with `Particles XXXX`: `sed` puts the number of particles, 3381, in
+its place, and the lines of `sample.txt` are appended.
 
-Now, we have all the pieces to assemble the input file. Let's start with the file `input_head.txt`: `cp input_head.txt input.txt`.
+**All at once.** `genAll.txt` does the same in a single file. `open shapes.txt`
+sends what follows into `shapes.txt` until `close`; `print` writes a line as it
+is; `Particles:placeHolder` writes `Particles` and leaves room for the number,
+which `generator` fills in at `close` with the count of the particles added in
+between.
 
-Open this file and edit the following lines:
+**The computation.** There is no `gravity` line: the default gravity,
+`(0, -9.81, 0)`, applies. The cubes fall, pile up at the bottom of the box,
+and are at rest from about `t = 0.5 s`. With 3375 particles, the computation
+takes about 15 minutes on one thread; `-j 4` runs it on 4 threads.
 
-```
-shapeFile shapes.txt
-nDriven 6
-Particles 3381
-```
+### What to look at
 
-Notice that the number of particles is the total number 3375 cubes + 6 walls (placed at the beginning of the list).
-The content of the file `sample.txt` can be copied at the end of the file `input.txt`.
+- In `see`, the key `d` hides the walls.
+- The kinetic energy, `kineticEnergy.txt`, which drops once the cubes are
+  piled up:
 
-The simulation is ready to be run:
+  ```sh
+  gnuplot -p -e "set logscale y; plot 'kineticEnergy.txt' using 1:2 with lines title 'translation'"
+  ```
+- `shapes.txt`: the shapes written by `generator`.
 
-```
-../../src/run input.txt
-```
+### Exercises
+
+1. Replace the cube by an elongated cuboid: `generateShape:cuboid Cube 0.0005
+   0.015 0.005 0.005` (the name is kept, so that nothing else has to change).
+2. Put fewer cubes, aligned (`5 5 5` and a last `0` in `generatePacking:grid`).
+   The number of particles is then 131: change it in the command `sed`, or use
+   `genAll.txt`, which counts them.
+3. Make the box twice as high: `0.25 0.5 0.25` in `genBox.txt`, and for the
+   size of the box and of the grid in `genPacking.txt`.
+4. Look at the other commands of `generator` (spheres, polyhedra, random
+   close packings, transformations) on the page
+   [generator](https://richefeu.github.io/rockable/generator.html).
+
+### Going further
+
+- [`DominoFun`](../DominoFun): a whole system written by `generator`, with
+  clusters of glued particles.
+- The C++ functions behind `generator`, in `prepro/genesis/cpptools`, can be
+  used directly in a program.
