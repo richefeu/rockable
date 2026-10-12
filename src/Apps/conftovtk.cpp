@@ -365,7 +365,6 @@ void writeVTKContactsSpheres(int num) {
   sortie_vtk = fopen(vtk_file, "w");
 
   long nbContacts = 0;
-  double fMax = 0;
 
   for (size_t k = 0; k < box.Interactions.size(); ++k) {
     std::set<Interaction>::iterator it = box.Interactions[k].begin();
@@ -375,7 +374,6 @@ void writeVTKContactsSpheres(int num) {
           continue;
         else {
           nbContacts++;
-          fMax = std::max(fMax, norm(it->fn * it->n + it->ft));
         }
       }
     }
@@ -403,7 +401,9 @@ void writeVTKContactsSpheres(int num) {
 
   fprintf(sortie_vtk, "POINT_DATA %li\n", nbContacts);
 
-  fprintf(sortie_vtk, "VECTORS F_Fmax float\n");
+  // Half the sum of the Minkowski radii of the two bodies, along z (a size for the glyphs of the contacts).
+  // This array was named F_Fmax, although it holds no force.
+  fprintf(sortie_vtk, "VECTORS MeanRadius float\n");
 
   for (size_t k = 0; k < box.Interactions.size(); ++k) {
     std::set<Interaction>::iterator it = box.Interactions[k].begin();
@@ -415,9 +415,9 @@ void writeVTKContactsSpheres(int num) {
         if (it->dn > 0.0 && it->stick == nullptr)
           continue;
         else {
-          fMax = box.Particles[i].MinkowskiRadius() + box.Particles[j].MinkowskiRadius();
-          if (fMax != 0.)
-            fprintf(sortie_vtk, "0. 0. %lf\n", fMax / 2.);
+          double sumRadii = box.Particles[i].MinkowskiRadius() + box.Particles[j].MinkowskiRadius();
+          if (sumRadii != 0.)
+            fprintf(sortie_vtk, "0. 0. %lf\n", sumRadii / 2.);
           else
             fprintf(sortie_vtk, "0. 0. 0.\n");
         }

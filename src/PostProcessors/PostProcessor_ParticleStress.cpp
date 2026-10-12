@@ -85,6 +85,21 @@ void ParticleStress::exec() {
   sprintf(fname, "ParticleStress-conf%d.txt", box->iconf);
   std::ofstream file(fname);
 
+  // Vector from the contact point to the centre of the particle (nearest image with a periodic cell)
+  auto lever = [this](const vec3r& xp, const vec3r& xc) {
+    vec3r d = xp - xc;
+#ifdef ROCKABLE_ENABLE_PERIODIC
+    if (box->usePeriodicCell == 1) {
+      vec3r s = box->Cell.hinv * d;
+      s.x -= std::round(s.x);
+      s.y -= std::round(s.y);
+      s.z -= std::round(s.z);
+      d = box->Cell.h * s;
+    }
+#endif
+    return d;
+  };
+
   std::vector<mat9r> M(box->Particles.size());
   for (size_t ibody = 0; ibody < box->Particles.size(); ibody++) {
     for (auto it = box->Interactions[ibody].begin(); it != box->Interactions[ibody].end(); ++it) {
@@ -93,41 +108,18 @@ void ParticleStress::exec() {
       size_t i = I->i;
       size_t j = I->j;
 
-      vec3r x = I->pos;
-      vec3r f = -(I->fn * I->n + I->ft); // the sign - is for obtaining positive M for compression
+      // The normal n goes from j to i, so that fn * n + ft is the force received by i.
+      // M_p = sum over the contacts c of F_c (x) (x_p - x_c), with F_c the force received by p: it is positive
+      // in compression, and it does not depend on the origin, even when the particle is not in equilibrium
+      // (with the absolute position x_c, the moment of the resultant force was added to it).
+      vec3r f = I->fn * I->n + I->ft;
 
-      double sxx = f.x * x.x;
-      double sxy = f.x * x.y;
-      double sxz = f.x * x.z;
-      double syx = f.y * x.x;
-      double syy = f.y * x.y;
-      double syz = f.y * x.z;
-      double szx = f.z * x.x;
-      double szy = f.z * x.y;
-      double szz = f.z * x.z;
-
-      if (i >= box->nDriven) { // the tensorial moment of walls is not computed
-        M[i].xx += sxx;
-        M[i].xy += sxy;
-        M[i].xz += sxz;
-        M[i].yx += syx;
-        M[i].yy += syy;
-        M[i].yz += syz;
-        M[i].zx += szx;
-        M[i].zy += szy;
-        M[i].zz += szz;
+      if (i >= box->nDriven) {  // the tensorial moment of walls is not computed
+        M[i] += dyadic_product(f, lever(box->Particles[i].pos, I->pos));
       }
 
-      if (j >= box->nDriven) { // the tensorial moment of walls is not computed
-        M[j].xx -= sxx;
-        M[j].xy -= sxy;
-        M[j].xz -= sxz;
-        M[j].yx -= syx;
-        M[j].yy -= syy;
-        M[j].yz -= syz;
-        M[j].zx -= szx;
-        M[j].zy -= szy;
-        M[j].zz -= szz;
+      if (j >= box->nDriven) {  // the tensorial moment of walls is not computed
+        M[j] += dyadic_product(-f, lever(box->Particles[j].pos, I->pos));
       }
     }
   }
