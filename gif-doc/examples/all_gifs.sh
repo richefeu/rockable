@@ -88,11 +88,11 @@ softBallImpactVoronoi() {
   JOBS=4 CMIN=-0.4 CMAX=0.4 COLORS=32 LOSSY=80 std softBallImpactVoronoi "$X/softParticles/softBallImpactVoronoi" 0.008 0.36
 }
 elasticCube() {
-  json elasticCube '0, -0.5, 0' '2.2, 0.6, 3.6' '"colorMode": 5, "alpha_fixparticles": 0.25'
+  json elasticCube '0, -0.5, 0' '2.6, -0.3, 3.4' '"colorMode": 5, "alpha_fixparticles": 0.25'
   CMIN=-4000 CMAX=0 WIDTH=280 COLORS=48 std elasticCube "$X/softParticles/elasticCube" 0.04 ''
 }
 viscousCube() {
-  json viscousCube '0, -0.5, 0' '2.2, 0.6, 3.6' '"colorMode": 5, "alpha_fixparticles": 0.25'
+  json viscousCube '0, -0.5, 0' '2.6, -0.3, 3.4' '"colorMode": 5, "alpha_fixparticles": 0.25'
   CMIN=-4000 CMAX=0 WIDTH=280 COLORS=48 std viscousCube "$X/softParticles/viscousCube" 0.04 ''
 }
 bondedBeam() {
