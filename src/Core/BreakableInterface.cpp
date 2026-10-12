@@ -34,6 +34,7 @@
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
 #include "BreakableInterface.hpp"
+#include "Interaction.hpp"
 
 BreakableInterface::BreakableInterface()
     : i(0), j(0), kn(0.0), kt(0.0), kr(0.0), fn0(0.0), ft0(0.0), mom0(0.0), power(2.0), dn0(0.0), isInner(1) {}
@@ -41,12 +42,23 @@ BreakableInterface::BreakableInterface()
 BreakableInterface::BreakableInterface(size_t I, size_t J)
     : i(I), j(J), kn(0.0), kt(0.0), kr(0.0), fn0(0.0), ft0(0.0), mom0(0.0), power(2.0), dn0(0.0), isInner(1) {}
 
-/*
-void BreakableInterface::computeAreaFromConcernedInnerBonds() {
-  // TODO *******
+/**
+ * @brief Computes the area of the interface from the current positions of its bonds,
+ *        with a fan of triangles (the bonds are supposed to be at the corners of a convex polygon)
+ */
+void BreakableInterface::computeAreaFromConcernedBonds() {
   area = 0.0;
+  size_t n = concernedBonds.size();
+  if (n < 3) {
+    return;  // Not a valid polygon
+  }
+
+  const vec3r& p0 = concernedBonds[0]->pos;
+  for (size_t b = 0; b < n; ++b) {
+    size_t c = (b + 1) % n;
+    area += 0.5 * norm(cross(concernedBonds[b]->pos - p0, concernedBonds[c]->pos - p0));
+  }
 }
-*/
 
 
 

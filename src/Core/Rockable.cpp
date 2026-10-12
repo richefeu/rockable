@@ -470,6 +470,9 @@ void Rockable::saveConf(const char* fname) {
     bodyForce->write(conf);
   }
   conf << "ParamsInInterfaces " << paramsInInterfaces << '\n';
+  if (bondStiffnessPerInterface != 0) {
+    conf << "bondStiffnessPerInterface " << bondStiffnessPerInterface << '\n';
+  }
   conf << "dynamicUpdateNL " << dynamicUpdateNL << '\n';
   if (dynamicUpdateNL != 0) {
     conf << "dispUpdateNL " << dispUpdateNL << '\n';
@@ -602,14 +605,18 @@ void Rockable::saveConf(const char* fname) {
   for (size_t i = 0; i < Interfaces.size(); i++) {
     std::set<BreakableInterface>::iterator it = Interfaces[i].begin();
     for (; it != Interfaces[i].end(); ++it) {
-      conf << it->i << ' ' << it->j << "  " << it->concernedBonds.size() << ' ' << it->dn0;
+      const int prec = CommBox().precision;
+      conf << it->i << ' ' << it->j << "  " << it->concernedBonds.size() << ' ' << it->dn0 << ' '
+           << fmt::format("{:.{}e}", it->area, prec);
       if (paramsInInterfaces == 1) {
         conf << ' ' << it->kn << ' ' << it->kt << ' ' << it->kr << ' ' << it->fn0 << ' ' << it->ft0 << ' ' << it->mom0
              << ' ' << it->power << ' ' << it->Gc << ' ';
       }
       for (size_t b = 0; b < it->concernedBonds.size(); ++b) {
-        conf << "  " << it->concernedBonds[b]->type << ' ' << it->concernedBonds[b]->isub << ' '
-             << it->concernedBonds[b]->jsub;
+        const Interaction* I = it->concernedBonds[b];
+        conf << "  " << I->type << ' ' << I->isub << ' ' << I->jsub << ' '
+             << fmt::format("{:.{}e} {:.{}e} {:.{}e} {:.{}e}", I->dn0, prec, I->ds.x, prec, I->ds.y, prec, I->ds.z,
+                            prec);
       }
       conf << '\n';
     }
@@ -682,6 +689,7 @@ void Rockable::initParser() {
   };
   parser.kwMap["gravity"] = __GET__(conf, gravity);
   parser.kwMap["ParamsInInterfaces"] = __GET__(conf, paramsInInterfaces);
+  parser.kwMap["bondStiffnessPerInterface"] = __GET__(conf, bondStiffnessPerInterface);
   parser.kwMap["dynamicUpdateNL"] = __GET__(conf, dynamicUpdateNL);
   parser.kwMap["dispUpdateNL"] = __GET__(conf, dispUpdateNL);
   parser.kwMap["angleUpdateNL"] = __DO__(conf) {
@@ -1115,6 +1123,8 @@ void Rockable::initParser() {
       Interfaces[i].clear();
     }
 
+    breakableInterfaces.clear();
+
     for (size_t k = 0; k < nbInterf; ++k) {
       Interaction ItoFind;
       BreakableInterface BI;
@@ -1124,13 +1134,41 @@ void Rockable::initParser() {
       ItoFind.j = BI.j;
       BI.concernedBonds.resize(nbBonds);
 
+      // The rest of the line is 'area [params] (type isub jsub dn0 ds) for each bond'.
+      // The conf-files written before (with neither area nor dn0 and ds) hold 'type isub jsub' for each bond.
+      // The number of values on the line tells which version it is.
+      std::string line;
+      getline(conf, line);
+      std::istringstream is(line);
+      size_t nbValues = 0;
+      std::string trash;
+      while (is >> trash) {
+        nbValues++;
+      }
       if (paramsInInterfaces == 1) {
-        conf >> BI.kn >> BI.kt >> BI.kr >> BI.fn0 >> BI.ft0 >> BI.mom0 >> BI.power >> BI.Gc;
+        nbValues -= 8;
+      }
+      bool fullBonds = (nbValues == 1 + 7 * nbBonds);
+      if (!fullBonds && nbValues != 3 * nbBonds) {
+        Logger::warn("Interfaces: unexpected number of values for the interface between {} and {}", BI.i, BI.j);
+      }
+      std::istringstream rest(line);
+      if (fullBonds) {
+        rest >> BI.area;
+      }
+
+      if (paramsInInterfaces == 1) {
+        rest >> BI.kn >> BI.kt >> BI.kr >> BI.fn0 >> BI.ft0 >> BI.mom0 >> BI.power >> BI.Gc;
       }
 
       bool missed = false;
+      std::vector<double> bondDn0(nbBonds, BI.dn0);
+      std::vector<vec3r> bondDs(nbBonds);
       for (size_t u = 0; u < nbBonds; ++u) {
-        conf >> ItoFind.type >> ItoFind.isub >> ItoFind.jsub;
+        rest >> ItoFind.type >> ItoFind.isub >> ItoFind.jsub;
+        if (fullBonds) {
+          rest >> bondDn0[u] >> bondDs[u];
+        }
         std::set<Interaction>::iterator it = Interactions[ItoFind.i].find(ItoFind);
         if (it != Interactions[ItoFind.i].end()) {
           BI.concernedBonds[u] = const_cast<Interaction*>(std::addressof(*it));
@@ -1145,7 +1183,19 @@ void Rockable::initParser() {
         BreakableInterface* ptr =
             const_cast<BreakableInterface*>(std::addressof(*((Interfaces[BI.i].insert(BI)).first)));
         for (size_t i = 0; i < BI.concernedBonds.size(); i++) {
-          ptr->concernedBonds[i]->stick = ptr;
+          Interaction* I = ptr->concernedBonds[i];
+          I->stick = ptr;
+          I->dn0 = bondDn0[i];
+          I->ds = bondDs[i];
+          // The viscous part of ft, as computed by the force law at the last step
+          I->ftv = I->damp * (I->vel - (I->vel * I->n) * I->n);
+        }
+        if (!fullBonds) {
+          ptr->computeAreaFromConcernedBonds();  // from the current positions of the bonds
+        }
+        // As done by stickBCM, so that the interface can break
+        if (optionNames["forceLaw"] == "BCM") {
+          breakableInterfaces.insert(ptr);
         }
       }
     }
@@ -3521,6 +3571,17 @@ void Rockable::compute_SpringJoints() {
   }
 }
 
+/**
+ * Weight applied to the stiffnesses of a bond (BCM): 1 when they are given for each bond,
+ * or 1 / (number of bonds) when they are given for the whole interface (bondStiffnessPerInterface 1).
+ */
+double Rockable::bondStiffnessWeight(const BreakableInterface* BI) const {
+  if (bondStiffnessPerInterface == 1 && BI != nullptr && !BI->concernedBonds.empty()) {
+    return 1.0 / static_cast<double>(BI->concernedBonds.size());
+  }
+  return 1.0;
+}
+
 void Rockable::check_breakage_of_interfaces() {
   START_TIMER("check_breakage_of_interfaces");
 
@@ -3535,7 +3596,12 @@ void Rockable::check_breakage_of_interfaces() {
       int g1 = Particles[BI->i].group;
       int g2 = Particles[BI->j].group;
 
-      if (BI->isInner == true) {
+      // Same parameters as in the force law (BCM)
+      if (paramsInInterfaces == 1) {
+        kn = BI->kn;
+        kt = BI->kt;
+        Gc = BI->Gc;
+      } else if (BI->isInner == true) {
         kn = dataTable.get(idKnInnerBond, g1, g2);
         kt = dataTable.get(idKtInnerBond, g1, g2);
         Gc = dataTable.get(idGcInnerBond, g1, g2);
@@ -3544,14 +3610,17 @@ void Rockable::check_breakage_of_interfaces() {
         kt = dataTable.get(idKtOuterBond, g1, g2);
         Gc = dataTable.get(idGcOuterBond, g1, g2);
       }
+      double weight = bondStiffnessWeight(BI);
+      kn *= weight;
+      kt *= weight;
 
       BI->En = 0.0;
       BI->Et = 0.0;
       for (size_t b = 0; b < BI->concernedBonds.size(); ++b) {
         Interaction* I = BI->concernedBonds[b];
 
-        if (I->dn > BI->dn0) {  // FIXME: there should be one dn0 per bond BI->dn0[b]
-          BI->En += 0.5 * kn * (I->dn - BI->dn0) * (I->dn - BI->dn0);
+        if (I->dn > I->dn0) {  // only the bonds in tension store energy
+          BI->En += 0.5 * kn * (I->dn - I->dn0) * (I->dn - I->dn0);
         }
         BI->Et += 0.5 * kt * norm2(I->ds);
       }
@@ -3587,6 +3656,9 @@ void Rockable::breakage_of_interfaces() {
 
     for (size_t b = 0; b < (*BI)->concernedBonds.size(); ++b) {  // concernedBonds includes the current bond
       (*BI)->concernedBonds[b]->stick = nullptr;                 // it unplugs the interface from the interaction
+      (*BI)->concernedBonds[b]->dn0 = 0.0;
+      (*BI)->concernedBonds[b]->ft -= (*BI)->concernedBonds[b]->ftv;  // a contact has no viscous part in ft
+      (*BI)->concernedBonds[b]->ftv.reset();
       if ((*BI)->concernedBonds[b]->dn >= 0.0) {
         (*BI)->concernedBonds[b]->fn = 0.0;
         (*BI)->concernedBonds[b]->ft.reset();

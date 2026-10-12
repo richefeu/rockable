@@ -188,6 +188,9 @@ class Rockable {
   vec3r gravity{0.0, -9.81, 0.0};  ///< Gravity acceleration
   int paramsInInterfaces{0};       ///< Flag saying if the parameters for sticked blonds
                                    ///< are embedded within the interfaces
+  int bondStiffnessPerInterface{0};  ///< Flag saying if the bond stiffnesses (BCM) are given for a whole interface
+                                     ///< (1) rather than for each of its bonds (0, default)
+  double bondStiffnessWeight(const BreakableInterface* BI) const;  ///< Weight of the bond stiffnesses (BCM)
   bool glue_with_walls{false};     ///< flag to say if the glue can be also set between free and controlled particles
 
   vec3r cellMinSizes{1.0, 1.0, 1.0};  ///< Sizes of the linked cells in the 3 directions x, y ad z

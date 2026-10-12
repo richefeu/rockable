@@ -49,7 +49,6 @@ class stickBCM : public PreproCommand {
 
  private:
   double epsilonDist;
-  void computeAreaFromConcernedInnerBonds(BreakableInterface* BI);
 };
 
 #endif /* end of include guard: PREPRO_COMMAND_STICK_BCM_HPP */

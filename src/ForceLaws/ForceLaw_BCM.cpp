@@ -58,7 +58,6 @@ void BCM::init() {
 bool BCM::computeInteraction(Interaction& I) {
   if (I.stick != nullptr) {  // =========== Cohesive bond
     double kn = 0.0, kt = 0.0;
-    double dn0 = I.stick->dn0;
     bool isInner = (box->Particles[I.i].cluster == box->Particles[I.j].cluster);
       
     // First we need to get the parameters
@@ -79,23 +78,21 @@ bool BCM::computeInteraction(Interaction& I) {
       }
     }
     
-    // en vrai il faudrait précalculer weight dans I.stick->weight au moment où on calcul l'aire
-    if (!I.stick->concernedBonds.empty()) {
-      double weight = 1.0 / static_cast<double>(I.stick->concernedBonds.size());
-      kn *= weight;
-      kt *= weight;
-    }
-    
+    // The stiffnesses are given for each bond, or for the whole interface (option bondStiffnessPerInterface)
+    double weight = box->bondStiffnessWeight(I.stick);
+    kn *= weight;
+    kt *= weight;
 
     // === Normal force (elastic contact + viscous damping)
     double vn = I.vel * I.n;
-    double fne = -kn * (I.dn - dn0);
+    double fne = -kn * (I.dn - I.dn0);  // dn0 is the distance when the bond was created
     double fnv = I.damp * vn;
     I.fn = fne + fnv;
 
     // === Tangential force (friction)
     vec3r vt = (I.vel - (vn * I.n));
     I.ds += vt * box->dt;
+    I.ft -= I.ftv;  // remove the viscous part added at the previous step
 #ifdef FT_CORR
     vec3r ft_corr = I.ft;
     ft_corr -= cross(ft_corr, cross(I.prev_n, I.n));
@@ -106,10 +103,10 @@ bool BCM::computeInteraction(Interaction& I) {
 #endif
 
     // Tangential viscosity ========
-    // This term should be added only on the elastic part of ft
-    // So it is somehow wrong because the viscosity is cumulated... Be carreful!
-    vec3r ftv = I.damp * vt;
-    I.ft += ftv;
+    // It is added to the elastic part of ft, and remembered so that it can be removed
+    // at the next step (otherwise, it would be cumulated)
+    I.ftv = I.damp * vt;
+    I.ft += I.ftv;
     // =============================
 
     // The breakage will be done in

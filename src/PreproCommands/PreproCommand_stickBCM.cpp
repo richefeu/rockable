@@ -60,6 +60,7 @@ void stickBCM::exec() {
   }
 
   int countAddedInteractions = 0;
+  std::set<BreakableInterface*> createdInterfaces;
 
   for (size_t i = box->nDriven; i < box->Particles.size(); i++) {
 
@@ -122,9 +123,11 @@ void stickBCM::exec() {
               BreakableInterface* BI = const_cast<BreakableInterface*>(std::addressof(*(ret.first)));
 
               box->breakableInterfaces.insert(BI); // Add to global list for checking breakage
+              createdInterfaces.insert(BI);
 
               Interaction I(i, j, vvType, iv, jv, Damp, BI);
               Interaction::UpdateDispatcher[vvType](I, box->Particles[i], box->Particles[j]);
+              I.dn0 = I.dn;  // the bond carries no force in its initial position
               Interaction* Iptr = const_cast<Interaction*>(std::addressof(*((box->Interactions[i].insert(I)).first)));
               BI->concernedBonds.push_back(Iptr);
               box->activeInteractions.push_back(Iptr);
@@ -138,11 +141,20 @@ void stickBCM::exec() {
     }  // j
   }  // i
 
+  // When the stiffnesses are given for a whole interface, each bond has only a part of it,
+  // and its damping (computed above from the whole stiffness) is reduced accordingly
+  for (BreakableInterface* BI : createdInterfaces) {
+    double weight = box->bondStiffnessWeight(BI);
+    for (Interaction* I : BI->concernedBonds) {
+      I->damp *= sqrt(weight);
+    }
+  }
+
   // Compute areas
   for (auto& interfaceSet : box->Interfaces) {
     for (auto& interface : interfaceSet) {
       // Because a set element is 'const'
-      computeAreaFromConcernedInnerBonds(const_cast<BreakableInterface*>(std::addressof(interface)));
+      const_cast<BreakableInterface&>(interface).computeAreaFromConcernedBonds();
     }
   }
 
@@ -156,28 +168,5 @@ void stickBCM::exec() {
     for (auto& interface : interfaceSet) {
       std::cout << " -> " <<interface.area << '\n';
     }
-  }
-}
-
-void stickBCM::computeAreaFromConcernedInnerBonds(BreakableInterface* BI) {
-
-  std::vector<vec3r> vertices;
-  for (size_t b = 0; b < BI->concernedBonds.size(); b++) {
-    vertices.push_back(BI->concernedBonds[b]->pos);
-  }
-
-  if (vertices.size() < 3) {
-    BI->area = 0.0;  // Not a valid polygon
-    std::cout << "Glups\n";
-    return;
-  }
-
-  BI->area = 0.0;
-  size_t n = vertices.size();
-
-  // Project the vertices onto the XY plane (you can choose another plane if needed)
-  for (size_t i = 0; i < n; ++i) {
-    size_t j = (i + 1) % n;
-    BI->area += 0.5 * norm(cross(vertices[i]-vertices[0], vertices[j]-vertices[0]));
   }
 }

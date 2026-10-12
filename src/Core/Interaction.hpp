@@ -70,6 +70,7 @@ class Interaction {
 
   double dn{0.0};       ///< Normal distance (overlap = negative distance)
   double prev_dn{0.0};  ///< Backup of dn at the previous time step
+  double dn0{0.0};      ///< Normal distance at which a bond carries no force (set when the bond is created)
 
   vec3r ds;
 
@@ -84,6 +85,7 @@ class Interaction {
   double fn{0.0};  ///< Normal force (scalar value)
   vec3r ft;        ///< Tangential force (vector)
   vec3r mom;       ///< Moment at the contact point
+  vec3r ftv;       ///< Viscous part of ft (bonds), removed before the next increment so that it is not cumulated
 
   double damp{0.0};                    ///< Precomputed vicuous damping coefficient
   BreakableInterface* stick{nullptr};  ///< The breakable interface (if there's no interface, then stick = nullptr)

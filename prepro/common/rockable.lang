@@ -429,12 +429,23 @@ doc: Interactions [(int) numberOfInteractions]
 doc: Interfaces [(int)numberOfInterfaces]
 
   REPEAT FOR EACH INTERFACE {
-     [(int) i] [(int) j] [(int) nbBonds]
+     [(int) i] [(int) j] [(int) nbBonds] [(double) dn0] [(double) area]
      IF (ParamsInInterfaces is not 0) {
-        [(double) kn] [(double) kt] [(double) kr] [(double) fn0] [(double) ft0] [(double) mom0] [(double) power]
+        [(double) kn] [(double) kt] [(double) kr] [(double) fn0] [(double) ft0] [(double) mom0] [(double) power] [(double) Gc]
      }
-     REPEAT FOR EACH BOND { [(int) type] [(int) isub] [(int) jsub] }
+     REPEAT FOR EACH BOND { [(int) type] [(int) isub] [(int) jsub] [(double) dn0] [(vec3r) ds] }
   }
+
+  The dn0 of a bond is its normal distance when it was created (it carries no force there),
+  and ds its cumulated tangential displacement. Older conf-files, without area, bond dn0 and ds,
+  are still read (the area is then computed from the positions of the bonds).
+
+[keyword] bondStiffnessPerInterface
+doc: bondStiffnessPerInterface [(int) 0 or 1]
+
+  With the force law BCM, the bond stiffnesses (knInnerBond, ktInnerBond...) are given
+  for each bond (0, default), or for the whole interface (1): each of the n bonds of an
+  interface then has 1/n of the stiffness. The breakage energy and the bond damping follow.
 
 [keyword] DataExtractor
 doc: DataExtractor [(string) Name] ...

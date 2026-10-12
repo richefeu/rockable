@@ -46,6 +46,7 @@ Interaction::Interaction()
       n(),
       dn(0.0),
       prev_dn(0.0),
+      dn0(0.0),
       ds(),
       pos(),
       vel(),
@@ -54,6 +55,7 @@ Interaction::Interaction()
       fn(0.0),
       ft(),
       mom(),
+      ftv(),
       damp(0.0),
       stick(nullptr) {}
 
@@ -67,6 +69,7 @@ Interaction::Interaction(const Interaction& I)
       n(I.n),
       dn(I.dn),
       prev_dn(I.prev_dn),
+      dn0(I.dn0),
       ds(),
       pos(I.pos),
       vel(I.vel),
@@ -75,6 +78,7 @@ Interaction::Interaction(const Interaction& I)
       fn(I.fn),
       ft(I.ft),
       mom(I.mom),
+      ftv(I.ftv),
       damp(I.damp),
       stick(I.stick) {}
 
@@ -88,6 +92,7 @@ Interaction::Interaction(size_t I, size_t J, int Type, size_t Isub, size_t Jsub,
       n(),
       dn(0.0),
       prev_dn(0.0),
+      dn0(0.0),
       ds(),
       pos(),
       vel(),
@@ -96,6 +101,7 @@ Interaction::Interaction(size_t I, size_t J, int Type, size_t Isub, size_t Jsub,
       fn(0.0),
       ft(),
       mom(),
+      ftv(),
       damp(Damp),
       stick(Stick) {}
 
@@ -110,6 +116,7 @@ Interaction& Interaction::operator=(const Interaction& other) {
     n = other.n;
     dn = other.dn;
     prev_dn = other.prev_dn;
+    dn0 = other.dn0;
     ds = other.ds;
     pos = other.pos;
     vel = other.vel;
@@ -118,6 +125,7 @@ Interaction& Interaction::operator=(const Interaction& other) {
     fn = other.fn;
     ft = other.ft;
     mom = other.mom;
+    ftv = other.ftv;
     damp = other.damp;
     stick = other.stick;
   }
@@ -129,6 +137,7 @@ void Interaction::deactivate() {
   fn = 0.0;
   ft.reset();
   mom.reset();
+  ftv.reset();
 }
 
 // Dispatching (array of lambdas)
