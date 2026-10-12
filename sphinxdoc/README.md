@@ -75,6 +75,10 @@ the following:
 - The tangential viscosity of `StickedLinks` was cumulated over time (as in
   `BCM`), and the $d_n^0$ of its inner bonds was taken as zero when the
   parameters come from the group-pair table. *Fixed.*
+- The bonds of `StickedLinks` never broke when `mom0*Bond` (or `ft0*Bond`) was
+  not defined: the term $0/0$ made the yield function NaN. This was the case of
+  the example `stickVerticesInClusters`. *Fixed* (a term with a zero numerator
+  contributes nothing).
 - The moment threshold of `Avalanche` was undefined when the free body does not
   rotate at all. *Fixed.*
 - The numerical damping used the total velocity, not the velocity relative to
