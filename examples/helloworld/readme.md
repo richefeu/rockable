@@ -1,111 +1,149 @@
-## Hello World for Rockable 
+## 1. Hello world: a first simulation
 
-To make our first simulation with `Rockable`, 2 text-files are needed: `input.txt` for setting the system, and `shapes.shp` that defines the sphero-polyedron shapes.
+### Goal
 
-Here is what `input.txt`, that is a so-called **conf-file**, looks like:
+Two grains, a sphere and an elongated grain, fall on a fixed plane and come to
+rest. This is the smallest complete simulation: it shows the two files that
+every computation needs, how to run it, and how to look at the result.
+
+![The system at the beginning, seen with see](see_input.png)
+
+### Notions
+
+- The **conf-file** (`input.txt`), which holds the whole system: time
+  parameters, interaction parameters and the list of particles
+  ([syntaxConf](https://richefeu.github.io/rockable/syntaxConf.html)).
+- The **shape file** (`shapes.shp`), which defines the sphero-polyhedra
+  ([syntaxShapes](https://richefeu.github.io/rockable/syntaxShapes.html)).
+- **Groups**, which select the interaction parameters, and **driven** bodies
+  (`nDriven`).
+- The commands `rockable` and `see`.
+
+### Files
+
+| File          | Content                                                                         |
+|---------------|---------------------------------------------------------------------------------|
+| `input.txt`   | The conf-file: the system at the initial time, and all the parameters          |
+| `shapes.shp`  | The library of shapes: `Plan`, `Sphere` and `Rice` (a sphero-segment)          |
+| `see_input.png` | What `see input.txt` shows                                                    |
+| `hello.chai`  | **Obsolete** (ChaiScript is no longer supported); ignore it                     |
+
+### Run it
+
+```sh
+see input.txt        # look at the system before running it
+rockable input.txt   # less than a second
+see                  # look at the results (conf0 by default)
+```
+
+The computation writes 21 conf-files, `conf0` (t = 0) to `conf20`
+(t = 1 s), plus `kineticEnergy.txt`, `perf.txt`, `staticBalance.txt` and
+`checkplots.txt`. `rockable -c` deletes them.
+
+### What happens
+
+Let us read `input.txt` from top to bottom.
 
 ```
-Rockable 29-11-2018
+Rockable 21-08-2022
+```
 
-#### time #############################
+Every conf-file starts with this header; the date is the version of the format.
+
+```
 t 0
-tmax 2.0
+tmax 1.0
 dt 1e-6
 interVerlet 0.01
 interConf 0.05
+```
 
-#### proximity of the particles #######
+The computation goes from `t = 0` to `tmax = 1 s` with a time step `dt` of
+1 microsecond. The list of neighbours is rebuilt every `interVerlet = 0.01 s`,
+and a conf-file is saved every `interConf = 0.05 s`.
+
+```
 DVerlet 0.08
 dVerlet 0.02
+```
 
-#### properties for particles #########
+Two bodies are neighbours when their bounding boxes, enlarged by `DVerlet`,
+overlap; two parts of them (vertices, edges, faces) are then followed when they
+are closer than `dVerlet`. These distances must be larger than the distance a
+body travels between two rebuilds of the list.
+
+```
 density 0 2700
 density 1 2700
+```
 
-#### interaction model ################
-forceLaw Avalanches
+The density of the bodies of group 0 and of group 1, in kg/m³. The mass and
+the inertia of a particle are computed from it and from its shape.
 
-#### interaction parameters ###########
-knContact 0 1 1e6
-en2Contact 0 1 0.2
-ktContact 0 1 1e7
-muContact 0 1 0.9
-krContact 0 1 1e7
-murContact 0 1 0.0
+```
+forceLaw Default
+knContact 0 1 1e7
+en2Contact 0 1 0.02
+...
+```
 
-#### the system #######################
-iconf 0
+The force law, and its parameters for each **pair of groups**: `0 1` is the
+plane (group 0) against a grain (group 1), `1 1` a grain against a grain. A
+contact has a normal stiffness `knContact`, a tangential stiffness
+`ktContact`, a friction coefficient `muContact`, and a restitution coefficient
+whose square is `en2Contact` (0.02 against the plane, 0.2 between grains).
+
+```
 nDriven 1
 shapeFile shapes.shp
 Particles 3
-Plan 0 0 1.0   0 -0.05 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
-Rice 1 0 1.0   -0.5 0.5 0   0 0 0   0 0 0   0.707 0 0.707 0   0 0 -10   0 0 0
-Sphere 1 0 1.0   0.3 0.5 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
+Plan   0 0 1.0   0 -0.05 0   0 0 0   0 0 0   1 0 0 0         0 0 0     0 0 0
+Rice   1 0 1.0  -0.5 0.5 0   0 0 0   0 0 0   0.707 0 0.707 0   0 0 -10   0 0 0
+Sphere 1 0 1.0   0.3 0.5 0   0 0 0   0 0 0   1 0 0 0         0 0 0     0 0 0
 ```
 
-A conf-file defines the format that `Rockable` is able to understand. It is used as input configuration, and also as stored configuration (periodically saved in the simulation flow). The definition of this format is documented [here](https://richefeu.gitbook.io/cdm/dem/format-of-configuration-files-conf-files).
+The first `nDriven = 1` particle, the plane, is **driven**: it does not move,
+since nothing else is said about it (see the example `driving`). Each
+particle line gives the shape name, the group, the cluster, the homothety
+(a size factor), then the position, the velocity, the acceleration, the
+orientation (a quaternion), the angular velocity and the angular acceleration.
+The gravity is `0 -9.81 0` by default, so `y` is the vertical.
 
-The shape file to be used is stated in the input file with the keyword `shapeFile` followed with the name of the file. Here is the shape-file defined in the hello-world example:
+The two grains fall from a height of 0.5 m. The elongated grain touches the
+plane first by one end, at about t = 0.24 s, tips over and ends lying on the
+plane. The sphere bounces a few times. From t = 0.7 s on, everything is at
+rest.
 
-```
-<
-name Sphere
-radius 0.08
-preCompDone y
-nv 1
-0 0 0
-ne 0
-nf 0
-obb.extent 0.08 0.08 0.08
-obb.e1 1 0 0
-obb.e2 0 1 0
-obb.e3 0 0 1
-obb.center 0 0 0
-volume 0.002144660584851
-I/m 0.00256 0.00256 0.00256
->
+### What to look at
 
-<
-name Rice
-radius 0.08
-preCompDone n
-nv 3
-0 -0.16 0
-0 0 0
-0 0.16 0
-ne 2
-0 1
-1 2
-nf 0
-obb.extent 0.08 0.24 0.08
-obb.e1 1 0 0
-obb.e2 0 1 0
-obb.e3 0 0 1
-obb.center 0 0 0
-volume 0.008578642339403
-I/m 0.00493333 0.00493333 0.0032
->
-```
+- In `see`, the keys `+` and `-` go from one conf-file to the next, and `k`
+  lists all the keys, `h` the use of the mouse: the left button rotates the
+  view, `Shift` + left button moves it, `Ctrl` + left button (or the middle
+  button) zooms. The right button opens a menu.
+- At the end (`conf20`), both grains lie on the plane at `y = 0.08`, which is
+  their Minkowski radius: the top of the plane is at `y = 0`. There are 4
+  contacts (`Interactions 4` in `conf20`).
+- `gnuplot checkplots.txt` plots the kinetic energy, which drops to zero.
 
-We can notice the definition of 3 particle shapes, each defined into brackets `< ... >`. The documentation can be found [here](https://richefeu.gitbook.io/cdm/dem/syntax-for-shape-files).
+### Exercises
 
-### Running and visualising a simulation
+1. Set `en2Contact 0 1` to `0.8`: the grains bounce much more. How long does
+   the sphere take to come to rest?
+2. Set `muContact 0 1` to `0`: what does the elongated grain do once it lies
+   on the plane?
+3. Remove the initial angular velocity of the `Rice` (`0 0 -10` → `0 0 0`).
+   Does it still fall on its side?
+4. Add a second sphere above the first one, at `0.3 0.8 0`, and do not forget
+   to update the number of particles (`Particles 4`).
+5. Follow the height of the sphere during the fall: create a file
+   `dataExtractors.txt` containing the line `TrackBody 2 sphere.txt 1000`, run
+   the computation again, and plot the third column of `sphere.txt` against the
+   first one (see [dataExtractors](https://richefeu.github.io/rockable/dataExtractors.html)).
 
-Since the file `input.txt` is a conf-file, it can be visualised by using the application `see`. If `see` has been successfully compiled in the folder `src`, it can be invoked that way in the current location:
+### Going further
 
-```
-../../src/see input.txt
-```
-
-As a result, a window will appear and it will be possible to inspect the system. This can be useful for checking the system before running a simulation.
-
-![](see_input.png)
-
-
-To run a simulation with what is defined in `input.txt`, type:
-
-```
-../../src/run input.txt
-```
-
-After a few seconds, hundred files named `confXXX` will have been created (`XXX` ranges from 0 to 40). To see them, simply invoke `see` without argument. the navigation from one file to another is done with the `+` and `-` keys. The mouse usage is explained when typing the key `h`, and keyboard shortcuts are obtained by typing `k`. 
+- [`helloworldPlus`](../helloworldPlus): a complex shape from an STL file, a
+  spring between two spheres, and a few other options of the conf-file.
+- [`driving`](../driving): moving the driven bodies.
+- The quick start of the documentation:
+  [quickStart](https://richefeu.github.io/rockable/quickStart.html).

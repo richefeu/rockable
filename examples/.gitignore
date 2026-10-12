@@ -1,0 +1,32 @@
+# Files written when an example is run in its own folder, so that they are
+# never committed. The conf-files, kineticEnergy.txt, perf.txt,
+# staticBalance.txt and extractedDataDoc.txt are already ignored by the
+# .gitignore of the repository.
+#
+# When a new example writes other files (data extractors, post-processors...),
+# add them below, or give them a name that matches one of the patterns.
+
+# Written by rockable
+checkplots.txt
+log.txt
+run.log
+
+# Written by the other tools
+*.vtk
+*.rmsh
+ParticleStress-conf*.txt
+ClusterGranulo-conf*.txt
+oneshot.*
+shot*.png
+shot*.tga
+
+# Data extractors of the examples
+helloworld/sphere.txt
+stickVerticesInClusters/plan_up.txt
+stickVerticesInClusters/plan_down.txt
+softParticles/*/damage.txt
+softParticles/*/lowestCell.txt
+softParticles/*/lowestCellPos.txt
+softParticles/*/midspan.txt
+softParticles/*/soft.txt
+softParticles/*/stress.txt
