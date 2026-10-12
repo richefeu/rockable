@@ -33,6 +33,9 @@
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
+#include <algorithm>
+#include <cctype>
+
 #include "conftovtk.hpp"
 
 bool tryToReadConf(int num) {
@@ -672,31 +675,18 @@ void writeVTKOBB(int num) {
 
 void nbConfToVtk() {
   std::string nomfich;
-  char nom[25];
   struct dirent* lecture;
   DIR* rep;
   rep = opendir(".");
 
-  int number;
-
   tabConf.clear();
 
+  // Only the files named conf<number>
   while ((lecture = readdir(rep))) {
-    strcpy(nom, lecture->d_name);
-
-    nomfich = nom;
-
-    if (nomfich[0] == 'c' && nomfich[1] == 'o' && nomfich[2] == 'n' && nomfich[3] == 'f') {
-      std::string temp;
-
-      for (unsigned int i = 0; i < nomfich.size(); i++) {
-        if (isdigit(nomfich[i])) {
-          temp += nomfich[i];
-        }
-      }
-      std::istringstream stream(temp);
-      stream >> number;
-      tabConf.push_back(number);
+    nomfich = lecture->d_name;
+    if (nomfich.size() > 4 && nomfich.compare(0, 4, "conf") == 0 &&
+        std::all_of(nomfich.begin() + 4, nomfich.end(), [](unsigned char c) { return std::isdigit(c); })) {
+      tabConf.push_back(std::stoi(nomfich.substr(4)));
     }
   }
   closedir(rep);

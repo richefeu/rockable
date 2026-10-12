@@ -39,7 +39,7 @@
 #include "PostProcessor_ParticleStress.hpp"
 #include "Core/Rockable.hpp"
 
-static Registrar<PostProcessor, ParticleStress> registrar("ParticleStress");
+// Registered in Rockable::ExplicitRegistrations
 
 ParticleStress::ParticleStress() { }
 
@@ -148,12 +148,11 @@ void ParticleStress::exec() {
   for (size_t ibody = 0; ibody < box->Particles.size(); ibody++) {
     vec3r u = box->Particles[ibody].Q * bodyAxis;
     
-    vec3r y(0.0, 1.0, 0.0);
-    vec3r ut1;
-    if (fabs(u.x) < 1e-10 && fabs(u.z) < 1e-10) ut1 = cross(u, y); // u different from y
-    else ut1.set(1.0, 0.0, 0.0);
+    // Two unit vectors perpendicular to u, built from an axis that is not parallel to u
+    vec3r helper = (fabs(u.y) < 0.9) ? vec3r(0.0, 1.0, 0.0) : vec3r(1.0, 0.0, 0.0);
+    vec3r ut1 = cross(u, helper);
     ut1.normalize();
-    vec3r ut2 = cross (ut1,u);
+    vec3r ut2 = cross(ut1, u);
     double a = (M[ibody] * u) * u;
     double r1 = (M[ibody] * ut1) * ut1;
     double r2 = (M[ibody] * ut2) * ut2;

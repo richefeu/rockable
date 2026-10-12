@@ -40,7 +40,7 @@
 #include "Core/Rockable.hpp"
 #include "ProcessingTools/processingTool_getBrokenSubClusters.hpp"
 
-static Registrar<PostProcessor, ClusterGranulo> registrar("ClusterGranulo");
+// Registered in Rockable::ExplicitRegistrations
 
 ClusterGranulo::ClusterGranulo() { }
 

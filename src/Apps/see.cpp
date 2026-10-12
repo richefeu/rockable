@@ -96,6 +96,9 @@ void save_see_json() {
 void showKeybinds() {
   // Declare the static vector inside the function
   static const std::vector<std::string> keybindLines = {
+      "[ ]    (space) clear the text at the bottom of the window",
+      "[!]    switch ON/OFF the probe box (read in probe.txt)",
+      "[@]    compute the solid fraction inside the probe box",
       "[+]    load next configuration file",
       "[-]    load previous configuration file",
       "[*]    select particle under the mouse",
@@ -118,10 +121,13 @@ void showKeybinds() {
       "[n]    switch ON/OFF the body displays",
       "[o]    switch ON/OFF the OBB displays",
       "[O]    switch ON/OFF the enlargement of OBBs by the Verlet distance",
+      "[P]    switch ON/OFF the periodic cell",
       "[w]    set the view so that gravity appears vertical",
       "[x]    print the space limits of the current scene",
       "[p]    edit selected body",
       "[q]    quit",
+      "[r]    switch ON/OFF the automatic rescaling of the color range",
+      "[v]    switch ON/OFF the velocity vectors (not drawn at present)",
       "[y]    make the display faster (and less nice)",
 #ifdef PNG_H
       "[z]    make a screenshot (oneshot.png)",

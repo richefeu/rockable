@@ -45,7 +45,7 @@ PostProcessor* readPostproCommands(const char* fname) {
   if (!file) {
     std::cout << "Problem with reading file " << fname << std::endl;
   }
-  PostProcessor* processor;
+  PostProcessor* processor = nullptr;
 
   kwParser parser;
   parser.kwMap["firstConf"] = __GET__(istr, firstConf);
@@ -56,6 +56,10 @@ PostProcessor* readPostproCommands(const char* fname) {
     istr >> postproName;
     std::cout << "PostProcessor: " << postproName << std::endl;
     processor = Factory<PostProcessor>::Instance()->Create(postproName);
+    if (processor == nullptr) {
+      std::cout << "The PostProcessor named '" << postproName << "' is unknown" << std::endl;
+      exit(1);
+    }
     processor->read(istr);
   };
 	
@@ -77,10 +81,15 @@ int main(int argc, char const* argv[]) {
       std::cout << "File " << argv[1] << " has not been found" << std::endl;
       return 1;
     }
-    processor = readPostproCommands(argv[1]);
   }
 
+  // The post-processors are registered in the factory by the constructor of Rockable
   Rockable box;
+  processor = readPostproCommands(argv[1]);
+  if (processor == nullptr) {
+    std::cout << "No PostProcessor in " << argv[1] << std::endl;
+    return 1;
+  }
   box.setInteractive(true);
   processor->plug(&box);
 

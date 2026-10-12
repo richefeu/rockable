@@ -173,13 +173,13 @@ void readCommands(const char* name) {
     }
   };
 
-  parser.kwMap["tranformation:add_translation"] = __DO__(com) {
+  parser.kwMap["transformation:add_translation"] = __DO__(com) {
     double xtrans, ytrans, ztrans;
     com >> xtrans >> ytrans >> ztrans;
     globalTransformation.translate(xtrans, ytrans, ztrans);
   };
 
-  parser.kwMap["tranformation:add_rotation"] = __DO__(com) {
+  parser.kwMap["transformation:add_rotation"] = __DO__(com) {
     double xaxe, yaxe, zaxe, angleDeg;
     com >> xaxe >> yaxe >> zaxe >> angleDeg;
     double angle = angleDeg * M_PI / 180.0;
@@ -189,17 +189,22 @@ void readCommands(const char* name) {
     individualParticleRotation.set_axis_angle(axis, angle);
   };
 
-  parser.kwMap["tranformation:reset"] = __DO__() {
+  parser.kwMap["transformation:reset"] = __DO__() {
     globalTransformation.reset();
     individualParticleRotation.reset();
   };
 
-  parser.kwMap["tranformation:reset_translation"] = __DO__() { globalTransformation.reset_translation(); };
+  parser.kwMap["transformation:reset_translation"] = __DO__() { globalTransformation.reset_translation(); };
 
-  parser.kwMap["tranformation:reset_rotation"] = __DO__() {
+  parser.kwMap["transformation:reset_rotation"] = __DO__() {
     globalTransformation.reset_rotation();
     individualParticleRotation.reset();
   };
+
+  // The first versions spelt these commands without the first 's': they are still accepted
+  for (const char* name : {"add_translation", "add_rotation", "reset", "reset_translation", "reset_rotation"}) {
+    parser.kwMap[std::string("tranformation:") + name] = parser.kwMap[std::string("transformation:") + name];
+  }
 
   parser.kwMap["addParticle"] = __DO__(com) {
     std::string name;

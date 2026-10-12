@@ -56,6 +56,9 @@
 #include "ForceLaws/ForceLaw_StickedLinks.hpp"
 #include "ForceLaws/ForceLaw_geoVisc.hpp"
 
+#include "PostProcessors/PostProcessor_ClusterGranulo.hpp"
+#include "PostProcessors/PostProcessor_ParticleStress.hpp"
+
 #include "PreproCommands/PreproCommand_copyParamsToInterfaces.hpp"
 #include "PreproCommands/PreproCommand_homothetyRange.hpp"
 #include "PreproCommands/PreproCommand_particlesClonage.hpp"
@@ -171,6 +174,10 @@ void Rockable::ExplicitRegistrations() {
   REGISTRER_BASE_DERIVED(PreproCommand, stickVerticesInClusters);
   REGISTRER_BASE_DERIVED(PreproCommand, stickVerticesInClustersMoments);
   REGISTRER_BASE_DERIVED(PreproCommand, stickBCM);
+
+  // PostProcessors (used by the application postpro)
+  REGISTRER_BASE_DERIVED(PostProcessor, ClusterGranulo);
+  REGISTRER_BASE_DERIVED(PostProcessor, ParticleStress);
 }
 
 /**
@@ -989,7 +996,8 @@ void Rockable::initParser() {
     size_t g1, g2;
     double viscRate;
     conf >> g1 >> g2 >> viscRate;
-    double en2 = exp(-viscRate * Mth::pi / sqrt(1.0 - viscRate * viscRate));
+    // e_n = exp(-alpha pi / sqrt(1 - alpha^2)), and the table holds e_n^2
+    double en2 = exp(-2.0 * viscRate * Mth::pi / sqrt(1.0 - viscRate * viscRate));
     dataTable.set(idEn2Contact, g1, g2, en2);
   };
   parser.kwMap["ktContact"] = __DO__(conf) { readLawData(conf, idKtContact); };
@@ -4229,7 +4237,7 @@ void Rockable::numericalDamping() {
 #ifdef COMPONENTWISE_NUM_DAMPING
     // Translation
     for (int c = 0; c < 3; ++c) {
-      factor = (Particles[i].force[c] * Particles[i].vel[c] > 0.0) ? factorMinus : factorPlus;
+      factor = (Particles[i].force[c] * vel[c] > 0.0) ? factorMinus : factorPlus;
       Particles[i].force[c] *= factor;
     }
 
@@ -4240,7 +4248,7 @@ void Rockable::numericalDamping() {
     }
 #else
     // Translation
-    factor = (Particles[i].force * Particles[i].vel > 0.0) ? factorMinus : factorPlus;
+    factor = (Particles[i].force * vel > 0.0) ? factorMinus : factorPlus;
     Particles[i].force *= factor;
 
     // Rotation

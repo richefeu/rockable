@@ -101,7 +101,6 @@ bool StickedLinks::computeInteraction(Interaction& I) {
         ft0 = box->dataTable.get(box->idFt0InnerBond, g1, g2);
         mom0 = box->dataTable.get(box->idMom0InnerBond, g1, g2);
         power = box->dataTable.get(box->idPowInnerBond, g1, g2);
-        dn0 = 0.0;
       } else {  // Outer
         kn = box->dataTable.get(box->idKnOuterBond, g1, g2);
         kt = box->dataTable.get(box->idKtOuterBond, g1, g2);
@@ -121,6 +120,7 @@ bool StickedLinks::computeInteraction(Interaction& I) {
 
     // === Tangential force (friction)
     vec3r vt = (I.vel - (vn * I.n));
+    I.ft -= I.ftv;  // remove the viscous part added at the previous step
 #ifdef FT_CORR
     vec3r ft_corr = I.ft;
     ft_corr -= cross(ft_corr, cross(I.prev_n, I.n));
@@ -131,10 +131,10 @@ bool StickedLinks::computeInteraction(Interaction& I) {
 #endif
 
     // Tangential viscosity ========
-    // This term should be added only on the elastic part of ft
-    // So it is somehow wrong because the viscosity is cumulated... Be carreful!
-    vec3r ftv = I.damp * vt;
-    I.ft += ftv;
+    // It is added to the elastic part of ft, and remembered so that it can be removed
+    // at the next step (otherwise, it would be cumulated)
+    I.ftv = I.damp * vt;
+    I.ft += I.ftv;
     // =============================
 
     // === Rupture criterion (and resistant moment for outer bonds)

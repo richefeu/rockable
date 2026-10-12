@@ -484,7 +484,7 @@ void DrivingSystem::read(bool allow_warn) {
         controls.push_back(C);
         ServoFunction = [icontr, dir, A, T, t_ini](Rockable& box) -> void {
           vec3r v = (4.0 * A / T) * dir;
-          double phase = box.t - std::floor((box.t - t_ini) / T) * T;
+          double phase = (box.t - t_ini) - std::floor((box.t - t_ini) / T) * T;
           phase /= T;
           if (phase >= 0.25 && phase < 0.75) v *= -1.0;
           box.System.controls[icontr].value = v.x;
@@ -502,8 +502,8 @@ void DrivingSystem::read(bool allow_warn) {
         C.value = valueBegin;
         size_t icontr = controls.size();
         controls.push_back(C);
-        ServoFunction = [icontr, valueBegin, valueEnd, tBegin, tEnd](Rockable& box) -> void {
-          static double slope = (valueEnd - valueBegin) / (tEnd - tBegin);
+        double slope = (valueEnd - valueBegin) / (tEnd - tBegin);
+        ServoFunction = [icontr, valueBegin, valueEnd, tBegin, tEnd, slope](Rockable& box) -> void {
           if (box.t <= tBegin)
             box.System.controls[icontr].value = valueBegin;
           else if (box.t >= tEnd)
