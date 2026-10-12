@@ -41,6 +41,9 @@ conf-files of the computation (sometimes shortened, or with more conf-files).
 <td align="center"><a href="sweepable"><img src="sweepable/animation.gif" width="200" alt="sweepable"/></a><br/><code>sweepable</code></td>
 <td align="center"><a href="complexShape"><img src="complexShape/animation.gif" width="200" alt="complexShape"/></a><br/><code>complexShape</code></td>
 </tr>
+<tr>
+<td colspan="4" align="center"><a href="rockfall"><img src="rockfall/animation.gif" width="560" alt="rockfall"/></a><br/><code>rockfall</code></td>
+</tr>
 </table>
 
 
@@ -110,6 +113,7 @@ repository clean during a training day, the folder can also be copied first:
 | 9  | [`softParticles`](softParticles)                       | Deformable particles (DCEM), bonded cells (`BCM`)                                | 1-5 s   |
 | 10 | [`sweepable`](sweepable)                               | Parametric studies: many computations from one script                            | 10 s    |
 | 11 | [`complexShape`](complexShape)                         | From an STL mesh to a shape: `stl2shape`, `shapeSurvey`                          | 20 s    |
+| 12 | [`rockfall`](rockfall)                               | A rockfall: a slope, the `Avalanche` law, run-out and `TrackRockfall`            | < 1 s   |
 
 The times are those of the whole computation on a laptop, with one thread
 unless stated otherwise.

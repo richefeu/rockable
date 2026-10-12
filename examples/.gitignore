@@ -47,3 +47,6 @@ DominoFun/shapes.txt
 complexShape/*.obj
 postProcessing/fn.txt
 SampleState.txt
+rockfall/sphere.txt
+rockfall/cube.txt
+rockfall/slab.txt

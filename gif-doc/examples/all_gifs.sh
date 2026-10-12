@@ -130,6 +130,10 @@ sweepable() {
   cp "$D/tiles/m0025.png" "$W/sweepable.png"
   echo "  sweepable.gif: $(($(wc -c < "$W/sweepable.gif") / 1024)) KB"
 }
+rockfall() {
+  json rockfall '12, -1, 0' '12, 26, 72' '"alpha_fixparticles": 0.6'
+  FILTER='crop=iw:400:0:150' WIDTH=560 COLORS=32 LOSSY=80 std rockfall "$X/rockfall" 0.1 10
+}
 complexShape() {
   # the rock of rock.stl spinning freely (the input.txt of the example), drawn twice side by side:
   # with spheres, tubes and slabs (left), and with its skin mesh, rock.rmsh (right)
@@ -174,7 +178,7 @@ dest() {
 }
 ALL="helloworld helloworldPlus driving isoComprSpheres prepro_cpptools DominoFun stickVerticesInClusters
      isoComprSpheresPeriodic PerioPoly softBallImpact softBallImpactVoronoi bondedBeam elasticCube viscousCube
-     sweepable complexShape"
+     sweepable complexShape rockfall"
 
 if [ "$1" = install ]; then
   for e in $ALL; do
