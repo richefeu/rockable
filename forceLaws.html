@@ -311,6 +311,23 @@ the normal force:</p>
 \underline{f}_t = \underline{f}_t^e + 2 \alpha_n \sqrt{k_n m_\text{eff}} \, \underline{v}_t\]</div>
 <p>As in <code class="docutils literal notranslate"><span class="pre">BCM</span></code>, the viscous part of the previous step is removed before
 the elastic increment is added, so that it is not cumulated.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The viscous part is explicit, and <span class="math notranslate nohighlight">\(m_\text{eff}\)</span> is built from
+the masses of the bodies, whereas a bond placed at a vertex also
+acts on their <strong>rotation</strong>. For flat or slender bodies held by many
+bonds, the effective inertia seen by a bond is much smaller than
+<span class="math notranslate nohighlight">\(m_\text{eff}\)</span>, and a strong damping (a small <code class="docutils literal notranslate"><span class="pre">en2*Bond</span></code>,
+close to 0) makes the integration unstable: the angular velocities
+grow exponentially from round-off, and the bonds break within a few
+hundred time steps, without any load. A larger <code class="docutils literal notranslate"><span class="pre">en2*Bond</span></code> or a
+smaller time step removes the problem. In <code class="docutils literal notranslate"><span class="pre">examples/DominoFun</span></code>
+(bricks of 5 x 40 x 20 mm, <code class="docutils literal notranslate"><span class="pre">kn</span> <span class="pre">=</span> <span class="pre">kt</span> <span class="pre">=</span> <span class="pre">1e7</span></code>, <code class="docutils literal notranslate"><span class="pre">dt</span> <span class="pre">=</span> <span class="pre">1e-6</span></code>),
+<code class="docutils literal notranslate"><span class="pre">en2InnerBond</span> <span class="pre">0.02</span></code> breaks the wall at once, <code class="docutils literal notranslate"><span class="pre">0.5</span></code> does not.</p>
+<p>Before the viscous part stopped being cumulated, this instability
+did not show: the cumulated term acted as an extra stiffness, not
+as a damping.</p>
+</div>
 </li>
 <li><p><strong>Moment vector</strong></p>
 <p>The moment carried by the bond is accumulated incrementally from the

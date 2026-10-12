@@ -493,7 +493,16 @@ only glue free bodies together, never a free body to a driven one.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">initSpringJoint</span></code> (<em>int</em>) <strong>ibody</strong> (<em>vec3r</em>) <strong>ipos0</strong> (<em>int</em>) <strong>jbody</strong> (<em>vec3r</em>) <strong>jpos0</strong> (<em>double</em>) <strong>stiffness</strong></p>
 <p>Add a linear spring joining two bodies. The anchor points <code class="docutils literal notranslate"><span class="pre">ipos0</span></code> and
 <code class="docutils literal notranslate"><span class="pre">jpos0</span></code> are given in the <strong>body frames</strong>, so they follow the bodies as they
-rotate. Unlike an interface, a spring joint never breaks.</p>
+rotate. The length of the spring at rest is the distance between the two
+anchors when the keyword is read. Unlike an interface, a spring joint never
+breaks.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SpringJoints</span></code> (<em>int</em>) <strong>numberOfJoints</strong></p>
+<p>The spring joints, as written in the conf-files, one per line:
+(<em>int</em>) <strong>ibody</strong> (<em>vec3r</em>) <strong>ipos0</strong> (<em>int</em>) <strong>jbody</strong> (<em>vec3r</em>) <strong>jpos0</strong>
+(<em>double</em>) <strong>stiffness</strong> (<em>double</em>) <strong>l0</strong>, where <strong>l0</strong> is the length at
+rest. A computation restarted from a conf-file therefore keeps its springs
+unchanged.</p>
 </li>
 </ul>
 </section>

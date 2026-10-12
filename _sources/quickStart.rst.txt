@@ -144,6 +144,12 @@ Running a simulation
 
 To run a simulation, a configuration file has to be written. The format of such a file is described in the section Syntax for conf-files. We show here a simple example simulating a sphere bouncing on a plan.
 
+.. tip::
+
+   The input files are best written with ``rockedit input.txt``, an editor that
+   runs in the terminal, colours the keywords, and shows the documentation of
+   the keyword under the cursor with ``Ctrl+D`` (see :ref:`editors`).
+
 .. code-block:: text
    :caption: bouncingSphere.txt
    

@@ -205,11 +205,13 @@ parameters, to be calibrated like <code class="docutils literal notranslate"><sp
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">cellVelocityCorrection</span></code> (<em>int</em>)</p></td>
-<td><p>Removes the mean velocity drift of the sample.</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">cellVelocityCorrection</span></code> (<em>double</em>)</p></td>
+<td><p>Time interval between two removals of the mean velocity of the
+particles. <code class="docutils literal notranslate"><span class="pre">0</span></code>, the default, disables it.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cellMomentumCorrection</span></code> (<em>int</em>)</p></td>
-<td><p>Removes the total momentum drift of the sample.</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cellMomentumCorrection</span></code> (<em>double</em>)</p></td>
+<td><p>Time interval between two removals of the total momentum of the
+particles. <code class="docutils literal notranslate"><span class="pre">0</span></code>, the default, disables it.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">useKineticStress</span></code> (<em>int</em>)</p></td>
 <td><p>Includes the kinetic (velocity fluctuation) term in the stress used to
@@ -228,7 +230,8 @@ the exact Parrinello-Rahman conjugate of <span class="math notranslate nohighlig
 </table>
 <p>A fully periodic system has no boundary to anchor it, so nothing prevents the
 whole sample from drifting: any residual momentum is conserved for ever. The two
-correction flags remove that drift, and are normally left on.</p>
+corrections remove that drift; they are off by default. A value equal to
+<code class="docutils literal notranslate"><span class="pre">dt</span></code> applies the correction at every time step.</p>
 <p><code class="docutils literal notranslate"><span class="pre">useKineticStress</span></code> matters as soon as the sample is not quasi-static. The
 stress of a granular assembly is the sum of a contact term and a kinetic term;
 for a slow compression the second is negligible, for a rapid flow it is not.</p>

@@ -153,7 +153,7 @@ Typical workflow after a conversion
 
 .. code-block:: sh
 
-   stl2shape -i mesh.stl -r 0.01 -c    # -> mesh.shp, preCompDone n
+   stl2shape -r 0.01 -c mesh.stl       # -> mesh.shp, preCompDone n
    shapeSurvey mesh.shp
 
 Then, in the window: browse with ``+`` to check the geometry, press ``C`` to

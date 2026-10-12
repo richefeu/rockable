@@ -96,7 +96,7 @@ The other executables
      - Inspect and pre-compute a shape library. See :ref:`shapeSurvey`.
    * - ``sweepable [script]``
      - Generate a tree of input files for a parameter sweep.
-   * - ``stl2shape -i <f.stl> -r <R>``
+   * - ``stl2shape -r <R> <f.stl>``
      - Convert a binary STL file into a shape. See :ref:`converters`.
 
 
