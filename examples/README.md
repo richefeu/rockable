@@ -105,7 +105,7 @@ repository clean during a training day, the folder can also be copied first:
 | 5  | [`DominoFun`](DominoFun)                               | A complete system built with `generator`                                         | 5 min (4 threads) |
 | 6  | [`stickVerticesInClusters`](stickVerticesInClusters)   | Breakable bonds: clusters, the `StickedLinks` law                                | 2 s     |
 | 7  | [`isoComprSpheresPeriodic`](isoComprSpheresPeriodic)   | Periodic boundary conditions                                                     | 6 s     |
-| 8  | [`PerioPoly`](PerioPoly)                               | A periodic sample of polyhedra: isotropic compression of the cell              | TBD     |
+| 8  | [`PerioPoly`](PerioPoly)                               | A periodic sample of polyhedra: isotropic compression of the cell              | 4 min   |
 | 9  | [`softParticles`](softParticles)                       | Deformable particles (DCEM), bonded cells (`BCM`)                                | 1-5 s   |
 | 10 | [`sweepable`](sweepable)                               | Parametric studies: many computations from one script                            | 10 s    |
 | 11 | [`complexShape`](complexShape)                         | From an STL mesh to a shape: `stl2shape`, `shapeSurvey`                          | 20 s    |
