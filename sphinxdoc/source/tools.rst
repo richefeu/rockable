@@ -10,6 +10,7 @@ described separately, in :ref:`Visualisation`.
 .. toctree::
    :maxdepth: 2
 
+   editors
    generator
    shapeSurvey
    converters

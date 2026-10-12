@@ -28,14 +28,14 @@ then serves as the initial state of the real test.
 | `dataExtractors.txt` | Records the positions of the three moving walls                     |
 | `genShapes.txt`      | Commands of `generator` that write `shapes.txt`                      |
 | `genSample.txt`      | Commands of `generator` that write the walls and the spheres         |
-| `solidFraction.py`   | Computes the solid fraction from the recorded wall positions         |
+| `solidFraction.sh`   | Computes the solid fraction from the recorded wall positions         |
 
 ### Run it
 
 ```sh
 rockable input.txt           # about 20 seconds
 see conf100
-python3 solidFraction.py     # the solid fraction during the compression
+sh solidFraction.sh          # the solid fraction during the compression
 ```
 
 ### What happens
@@ -90,8 +90,15 @@ friction and of the fast compression.
 
 - In `see`, compare `conf0` and `conf100`. The key `d` hides the walls, and
   the key `2` colours the spheres by their velocity.
-- `python3 solidFraction.py` prints the size of the box and the solid fraction
-  at each record: it reaches its final value around `t = 0.1 s`.
+- `sh solidFraction.sh` prints the size of the box and the solid fraction at
+  each record: it reaches its final value around `t = 0.1 s`. The script only
+  uses `awk`; read it to see how the files of the data extractors are combined.
+  To plot the solid fraction:
+
+  ```sh
+  sh solidFraction.sh > phi.txt
+  gnuplot -p -e "plot 'phi.txt' using 1:5 with lines title 'solid fraction'"
+  ```
 - `gnuplot checkplots.txt`: the kinetic energy drops by several orders of
   magnitude once the sample is compressed.
 
@@ -113,7 +120,9 @@ friction and of the fast compression.
 
    then run `rockable conf100`. The top wall now comes down at 0.01 m/s, while
    the lateral pressure stays at 1000 Pa: the sample shortens along `y`,
-   widens along `x` and `z`, and its solid fraction decreases (it dilates).
+   widens along `x` and `z`, and its solid fraction decreases (it dilates):
+   `sh solidFraction.sh conf100` (run in the new folder, with a copy of the
+   script) gives about 0.51 at `t = 1.5 s`.
 
 ### Going further
 

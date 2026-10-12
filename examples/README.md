@@ -25,6 +25,23 @@ The examples then use the commands `rockable` (the computation), `see` (the
 viewer), and, for some of them, `generator`, `shapeSurvey`, `stl2shape`,
 `postpro` or `sweepable`.
 
+**Edit the input files with `rockedit`.** It is an editor that runs in the
+terminal, installed with Rockable. It colours the keywords and, above all,
+**documents them**: put the cursor on a keyword (`tmax`, `knContact`,
+`Control`...) and press `Ctrl+D` to read what it does and what it expects.
+`Ctrl+P` inserts ready-made blocks, `Ctrl+O` saves, `Ctrl+X` quits.
+
+```sh
+rockedit input.txt
+```
+
+`confedit` is its graphical counterpart (see the page
+[editors](https://richefeu.github.io/rockable/editors.html) of the
+documentation).
+
+The scripts of the examples only use the shell and `awk`, and the plots
+`gnuplot`.
+
 An example can be run directly in its folder:
 
 ```sh

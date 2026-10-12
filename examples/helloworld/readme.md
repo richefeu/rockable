@@ -31,6 +31,7 @@ every computation needs, how to run it, and how to look at the result.
 ### Run it
 
 ```sh
+rockedit input.txt   # read the input file; Ctrl+D documents the keyword under the cursor
 see input.txt        # look at the system before running it
 rockable input.txt   # less than a second
 see                  # look at the results (conf0 by default)
@@ -42,7 +43,9 @@ The computation writes 21 conf-files, `conf0` (t = 0) to `conf20`
 
 ### What happens
 
-Let us read `input.txt` from top to bottom.
+Let us read `input.txt` from top to bottom. Open it with `rockedit input.txt`:
+on any keyword, `Ctrl+D` shows its documentation, which is a good way to
+follow the explanations below and to discover the other keywords.
 
 ```
 Rockable 21-08-2022
@@ -134,7 +137,8 @@ rest.
 3. Remove the initial angular velocity of the `Rice` (`0 0 -10` → `0 0 0`).
    Does it still fall on its side?
 4. Add a second sphere above the first one, at `0.3 0.8 0`, and do not forget
-   to update the number of particles (`Particles 4`).
+   to update the number of particles (`Particles 4`). Use `rockedit`: `Ctrl+D`
+   on `Particles` recalls the meaning of each column.
 5. Follow the height of the sphere during the fall: create a file
    `dataExtractors.txt` containing the line `TrackBody 2 sphere.txt 1000`, run
    the computation again, and plot the third column of `sphere.txt` against the
