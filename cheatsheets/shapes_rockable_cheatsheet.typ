@@ -208,9 +208,9 @@
   MCnstep             50000
   ```
 
-  #note[The keyword is `MinkowskiRadius`. Some example files in the repository
-  spell it `MinskowskiRadius`, which is *not* recognised and silently leaves the
-  radius at its default.]
+  #note[The keyword is `MinkowskiRadius`. Older command files may spell it
+  `MinskowskiRadius`, which is *not* recognised and silently leaves the radius
+  at its default. `tess2shape` is not built by CMake: use its own `Makefile`.]
 
   Generating the tessellation itself:
   ```sh

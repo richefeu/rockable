@@ -107,34 +107,36 @@ The Beeman method is a second-order accurate integration technique, which means 
 For a discrete particle in DEM, the equations used to update its position and velocity using the Beeman method are as follows:
 
 
+In Rockable, it is used as a predictor-corrector, written here for the
+translations (the rotations follow the same logic with quaternions).
+
 **Position update**
 
-
-The new position of a particle, :math:`\underline{x}_{t+\Delta t}`, at the next time step (:math:`t+\Delta t`) is calculated using the current position, :math:`\underline{x}_t`, current velocity, :math:`\underline{v}_t`, and current acceleration, :math:`\underline{a}_t`. The position update equation for particle 'i' is given by:
-
-.. math::
-
-   \begin{cases}
-   \underline{x}_{t+\Delta t} &= \underline{x}_t + \Delta t \underline{v}_t + \frac{1}{6} \Delta t^2 \left( 5 \underline{a}_t - \underline{a}_{t-\Delta t} \right) \\
-   \mathbf{Q}_{t+\Delta t} &= \mathbf{Q}_t + \Delta t \mathbf{\dot{Q}}\left(\underline{\omega}_t\right) + \frac{1}{6} \Delta t^2 \left( 5  \mathbf{\ddot{Q}}\left(\underline{\omega}_t,\underline{\dot{\omega}}_t\right)  - \mathbf{\ddot{Q}}\left(\underline{\omega}_{t-\Delta t},\underline{\dot{\omega}}_{t-\Delta t} \right)  \right) 
-   \end{cases}
-
-where :math:`\Delta t` is the time step size, and :math:`\underline{a}_{t-\Delta t}` represents the acceleration at the previous time step.
-
-
-**Velocity update**
-
-
-The new velocity of a particle, :math:`\underline{v}_{t+\Delta t}`, at the next time step (:math:`t+\Delta t`) is calculated using the current velocity, :math:`\underline{v}_t`, current acceleration, :math:`\underline{a}_t`, and the acceleration, :math:`\underline{a}_{t+\Delta t}`, at the next time step (:math:`t+\Delta t`). The velocity update equation for particle 'i' is given by:
+The new position uses the current and the previous accelerations:
 
 .. math::
 
-   \begin{cases}
-   \underline{v}_{t+\Delta t} &= \underline{v}_t + \frac{\Delta t}{6} \left( 2 \underline{a}_{t+\Delta t} + 5 \underline{a}_t - \underline{a}_{t-\Delta t} \right) \\
-   \underline{\omega}_{t+\Delta t} &= \underline{\omega}_t + \frac{\Delta t}{6} \left( 2 \underline{\dot{\omega}}_{t+\Delta t} + 5 \underline{\dot{\omega}}_t - \underline{\dot{\omega}}_{t-\Delta t} \right)
-   \end{cases}
+   \underline{x}_{t+\Delta t} = \underline{x}_t + \Delta t \, \underline{v}_t + \frac{\Delta t^2}{6} \left( 4 \underline{a}_t - \underline{a}_{t-\Delta t} \right)
 
-where :math:`\underline{a}_{t+\Delta t}` represents the acceleration calculated from the forces acting on the particle at the next time step.
+**Predicted velocity**
+
+The forces at :math:`t+\Delta t` are computed with a predicted velocity (it
+matters for the viscous forces):
+
+.. math::
+
+   \underline{v}^\text{pred}_{t+\Delta t} = \underline{v}_t + \Delta t \left( \frac{3}{2} \underline{a}_t - \frac{1}{2} \underline{a}_{t-\Delta t} \right)
+
+**Corrected velocity**
+
+Once the acceleration :math:`\underline{a}_{t+\Delta t}` is known, the velocity
+is corrected:
+
+.. math::
+
+   \underline{v}_{t+\Delta t} = \underline{v}_t + \frac{\Delta t}{12} \left( 5 \underline{a}_{t+\Delta t} + 8 \underline{a}_t - \underline{a}_{t-\Delta t} \right)
+
+The scheme computes the accelerations twice per time step.
 
 
 Runge-Kutta-Nyström 4th-order scheme (keyword ``RungeKutta4``)
@@ -146,55 +148,31 @@ The Runge-Kutta-Nyström (RKN) 4th-order scheme is a higher-order accurate integ
 
 .. warning:: For this scheme, the equations for rotations are not shown but follow the same logic as for other schemes.
 
-
-For a discrete particle in DEM, the equations used to update its position and velocity using the RKN 4th-order scheme are as follows:
-
-
-**Position update**
-
-
-The new position of a particle, :math:`\underline{x}_{t+\Delta t}`, at the next time step (:math:`t+\Delta t`) is obtained using the current position, :math:`\underline{x}_t`, current velocity, :math:`\underline{v}_t`, and the calculated intermediate velocities, :math:`\underline{v}_{1/2}`, :math:`\underline{v}_{1}`, and :math:`\underline{v}_{2}`. The position update equation for particle 'i' is given by:
+The accelerations are computed four times per time step. With
+:math:`\underline{k}_n` the accelerations computed at the stage :math:`n`:
 
 .. math::
 
-   \underline{x}_{t+\Delta t} = \underline{x}_t + \Delta t \left( \underline{v}_{1/2} + 2 \underline{v}_{1} + 2 \underline{v}_{2} + \underline{v}_t \right) \, \frac{\Delta t}{6}
+   \begin{aligned}
+   \underline{k}_1 &= \underline{a}\left( \underline{x}_t, \; \underline{v}_t \right) \\
+   \underline{k}_2 &= \underline{a}\left( \underline{x}_t + \frac{\Delta t}{2} \underline{v}_t + \frac{\Delta t^2}{8} \underline{k}_1, \; \underline{v}_t + \frac{\Delta t}{2} \underline{k}_1 \right) \\
+   \underline{k}_3 &= \underline{a}\left( \underline{x}_t + \frac{\Delta t}{2} \underline{v}_t + \frac{\Delta t^2}{8} \underline{k}_1, \; \underline{v}_t + \frac{\Delta t}{2} \underline{k}_2 \right) \\
+   \underline{k}_4 &= \underline{a}\left( \underline{x}_t + \Delta t \, \underline{v}_t + \frac{\Delta t^2}{2} \underline{k}_3, \; \underline{v}_t + \Delta t \, \underline{k}_3 \right)
+   \end{aligned}
 
-where :math:`\Delta t` is the time step size, and the intermediate velocities are calculated as follows:
-
-.. math::
-
-   \underline{v}_{1/2} &= \underline{v}_t + \frac{\Delta t}{2} \, \underline{a}_t
-
-   \underline{v}_{1}   &= \underline{v}_t + \frac{\Delta t}{2} \, \underline{a}_{1/2}
-
-   \underline{v}_{2}   &= \underline{v}_t + \Delta t \, \underline{a}_{1}
-
-where :math:`\underline{a}_t` is the acceleration calculated from the forces acting on the particle at time step :math:`t`, and the subsequent accelerations are computed as:
+and the position and the velocity at the end of the step are
 
 .. math::
 
-   \underline{a}_{1/2} &= \text{accelerations}(\underline{x}_t, \underline{v}_{1/2})
+   \begin{aligned}
+   \underline{x}_{t+\Delta t} &= \underline{x}_t + \Delta t \, \underline{v}_t + \frac{\Delta t^2}{6} \left( \underline{k}_1 + \underline{k}_2 + \underline{k}_3 \right) \\
+   \underline{v}_{t+\Delta t} &= \underline{v}_t + \frac{\Delta t}{6} \left( \underline{k}_1 + 2 \underline{k}_2 + 2 \underline{k}_3 + \underline{k}_4 \right)
+   \end{aligned}
 
-   \underline{a}_{1}   &= \text{accelerations}(\underline{x}_t, \underline{v}_{1})
+.. note::
 
-
-**Velocity update**
-
-
-The new velocity of a particle, :math:`\underline{v}_{t+\Delta t}`, at the next time step (:math:`t+\Delta t`) is obtained using the calculated intermediate accelerations, :math:`\underline{a}_{1/2}`, :math:`\underline{a}_{1}`, and :math:`\underline{a}_{2}`. The velocity update equation for particle 'i' is given by:
-
-.. math::
-
-   \underline{v}_{t+\Delta t} = \underline{v}_t + \Delta t \left( \underline{a}_{1/2} + 2 \underline{a}_{1} + 2 \underline{a}_{2} + \underline{a}_t \right) \, \frac{\Delta t}{6}
-
-where :math:`\Delta t` is the time step size, and the intermediate accelerations are calculated as follows:
-
-.. math::
-
-   \underline{a}_{1/2} &= \text{accelerations}(\underline{x}_t, \underline{v}_{1/2})
-
-   \underline{a}_{1}   &= \text{accelerations}(\underline{x}_t, \underline{v}_{1})
-
-   \underline{a}_{2}   &= \text{accelerations}(\underline{x}_{t+1}, \underline{v}_{t+1})
-
-
+   The schemes ``Beeman`` and ``RungeKutta4`` compute the forces more than once
+   per time step. The force laws that accumulate a quantity at each
+   computation (the tangential forces of the contacts, for instance) then
+   accumulate it as many times, and the viscoelastic soft particles (see
+   :ref:`softParticles`) are only correct with ``Euler`` and ``velocityVerlet``.

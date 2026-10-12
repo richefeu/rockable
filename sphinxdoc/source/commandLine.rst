@@ -39,9 +39,15 @@ there, and the dumps are written there.
      - Print the banner, which lists the version, the git tag and the
        compilation options actually used, then exit.
    * - ``-n`` (*string*) ``-r`` (*string*)
-     - Non-regression check. After the run, compare the two conf-files line by
-       line from their ``Particles`` section onwards, and exit with an error if
-       they differ.
+     - Non-regression check. After the run, compare the conf-file given by
+       ``-n`` with the reference given by ``-r``, from their ``Particles``
+       section onwards, and exit with an error if they differ beyond the
+       tolerance. The numbers are compared with a relative tolerance, and the
+       interactions are matched by their key, since their order in the file is
+       not reproducible (``test/README.md`` details the comparison).
+   * - ``-t``, ``--tolerance`` (*double*)
+     - Relative tolerance of the comparison between the ``-n`` and ``-r``
+       files, ``1e-5`` by default.
    * - ``-h``, ``--help``
      - The usual help.
    * - ``--version``
@@ -158,13 +164,16 @@ even when a computation does not use it, so disable the ones you do not need.
    * - ``ROCKABLE_USE_FT_CORR``
      - Objectivity correction of the tangential forces under large rotations.
    * - ``ROCKABLE_ENABLE_PROFILING``
-     - Time profiling of the main routines, reported into ``perf.txt``.
+     - Time profiling of the main routines with MATools (fetched by CMake),
+       which reports the timers at the end of the run. The file ``perf.txt`` is
+       written in any case.
 
 .. warning::
 
-   ``ROCKABLE_ENABLE_BOUNDARY`` compiles the ``Ball`` and ``Cylinder``
-   boundaries, but their ``read`` methods are still empty stubs in the source.
-   Enabling the option therefore does not yet give a usable feature.
+   ``ROCKABLE_ENABLE_BOUNDARY`` is not usable yet. With this option, the
+   current sources do **not compile** (``InteractionBoundary`` is used in
+   ``Rockable.hpp`` without being declared), and the ``read`` methods of the
+   ``Ball`` and ``Cylinder`` boundaries are still empty stubs. Keep it ``OFF``.
 
 Options that select what gets compiled:
 
@@ -179,7 +188,7 @@ Options that select what gets compiled:
      - ``ON``
      - ``see``
    * - ``ROCKABLE_COMPILE_SEER``
-     - ``ON``
+     - ``OFF``
      - ``seer`` (Dear My Seer) and ``shape`` (Dear My Shape)
    * - ``ROCKABLE_COMPILE_CONF2VTK``
      - ``ON``

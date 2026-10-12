@@ -184,8 +184,9 @@ doc: ContactPartnership [(string) Name]
 [keyword] preventCrossingLength
 doc: preventCrossingLength [(double) value]
 
-  If positive, enables a safeguard that prevents bodies from crossing/tunneling
-  through each other when the overlap would exceed this characteristic length.
+  If positive, stiffens the normal repulsion at large overlap, to prevent bodies
+  from crossing each other (laws Default and GeoVisc): the elastic normal force is
+  multiplied by L / (L + dn), capped at 100.
 
 [keyword] initSpringJoint
 doc: initSpringJoint [(int) ibody] [(vec3r) ipos0] [(int) jbody] [(vec3r) jpos0] [(double) stiffness]

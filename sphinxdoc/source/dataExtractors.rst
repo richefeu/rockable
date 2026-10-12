@@ -56,8 +56,12 @@ Every extractor ends its parameter list with the same two entries:
    * - Parameter
      - Description
    * - ``<filename>``
-     - Name of the text file to write. It is opened at start-up and flushed
-       after each record, so it can be plotted while the computation runs.
+     - Name of the text file to write. It is opened at start-up and, for most
+       extractors, flushed after each record, so it can be plotted while the
+       computation runs (``TrackDamage`` writes it by blocks, and completes it
+       at the end of the run). The file is **emptied** when it is opened: a
+       computation restarted from a conf-file overwrites what the previous run
+       recorded, so rename the file, or copy it, before restarting.
    * - ``<nrec>``
      - Number of **time steps** between two records. This is a step count, not
        a duration: with ``dt 1e-6``, ``nrec 1000`` records every millisecond of

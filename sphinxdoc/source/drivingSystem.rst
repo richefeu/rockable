@@ -88,19 +88,32 @@ The elementary entry drives **one component** of one body:
    # a drum rotating about the z axis
    Control _xyzrot_Vel_ 2 0 0 1.5
 
-A component that is **not** controlled stays free: the body is integrated along
-that degree of freedom like any other one. A body listed in ``drivingSystem.txt``
-with a single ``_y_Vel_`` control therefore falls under gravity along :math:`x`
-and :math:`z` while its vertical motion is imposed. To keep a wall completely
-fixed, either give it no control at all, or control all of its components.
+A component of a driven body that is **not** controlled is not integrated at
+all: the body keeps its position along that degree of freedom. A wall listed in
+``drivingSystem.txt`` with a single ``_y_Vel_`` control therefore moves
+vertically at the imposed velocity, and stays where it is along :math:`x` and
+:math:`z`, whatever the forces it receives.
 
 .. note::
 
    Velocity-driven and force-driven components are not integrated in the same
-   way. A force-driven component is integrated like a free body, with the
-   imposed force added to the resultant; a velocity-driven component is simply
-   translated at the imposed velocity, which makes it exactly kinematic. See
+   way. A velocity-driven component is simply translated at the imposed
+   velocity, which makes it exactly kinematic. A force-driven component is
+   integrated like a free body, with the imposed force added to the resultant
+   of the contact forces. **Gravity is not applied** to it: the imposed force is
+   the only external force along that component, so the weight of a heavy
+   piston has to be included in the imposed force if it matters. See
    :ref:`IntegrationSchemes`.
+
+.. warning::
+
+   A ``Control`` can also be given to a **free** body (one that is not among the
+   ``nDriven`` first ones), for instance to hold the ends of a beam. The
+   controlled velocity component is then reset at every step, but the body is
+   still integrated as a free one, so it moves by :math:`a\,\Delta t^2/2`
+   per step along that component, :math:`a` being its acceleration. Such a
+   control holds the body only as long as the forces on it are nearly balanced;
+   to impose a motion exactly, make the body a driven one.
 
 .. tip::
 

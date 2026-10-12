@@ -75,7 +75,7 @@
     - #command("angleUpdateNL <value>") ~Rotation threshold, *in degrees*.
   - #command("preventCrossingLength <value>") ~When positive, stiffens the
     normal repulsion at large overlap to prevent bodies from crossing each
-    other. Only written in the conf-file when non-zero.
+    other (`Default` and `GeoVisc`; factor $L\/(L+d_n)$ capped at 100).
 ])
 
 = Neighbor-list and contact strategies

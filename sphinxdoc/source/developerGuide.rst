@@ -21,8 +21,14 @@ The factory mechanism
 ---------------------
 
 Each family has an abstract base class, and the concrete classes register
-themselves in a factory keyed by their **class name**. The registration happens
-in ``Rockable::ExplicitRegistrations``:
+themselves in a factory keyed by their **class name**. For the force laws, the
+body forces, the data extractors and the pre-processing commands, the
+registration happens in ``Rockable::ExplicitRegistrations``, for all the
+families, post-processors included (the header of the class also has to be
+included at the top of ``Rockable.cpp``). A registration made by a static
+object in the source file of the class would be lost: the object files are
+gathered into a static library, and the linker drops those that nothing
+references.
 
 .. code-block:: c++
 
@@ -111,8 +117,10 @@ Adding a force law
         return true;
       }
 
-4. Register the class in ``Rockable::ExplicitRegistrations``, and add the file to
-   ``CMakeLists.txt``.
+4. Register the class in ``Rockable::ExplicitRegistrations``. The new files
+   do not need to be added to ``CMakeLists.txt``: every ``.cpp`` of the folders
+   of ``src`` is collected by CMake, which only has to be run again
+   (``cmake ..``) so that it sees them.
 
 .. important::
 
@@ -174,7 +182,11 @@ Derive from ``DataExtractor`` and implement four methods:
    undocumented is of little use six months later.
 
 Set ``nstep`` to a huge value when the extractor has nothing to compute between
-two records, as all the current ones do.
+two records, as all the current ones do. Register the class in
+``Rockable::ExplicitRegistrations`` with ``REGISTRER_BASE_DERIVED(DataExtractor,
+MyExtractor)``. If it relies on an optional feature (a periodic cell, soft
+particles), guard its body with the corresponding ``#ifdef``, so that it still
+compiles when the feature is disabled; ``TrackSoftParticle`` is an example.
 
 
 Adding a pre-processing command
@@ -217,8 +229,8 @@ Then add the name to the ``commands`` array at the end of
 Adding a post-processor
 -----------------------
 
-Derive from ``PostProcessor``, and implement ``read``, ``init``, ``exec`` and
-``end``. The parameters are read with a local ``kwParser``, which lets a
+Derive from ``PostProcessor``, implement ``read``, ``init``, ``exec`` and
+``end``, and register the class in ``Rockable::ExplicitRegistrations``. The parameters are read with a local ``kwParser``, which lets a
 post-processor have its own small keyword set:
 
 .. code-block:: c++
@@ -244,7 +256,9 @@ Where things live
      - Contents
    * - ``src/Core``
      - ``Rockable``, ``Particle``, ``Shape``, ``Interaction``,
-       ``DrivingSystem``, ``PeriodicCell``: the heart of the code.
+       ``BreakableInterface``, ``DrivingSystem``, ``PeriodicCell``,
+       ``SoftParticlePhysics`` and ``VisDamping`` (soft particles): the heart
+       of the code.
    * - ``src/Apps``
      - ``run.cpp`` (the ``rockable`` binary), ``see.cpp``, ``postpro.cpp``,
        ``conftovtk.cpp``, ``DearMySeer``, ``DearMyShape``.
@@ -269,18 +283,40 @@ The library ``toofus`` provides most of the utilities used throughout:
 ``Factory``, ``Tempo``, and the logging.
 
 
+Keeping restarts exact
+----------------------
+
+Any dump is a valid input file, and a computation restarted from a conf-file is
+expected to follow the uninterrupted one. Two rules keep it so:
+
+- Everything a force law accumulates from one step to the next (the
+  tangential force, a moment, a sliding distance, the deformation of a soft
+  particle...) must be written in the conf-files and read back. Otherwise, the
+  restarted computation starts from zero for that quantity.
+- When a conf-file is loaded, ``Rockable::loadConf`` performs one computation
+  of the forces to rebuild the resultants and the accelerations. It is done
+  with a zero time step, so that the force laws compute the forces of the state
+  read without adding an increment to it. A new force law must therefore make
+  its increments proportional to ``box->dt``, and must not divide by it.
+
+The tests ``bcm_two_cubes_stick`` and ``bcm_two_cubes_restart`` check this for
+the ``BCM`` law: they share one reference.
+
+
 Testing a change
 ----------------
 
-Build the regression tests with ``-DROCKABLE_USE_TESTING=ON``. The comparison
-itself is available from the command line:
+Build the regression tests with ``-DROCKABLE_USE_TESTING=ON`` and run them with
+``ctest``; ``test/README.md`` explains how they work and how to add one. The
+comparison itself is available from the command line:
 
 .. code-block:: sh
 
    rockable input.txt -n conf10 -r reference/conf10
 
-which runs the simulation and then compares the two conf-files line by line from
-their ``Particles`` section onwards, exiting with an error if they differ.
+which runs the simulation and then compares the two conf-files from their
+``Particles`` section onwards, with a relative tolerance (``-t``, ``1e-5`` by
+default), exiting with an error if they differ.
 
 .. tip::
 

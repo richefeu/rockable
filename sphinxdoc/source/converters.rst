@@ -4,8 +4,8 @@ Converters
 ==========
 
 Three converters bridge Rockable's shape format and the usual geometry formats.
-They live in ``prepro/converters`` and are built with
-``ROCKABLE_COMPILE_PREPRO``.
+They live in ``prepro/converters``. ``stl2shape`` and ``shape2mesh`` are built
+by CMake with ``ROCKABLE_COMPILE_PREPRO``; ``tess2shape`` is not (see below).
 
 .. contents::
    :local:
@@ -73,6 +73,15 @@ space-filling grains, of the kind used for the bonded models.
 
    tess2shape command.txt
 
+.. warning::
+
+   ``tess2shape`` is **not built by CMake**: its line is commented out in
+   ``prepro/converters/CMakeLists.txt``. It has its own ``Makefile`` in
+   ``prepro/converters/tess2shape``, which expects ``toofus`` in ``~/toofus``
+   and compiles in C++11; it may need to be updated to build against the
+   current sources of Rockable, which are C++17. The same holds for
+   ``tif2rockable``, in the same folder.
+
 The command file is a list of keywords:
 
 .. code-block:: text
@@ -108,9 +117,9 @@ The command file is a list of keywords:
 
 .. warning::
 
-   The keyword is ``MinkowskiRadius``. Some example files shipped with the
-   repository spell it ``MinskowskiRadius``, which is **not** recognised: the
-   line is ignored and the radius silently keeps its default value.
+   The keyword is ``MinkowskiRadius``. Older command files may spell it
+   ``MinskowskiRadius``, which is **not** recognised: the line is ignored and
+   the radius silently keeps its default value.
 
 Generating the tessellation itself is a Neper matter:
 
@@ -168,6 +177,10 @@ When that file sits next to the shape file, ``see`` draws each particle with its
 skin mesh instead of the overlapping spheres, tubes and slabs it normally uses.
 The difference is purely visual, but on a rounded polyhedron it is the
 difference between a figure that reads and one that does not.
+
+The skin mesh cannot follow the deformation of a soft particle (see
+:ref:`softParticles`): the soft particles are always drawn with the overlapping
+primitives, deformed.
 
 .. code-block:: sh
 

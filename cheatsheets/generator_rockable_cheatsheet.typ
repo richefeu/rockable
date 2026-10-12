@@ -69,16 +69,15 @@
   A global transformation is carried along the script and applied by the packing
   commands when they place the particles.
 
-  - #command("tranformation:add_translation <x> <y> <z>")
-  - #command("tranformation:add_rotation <x> <y> <z> <angle_deg>") ~Rotation of
+  - #command("transformation:add_translation <x> <y> <z>")
+  - #command("transformation:add_rotation <x> <y> <z> <angle_deg>") ~Rotation of
     `angle_deg` degrees around the axis $(x, y, z)$.
-  - #command("tranformation:reset") ~Back to identity.
-  - #command("tranformation:reset_translation") /
-    #command("tranformation:reset_rotation") ~Reset only one part.
+  - #command("transformation:reset") ~Back to identity.
+  - #command("transformation:reset_translation") /
+    #command("transformation:reset_rotation") ~Reset only one part.
 
-  #note[Mind the spelling: the keyword really is `tranformation:`, without the
-  first `s`. `transformation:...` is silently ignored (with an "unknown token"
-  message).]
+  #note[The old spelling `tranformation:...`, without the first `s`, is still
+  accepted.]
 ])
 
 = Generating shapes
@@ -221,11 +220,11 @@
 
   #inline("Placing an inclined plane")
   ```txt
-  tranformation:reset
-  tranformation:add_rotation 0 0 1 -30
-  tranformation:add_translation 0 0.1 0
+  transformation:reset
+  transformation:add_rotation 0 0 1 -30
+  transformation:add_translation 0 0.1 0
   generatePacking:grid Ball 0 0 0  0.1 0.1 0.1  3 3 3  1 0 1.0 0
-  tranformation:reset
+  transformation:reset
   ```
   The transformation stays in effect until it is reset, so a script that mixes
   placed and unplaced groups should reset it explicitly.

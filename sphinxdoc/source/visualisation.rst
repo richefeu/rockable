@@ -55,6 +55,46 @@ So, to visualise a conf-file you can use its name
 
 or simply invoke ``see`` with no other argument, and the default one will be ``conf0``.
 
+In the window, the key ``k`` lists all the key bindings, and ``h`` the use of the
+mouse. The keys ``0`` to ``5`` choose how the particles are colored: uniform,
+random, by velocity, by shape, and, for soft particles (see
+:ref:`softParticles`), by their volume change :math:`\det \mathbf{F} - 1` and
+by their mean stress. The soft particles are drawn with their deformation. The
+cheatsheet ``see_rockable_cheatsheet`` (folder ``cheatsheets``) describes every
+key and the settings of ``see.json``.
+
+
+
+Application `conftovtk`
+-----------------------
+
+``conftovtk`` converts the conf-files into VTK files, to be visualised with
+ParaView. It converts **every** file named ``conf<number>`` of the current
+folder (the conf-file given on the command line is not used, and a file such as
+``conf10.txt`` is not converted), and writes, for each of them:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 34 66
+
+   * - File
+     - Content
+   * - ``Shepres####.vtk``
+     - The particles whose shape is a single vertex (spheres). The name is
+       spelt this way in the source.
+   * - ``Polyr####.vtk``
+     - The particles with more than two vertices (polyhedra), with their faces.
+       The soft particles are written with their deformation.
+   * - ``Forces####.vtk``
+     - The contact forces.
+   * - ``OBB####.vtk``
+     - The oriented bounding boxes of the particles.
+
+The particles with exactly two vertices (sticks) are not written.
+
+.. code-block:: sh
+
+   conftovtk
 
 
 Application `seer` (Dear My Seer)
@@ -64,7 +104,7 @@ Application `seer` (Dear My Seer)
    :width: 250px
    :align: center
 
-**Dear My Seer** is the visualization application that replaces ``see`` in **Rockable**.
+**Dear My Seer** is the visualization application meant to replace ``see`` in **Rockable**. It is built with the CMake option ``ROCKABLE_COMPILE_SEER``, which is **off** by default, so ``see`` remains the default viewer.
 The old ``see`` application uses ``freeglut`` and thus **X11**, which made maintenance difficult, especially on Apple computers. The console-name ``seer`` stands for **see-rockable**, and since this new version uses **Dear ImGui**, it has been named **Dear My Seer** as a playful wordplay.
 
 .. note::
@@ -92,7 +132,7 @@ its shapes, and lets them be inspected one by one.
 The argument is optional and defaults to ``shapes.txt``.
 
 It is built by the same CMake option as ``seer``, ``ROCKABLE_COMPILE_SEER``,
-which is on by default. The two applications share the vendored Dear ImGui and
+which is off by default. The two applications share the vendored Dear ImGui and
 ImPlot sources, compiled once into a static library.
 
 .. note::
@@ -104,7 +144,8 @@ ImPlot sources, compiled once into a static library.
 .. warning::
 
    Both **Dear My Seer** and **Dear My Shape** are under active development and
-   their feature sets are not frozen.
+   their feature sets are not frozen. In particular, **Dear My Seer** does not
+   draw the deformation of the soft particles yet: use ``see`` for them.
 
    ``shape`` already fits the bounding box, toggles ``preCompDone`` and computes
    the mass properties of the displayed shape, but it has **no save**: nothing

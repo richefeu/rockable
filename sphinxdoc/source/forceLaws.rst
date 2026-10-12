@@ -22,10 +22,11 @@ For example, to set the value :math:`10^8` to the normal stiffness :math:`k_n` b
 Default model (keyword ``Default``)
 -----------------------------------
 
-This is the force law to be used in most cases. 
-In short, the model includes elastic linear normal force for contact, normal viscosity force, constant normal cohesion force at contact, 
-Coulomb friction tangent force, and rolling resistance moment
-
+This is the force law to be used in most cases. In short, the model includes a
+linear elastic normal force, a normal viscous damping, a Coulomb friction, and
+a rolling resistance moment. There is no cohesion: the interaction exists only
+while the bodies overlap (:math:`d_n \leq 0`), and all its forces are reset to
+zero as soon as the contact is lost.
 
 1. **Normal component**
 
@@ -35,81 +36,138 @@ Coulomb friction tangent force, and rolling resistance moment
 
      f_n^\text{elas} = -k_n d_n
 
-  where :math:`d_n \leq 0` is the normal distance, so :math:`f_n^\text{elas} \geq 0`. When :math:`d_n > 0`, this force is zero. The value of :math:`k_n` can be set with the keyword ``knContact``
+  where :math:`d_n \leq 0` is the normal distance, so :math:`f_n^\text{elas} \geq 0`. The value of :math:`k_n` is set with the keyword ``knContact``.
 
-  b. The viscuous part of the normal contact force is
+  b. The viscous part of the normal contact force is
 
   .. math::
 
      f_n^\text{visc} = 2 \alpha_n \sqrt{k_n m_\text{eff}} \, v_n
 
-  where :math:`v_n` is the relative normal velocity, :math:`m_\text{eff}=(m_i m_j)/(m_i+m_j)` is the effective mass, and :math:`\alpha_n \in [0, 1[` is the rate of normal viscuous damping. There are two ways to set the value of :math:`\alpha_n`:
+  where :math:`v_n` is the relative normal velocity, :math:`m_\text{eff}=(m_i m_j)/(m_i+m_j)` is the effective mass, and :math:`\alpha_n \in [0, 1[` is the rate of normal viscous damping. There are two ways to set the value of :math:`\alpha_n`:
 
-    i. The keyword ``en2Contact`` that is the energy normal restitution rate (:math:`e_n^2`). In this case, the viscuous damping rate will be set associated
+    i. The keyword ``en2Contact``, which is the squared normal restitution coefficient (:math:`e_n^2`). The viscous damping rate is then
 
     .. math::
 
        \alpha_n = \frac{- \ln e_n}{\sqrt{\ln^2 e_n + \pi^2}}
 
-    ii. The keyword ``en2ContactFromViscRate`` that will  
+    ii. The keyword ``en2ContactFromViscRate``, which gives :math:`\alpha_n` directly; the corresponding restitution is
 
     .. math:: 
 
-       e_n^2 = \exp \left(-\frac{\alpha_n \pi}{\sqrt{1 - \alpha_n^2}}\right)
-
+       e_n^2 = \exp \left(-\frac{2 \alpha_n \pi}{\sqrt{1 - \alpha_n^2}}\right)
 
   .. note:: 
 
-     Because of the viscuous part of the normal force, the total normal force :math:`f_n = f_n^\text{elas} + f_n^\text{visc}` can be negative. Although the physical meaning of this negative value is arguable, the normal force is by default restricted to remain positive or zero.
+     Because of the viscous part, the total normal force :math:`f_n = f_n^\text{elas} + f_n^\text{visc}` could be negative. It is restricted to remain positive or zero.
+
+  .. note::
+
+     With ``preventCrossingLength`` :math:`L > 0`, the elastic part is
+     multiplied by :math:`L / (L + d_n)`, which stiffens the repulsion at large
+     overlap and prevents the bodies from crossing each other. The factor is
+     capped at 100. This holds for ``Default`` and ``GeoVisc``.
 
 
 2. **Tangential component**
 
-The tangential force represents the frictional resistance between particles when they slide against each other. It is calculated based on the relative tangential velocity (:math:`v_t`) and a tangential stiffness parameter (:math:`k_t`, keyword ``ktContact``). The Coulomb friction model is used to limit the tangential force, ensuring that it does not exceed the product of the friction coefficient (:math:`\mu`, keyword ``muContact``) and the normal elastic force (:math:`f_n^\text{elas}`). The tangential force is incrementally updated with the following relation, at each time step :math:`\Delta t`, since the onset of contact:
+The tangential force is accumulated incrementally from the relative tangential
+velocity :math:`\underline{v}_t`, with the tangential stiffness :math:`k_t`
+(keyword ``ktContact``), and projected onto the Coulomb cone defined by the
+friction coefficient :math:`\mu` (keyword ``muContact``) and the **elastic**
+part of the normal force:
 
 .. math::
 
-   \Delta f_t = \left [ k_t v_t \Delta t \right ]_{\pm \mu f_n^\text{elas}}
+   \underline{f}_t \leftarrow \underline{f}_t + k_t \underline{v}_t \Delta t,
+   \qquad
+   \left\Vert \underline{f}_t \right\Vert \leq \mu f_n^\text{elas}
 
-The friction force :math:`f_t` is cancelled as soon as contact is lost. 
+Compiling with ``ALLOW_NEGATIVE_THRESHOLDS`` uses the total normal force
+:math:`f_n` instead of :math:`f_n^\text{elas}` in the threshold.
 
 
-3. **Moment  vector**
+3. **Moment vector**
 
-The resistant moment (:math:`\underline{M}`) accounts for rotational resistance between particles. It is calculated based on the rotational velocity difference (:math:`\underline{\omega}_i - \underline{\omega}_j`) and the rotational stiffness parameter (:math:`k_r`, keyword ``krContact``). Additionally, the moment is limited by the product of the moment length coefficient (:math:`\mu_r`, keyword ``murContact``), the normal force (:math:`f_n`), and the length of the branch vector (:math:`\ell`). The resistant moment is updated, similarly to the friction force, as follows:
+When the rolling stiffness :math:`k_r` (keyword ``krContact``) is strictly
+positive, a resistant moment is accumulated from the relative rotation velocity,
+and capped by the rolling resistance :math:`\mu_r` (keyword ``murContact``),
+which is a **length**, times the normal force:
 
 .. math::
 
-   \Delta \underline{M} = \left [ k_r (\underline{\omega}_i - \underline{\omega}_j) \Delta t \right ]_{\pm \mu_r \ell f_n^\text{elas}}
-   
+   \underline{M} \leftarrow \underline{M} + k_r \left( \underline{\omega}_j - \underline{\omega}_i \right) \Delta t,
+   \qquad
+   \left\Vert \underline{M} \right\Vert \leq \mu_r f_n
 
-.. note:: The moment resistance is applied only when :math:`k_r > 0`.
-	 
+.. note:: When :math:`k_r = 0`, no moment is computed.
 
+.. note::
+
+   When a contact partnership is active (keyword ``ContactPartnership``), the
+   stiffnesses :math:`k_n`, :math:`k_t`, :math:`k_r` of each sub-contact are
+   multiplied by its weight :math:`w`, and the damping coefficient by
+   :math:`\sqrt{w}`.
 
 
 Law for rock avalanches (keyword ``Avalanche``)
 -----------------------------------------------
 
-This is historically the first law that has been implemented in ``Rockable`` (actually in ``DEMbox``, its ancestor).
-
-The force-law implemented is specifically designed for simulating rock avalanches at Laboratoire 3SR. It governs the interactions between particles or bodies in a granular material, considering both normal and tangential forces as well as resistant moments due to rotational motion. 
+This is historically the first law that has been implemented in ``Rockable``
+(actually in ``DEMbox``, its ancestor), to simulate rock avalanches at
+Laboratoire 3SR. It differs from ``Default`` by the way the energy is
+dissipated at the contacts: there is no viscous damping, but a hysteretic
+normal force.
 
 1. **Normal component**
 
-   The normal force (`I.fn`) between particles is calculated to represent the contact forces that resist compression and prevent interpenetration. The calculation involves considering the change in the normal displacement (`I.dn`) and the normal stiffness parameter (`kn`). The normal force may also undergo unloading or loading depending on the change in normal displacement.
+   The normal force is computed incrementally while the bodies get closer
+   (loading), and follows a softer unloading branch when they separate:
+
+   .. math::
+
+      f_n \leftarrow
+      \begin{cases}
+        f_n - k_n \, \Delta d_n & \text{if } \Delta d_n < 0 \text{ (loading)} \\
+        - e_n^2 \, k_n \, d_n & \text{if } \Delta d_n > 0 \text{ (unloading)}
+      \end{cases}
+      \qquad f_n \geq 0
+
+   where :math:`\Delta d_n` is the change of the normal distance since the
+   previous step. The unloading stiffness is :math:`e_n^2 k_n`, so that the
+   ratio of the energy given back to the energy stored is :math:`e_n^2`
+   (keyword ``en2Contact``). The force is kept positive or zero.
 
 2. **Tangential component**
 
-   The tangential force (`I.ft`) represents the frictional resistance between particles when they slide against each other. The calculation considers the tangential velocity (`vt`) and a tangential stiffness parameter (`kt`). Frictional forces are limited by the friction coefficient (`mu`) and the normal force (`I.fn`).
+   As in ``Default``, accumulated incrementally with :math:`k_t` and capped by
+   the Coulomb cone, here with the total normal force:
+   :math:`\Vert \underline{f}_t \Vert \leq \mu f_n`.
 
 3. **Resistant moment**
 
-   The resistant moment (`I.mom`) accounts for the rotational resistance between particles. The calculation considers the rotational velocity difference (`box->Particles[I.j].vrot - box->Particles[I.i].vrot`) and the rotational stiffness parameter (`kr`). Additionally, there is a correction applied to the branch vector (`branch`) to account for different scenarios when the free body is either particle `i` or particle `j`.
+   Accumulated as in ``Default``,
+   :math:`\underline{M} \leftarrow \underline{M} + k_r (\underline{\omega}_j - \underline{\omega}_i) \Delta t`
+   (even when :math:`k_r = 0`, which then gives no moment), and capped by
 
-.. note:: Weighted Interaction Parameters. The force-law allows for adjusting the interaction parameters (`kn`, `kt`, `kr`) based on a weight factor (`w`). This weighting is determined by the function `box->ctcPartnership.getWeight`, which can influence the forces and moments between the particles.
+   .. math::
 
-.. note:: The code includes conditional blocks for certain options (`FT_CORR`) which may affect the actual computations. Additionally, the equations use specific parameters (`en2` and `mur`), which should be defined and obtained from relevant data sources in the simulation setup.
+      \left\Vert \underline{M} \right\Vert \leq \mu_r \, \ell \, f_n
+
+   where :math:`\mu_r` (keyword ``murContact``) is here **dimensionless**, and
+   :math:`\ell` is the distance from the contact point to the rotation axis of
+   the free body (a rock block), that is, the length of the branch vector from
+   its centre to the contact point once its component along the rotation
+   vector is removed. When body :math:`i` is driven, the free body is
+   :math:`j`; otherwise it is :math:`i`. When the free body does not rotate at
+   all, the whole branch vector is used.
+
+.. note::
+
+   The contact partnership weights :math:`k_n`, :math:`k_t` and :math:`k_r` as
+   in ``Default``. ``FT_CORR`` applies the objectivity correction to the
+   tangential force, as in the other laws.
 
 
 
@@ -122,7 +180,9 @@ Two states can exist: cohesive bond and contact.
 
 1. **Cohesive bond**
 
-    When a cohesive bond exists between two particles, the force-law employs the following equations:
+    The parameters are those of the interface when ``ParamsInInterfaces`` is 1.
+    Otherwise, they are read in the group-pair table, as ``*InnerBond`` when
+    the two bodies share the same cluster and ``*OuterBond`` otherwise.
 
     a. **Normal component**
 
@@ -133,25 +193,33 @@ Two states can exist: cohesive bond and contact.
 
           f_n^\text{elas} = -k_n (d_n - d_n^0)
         
-       where :math:`d_n^0` is the initial normal distance. This time, the parameter :math:`k_n` is set with the keyword ``knInnerBond`` or ``knOuterBond``.
-       The viscous normal force is:
+       where :math:`d_n^0` is the normal distance of the interface when it was
+       created. The parameter :math:`k_n` is set with the keyword
+       ``knInnerBond`` or ``knOuterBond``. The viscous normal force is:
 
        .. math::
 
           f_n^\text{visc} = 2 \alpha_n \sqrt{k_n m_\text{eff}} \, v_n	
 
        where :math:`\alpha_n` is indirectly set with the keyword ``en2InnerBond`` or ``en2OuterBond``.
+       The normal force is not clamped: a bond can carry a tensile force.
 
     b. **Tangential component**
 
-       The tangential elastic force (:math:`f_t`) is incrementally calculated based on the relative tangential velocity (:math:`v_t`) and a tangential stiffness parameter (:math:`k_t`, keyword ``ktInnerBond`` or ``ktOuterBond``):
+       The tangential force is the sum of an elastic part, incrementally
+       calculated from the relative tangential velocity :math:`\underline{v}_t`
+       and the tangential stiffness :math:`k_t` (keyword ``ktInnerBond`` or
+       ``ktOuterBond``), and of a viscous part, with the damping coefficient of
+       the normal force:
 
        .. math::
 
-           \Delta f_t = k_t (v_t \Delta t)
+           \underline{f}_t^e \leftarrow \underline{f}_t^e + k_t \underline{v}_t \Delta t,
+           \qquad
+           \underline{f}_t = \underline{f}_t^e + 2 \alpha_n \sqrt{k_n m_\text{eff}} \, \underline{v}_t
 
-    Optionally, an additional term for tangential viscosity (:math:`f_t^\text{visc} = 2 \alpha_n \sqrt{k_n m_\text{eff}} \, v_t`) can be added to the elastic part of the tangential force. However, this approach accumulates viscosity over time and may not be accurate:
-
+       As in ``BCM``, the viscous part of the previous step is removed before
+       the elastic increment is added, so that it is not cumulated.
 
     c. **Moment vector**
 
@@ -173,41 +241,21 @@ Two states can exist: cohesive bond and contact.
 
        .. math::
 
-          \varphi = \left( \frac{\vert f_t \vert}{f_t^0} \right)^p + \left(\frac{\Vert\underline{M}\Vert}{M_0}\right)^p - \frac{f_n}{f_n^0} - 1 
+          \varphi = \left( \frac{\Vert \underline{f}_t \Vert}{f_t^0} \right)^p + \left(\frac{\Vert\underline{M}\Vert}{M_0}\right)^p - \frac{f_n}{f_n^0} - 1 
+
+       with the strengths :math:`f_n^0`, :math:`f_t^0`, :math:`M_0` and the
+       exponent :math:`p` (keywords ``fn0*Bond``, ``ft0*Bond``, ``mom0*Bond``
+       and ``pow*Bond``). The breakage is postponed until all the forces of
+       the step are computed, to avoid an asymmetry in the tangential forces.
 
 
 2. **Contact**
 
-    When particles are in contact (no cohesive bond), the force-law employs the following equations:
-
-    a. **Normal component**
-
-       The normal force (`I.fn`) between the particles is calculated similar to the cohesive bond case, but with different interaction parameters (`kn`, `kt`, `damp`, etc.):
-
-       .. math::
-
-           \text{vn} = \mathbf{I.vel} \cdot \mathbf{I.n}
-
-           \text{fne} = -\text{kn} \cdot \text{I.dn}
-
-           \text{fnv} = \text{damp} \cdot \text{vn}
-
-           \text{I.fn} = \text{fne} + \text{fnv}
-
-    b. **Tangential component** (Friction)
-
-       The tangential force (`I.ft`) due to friction between the particles is calculated in a similar manner to the cohesive bond case but with different interaction parameters (`kt`, `mu`, etc.).
-
-    c. **Resistant moment vector**
-
-       If the contact allows for rotational motion (`kr` parameter), a resistant moment (`I.mom`) is calculated based on the relative rotational velocity of the particles.
-
-Note: The code includes conditional blocks for certain options (`FT_CORR` and `box->ctcPartnership.getWeight != nullptr`) which may affect the actual computations.
-
-
-
-
-
+    When the bodies are not bonded (or once their bond is broken), the law is
+    that of ``Default``, with the ``*Contact`` parameters and the contact
+    partnership, with two differences: the Coulomb threshold uses the total
+    normal force, :math:`\Vert \underline{f}_t \Vert \leq \mu f_n`, and the
+    moment is computed even when :math:`k_r = 0`.
 
 
 Bonded Cell Method (keyword ``BCM``)
@@ -421,13 +469,25 @@ Summary of the parameters used by each law
      - no
      - no
      - yes
-   * - ``kn/kt/krInnerBond``, ``kn/kt/krOuterBond``
+   * - ``kn/ktInnerBond``, ``kn/ktOuterBond``
      - no
      - no
      - yes
      - inner only
      - no
-   * - ``fn0/ft0/mom0/pow*Bond``, ``en2*Bond``
+   * - ``krInnerBond``, ``krOuterBond``
+     - no
+     - no
+     - yes
+     - no
+     - no
+   * - ``en2InnerBond``, ``en2OuterBond``
+     - no
+     - no
+     - yes
+     - inner only (damping set by ``stickBCM``)
+     - no
+   * - ``fn0/ft0/mom0/pow*Bond``
      - no
      - no
      - yes
