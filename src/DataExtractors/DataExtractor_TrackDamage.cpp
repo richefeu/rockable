@@ -74,4 +74,5 @@ void TrackDamage::record() {
   recordFile << box->t << ' ' << D << '\n';
 }
 
-void TrackDamage::end() {}
+// The records are not flushed one by one (nrec can be 1), so the end of the file is written here
+void TrackDamage::end() { recordFile << std::flush; }

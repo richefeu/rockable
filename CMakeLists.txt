@@ -33,13 +33,25 @@ message(STATUS "Installation prefix: ${CMAKE_INSTALL_PREFIX}")
 
 # ##############################################################################
 # OPTIONS
+#
+# The features that work (periodic cell, soft particles) are enabled by default,
+# so that a default build, and in particular the continuous integration, compiles
+# and tests all of them. Each one has a cost, even when it is not used by a
+# computation: periodic boundary conditions add tests and corrections in the
+# contact detection and the time integration, and soft particles add a pointer to
+# every particle and a test in the computation of the vertex positions.
+# If you do not need a feature, disable it, for instance:
+#
+#   cmake .. -DROCKABLE_ENABLE_PERIODIC=OFF -DROCKABLE_ENABLE_SOFT_PARTICLES=OFF
+#
+# A keyword of a disabled feature is still read, but only prints a warning.
 
 option(ROCKABLE_USE_FT_CORR "Add objectivity correction to tangent forces" OFF)
 option(ROCKABLE_USE_TESTING "Add tests" OFF)
 option(ROCKABLE_ENABLE_PROFILING "Enable the time profiling" OFF)
 
 option(ROCKABLE_ENABLE_BOUNDARY "Enable the special boundaries like Ball or Cylinder" OFF)
-option(ROCKABLE_ENABLE_SOFT_PARTICLES "Enable the homogeneous deformation of particles" OFF)
+option(ROCKABLE_ENABLE_SOFT_PARTICLES "Enable the homogeneous deformation of particles (DCEM)" ON)
 option(ROCKABLE_ENABLE_PERIODIC "Enable full periodic boundary conditions" ON)
 
 option(ROCKABLE_COMPILE_POSTPRO "Compile the application to run post-processing commands" ON)

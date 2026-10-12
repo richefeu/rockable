@@ -44,9 +44,9 @@ among others:
   *Documented with a warning; not fixed.*
 - `copyParamsToInterfaces inner` does not copy `kr` and `mom0`, while its
   `outer` branch does. *Documented with a warning; not fixed.*
-- With `useSoftParticles`, the uniform transformation is not written to the
-  conf-files, so such a run cannot be restarted exactly from a dump.
-  *Documented with a warning; not fixed.*
+- With `useSoftParticles`, the uniform transformation was not written to the
+  conf-files, so such a run could not be restarted exactly from a dump.
+  *Fixed* (section `SoftParticles` of the conf-files).
 
 Findings of this kind are reported, not silently papered over. A page that
 described a bug as if it were a feature would be worse than no page at all.

@@ -147,6 +147,33 @@ Available extractors
        (``StickedLinks``, ``BCM``) and once the interfaces have been created by
        a sticking pre-processing command.
 
+``TrackSoftParticle`` (*int*) **ibody** (*string*) **filename** (*int*) **nrec**
+    State of a soft particle (see :ref:`softParticles`): its homogeneous
+    deformation, and its mean stress and strain, expressed in the frame of the
+    body.
+
+    Columns: ``t``, :math:`\det \mathbf{F}` (the ratio of the current volume to
+    the initial one), :math:`\operatorname{tr}\boldsymbol{\sigma}`,
+    :math:`\operatorname{tr}\boldsymbol{\varepsilon}` (the volumetric strain),
+    then the 9 components of :math:`\mathbf{F}`, of
+    :math:`\boldsymbol{\sigma}` and of :math:`\boldsymbol{\varepsilon}`, each in
+    the order ``xx xy xz yx yy yz zx zy zz``.
+
+    .. note::
+
+       Nothing is recorded when the particle is not soft, or when Rockable was
+       compiled without ``ROCKABLE_ENABLE_SOFT_PARTICLES``; a warning says so.
+
+``TrackStress`` (*int*) **istart** (*string*) **filename** (*int*) **nrec**
+    Component :math:`\sigma_{xx}` of the mean stress (frame of the body) of all
+    the particles from **istart** to the last one, one column per particle. A
+    rigid particle is recorded with a zero stress.
+
+    Columns: ``t``, then :math:`\sigma_{xx}` of the particles **istart**,
+    **istart** + 1, ...
+
+    For the whole stress tensor of one particle, use ``TrackSoftParticle``.
+
 
 Declaring an extractor inside a conf-file
 -----------------------------------------

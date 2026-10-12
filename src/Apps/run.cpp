@@ -45,7 +45,7 @@ struct ConfSection {
 
 /**
  *  @brief Reads a conf-file from its 'Particles' line on, cut into the sections
- *         Particles, Interactions and Interfaces. Blank and '#' lines are skipped.
+ *         Particles, SoftParticles, Interactions and Interfaces. Blank and '#' lines are skipped.
  */
 static bool readConfSections(const std::string& fileName, std::vector<ConfSection>& sections) {
   std::ifstream file(fileName);
@@ -65,7 +65,7 @@ static bool readConfSections(const std::string& fileName, std::vector<ConfSectio
     if (row.empty() || row[0][0] == '#') {
       continue;
     }
-    if (row[0] == "Particles" || row[0] == "Interactions" || row[0] == "Interfaces") {
+    if (row[0] == "Particles" || row[0] == "SoftParticles" || row[0] == "Interactions" || row[0] == "Interfaces") {
       sections.push_back({row, {}});
     } else if (!sections.empty()) {
       sections.back().rows.push_back(row);
@@ -106,6 +106,9 @@ static std::string joinRow(const ConfRow& row) {
  *  S_j keeps the comparison meaningful for values that are the small difference of
  *  large ones, such as the resultant force on a grain at equilibrium, whose
  *  round-off error scales with the contact forces and not with the resultant.
+ *  The scale is also at least 1e-10 times the largest magnitude of the reference row,
+ *  so that a column that should be zero (e.g. pos.z of a motion in the plane xy),
+ *  and holds only round-off noise, is not compared relatively to that noise.
  *
  *  Interactions are saved in the order of their addresses in memory, which is not
  *  reproducible, so they are matched by their key (i, j, type, isub, jsub).
@@ -168,10 +171,18 @@ bool compareConf(const std::string& newFileName, const std::string& refFileName,
       const ConfRow& refRow = refSec.rows[r];
       bool rowMatches = (newRow.size() == refRow.size());
 
+      double rowScale = 0.0;
+      for (const auto& token : refRow) {
+        double value;
+        if (toNumber(token, value)) {
+          rowScale = std::max(rowScale, std::fabs(value));
+        }
+      }
+
       for (size_t j = 0; rowMatches && j < refRow.size(); j++) {
         double a, b;
         if (toNumber(newRow[j], a) && toNumber(refRow[j], b)) {
-          double scale = std::max({std::fabs(a), std::fabs(b), columnScale[j]});
+          double scale = std::max({std::fabs(a), std::fabs(b), columnScale[j], 1e-10 * rowScale});
           double deviation = (scale > 0.0) ? std::fabs(a - b) / scale : 0.0;
           worstDeviation = std::max(worstDeviation, deviation);
           rowMatches = (deviation <= tolerance);

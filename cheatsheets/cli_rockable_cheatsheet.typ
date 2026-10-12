@@ -87,12 +87,13 @@
 
 #concept-block(body: [
   #inline("Features (change the physics or the keywords)")
-  All default to `OFF`.
+  `PERIODIC` and `SOFT_PARTICLES` default to `ON` (so that the tests cover
+  them), the others to `OFF`. Disable what you do not need.
   - #command("ROCKABLE_ENABLE_PERIODIC") ~Tri-periodic cell: the
     `usePeriodicCell`, `h`, `vh`, `ah`, `mh`, `dh`, ... keywords and the
     `PeriodicLoading` drivings. Without it, those keywords only print a warning.
-  - #command("ROCKABLE_ENABLE_SOFT_PARTICLES") ~Homogeneous straining of the
-    particles (`useSoftParticles`).
+  - #command("ROCKABLE_ENABLE_SOFT_PARTICLES") ~Homogeneous deformation of the
+    particles, DCEM (`useSoftParticles`, `defineElasticParticles`, ...).
   - #command("ROCKABLE_ENABLE_BOUNDARY") ~The special boundary shapes (`Ball`,
     `Cylinder`). #note[Still incomplete in the source.]
   - #command("ROCKABLE_USE_FT_CORR") ~Objectivity correction of the tangential

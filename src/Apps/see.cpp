@@ -133,7 +133,9 @@ void showKeybinds() {
       "[0]    particles with same color",
       "[1]    particles with cyclic colors",
       "[2]    particles with velocity magnitude colors",
-      "[3]    particles with name colors"};
+      "[3]    particles with name colors",
+      "[4]    soft particles colored by their volume change det(F) - 1",
+      "[5]    soft particles colored by their mean stress"};
 
   switch2D::go(width, height);
 

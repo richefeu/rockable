@@ -229,39 +229,42 @@ a **fracture energy** rather than by a force threshold.
 Cohesive bond
 ^^^^^^^^^^^^^
 
-The stiffnesses of an interface are shared between the sub-bonds it holds. If
-the interface carries :math:`N_b` bonds, each of them uses
+The values of :math:`k_n` and :math:`k_t` come from ``knInnerBond`` and
+``ktInnerBond``, or from the interface itself when ``ParamsInInterfaces`` is 1.
+By default, they are the stiffnesses of **each bond**. With
+``bondStiffnessPerInterface 1``, they are the stiffnesses of the **whole
+interface**, shared between its :math:`N_b` bonds:
 
 .. math::
 
    k_n \leftarrow \frac{k_n}{N_b} \qquad k_t \leftarrow \frac{k_t}{N_b}
 
 so that refining the discretisation of an interface does not stiffen it. The
-values of :math:`k_n` and :math:`k_t` come from ``knInnerBond`` and
-``ktInnerBond``, or from the interface itself when ``ParamsInInterfaces`` is 1.
+damping coefficient of the bonds and the breakage energy below use the same
+weighted stiffnesses. For the cubic cells of :ref:`softParticles`, which have
+4 bonds per face, ``knInnerBond 0 0 1e5`` per bond and ``knInnerBond 0 0 4e5``
+per interface give the same result.
 
 The normal force combines the elastic response, measured from the distance
-:math:`d_n^0` recorded at gluing, with the viscous damping:
+:math:`d_n^0` of the bond when it was created by ``stickBCM`` (each bond has its
+own, so that a bond carries no force in its initial position), with the viscous
+damping:
 
 .. math::
 
    f_n = -k_n \left( d_n - d_n^0 \right) + c\, v_n
 
-and the tangential force is accumulated incrementally, then completed by a
-viscous term:
+and the tangential force is the sum of an elastic part, accumulated
+incrementally, and of a viscous part:
 
 .. math::
 
-   \Delta \underline{f}_t = k_t\, \underline{v}_t \Delta t
-   \qquad\text{then}\qquad
-   \underline{f}_t \leftarrow \underline{f}_t + c\, \underline{v}_t
+   \underline{f}_t^e \leftarrow \underline{f}_t^e + k_t\, \underline{v}_t \Delta t
+   \qquad
+   \underline{f}_t = \underline{f}_t^e + c\, \underline{v}_t
 
-.. warning::
-
-   As in ``StickedLinks``, the tangential viscous term is added to the
-   *accumulated* force rather than to its elastic part alone, so the viscosity
-   piles up over time. Keep this in mind when interpreting the tangential
-   response of a bond.
+The viscous part of the previous step is removed before the elastic increment
+is added, so that the viscosity is not cumulated over time.
 
 Neither the tangential force nor the moment is capped while the bond holds: the
 bond is elastic until it breaks.
@@ -276,7 +279,7 @@ part:
 
 .. math::
 
-   E_n = \sum_{b\,\mid\, d_n^b > d_n^0} \frac{1}{2} k_n \left( d_n^b - d_n^0 \right)^2
+   E_n = \sum_{b\,\mid\, d_n^b > d_n^{0,b}} \frac{1}{2} k_n \left( d_n^b - d_n^{0,b} \right)^2
    \qquad
    E_t = \sum_{b} \frac{1}{2} k_t \left\Vert \underline{s}_b \right\Vert^2
 
@@ -291,11 +294,14 @@ with :math:`A` the area of the interface and :math:`G_c` the fracture energy
 (keyword ``gcInnerBond``, or ``gcOuterBond`` for an outer interface). The factor
 2 accounts for the two surfaces created by the crack.
 
-.. note::
+The stiffnesses and :math:`G_c` are those of the force computation: per bond or
+per interface (``bondStiffnessPerInterface``), and taken from the interface
+itself when ``ParamsInInterfaces`` is 1.
 
-   The stiffnesses used in this energy balance are the ones read from the
-   group-pair table, *not* the per-bond values divided by :math:`N_b` that the
-   force computation uses.
+The area, and the :math:`d_n^0` and :math:`\underline{s}_b` of each bond, are
+saved in the conf-files (see :ref:`syntaxConf`), so that a computation restarted
+from a conf-file breaks its interfaces at the same time as the uninterrupted
+one.
 
 When the criterion is met the interface is not broken immediately: it is added
 to a list and all its bonds are released once every force has been computed.

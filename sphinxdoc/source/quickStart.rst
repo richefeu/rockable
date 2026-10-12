@@ -48,10 +48,10 @@ These options will set up the CMake build system accordingly to either include o
 All the options are listed below:
 
 - ``ROCKABLE_USE_FT_CORR`` (default is ``OFF``): add objectivity correction to tangent forces.
-- ``ROCKABLE_ENABLE_PROFILING`` (default is ``ON``): enable time profiling.
+- ``ROCKABLE_ENABLE_PROFILING`` (default is ``OFF``): enable time profiling.
 - ``ROCKABLE_ENABLE_BOUNDARY`` (default is ``OFF``): enable the special boundaries like Ball or Cylinder.
-- ``ROCKABLE_ENABLE_SOFT_PARTICLES``` (default is ``OFF``): enable straining of particles.
-- ``ROCKABLE_ENABLE_PERIODIC`` (default is ``OFF``): enable full periodic boundary conditions.
+- ``ROCKABLE_ENABLE_SOFT_PARTICLES`` (default is ``ON``): enable the homogeneous deformation of particles (DCEM), see :ref:`softParticles`.
+- ``ROCKABLE_ENABLE_PERIODIC`` (default is ``ON``): enable full periodic boundary conditions.
 - ``ROCKABLE_COMPILE_SEE`` (default is ``ON``): compile the application to visualize the conf-files.
 - ``ROCKABLE_COMPILE_SEE3`` (default is ``OFF``): compile the application to edit graphically the input files.
 

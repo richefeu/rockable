@@ -83,6 +83,8 @@ Here is the non-exhaustive list of involved persons with their main mission:
 > [!NOTE]
 > The possibility of applying tri-periodic loading to an assembly is implemented and currently in the testing phase.
 
+* **Deformable Particles**: a particle can be given a uniform, linear isotropic elastic (or viscoelastic) deformation, driven by its mean stress: the Discrete Compliant-Element Method (DCEM). Glued together with the `BCM` force law, such particles model a material made of deformable cells whose interfaces can break. See `examples/softParticles` and the page *Deformable particles* of the documentation.
+
 * **Parallel Computation**: currently, an OpenMP optimization using compilation flags has been implemented. However, the computational speedup is relatively low. Typically, 8 cores are needed to halve the simulation time (for a dense system with a large number of elements).
 
 * **Documentation**: there is little [documentation](https://richefeu.github.io/rockable/), although efforts are being made to address this. For now, it is possible to generate the sphinxdoc documentation in your local folder.
@@ -124,16 +126,19 @@ make -j
 make install 
 ```
 
-The options available are listed below:
+The options available are listed below. The features that work (periodic cell,
+soft particles) are enabled by default, so that a default build, and the
+continuous integration, compiles and tests all of them; disable the ones you do
+not need, since each has a small cost even when it is not used.
 
 * `ROCKABLE_USE_FT_CORR` (default is OFF): add objectivity correction to tangent forces.
 * `ROCKABLE_USE_TESTING` (default is OFF): build the regression tests.
 * `ROCKABLE_ENABLE_PROFILING` (default is OFF): enable time profiling.
 * `ROCKABLE_ENABLE_BOUNDARY` (default is OFF): enable the special boundaries like Ball or Cylinder.
-* `ROCKABLE_ENABLE_SOFT_PARTICLES` (default is OFF): enable straining of particles.
-* `ROCKABLE_ENABLE_PERIODIC` (default is OFF): enable full periodic boundary conditions.
+* `ROCKABLE_ENABLE_SOFT_PARTICLES` (default is ON): enable the homogeneous deformation of particles (DCEM).
+* `ROCKABLE_ENABLE_PERIODIC` (default is ON): enable full periodic boundary conditions.
 * `ROCKABLE_COMPILE_SEE` (default is ON): compile the application to visualize the conf-files.
-* `ROCKABLE_COMPILE_SEER` (default is ON): compile Dear My Seer (and Dear My Shape), the successor of `see`.
+* `ROCKABLE_COMPILE_SEER` (default is OFF): compile Dear My Seer (and Dear My Shape), the successor of `see`.
 * `ROCKABLE_COMPILE_CONF2VTK` (default is ON): compile the application to convert the conf-files into VTK files, to visualize the results with paraview.
 * `ROCKABLE_COMPILE_POSTPRO` (default is ON): compile the application for postprocessing the results.
 * `ROCKABLE_COMPILE_PREPRO` (default is ON): compile the applications to generate inputs for the code.

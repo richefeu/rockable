@@ -398,10 +398,12 @@ doc: By default, the separator character in a conf-file is the 'space'
   but it can be changed to 'tab' or 'semicolon'
 
 [keyword] glue_with_walls
-doc: glue_with_walls [0/1]
+doc: glue_with_walls [yes/no]
 
-  State wether the glue will be activated between driven and not-driven bodies
-  when the command 'stickClusters' will be invoked
+  State whether the glue will be activated between driven and not-driven bodies
+  by the commands 'stickClusters' and 'stickVerticesInClustersMoments'
+  ('stickVerticesInClusters' and 'stickBCM' ignore it). Accepted affirmative
+  forms are yes, YES, y, Y and 1.
 
 [keyword] precision
 doc: precision [(int) value]

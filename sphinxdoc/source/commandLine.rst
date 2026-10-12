@@ -133,8 +133,11 @@ To make the binaries reachable from the shell:
 Compilation options
 -------------------
 
-Options that change the physics, or the set of keywords understood. All default
-to ``OFF``.
+Options that change the physics, or the set of keywords understood.
+``ROCKABLE_ENABLE_PERIODIC`` and ``ROCKABLE_ENABLE_SOFT_PARTICLES`` default to
+``ON``, so that a default build, and the continuous integration, compiles and
+tests them; the others default to ``OFF``. Each enabled feature has a small cost
+even when a computation does not use it, so disable the ones you do not need.
 
 .. list-table::
    :header-rows: 1
@@ -147,7 +150,8 @@ to ``OFF``.
        ``mh``, ``dh`` keywords and the ``PeriodicLoading`` drivings. See
        :ref:`periodicBoundaryConditions`.
    * - ``ROCKABLE_ENABLE_SOFT_PARTICLES``
-     - Homogeneous straining of the particles, keyword ``useSoftParticles``.
+     - Homogeneous deformation of the particles (DCEM), keywords
+       ``useSoftParticles``, ``defineElasticParticles``, ``useViscousTime``...
        See :ref:`softParticles`.
    * - ``ROCKABLE_ENABLE_BOUNDARY``
      - The special boundary shapes, ``Ball`` and ``Cylinder``.

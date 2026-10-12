@@ -1339,10 +1339,18 @@ void Rockable::loadConf(const char* a_name) {
   // mainly used to compute resultant forces and moments on the particles.
   // It will also populate the vector 'activeInteractions'.
   if (interactiveMode == false) {
-    // The state of the soft particles has been read: it must not be updated by this fake step
+    // The state read in the conf-file must not be changed by this fake step, otherwise a computation restarted
+    // from a conf-file would not follow the uninterrupted one. With a zero time step, the force laws compute the
+    // forces of this state without adding an increment to the tangential forces, moments and displacements.
+    // The deformation of the soft particles is not updated either.
+    double dtSaved = dt;
+    double dt_2Saved = dt_2;
+    dt = dt_2 = 0.0;
     freezeSoftParticles = true;
     accelerations();
     freezeSoftParticles = false;
+    dt = dtSaved;
+    dt_2 = dt_2Saved;
 #ifdef ROCKABLE_ENABLE_PERIODIC
     if (usePeriodicCell == 1) {
       realToReducedKinematics();
