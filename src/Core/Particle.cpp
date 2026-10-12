@@ -38,30 +38,39 @@
 #include "Particle.hpp"
 
 // Ctor
-Particle::Particle() {
-  // uniformTransformation = mat9r::unit();
-}
+Particle::Particle() {}
 
 /** @brief Given a vector expressed in the shape framework,
  *         this method returns its expression in the global framework
  *
  */
-vec3r Particle::Glob(vec3r& Vertex) const { return pos + Q * (/*uniformTransformation * */ (homothety * Vertex)); }
+vec3r Particle::Glob(vec3r& Vertex) const { return pos + Q * Deform(homothety * Vertex); }
 
 /** @brief Given the vertex number v of the shape,
  *         this method returns the vector expression in the global framework
  *
  */
-vec3r Particle::GlobVertex(size_t v) const {
-  return pos + Q * (/*uniformTransformation * */ (homothety * shape->vertex[v]));
-}
+vec3r Particle::GlobVertex(size_t v) const { return pos + Q * Deform(homothety * shape->vertex[v]); }
 
 /** @brief Given the vertex index v of the face f in the shape,
  *         this method returns the vector expression in the global framework
  *
  */
 vec3r Particle::GlobFaceVertex(size_t f, size_t v) const {
-  return pos + Q * (/* uniformTransformation * */ (homothety * shape->vertex[shape->face[f][v]]));
+  return pos + Q * Deform(homothety * shape->vertex[shape->face[f][v]]);
+}
+
+/** @brief Applies the homogeneous deformation of a soft particle to a vector of the shape framework
+ *         (identity for a rigid particle)
+ *
+ */
+vec3r Particle::Deform(const vec3r& v) const {
+#ifdef ROCKABLE_ENABLE_SOFT_PARTICLES
+  if (SPP != nullptr) {
+    return SPP->F * v;
+  }
+#endif
+  return v;
 }
 
 /**
@@ -77,11 +86,25 @@ double Particle::MinkowskiRadius() const { return homothety * shape->radius; }
  */
 void Particle::updateObb() {
   obb = shape->obb;
+#ifdef ROCKABLE_ENABLE_SOFT_PARTICLES
+  if (SPP != nullptr) {
+    // The deformation acts on the polyhedron, not on the Minkowski radius. The image of the core box by F is a
+    // parallelepiped, whose exact bounding box along the (undeformed) axes of the OBB is kept.
+    obb.enlarge(-shape->radius);
+    vec3r Fe[3];
+    for (size_t k = 0; k < 3; k++) {
+      Fe[k] = SPP->F * (obb.extent[k] * obb.e[k]);
+    }
+    for (size_t k = 0; k < 3; k++) {
+      obb.extent[k] = fabs(obb.e[k] * Fe[0]) + fabs(obb.e[k] * Fe[1]) + fabs(obb.e[k] * Fe[2]);
+    }
+    obb.center = SPP->F * obb.center;
+    obb.enlarge(shape->radius);
+  }
+#endif
   obb.rotate(Q);
-  // obb.extent *= homothety;
-  obb.extent = /*uniformTransformation * */ (homothety * obb.extent);
-  // obb.center *= homothety;
-  obb.center = /* uniformTransformation * */ (homothety * obb.center);
+  obb.extent = homothety * obb.extent;
+  obb.center = homothety * obb.center;
   obb.center += pos;
 }
 

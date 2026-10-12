@@ -143,8 +143,8 @@ class Rockable {
                                         ///< instead of the Parrinello-Rahman conjugate of h (0, default)
 #endif
 
-  int useSoftParticles{0};  ///< Flag indicating if soft particles are used
-  Compliance Cinv;          ///< The inverse compliance
+  int useSoftParticles{0};           ///< Flag indicating if soft particles are used
+  bool freezeSoftParticles{false};  ///< When true, the deformation of the soft particles is not updated
 
   // Time parameters
   double t{0.0};                ///< Current Time
@@ -243,6 +243,10 @@ class Rockable {
   void compute_forces_and_moments();              ///< Compute forces and moments
   void compute_resultants();                      ///< Compute the resulting forces and moments
   void compute_SpringJoints();                    ///< Compute the spring joints
+#ifdef ROCKABLE_ENABLE_SOFT_PARTICLES
+  void compute_SoftParticles_transformation();  ///< Update the deformation of the soft particles
+  void setSoftParticle(size_t id, double Young, double Poisson);  ///< Make a particle soft
+#endif
   void check_breakage_of_interfaces();            ///< ____
   void breakage_of_interfaces();                  ///< Break the interfaces
   void compute_accelerations_from_resultants();   ///< Compute accelerations

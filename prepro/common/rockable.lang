@@ -247,8 +247,31 @@ doc: useKineticStress [0/1]
 [keyword] useSoftParticles
 doc: useSoftParticles [(double) Young] [(double) Poisson]
 
-  Enable deformable (soft) particles with the given Young modulus and Poisson ratio.
+  Make all the free particles (not driven) soft, with the given Young modulus and Poisson ratio.
+  To be placed after the particles.
   Requires Rockable compiled with ROCKABLE_ENABLE_SOFT_PARTICLES.
+
+[keyword] defineElasticParticles
+doc: defineElasticParticles [(double) Young] [(double) Poisson] [(int) number] [(int) id1] [(int) id2] ...
+
+  Make the listed particles (identified by their ID) soft, with the given Young modulus and Poisson ratio.
+  To be placed after the particles.
+  Requires Rockable compiled with ROCKABLE_ENABLE_SOFT_PARTICLES.
+
+[keyword] SoftParticles
+doc: SoftParticles [(int) numberOfSoftParticles]
+
+  State of the soft particles, as written in the conf-files (strain and stress in the body frame).
+  REPEAT FOR EACH SOFT PARTICLE {
+     [(int) id] [(double) Young] [(double) Poisson]
+     [(mat9r) deformationGradient] [(mat9r) stress] [(mat9r) strain]
+  }
+
+[keyword] Transformations
+doc: Transformations [(int) numberOfSoftParticles]
+
+  Deformation gradients written by the first versions of the soft particles (read only).
+  REPEAT FOR EACH SOFT PARTICLE { [(int) id] [(mat9r) deformationGradient] }
 
 [keyword] knContact
 doc: knContact [(int) group1] [(int) group2] [(double) value]

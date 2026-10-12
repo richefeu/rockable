@@ -39,7 +39,7 @@ option(ROCKABLE_USE_TESTING "Add tests" OFF)
 option(ROCKABLE_ENABLE_PROFILING "Enable the time profiling" OFF)
 
 option(ROCKABLE_ENABLE_BOUNDARY "Enable the special boundaries like Ball or Cylinder" OFF)
-option(ROCKABLE_ENABLE_SOFT_PARTICLES "Enable strainning of particles" OFF)
+option(ROCKABLE_ENABLE_SOFT_PARTICLES "Enable the homogeneous deformation of particles" OFF)
 option(ROCKABLE_ENABLE_PERIODIC "Enable full periodic boundary conditions" ON)
 
 option(ROCKABLE_COMPILE_POSTPRO "Compile the application to run post-processing commands" ON)
@@ -70,6 +70,10 @@ endif()
 
 if(ROCKABLE_ENABLE_PERIODIC)
   add_compile_options(-DROCKABLE_ENABLE_PERIODIC)
+endif()
+
+if(ROCKABLE_ENABLE_SOFT_PARTICLES)
+  add_compile_options(-DROCKABLE_ENABLE_SOFT_PARTICLES)
 endif()
 
 # get the git tag of Rockable
