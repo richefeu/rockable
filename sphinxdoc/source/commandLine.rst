@@ -94,6 +94,8 @@ The other executables
      - Build shape files, input files and packings. See the ``generator`` page.
    * - ``shapeSurvey <shapeFile>``
      - Inspect and pre-compute a shape library. See :ref:`shapeSurvey`.
+   * - ``shapeSurvey <f.shp> -P <f.shp>``
+     - Pre-compute the shapes of a library, in place, without window.
    * - ``sweepable [script]``
      - Generate a tree of input files for a parameter sweep.
    * - ``stl2shape -r <R> <f.stl>``

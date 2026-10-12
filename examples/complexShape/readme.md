@@ -35,8 +35,9 @@ fast drawing in `see`.
 ```sh
 stl2shape -r 0.5 -c rock.stl     # writes mesh.shp
 mv mesh.shp rock.shp
-shapeSurvey rock.shp             # look at it, press C then s (pre-computation)
-rockable input.txt               # less than 1 s once pre-computed (20 s otherwise)
+shapeSurvey rock.shp             # look at it (q to quit)
+shapeSurvey rock.shp -P rock.shp # pre-computation, about 20 seconds
+rockable input.txt               # less than 1 second
 shape2mesh rock.shp --rmsh       # writes rock.rmsh, the skin mesh
 see
 ```
@@ -74,10 +75,11 @@ Computation of mass properties (volume, mass-center, inertia and body-frame) for
                                   inertia/mass: 179.796 215.449 210.393
 ```
 
-For this rock, it takes about 20 seconds, at each start. `shapeSurvey rock.shp`
-shows the shape; in its window, the key `C` computes the mass properties, and
-`s` saves them in `rock.shp` (which is overwritten), with `preCompDone y`: the
-next computations start at once.
+For this rock, it takes about 20 seconds, at each start. `shapeSurvey rock.shp
+-P rock.shp` does it once and for all: it computes the mass properties, writes
+them in `rock.shp` with `preCompDone y`, and exits, without opening a window.
+The next computations start at once. In the window of `shapeSurvey rock.shp`,
+the keys `C` then `s` do the same, but write the result in `mod_rock.shp`.
 
 **The units.** The mesh is in millimetres: the volume is 42 878 mm³, about
 43 cm³. In `input.txt`, the particle has a homothety of `1.0e-3`, which turns
@@ -102,11 +104,10 @@ shape file (`rock.shp` and `rock.rmsh`) is next to it, `see` loads it
 skin: the drawing is smooth, and about six times faster here. The skin is
 only a drawing: the computation does not use it.
 
-The mesh is built in the frame stored in the shape file. **Pre-compute the
-shape before meshing it** (`C` then `s` in `shapeSurvey`): the pre-computation
-moves the shape to its mass centre and turns it to its principal axes, and a
-skin made from a shape still marked `preCompDone n` is drawn shifted and
-turned with respect to the particle.
+The mesh is built in the body frame of the shape (its mass centre and its
+principal axes). If the shape is still marked `preCompDone n`, `shape2mesh`
+pre-computes it first, which takes 20 seconds more each time.
+
 ### What to look at
 
 - In `see`, the rock and its rotation, with its skin. Rename `rock.rmsh` and

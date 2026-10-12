@@ -155,13 +155,14 @@
   - #command("d") ~Clean every shape (remove the duplicated entities).
 
   #inline("Saving")
-  - #command("s") ~Save the library back to *the file it was read from*.
+  - #command("s") ~Save the library in `mod_<file>` (the file read is kept).
   - #command("p") ~Export a sample: one particle per shape, laid out so that the
     library can be opened directly in `see`.
 
-  #note[The usual workflow after a conversion: open the library, press
-  #command("C"), then #command("s"). The simulation then starts without
-  recomputing anything.]
+  #note[The usual workflow after a conversion, without window:
+  #command("shapeSurvey shapes.shp -P shapes.shp") pre-computes the library
+  in place (the keys #command("C") then #command("s") write `mod_shapes.shp`).
+  The simulation then starts without recomputing anything.]
 ])
 
 = `stl2shape`

@@ -51,6 +51,8 @@
       packings.],
     command("shapeSurvey <shapeFile>"), [Inspect and pre-compute a shape
       library.],
+    command("shapeSurvey <f.shp> -P <f.shp>"), [Pre-compute the shapes, without
+      window.],
     command("sweepable [script]"), [Generate a tree of input files for a
       parameter sweep.],
     command("stl2shape -r <R> <f.stl>"), [Convert a *binary* STL into a
