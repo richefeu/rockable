@@ -592,6 +592,15 @@ void Rockable::saveConf(const char* fname) {
   }
 #endif
 
+  // The spring joints, with their stiffness and their length at rest
+  if (!joints.empty()) {
+    conf << "SpringJoints " << joints.size() << '\n';
+    conf << "#ibody ipos0 jbody jpos0 stiffness l0\n";
+    for (const SpringJoint& SJ : joints) {
+      conf << SJ.ibody << ' ' << SJ.ipos0 << ' ' << SJ.jbody << ' ' << SJ.jpos0 << ' ' << SJ.K << ' ' << SJ.l0 << '\n';
+    }
+  }
+
   conf << "Interactions " << activeInteractions.size() << '\n';
   // Lexico-sort before saving
   std::sort(activeInteractions.begin(), activeInteractions.end(), std::less<Interaction*>());
@@ -962,6 +971,27 @@ void Rockable::initParser() {
     SpringJoint SJ(ibody, jbody, ipos0, jpos0);
     SJ.init(Particles, stiffness);
     joints.push_back(SJ);
+  };
+  // The spring joints as saved in the conf-files (the length at rest is not recomputed)
+  parser.kwMap["SpringJoints"] = __DO__(conf) {
+    size_t nb;
+    conf >> nb;
+    joints.clear();
+    for (size_t k = 0; k < nb; ++k) {
+      std::string token;
+      conf >> token;
+      if (token[0] == '#') {  // a commented line
+        getline(conf, token);
+        --k;
+        continue;
+      }
+      size_t ibody = std::stoul(token), jbody;
+      vec3r ipos0, jpos0;
+      conf >> ipos0 >> jbody >> jpos0;
+      SpringJoint SJ(ibody, jbody, ipos0, jpos0);
+      conf >> SJ.K >> SJ.l0;
+      joints.push_back(SJ);
+    }
   };
 
   parser.kwMap["AddOrRemoveInteractions"] = __DO__(conf) {
@@ -2118,24 +2148,28 @@ void Rockable::velocityControlledDrive() {
       case _xrot_Vel_: {
         size_t i = System.controls[c].i;
         vec3r vrot(System.controls[c].value, 0.0, 0.0);
+        Particles[i].vrot.x = System.controls[c].value;  // used by the contacts (velocity at the contact point)
         Particles[i].Q += ((Particles[i].Q.dot(vrot)) *= dt);
         Particles[i].Q.normalize();
       } break;
       case _yrot_Vel_: {
         size_t i = System.controls[c].i;
         vec3r vrot(0.0, System.controls[c].value, 0.0);
+        Particles[i].vrot.y = System.controls[c].value;  // used by the contacts (velocity at the contact point)
         Particles[i].Q += ((Particles[i].Q.dot(vrot)) *= dt);
         Particles[i].Q.normalize();
       } break;
       case _zrot_Vel_: {
         size_t i = System.controls[c].i;
         vec3r vrot(0.0, 0.0, System.controls[c].value);
+        Particles[i].vrot.z = System.controls[c].value;  // used by the contacts (velocity at the contact point)
         Particles[i].Q += ((Particles[i].Q.dot(vrot)) *= dt);
         Particles[i].Q.normalize();
       } break;
       case _xyzrot_Vel_: {
         size_t i = System.controls[c].i;
         vec3r vrot = System.controls[c].vec_value;
+        Particles[i].vrot = vrot;  // used by the contacts (velocity at the contact point)
         Particles[i].Q += ((Particles[i].Q.dot(vrot)) *= dt);
         Particles[i].Q.normalize();
       } break;

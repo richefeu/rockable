@@ -45,7 +45,7 @@ struct ConfSection {
 
 /**
  *  @brief Reads a conf-file from its 'Particles' line on, cut into the sections
- *         Particles, SoftParticles, Interactions and Interfaces. Blank and '#' lines are skipped.
+ *         Particles, SoftParticles, SpringJoints, Interactions and Interfaces. Blank and '#' lines are skipped.
  */
 static bool readConfSections(const std::string& fileName, std::vector<ConfSection>& sections) {
   std::ifstream file(fileName);
@@ -65,7 +65,8 @@ static bool readConfSections(const std::string& fileName, std::vector<ConfSectio
     if (row.empty() || row[0][0] == '#') {
       continue;
     }
-    if (row[0] == "Particles" || row[0] == "SoftParticles" || row[0] == "Interactions" || row[0] == "Interfaces") {
+    if (row[0] == "Particles" || row[0] == "SoftParticles" || row[0] == "SpringJoints" || row[0] == "Interactions" ||
+        row[0] == "Interfaces") {
       sections.push_back({row, {}});
     } else if (!sections.empty()) {
       sections.back().rows.push_back(row);
