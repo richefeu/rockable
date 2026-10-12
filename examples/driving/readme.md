@@ -49,9 +49,16 @@ Control _zrot_Vel_ 0 6.28
 
 which imposes on body `0` an angular velocity of 6.28 rad/s about the `z` axis.
 The plate turns about its centre, and makes one full turn during the second of
-simulation. The sphere is hit at about `t = 0.1 s` and thrown upwards at about
-15 m/s. The two elongated grains are swept along by the plate, then thrown
-away near the end.
+simulation. The sphere is hit at about `t = 0.1 s`, hit again, and thrown away
+at about 15 m/s. The two elongated grains are swept along by the plate, then
+thrown away near the end.
+
+The ends of the plate, 2 m from its centre, move at 12.6 m/s. The list of
+neighbours is rebuilt every `interVerlet = 0.001 s`, so that they travel 1.3 cm
+between two rebuilds, less than `dVerlet = 0.02` (see
+[`helloworldPlus`](../helloworldPlus)). With `interVerlet 0.01`, the plate goes
+into the grains before the contacts are found, and a grain is thrown at more
+than 30 m/s.
 
 The general form of a control is
 

@@ -35,3 +35,6 @@ softParticles/*/lowestCellPos.txt
 softParticles/*/midspan.txt
 softParticles/*/soft.txt
 softParticles/*/stress.txt
+sweepable/simulations/
+sweepable/all_inputs.txt
+sweepable/results.txt

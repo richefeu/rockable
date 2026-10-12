@@ -98,7 +98,7 @@ repository clean during a training day, the folder can also be copied first:
 | #  | Folder                                                 | What it teaches                                                                 | Time    |
 |----|--------------------------------------------------------|---------------------------------------------------------------------------------|---------|
 | 1  | [`helloworld`](helloworld)                             | The input file, the shape file, running a computation, looking at it with `see` | < 1 s   |
-| 1b | [`helloworldPlus`](helloworldPlus)                     | A shape from an STL mesh, the homothety, a spring joint, an expression          | 3 s     |
+| 1b | [`helloworldPlus`](helloworldPlus)                     | A shape from an STL mesh, the homothety, a spring joint, an expression          | 4 s     |
 | 2  | [`driving`](driving)                                   | Driving a body with `drivingSystem.txt`                                          | 1 s     |
 | 3  | [`isoComprSpheres`](isoComprSpheres)                   | Preparing a sample: a box of walls, a servo-controlled isotropic compression     | 20 s    |
 | 4  | [`prepro_cpptools`](prepro_cpptools)                   | Generating shapes and packings with `generator`                                  | short   |
@@ -107,7 +107,7 @@ repository clean during a training day, the folder can also be copied first:
 | 7  | [`isoComprSpheresPeriodic`](isoComprSpheresPeriodic)   | Periodic boundary conditions                                                     | 6 s     |
 | 8  | [`PerioPoly`](PerioPoly)                               | A periodic sample of polyhedra: isotropic compression of the cell              | TBD     |
 | 9  | [`softParticles`](softParticles)                       | Deformable particles (DCEM), bonded cells (`BCM`)                                | 1-5 s   |
-| 10 | [`sweepable`](sweepable)                               | Parametric studies: many computations from one script                            | short   |
+| 10 | [`sweepable`](sweepable)                               | Parametric studies: many computations from one script                            | 10 s    |
 | 11 | [`complexShape`](complexShape)                         | From an STL mesh to a shape: `stl2shape`, `shapeSurvey`                          | short   |
 
 The times are those of the whole computation on a laptop, with one thread.

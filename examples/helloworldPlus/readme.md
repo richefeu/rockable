@@ -28,7 +28,7 @@ Read `helloworld` first.
 ### Run it
 
 ```sh
-rockable input.txt   # about 3 seconds
+rockable input.txt   # about 4 seconds
 see
 ```
 
@@ -42,6 +42,20 @@ dt $2 * 0.5e-6$
 
 The time step is given as an expression between `$`, which is evaluated when
 the file is read (here, `1e-6`). Only `dt` accepts an expression.
+
+```
+interVerlet 0.001
+```
+
+The list of neighbours is rebuilt ten times more often than in `helloworld`.
+Between two rebuilds, no point of a body may travel more than `dVerlet`
+(2 cm here), and the velocity to consider is that of the fastest vertex, the
+rotation included: the tips of the elongated grain and of the rock move much
+faster than their centres. With `interVerlet 0.01`, a tip can cross `dVerlet`
+before the list is rebuilt, and the contact is only found when the two bodies
+already overlap by several millimetres: the huge repulsive force then creates
+energy, and a grain can be thrown up at more than 10 m/s (see the exercises of
+[`sweepable`](../sweepable)).
 
 ```
 Sphere             1 0 1.0      0.3 0.5 0   0 0 0     0 0 0   ...
@@ -67,8 +81,8 @@ second one, which coincide at the start: the spring has a zero length at rest
 and keeps the two spheres together. Unlike a bond, a spring never breaks.
 
 The rock and the pair of spheres fall, collide and roll on the plane. At
-`t = 1 s`, the elongated grain is at rest, while the rock and the spheres are
-still moving.
+`t = 1 s`, the elongated grain and the rock are at rest, while the two spheres
+still roll.
 
 ### What to look at
 

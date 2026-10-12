@@ -4,7 +4,7 @@ Rockable 21-08-2022
 t 0
 tmax 1.0
 dt 1e-6
-interVerlet 0.01
+interVerlet 0.001
 interConf 0.01
 
 #### proximity of the particles #######

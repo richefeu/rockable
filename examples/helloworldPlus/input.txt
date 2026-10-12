@@ -5,7 +5,7 @@ t 0
 tmax 1.0
 # the time step can be written as an expression between $
 dt $2 * 0.5e-6$
-interVerlet 0.01
+interVerlet 0.001
 interConf 0.05
 
 #### proximity of the particles #######
