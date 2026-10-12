@@ -1,10 +1,10 @@
 Rockable 21-08-2022
 
 t 0
-tmax 1.0
+tmax 0.3
 dt 1e-6
 interVerlet 100e-6
-interConf 1000e-6
+interConf 0.01
 
 DVerlet 0.008
 dVerlet 0.001

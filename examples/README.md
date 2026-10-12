@@ -104,7 +104,7 @@ repository clean during a training day, the folder can also be copied first:
 | 4  | [`prepro_cpptools`](prepro_cpptools)                   | Generating shapes and packings with `generator`                                  | short   |
 | 5  | [`DominoFun`](DominoFun)                               | A complete system built with `generator`                                         | TBD     |
 | 6  | [`stickVerticesInClusters`](stickVerticesInClusters)   | Breakable bonds: clusters, the `StickedLinks` law                                | 4 s     |
-| 7  | [`isoComprSpheresPeriodic`](isoComprSpheresPeriodic)   | Periodic boundary conditions                                                     | 20 s    |
+| 7  | [`isoComprSpheresPeriodic`](isoComprSpheresPeriodic)   | Periodic boundary conditions                                                     | 6 s     |
 | 8  | [`PerioPoly`](PerioPoly)                               | A periodic sample of polyhedra: isotropic compression of the cell              | TBD     |
 | 9  | [`softParticles`](softParticles)                       | Deformable particles (DCEM), bonded cells (`BCM`)                                | 1-5 s   |
 | 10 | [`sweepable`](sweepable)                               | Parametric studies: many computations from one script                            | short   |

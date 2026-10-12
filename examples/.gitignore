@@ -26,6 +26,7 @@ isoComprSpheres/xmax.txt
 isoComprSpheres/ymax.txt
 isoComprSpheres/zmax.txt
 isoComprSpheres/phi.txt
+isoComprSpheresPeriodic/phi.txt
 stickVerticesInClusters/plan_up.txt
 stickVerticesInClusters/plan_down.txt
 softParticles/*/damage.txt
