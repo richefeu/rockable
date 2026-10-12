@@ -36,7 +36,9 @@ rockable -c          # deletes the results of the computation
 
 The files written by a computation (`conf0`, `conf1`, ..., `kineticEnergy.txt`,
 `perf.txt`, ...) are ignored by git (see `examples/.gitignore`), so they cannot
-be committed by mistake. `rockable -c` deletes them. To keep the folder of the
+be committed by mistake. `rockable -c` deletes them, except the files written
+by the data extractors and `extractedDataDoc.txt`, which have to be deleted by
+hand. To keep the folder of the
 repository clean during a training day, the folder can also be copied first:
 `cp -r examples/helloworld ~/tuto/`.
 

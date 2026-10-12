@@ -9,10 +9,13 @@ interConf 10000e-6
 DVerlet 0.001
 dVerlet 0.001
 
+# group 0: the six walls, group 1: the spheres
+
 density 0 2700
 density 1 2700
 
 forceLaw Default
+# no gravity: the sample is only loaded by the walls
 gravity 0 0 0
 
 # sphere-wall
@@ -32,8 +35,11 @@ krContact 1 1 1e7
 murContact 1 1 0.0
 
 iconf 0
+# the six walls are driven by the servo of drivingSystem.txt
 nDriven 6
 shapeFile shapes.txt
+
+# The particle lines below are produced by: generator genSample.txt
 
 Particles 131
 
@@ -169,4 +175,5 @@ Sphere 1 122 4.0000000000000001e-03 4.4999999999999998e-02 4.4999999999999998e-0
 Sphere 1 123 4.0000000000000001e-03 4.4999999999999998e-02 4.4999999999999998e-02 3.4999999999999996e-02  0 0 0  0 0 0  1.0000000000000000e+00 0.0000000000000000e+00 0.0000000000000000e+00 0.0000000000000000e+00  0 0 0  0 0 0
 Sphere 1 124 4.0000000000000001e-03 4.4999999999999998e-02 4.4999999999999998e-02 4.4999999999999998e-02  0 0 0  0 0 0  1.0000000000000000e+00 0.0000000000000000e+00 0.0000000000000000e+00 0.0000000000000000e+00  0 0 0  0 0 0
 
+# The spheres 6 to 130 are given a radius between 2 and 4 mm (the shape Sphere has a unit radius)
 homothetyRange 6 130   2.0e-3 4.0e-3  0

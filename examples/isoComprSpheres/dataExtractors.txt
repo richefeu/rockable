@@ -1,0 +1,3 @@
+TrackBody 1 xmax.txt 1000
+TrackBody 3 ymax.txt 1000
+TrackBody 5 zmax.txt 1000

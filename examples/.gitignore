@@ -22,6 +22,9 @@ shot*.tga
 
 # Data extractors of the examples
 helloworld/sphere.txt
+isoComprSpheres/xmax.txt
+isoComprSpheres/ymax.txt
+isoComprSpheres/zmax.txt
 stickVerticesInClusters/plan_up.txt
 stickVerticesInClusters/plan_down.txt
 softParticles/*/damage.txt
