@@ -1,0 +1,9 @@
+# postpro command file: the fragments in the last conf-file, by number of cells
+firstConf 40
+lastConf 40
+stepConf 1
+
+PostProcessor ClusterGranulo
+# classes: 1 cell, 2 to 10, 11 to 100, more than 100
+SievingSizes 4
+1 10 100 1000

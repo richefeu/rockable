@@ -32,6 +32,7 @@ inside the bunny.
 | `dataExtractors.txt` | `TrackDamage`: the broken fraction of the interfaces (`damage.txt`)   |
 | `fragments.sh`       | The number and the sizes of the fragments in a conf-file             |
 | `energies.sh`        | The energy balance of the shot                                       |
+| `granulo.txt`        | The command file of `postpro`: the sizes of the fragments (exercise 6) |
 
 ### Run it
 
@@ -150,6 +151,20 @@ few of them), while the body slides back at less than 1 m/s.
    cells (damage 0.13).
 5. **The ball.** Make it heavier (a radius of 2 cm in `genShapes.txt`), or
    aim at the ears.
+6. **The post-processor `ClusterGranulo`.** `postpro granulo.txt` writes
+   `ClusterGranulo-conf40.txt`: the fraction, in number, of the fragments of
+   1 cell, of 2 to 10, of 11 to 100, and of more than 100 cells (the values of
+   `SievingSizes` are the bounds of the classes):
+
+   ```
+   1 0.858824
+   10 0.117647
+   100 0.0117647
+   1000 0.0117647
+   ```
+
+   It finds 85 fragments, one more than `fragments.sh`: the ball, a particle
+   that is not driven, counts as a fragment of one particle.
 
 ### Going further
 
