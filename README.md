@@ -35,7 +35,7 @@ The use of the code is not interfaced by any tool (like lua, python or any graph
 ### Source tree 
 
 * `sphinxdoc`: user [documentation](https://richefeu.github.io/rockable/) (sphinx with ReStructuredText)
-* `examples`: examples for usage tutorials or for testing features
+* `examples`: the tutorials, with their learning path in [`examples/README.md`](examples/README.md)
 * `prepro`: some pre-processing tools
 * `src`: C++ source files
 * `test`: regression test files
@@ -95,8 +95,10 @@ Here is the non-exhaustive list of involved persons with their main mission:
 
 ## Examples
 
-The folder [`examples`](examples) holds small simulations, most of them written as
-tutorials to be followed in order (see [`examples/README.md`](examples/README.md)).
+**To learn Rockable, start with the [tutorials and their learning path](examples/README.md).**
+
+The folder [`examples`](examples) holds small simulations written as tutorials, to
+be followed in order. Each one has a `readme.md` that explains it, with exercises.
 Each animation links to its example.
 
 <table>
@@ -134,6 +136,8 @@ Each animation links to its example.
 <td colspan="4" align="center"><a href="examples/rockfall"><img src="examples/rockfall/animation.gif" width="560" alt="rockfall"/></a><br/><code>rockfall</code></td>
 </tr>
 </table>
+
+<p align="center"><a href="examples/README.md"><b>All the tutorials, in the order of the learning path</b></a></p>
 
 ## How to install
 
