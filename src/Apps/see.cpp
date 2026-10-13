@@ -1542,12 +1542,13 @@ void drawC2CNormalForce() {
 
     double D = Dmax * fabs(fn / fnMax);
 
-    if (i > box.nDriven && j > box.nDriven) {
+    // the bodies 0 to nDriven-1 are the driven ones
+    if (i >= box.nDriven && j >= box.nDriven) {
       vec3r begin = box.Particles[i].pos;
       vec3r branch = box.Particles[j].pos - begin;
       glShape::tube(begin, branch, D);
     } else {
-      if (i <= box.nDriven) {
+      if (i < box.nDriven) {
         // TODO
       } else {
         // TODO

@@ -50,9 +50,6 @@ class BreakableInterface {
   size_t i{0};  ///< ID-number of the first particle
   size_t j{0};  ///< ID-number of the second particle
 
-  // Be careful not to change the order of the following parameters
-  // because they are accessed in Rockable::setVariableStickParams
-  // with a shift relative to 'kn'
   double kn{0.0};     ///< Embeded kn
   double kt{0.0};     ///< Embeded kt
   double kr{0.0};     ///< Embeded kr
