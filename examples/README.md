@@ -42,8 +42,9 @@ conf-files of the computation (sometimes shortened, or with more conf-files).
 <td align="center"><a href="complexShape"><img src="complexShape/animation.gif" width="200" alt="complexShape"/></a><br/><code>complexShape</code></td>
 </tr>
 <tr>
+<td align="center"><a href="postProcessing"><img src="postProcessing/animation.gif" width="200" alt="postProcessing"/></a><br/><code>postProcessing</code></td>
 <td align="center"><a href="triaxialTest"><img src="triaxialTest/animation.gif" width="200" alt="triaxialTest"/></a><br/><code>triaxialTest</code></td>
-<td colspan="3" align="center"><a href="rockfall"><img src="rockfall/animation.gif" width="560" alt="rockfall"/></a><br/><code>rockfall</code></td>
+<td colspan="2" align="center"><a href="rockfall"><img src="rockfall/animation.gif" width="410" alt="rockfall"/></a><br/><code>rockfall</code></td>
 </tr>
 </table>
 

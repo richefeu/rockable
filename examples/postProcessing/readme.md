@@ -1,5 +1,7 @@
 ## 3b. Post-processing: `postpro`, the conf-files, and ParaView
 
+<p align="center"><img src="animation.gif" alt="animation of the example"/></p>
+
 ### Goal
 
 The sample of [`isoComprSpheres`](../isoComprSpheres) is compressed again,
@@ -116,6 +118,9 @@ points, with the normal force `Fn` and the tangential force `Ft`), and
 
 ### What to look at
 
+- In `see conf60`, the key `F` draws the **force chains**: a tube between the
+  centres of two spheres in contact, as thick as their normal force (the
+  animation above). The key `e` makes the spheres more transparent, `E` less.
 - The solid fraction, the coordination number and the mean stress against
   time:
 

@@ -134,6 +134,11 @@ rockfall() {
   json rockfall '12, -1, 0' '12, 26, 72' '"alpha_fixparticles": 0.6'
   FILTER='crop=iw:400:0:150' WIDTH=560 COLORS=32 LOSSY=80 std rockfall "$X/rockfall" 0.1 10
 }
+postProcessing() {
+  # the force chains: tubes between the centres, as thick as the normal force, in translucent spheres
+  json postProcessing '0.017, 0.017, 0.017' '0.053, 0.047, 0.077' '"show_driven": 0, "show_normal_forces": 1, "alpha_particles": 0.15'
+  FIRST=16 STEP=2 WIDTH=260 COLORS=32 LOSSY=80 std postProcessing "$X/postProcessing" '' ''
+}
 triaxialTest() {
   # the shear only: the compression is run first, and restart.sh builds the input file of the shear
   json triaxialTest '0.026, 0.022, 0.026' '0.094, 0.056, 0.126' '"show_driven": 0'
@@ -184,7 +189,7 @@ dest() {
 }
 ALL="helloworld helloworldPlus driving isoComprSpheres prepro_cpptools DominoFun stickVerticesInClusters
      isoComprSpheresPeriodic PerioPoly softBallImpact softBallImpactVoronoi bondedBeam elasticCube viscousCube
-     sweepable complexShape rockfall triaxialTest"
+     sweepable complexShape rockfall triaxialTest postProcessing"
 
 if [ "$1" = install ]; then
   for e in $ALL; do

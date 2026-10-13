@@ -5,6 +5,7 @@
 # for a while), then makes a light GIF with ffmpeg and gifsicle.
 # Environment:
 #   STEP, LAST     conf-files between two frames (1), last conf-file (all)
+#   FIRST          first conf-file (0)
 #   CMIN, CMAX     fixed colour range (colorMode of see.json)
 #   WIDTH, FPS     width of the GIF in pixels (300), frames per second (12)
 #   FRAMES         number of frames kept (all)
@@ -22,7 +23,7 @@ rm -f frame*.tga
 export AUTOSHOT_STEP=${STEP:-1}
 [ -n "$LAST" ] && export AUTOSHOT_LAST=$LAST
 [ -n "$CMIN" ] && [ -n "$CMAX" ] && export AUTOSHOT_CMIN=$CMIN AUTOSHOT_CMAX=$CMAX
-"$H/see_auto" conf0 > see.log 2>&1
+"$H/see_auto" conf${FIRST:-0} > see.log 2>&1
 # the frames are 768x768: the bottom strip (text zone) is dropped
 F="crop=iw:ih-60:0:0${FILTER:+,$FILTER},scale=${WIDTH:-300}:-1:flags=lanczos"
 ffmpeg -loglevel error -y -framerate "${FPS:-12}" -i frame%04d.tga ${FRAMES:+-frames:v $FRAMES} \
