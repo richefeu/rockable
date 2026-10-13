@@ -141,6 +141,12 @@ Each animation links to its example.
 <td align="center"><a href="examples/bunnyFun/bunnyShot"><img src="examples/bunnyFun/bunnyShot/animation.gif" width="200" alt="bunnyShot"/></a><br/><code>bunnyFun/bunnyShot</code></td>
 <td align="center"><a href="examples/bunnyFun/jellyBunny"><img src="examples/bunnyFun/jellyBunny/animation.gif" width="200" alt="jellyBunny"/></a><br/><code>bunnyFun/jellyBunny</code></td>
 </tr>
+<tr>
+<td align="center"><a href="examples/bunnyFun/voronoiBunny"><img src="examples/bunnyFun/voronoiBunny/animation.gif" width="200" alt="voronoiBunny"/></a><br/><code>bunnyFun/voronoiBunny</code></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
 </table>
 
 <p align="center"><a href="examples/README.md"><b>All the tutorials, in the order of the learning path</b></a></p>

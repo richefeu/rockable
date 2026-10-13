@@ -15,6 +15,7 @@ commands of `generator`.
 | [`bunnyInBunny`](bunnyInBunny) | Bunnies in a bunny: a shape edited into a shell with a hole (`isSurface`), a driven rotation, counting with a ray | 1.5 min (4 threads) |
 | [`bunnyShot`](bunnyShot) | A shot in the head: a bunny cut into glued cubic cells (`generatePacking:grid_clust_inside`, `BCM`), fragments and energy | 45 s (4 threads) |
 | [`jellyBunny`](jellyBunny) | Jelly bunnies: soft particles (DCEM) of three moduli, the stability limit and the viscosity | < 1 s |
+| [`voronoiBunny`](voronoiBunny) | A Voronoi bunny: Neper, `tess2shape`, cells kept inside a shape, the time step of bonded cells | 6 min (4 threads) |
 
 ### The mesh
 

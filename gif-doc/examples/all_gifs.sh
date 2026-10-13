@@ -9,6 +9,7 @@
 #   sh all_gifs.sh install
 #
 # Needs: Rockable built in ../../BUILD, or in the folder given by the variable BIN
+# (voronoiBunny also needs Neper, in the PATH or given by the variable NEPER),
 # (with see), see_auto (build_see_auto.sh),
 # ffmpeg, gifsicle, ImageMagick (magick).
 # Times on a laptop: a few seconds to a few minutes per example, except
@@ -20,6 +21,7 @@ X=$(cd "$H/../../examples" && pwd)
 W=$H/work
 BIN=$(cd "${BIN:-$H/../../BUILD}" && pwd)
 export ROCKABLE=${ROCKABLE:-$BIN/rockable}
+NEPER=${NEPER:-neper}  # for voronoiBunny only
 mkdir -p "$W"
 
 # camera: json <name> '<center>' '<eye>' [extra json]
@@ -177,6 +179,14 @@ jellyBunny() {
   FIRST=95 LAST=165 STEP=1 FPS=14 WIDTH=320 COLORS=24 LOSSY=110 sh "$H/render.sh" "$W/jellyBunny" "$W/jellyBunny.json" "$W/jellyBunny.gif"
   sh "$H/sheet.sh" "$W/jellyBunny" "$W/jellyBunny.png"
 }
+voronoiBunny() {
+  # the same shot as bunnyShot, on a bunny made of 523 Voronoi cells (Neper, tess2shape, keepInside.sh)
+  json voronoiBunny '-0.02, 0.06, 0.02' '0.28, 0.3, 0.45' '"alpha_fixparticles": 0.25'
+  PRE="$BIN/stl2shape -r 0.001 -c -n Bunny -o bunny.shp $X/bunnyFun/bunny.stl > stl2shape.log && $NEPER -T -n 2500 -morpho centroidal -domain 'cube(0.21,0.12,0.18)' -transform 'translate(-0.114,-0.052,-0.081)' -id 1 -o box > neper.log 2>&1 && $BIN/tess2shape command.txt > t2s.log 2>&1 && sh keepInside.sh bunny.shp Bunny 2 cells.txt cells.shp kept.txt kept.shp 2> keep.log && $BIN/generator genShapes.txt > gen.log 2>&1 && sh makeInput.sh > make.log" \
+    JOBS=8 sh "$H/run_example.sh" "$X/bunnyFun/voronoiBunny" "$W/voronoiBunny" '' ''
+  WIDTH=300 COLORS=32 LOSSY=80 sh "$H/render.sh" "$W/voronoiBunny" "$W/voronoiBunny.json" "$W/voronoiBunny.gif"
+  sh "$H/sheet.sh" "$W/voronoiBunny" "$W/voronoiBunny.png"
+}
 postProcessing() {
   # the force chains: tubes between the centres, as thick as the normal force, in translucent spheres
   json postProcessing '0.017, 0.017, 0.017' '0.053, 0.047, 0.077' '"alpha_fixparticles": 0.05, "show_normal_forces": 1, "alpha_particles": 0.15'
@@ -227,13 +237,13 @@ complexShape() {
 dest() {
   case $1 in
     softBallImpact | softBallImpactVoronoi | elasticCube | viscousCube | bondedBeam) echo "$X/softParticles/$1" ;;
-    bunnyPile | bunnyInBunny | bunnyShot | jellyBunny) echo "$X/bunnyFun/$1" ;;
+    bunnyPile | bunnyInBunny | bunnyShot | jellyBunny | voronoiBunny) echo "$X/bunnyFun/$1" ;;
     *) echo "$X/$1" ;;
   esac
 }
 ALL="helloworld helloworldPlus driving isoComprSpheres prepro_cpptools DominoFun stickVerticesInClusters
      isoComprSpheresPeriodic PerioPoly softBallImpact softBallImpactVoronoi bondedBeam elasticCube viscousCube
-     sweepable complexShape rockfall triaxialTest postProcessing fragmentation columnCollapse bunnyPile bunnyInBunny bunnyShot jellyBunny"
+     sweepable complexShape rockfall triaxialTest postProcessing fragmentation columnCollapse bunnyPile bunnyInBunny bunnyShot jellyBunny voronoiBunny"
 
 if [ "$1" = install ]; then
   for e in $ALL; do

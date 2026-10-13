@@ -1,0 +1,8 @@
+tessFileName        box.tess
+inputFileName       cells.txt
+shapesFileName      cells.shp
+MinkowskiRadius     0.0002
+ParticlesGroup      1
+ParticlesCluster    0
+ParticlesHomothety  1.0
+MCnstep             5000

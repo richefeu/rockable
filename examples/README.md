@@ -56,6 +56,12 @@ conf-files of the computation (sometimes shortened, or with more conf-files).
 <td align="center"><a href="bunnyFun/bunnyShot"><img src="bunnyFun/bunnyShot/animation.gif" width="200" alt="bunnyShot"/></a><br/><code>bunnyFun/bunnyShot</code></td>
 <td align="center"><a href="bunnyFun/jellyBunny"><img src="bunnyFun/jellyBunny/animation.gif" width="200" alt="jellyBunny"/></a><br/><code>bunnyFun/jellyBunny</code></td>
 </tr>
+<tr>
+<td align="center"><a href="bunnyFun/voronoiBunny"><img src="bunnyFun/voronoiBunny/animation.gif" width="200" alt="voronoiBunny"/></a><br/><code>bunnyFun/voronoiBunny</code></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
 </table>
 
 
@@ -133,6 +139,7 @@ repository clean during a training day, the folder can also be copied first:
 | 16 | [`bunnyFun/bunnyInBunny`](bunnyFun/bunnyInBunny)    | Bunnies in a bunny: a shape edited into a shell (`isSurface`), a driven rotation  | 1.5 min (4 threads) |
 | 17 | [`bunnyFun/bunnyShot`](bunnyFun/bunnyShot)          | A shot in the head: a shape cut into bonded cells (`grid_clust_inside`), fragments | 45 s (4 threads) |
 | 18 | [`bunnyFun/jellyBunny`](bunnyFun/jellyBunny)        | Jelly bunnies: soft particles (DCEM) on a mesh, their stability and viscosity  | < 1 s   |
+| 19 | [`bunnyFun/voronoiBunny`](bunnyFun/voronoiBunny)    | A Voronoi bunny: Neper and `tess2shape`, the time step of bonded cells           | 6 min (4 threads) |
 
 The times are those of the whole computation on a laptop, with one thread
 unless stated otherwise.
