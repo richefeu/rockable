@@ -4,8 +4,8 @@ Converters
 ==========
 
 Three converters bridge Rockable's shape format and the usual geometry formats.
-They live in ``prepro/converters``. ``stl2shape`` and ``shape2mesh`` are built
-by CMake with ``ROCKABLE_COMPILE_PREPRO``; ``tess2shape`` is not (see below).
+They live in ``prepro/converters``, and are built by CMake with
+``ROCKABLE_COMPILE_PREPRO``.
 
 .. contents::
    :local:
@@ -82,14 +82,16 @@ space-filling grains, of the kind used for the bonded models.
 
    tess2shape command.txt
 
-.. warning::
+The cells are shrunk by the Minkowski radius (each face moves inwards by the
+radius), so that two neighbouring cells touch without overlapping, and can be
+glued by ``stickBCM``. The mass properties of each cell are computed by a
+Monte-Carlo integration of ``MCnstep`` points: most of the time of the
+conversion, about 30 s for 1000 cells with ``20000``.
 
-   ``tess2shape`` is **not built by CMake**: its line is commented out in
-   ``prepro/converters/CMakeLists.txt``. It has its own ``Makefile`` in
-   ``prepro/converters/tess2shape``, which expects ``toofus`` in ``~/toofus``
-   and compiles in C++11; it may need to be updated to build against the
-   current sources of Rockable, which are C++17. The same holds for
-   ``tif2rockable``, in the same folder.
+.. note::
+
+   ``tif2rockable``, in the same folder, is still **not built by CMake** (its
+   line is commented out in ``prepro/converters/CMakeLists.txt``).
 
 The command file is a list of keywords:
 
@@ -135,6 +137,24 @@ Generating the tessellation itself is a Neper matter:
 .. code-block:: sh
 
    neper -T -n 100 -domain "cube(1,1,1)" -o tessel
+
+Neper places its domain at the origin; ``-transform "translate(x,y,z)"`` moves
+it, for instance to surround a shape that will be used as a cookie cutter
+(see ``examples/bunnyFun/voronoiBunny``).
+
+.. warning::
+
+   Neper 5.0.1 crashes with a domain read from a file,
+   ``-domain "file(shape.obj)"``, even for a cube: a non-convex domain cannot
+   be tessellated directly. The tutorial ``voronoiBunny`` tessellates a box,
+   and keeps the cells whose centre is inside the shape.
+
+.. tip::
+
+   Neper is built from its sources (``https://github.com/neperfepx/neper``),
+   with ``gsl`` and ``nlopt``. With GCC 16, which compiles C in C23 by default,
+   the library Scotch that Neper includes needs
+   ``-DCMAKE_C_FLAGS="-std=gnu17 -Wno-incompatible-pointer-types"``.
 
 .. tip::
 
