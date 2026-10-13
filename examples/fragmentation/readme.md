@@ -86,21 +86,21 @@ fraction, in number, of the fragments made of 1, 2, ..., 9 cells, and of 10
 cells or more (the last class):
 
 ```
-1 0.541667
-2 0.208333
-3 0.125
+1 0.58209
+2 0.223881
+3 0.0895522
 4 0
 5 0
 6 0
-7 0.0416667
+7 0
 8 0
-9 0.0138889
-10 0.0694444
+9 0.0447761
+10 0.0597015
 ```
 
-There are 72 fragments (0.0138889 = 1/72): 39 single cells, 15 pairs, 9
-triplets, three fragments of 7 cells, one of 9, and five of 10 cells or more,
-among them the top of the block.
+There are 67 fragments (0.0149254 = 1/67): 39 single cells, 15 pairs, 6
+triplets, three fragments of 9 cells, and four of 10 cells or more, among
+them the top of the block.
 
 **The energy balance.** `energies.sh` reads the cells and the interfaces of
 `conf0` and of `conf20`:
