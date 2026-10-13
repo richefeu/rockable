@@ -134,6 +134,10 @@ rockfall() {
   json rockfall '12, -1, 0' '12, 26, 72' '"alpha_fixparticles": 0.6'
   FILTER='crop=iw:400:0:150' WIDTH=560 COLORS=32 LOSSY=80 std rockfall "$X/rockfall" 0.1 10
 }
+fragmentation() {
+  json fragmentation '0, 0.03, 0' '0.16, 0.13, 0.29' '"alpha_fixparticles": 0.5'
+  WIDTH=260 COLORS=24 LOSSY=100 std fragmentation "$X/fragmentation" 0.00025 ''
+}
 postProcessing() {
   # the force chains: tubes between the centres, as thick as the normal force, in translucent spheres
   json postProcessing '0.017, 0.017, 0.017' '0.053, 0.047, 0.077' '"show_driven": 0, "show_normal_forces": 1, "alpha_particles": 0.15'
@@ -189,7 +193,7 @@ dest() {
 }
 ALL="helloworld helloworldPlus driving isoComprSpheres prepro_cpptools DominoFun stickVerticesInClusters
      isoComprSpheresPeriodic PerioPoly softBallImpact softBallImpactVoronoi bondedBeam elasticCube viscousCube
-     sweepable complexShape rockfall triaxialTest postProcessing"
+     sweepable complexShape rockfall triaxialTest postProcessing fragmentation"
 
 if [ "$1" = install ]; then
   for e in $ALL; do

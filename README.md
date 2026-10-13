@@ -127,7 +127,11 @@ Each animation links to its example.
 <tr>
 <td align="center"><a href="examples/postProcessing"><img src="examples/postProcessing/animation.gif" width="200" alt="postProcessing"/></a><br/><code>postProcessing</code></td>
 <td align="center"><a href="examples/triaxialTest"><img src="examples/triaxialTest/animation.gif" width="200" alt="triaxialTest"/></a><br/><code>triaxialTest</code></td>
-<td colspan="2" align="center"><a href="examples/rockfall"><img src="examples/rockfall/animation.gif" width="410" alt="rockfall"/></a><br/><code>rockfall</code></td>
+<td align="center"><a href="examples/fragmentation"><img src="examples/fragmentation/animation.gif" width="200" alt="fragmentation"/></a><br/><code>fragmentation</code></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="4" align="center"><a href="examples/rockfall"><img src="examples/rockfall/animation.gif" width="560" alt="rockfall"/></a><br/><code>rockfall</code></td>
 </tr>
 </table>
 

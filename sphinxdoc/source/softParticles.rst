@@ -275,3 +275,6 @@ each with a ``readme.md`` that tells what to check:
   with unbreakable or breakable interfaces.
 - ``softBallImpactVoronoi``: the illustration of the DCEM paper, with 200
   Voronoi cells (about 12 minutes).
+
+The tutorial ``examples/fragmentation`` breaks a block of bonded cells, rigid
+or soft, on impact.

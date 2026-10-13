@@ -16,3 +16,6 @@ cmake .. -DROCKABLE_ENABLE_SOFT_PARTICLES=ON
 | `softBallImpactVoronoi` | The same with the 200 Voronoi cells of the DCEM paper                 | 12 min (4 threads) |
 
 Each folder has a `readme.md` that tells what to check in the results.
+
+The tutorial [`fragmentation`](../fragmentation) breaks a block of bonded
+cells (`BCM`) on impact, with rigid or soft cells.
