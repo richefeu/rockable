@@ -158,6 +158,16 @@ damping of the bonds and of the contacts, and by friction.
    only 0.13, and the top of the block flies back up.
 6. Follow the fragmentation in time: `firstConf 0` and `stepConf 2` in
    `fragments.txt` give one file `ClusterGranulo-conf<n>.txt` per conf-file.
+7. Scatter the toughness: add, after `stickBCM`,
+
+   ```
+   setVariableStickParams Gc inner 50 4 0
+   ```
+
+   Each interface now draws its own `Gc` from a Weibull law of scale 50 J/m²
+   and modulus 4 (between 9 and 78 J/m² here, 45 J/m² on average). The weak
+   interfaces break first, and the damage rises to 0.64; with a modulus of 2
+   (a wider scatter), to 0.70. The last `0` makes the draw reproducible.
 
 ### Going further
 
@@ -165,5 +175,5 @@ damping of the bonds and of the contacts, and by friction.
   law, `StickedLinks`, with a force threshold instead of an energy.
 - [`softParticles`](../softParticles): soft cells, a bonded beam, a ball of
   soft cells that can break (`softBallImpact`).
-- `setVariableStickParams` scatters the stiffness or the strength of the
-  interfaces: [preProcessing](https://richefeu.github.io/rockable/preProcessing.html).
+- `setVariableStickParams` scatters the other parameters of the interfaces as
+  well (stiffness, strength): [preProcessing](https://richefeu.github.io/rockable/preProcessing.html).

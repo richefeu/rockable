@@ -110,6 +110,12 @@ one of the sticking commands.
     usual way of introducing a controlled scatter of strength, and hence a
     progressive rather than simultaneous failure.
 
+    ``paramName`` is one of ``kn``, ``kt``, ``kr``, ``fn0``, ``ft0``, ``mom0``,
+    ``power`` and ``Gc`` (the fracture energy of the law ``BCM``). Any other
+    name is reported and changes nothing. The mean of the distribution is
+    ``lambda`` times :math:`\Gamma(1 + 1/m)`, a little less than ``lambda``
+    (0.91 ``lambda`` for :math:`m = 4`).
+
     ``timeSeeded`` set to 1 seeds the random generator on the clock, so that two
     runs differ; set to 0, the same sample is reproduced exactly.
 
@@ -192,7 +198,7 @@ A typical bonded sample
 
    stickVerticesInClusters 0.05
    copyParamsToInterfaces inner
-   setVariableStickParams fn0InnerBond inner 1.0e4 5 0
+   setVariableStickParams fn0 inner 1.0e4 5 0
 
 The sample is glued cluster by cluster, each interface then receives its own
 copy of the parameters, and the tensile strength of the bonds is finally

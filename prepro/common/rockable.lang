@@ -515,7 +515,7 @@ doc: setStiffnessRatioInterfaces [(double) ratio]
   glued interfaces (only for parameters that are embedded in the Interfaces).
 
 [keyword] setVariableStickParams
-doc: setVariableStickParams [(string) paramName] [(string) isInnerStr] [(double) lambda] [(double) m] [(int) timeSeeded]
+doc: setVariableStickParams [(string) paramName: kn, kt, kr, fn0, ft0, mom0, power or Gc] [(string) inner|outer] [(double) lambda] [(double) m] [(int) timeSeeded]
 
 [keyword] randomlyOrientedVelocities
 doc: randomlyOrientedVelocities [(double) velocity]
