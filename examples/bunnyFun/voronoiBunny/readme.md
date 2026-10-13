@@ -2,6 +2,9 @@
 
 <p align="center"><img src="animation.gif" alt="animation of the example"/></p>
 
+> **This tutorial needs an installation of [Neper](https://neper.info)**, a
+> program that is not part of Rockable: see [What is needed](#what-is-needed).
+
 ### Goal
 
 The shot of [`bunnyShot`](../bunnyShot) again, on a bunny made of 523 Voronoi

@@ -139,7 +139,7 @@ repository clean during a training day, the folder can also be copied first:
 | 16 | [`bunnyFun/bunnyInBunny`](bunnyFun/bunnyInBunny)    | Bunnies in a bunny: a shape edited into a shell (`isSurface`), a driven rotation  | 1.5 min (4 threads) |
 | 17 | [`bunnyFun/bunnyShot`](bunnyFun/bunnyShot)          | A shot in the head: a shape cut into bonded cells (`grid_clust_inside`), fragments | 45 s (4 threads) |
 | 18 | [`bunnyFun/jellyBunny`](bunnyFun/jellyBunny)        | Jelly bunnies: soft particles (DCEM) on a mesh, their stability and viscosity  | < 1 s   |
-| 19 | [`bunnyFun/voronoiBunny`](bunnyFun/voronoiBunny)    | A Voronoi bunny: Neper and `tess2shape`, the time step of bonded cells           | 6 min (4 threads) |
+| 19 | [`bunnyFun/voronoiBunny`](bunnyFun/voronoiBunny)    | A Voronoi bunny: Neper and `tess2shape` (**needs Neper**), the time step of bonded cells | 6 min (4 threads) |
 
 The times are those of the whole computation on a laptop, with one thread
 unless stated otherwise.
