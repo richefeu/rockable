@@ -1,0 +1,48 @@
+Rockable 21-08-2022
+
+# A bunny cut into 85 blocks by stl2blocks, glued, standing on a plate, and hit by
+# a steel cannonball rolling at 3 m/s. The parameters of examples/bunnyFun/bunnyShot,
+# with a weaker glue (gcInnerBond). Units: m, kg, s.
+
+t 0
+tmax 0.12
+dt 1e-6
+interVerlet 1e-5
+interConf 0.002
+
+DVerlet 0.002
+dVerlet 0.001
+
+# group 0: the plate, group 1: the blocks, group 2: the cannonball (steel)
+density 0 2700
+density 1 2700
+density 2 7800
+gravity 0 -9.81 0
+
+forceLaw BCM
+
+knContact 0 1 1e7
+en2Contact 0 1 0.1
+ktContact 0 1 1e7
+muContact 0 1 0.5
+knContact 1 1 1e7
+en2Contact 1 1 0.1
+ktContact 1 1 1e7
+muContact 1 1 0.5
+knContact 1 2 1e7
+en2Contact 1 2 0.1
+ktContact 1 2 1e7
+muContact 1 2 0.3
+knContact 0 2 1e7
+en2Contact 0 2 0.1
+ktContact 0 2 1e7
+muContact 0 2 0.3
+
+knInnerBond 1 1 2.5e6
+ktInnerBond 1 1 1e6
+en2InnerBond 1 1 0.5
+gcInnerBond 1 1 15
+
+iconf 0
+nDriven 1
+shapeFile shapes.txt

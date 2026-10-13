@@ -187,6 +187,14 @@ voronoiBunny() {
   WIDTH=300 COLORS=32 LOSSY=80 sh "$H/render.sh" "$W/voronoiBunny" "$W/voronoiBunny.json" "$W/voronoiBunny.gif"
   sh "$H/sheet.sh" "$W/voronoiBunny" "$W/voronoiBunny.png"
 }
+bunnyBlocks() {
+  # the bunny cut into 85 blocks by stl2blocks, standing on the plate, broken by a rolling cannonball
+  json bunnyBlocks '-0.03, 0.06, -0.01' '0.6, 0.36, 0.14' '"alpha_fixparticles": 0.25, "colorMode": 3, "show_colorBar": 0'
+  PRE="sed -i.bak 's|^stlFile .*|stlFile $X/bunnyFun/bunny.stl|' cut.txt && $BIN/stl2blocks cut.txt > s2b.log && $BIN/generator genShapes.txt > gen.log 2>&1 && sh makeInput.sh > make.log" \
+    JOBS=8 sh "$H/run_example.sh" "$X/bunnyFun/bunnyBlocks" "$W/bunnyBlocks" '' ''
+  WIDTH=300 COLORS=48 LOSSY=80 sh "$H/render.sh" "$W/bunnyBlocks" "$W/bunnyBlocks.json" "$W/bunnyBlocks.gif"
+  sh "$H/sheet.sh" "$W/bunnyBlocks" "$W/bunnyBlocks.png"
+}
 postProcessing() {
   # the force chains: tubes between the centres, as thick as the normal force, in translucent spheres
   json postProcessing '0.017, 0.017, 0.017' '0.053, 0.047, 0.077' '"alpha_fixparticles": 0.05, "show_normal_forces": 1, "alpha_particles": 0.15'
@@ -237,13 +245,13 @@ complexShape() {
 dest() {
   case $1 in
     softBallImpact | softBallImpactVoronoi | elasticCube | viscousCube | bondedBeam) echo "$X/softParticles/$1" ;;
-    bunnyPile | bunnyInBunny | bunnyShot | jellyBunny | voronoiBunny) echo "$X/bunnyFun/$1" ;;
+    bunnyPile | bunnyInBunny | bunnyShot | jellyBunny | voronoiBunny | bunnyBlocks) echo "$X/bunnyFun/$1" ;;
     *) echo "$X/$1" ;;
   esac
 }
 ALL="helloworld helloworldPlus driving isoComprSpheres prepro_cpptools DominoFun stickVerticesInClusters
      isoComprSpheresPeriodic PerioPoly softBallImpact softBallImpactVoronoi bondedBeam elasticCube viscousCube
-     sweepable complexShape rockfall triaxialTest postProcessing fragmentation columnCollapse bunnyPile bunnyInBunny bunnyShot jellyBunny voronoiBunny"
+     sweepable complexShape rockfall triaxialTest postProcessing fragmentation columnCollapse bunnyPile bunnyInBunny bunnyShot jellyBunny voronoiBunny bunnyBlocks"
 
 if [ "$1" = install ]; then
   for e in $ALL; do

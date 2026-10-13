@@ -1,0 +1,20 @@
+# The command file of stl2blocks: the bunny (homothety 2, 21 cm long, standing on
+# the plate) cut into blocks, along a tree of cuts
+stlFile          ../bunny.stl
+homothety        2
+translation      0 0.0523 0
+MinkowskiRadius  0.001
+
+# Vertical slices across the bunny, every 3 cm; each slice cut every 3 cm along
+# z; then each piece cut in three, along a tilted direction
+cut root      1 0 0      spacing 0.03 0
+cut root.*    0 0 1      spacing 0.03 0.015
+cut root.*.*  0 1 0.3    number 3
+
+# The parts whose core is smaller than 0.3 cm3 are removed (slivers at the surface)
+minVolume        3e-7
+
+shapesFile       blocks.shp
+inputFile        blocks.txt
+ParticlesGroup   1
+ParticlesCluster 1

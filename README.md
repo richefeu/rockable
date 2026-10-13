@@ -143,7 +143,7 @@ Each animation links to its example.
 </tr>
 <tr>
 <td align="center"><a href="examples/bunnyFun/voronoiBunny"><img src="examples/bunnyFun/voronoiBunny/animation.gif" width="200" alt="voronoiBunny"/></a><br/><code>bunnyFun/voronoiBunny</code></td>
-<td></td>
+<td align="center"><a href="examples/bunnyFun/bunnyBlocks"><img src="examples/bunnyFun/bunnyBlocks/animation.gif" width="200" alt="bunnyBlocks"/></a><br/><code>bunnyFun/bunnyBlocks</code></td>
 <td></td>
 <td></td>
 </tr>
