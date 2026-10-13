@@ -237,9 +237,16 @@ the continuously varying inertial forcing of a sine.
 ``sawtooth_shaker`` (*int*) **body** (*vec3r*) **dir** (*double*) **A** (*double*) **freq** (*double*) **t_ini**
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-``triangle_shaker`` with a settable phase origin ``t_ini``, so that the
-oscillation can be made to start at a chosen time rather than at :math:`t = 0`.
-This is what makes it usable after a deposition stage.
+``triangle_shaker`` with a starting time ``t_ini``: the body stays still until
+``t_ini``, then oscillates. Its displacement is a triangular wave of amplitude
+:math:`A` about its position at ``t_ini``, starting along ``dir``. This is what
+makes it usable after a deposition stage, in the same computation.
+
+.. code-block:: text
+   :caption: drivingSystem.txt
+
+   # body 1 still until t = 0.5 s, then shaken vertically, 2 mm at 20 Hz
+   Servo sawtooth_shaker 1  0 1 0  0.002 20  0.5
 
 
 Ramps

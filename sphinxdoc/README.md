@@ -84,10 +84,12 @@ the following:
 - The numerical damping used the total velocity, not the velocity relative to
   the deformation of a periodic cell. *Fixed.*
 - `sawtooth_shaker` drifted when `t_ini` was not a multiple of the period, and
-  the slope of `ramp` was computed once for the whole run. *Fixed.*
+  moved before `t_ini` (which was only a phase); the slope of `ramp` was
+  computed once for the whole run. *Fixed.*
 - `ParticleStress` built a wrong transverse vector for its columns `a` and `r`
-  (*fixed*), and `ClusterGranulo` classifies the sub-clusters by number of
-  particles, not by size (documented).
+  (*fixed*), and `ClusterGranulo` ignored the values of `SievingSizes`, and
+  classified the sub-clusters by their number of particles minus one. *Fixed*:
+  the values are the bounds of the classes, in number of particles.
 - `conftovtk` copied the file names of the folder into a buffer of 25
   characters. *Fixed.*
 - The `generator` commands were spelt `tranformation:...` in the source. *Fixed*

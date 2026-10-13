@@ -250,7 +250,8 @@ post-processor counts them.
    * - Keyword
      - Description
    * - ``SievingSizes <nb>``
-     - Followed by ``nb`` values, one per class.
+     - Followed by ``nb`` values, in increasing order, one per class: the
+       largest number of particles of a sub-cluster in that class.
 
 .. code-block:: text
    :caption: commands.txt
@@ -267,14 +268,13 @@ The results are written into ``ClusterGranulo-conf<iconf>.txt``, one line per
 class: the value given in ``SievingSizes``, and the fraction (in number) of the
 sub-clusters in that class.
 
-.. warning::
-
-   Despite their name, the values of ``SievingSizes`` are not sizes that the
-   sub-clusters are compared with: they are only written as labels. The class
-   of a sub-cluster is its **number of particles** minus one (a single particle
-   is in the first class, two particles in the second, ...), and the larger
-   sub-clusters all go into the last class. It is therefore a distribution of
-   the number of particles per sub-cluster, not a grain-size distribution.
+A sub-cluster of :math:`n` particles goes into the first class whose value is
+not smaller than :math:`n`, and the sub-clusters larger than the last value go
+into the last class. With ``1 2 3 4 5``, the classes hold the sub-clusters of 1,
+2, 3 and 4 particles, and of 5 particles or more; with ``1 10 100``, the single
+particles, the sub-clusters of 2 to 10 particles, and those of more than 10.
+It is a distribution of the **number of particles** per sub-cluster, not a
+grain-size distribution.
 
 .. note::
 

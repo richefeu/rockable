@@ -214,7 +214,8 @@
       volume, solid fraction, coordination number, stress tensor.
       #command("WallBox <6 walls>") for a box; nothing for a periodic cell.],
     command("ClusterGranulo"), [Size distribution of the (possibly broken)
-      clusters. #command("SievingSizes <nb>") followed by `nb` sieve sizes.],
+      clusters, in number of particles. #command("SievingSizes <nb>") followed by
+      `nb` increasing class bounds (the last class also holds the larger ones).],
   )
 
   #note[`postpro` loads the dumps in interactive mode: the extractors are not

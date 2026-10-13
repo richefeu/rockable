@@ -604,7 +604,9 @@ doc: ConfVolumes [(int) nb]
 [keyword] SievingSizes
 doc: SievingSizes [(int) nb] [(double) size1] [(double) size2] ...
 
-  List of nb sieving sizes used by the ClusterGranulo post-processor.
+  List of nb sieving sizes used by the ClusterGranulo post-processor: the
+  upper bounds, in number of particles, of the classes of sub-clusters
+  (the last class also holds the larger ones).
 
 [keyword] Volume
 doc: Volume [(double) value]
