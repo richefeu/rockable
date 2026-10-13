@@ -214,6 +214,11 @@ explicitly if your model relies on them.</p>
 <code class="docutils literal notranslate"><span class="pre">lambda</span></code> and modulus <code class="docutils literal notranslate"><span class="pre">m</span></code>, independently for each interface. This is the
 usual way of introducing a controlled scatter of strength, and hence a
 progressive rather than simultaneous failure.</p>
+<p><code class="docutils literal notranslate"><span class="pre">paramName</span></code> is one of <code class="docutils literal notranslate"><span class="pre">kn</span></code>, <code class="docutils literal notranslate"><span class="pre">kt</span></code>, <code class="docutils literal notranslate"><span class="pre">kr</span></code>, <code class="docutils literal notranslate"><span class="pre">fn0</span></code>, <code class="docutils literal notranslate"><span class="pre">ft0</span></code>, <code class="docutils literal notranslate"><span class="pre">mom0</span></code>,
+<code class="docutils literal notranslate"><span class="pre">power</span></code> and <code class="docutils literal notranslate"><span class="pre">Gc</span></code> (the fracture energy of the law <code class="docutils literal notranslate"><span class="pre">BCM</span></code>). Any other
+name is reported and changes nothing. The mean of the distribution is
+<code class="docutils literal notranslate"><span class="pre">lambda</span></code> times <span class="math notranslate nohighlight">\(\Gamma(1 + 1/m)\)</span>, a little less than <code class="docutils literal notranslate"><span class="pre">lambda</span></code>
+(0.91 <code class="docutils literal notranslate"><span class="pre">lambda</span></code> for <span class="math notranslate nohighlight">\(m = 4\)</span>).</p>
 <p><code class="docutils literal notranslate"><span class="pre">timeSeeded</span></code> set to 1 seeds the random generator on the clock, so that two
 runs differ; set to 0, the same sample is reproduced exactly.</p>
 </dd>
@@ -288,7 +293,7 @@ Particles 512
 
 stickVerticesInClusters 0.05
 copyParamsToInterfaces inner
-setVariableStickParams fn0InnerBond inner 1.0e4 5 0
+setVariableStickParams fn0 inner 1.0e4 5 0
 </pre></div>
 </div>
 </div>

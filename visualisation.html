@@ -190,7 +190,10 @@ spelt this way in the source.</p></td>
 The soft particles are written with their deformation.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Forces####.vtk</span></code></p></td>
-<td><p>The contact forces.</p></td>
+<td><p>The contact forces, at the contact points: the vectors <code class="docutils literal notranslate"><span class="pre">Fn</span></code> (normal
+force) and <code class="docutils literal notranslate"><span class="pre">Ft</span></code> (tangential force), and <code class="docutils literal notranslate"><span class="pre">MeanRadius</span></code>, which holds,
+along <code class="docutils literal notranslate"><span class="pre">z</span></code>, half the sum of the Minkowski radii of the two bodies (it
+was named <code class="docutils literal notranslate"><span class="pre">F_Fmax</span></code> before October 2026, although it is not a force).</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">OBB####.vtk</span></code></p></td>
 <td><p>The oriented bounding boxes of the particles.</p></td>

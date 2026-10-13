@@ -282,6 +282,21 @@ accepted, so that the old command files keep working.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">transformation:add_rotation</span> <span class="pre">&lt;x&gt;</span> <span class="pre">&lt;y&gt;</span> <span class="pre">&lt;z&gt;</span> <span class="pre">&lt;angle_deg&gt;</span></code></dt><dd><p>Add a rotation around the axis <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y,</span> <span class="pre">z)</span></code> by <code class="docutils literal notranslate"><span class="pre">angle_deg</span></code> degrees.</p>
 </dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The last command written is applied first. To turn a packing about its
+centre and then move it, write the translation <strong>before</strong> the rotation,
+with the packing centred on the origin:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>transformation:add_translation 0 0.056 0
+transformation:add_rotation -1 0 1 54.7356
+</pre></div>
+</div>
+<p>The rotation also turns each particle, but only the <strong>last</strong>
+<code class="docutils literal notranslate"><span class="pre">add_rotation</span></code> does: the orientations are not composed, so a packing that
+needs two rotations should be given a single equivalent one.</p>
+</div>
+<dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">transformation:reset</span></code></dt><dd><p>Reset the transformation to identity (clears both translation and rotation).</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">transformation:reset_translation</span></code></dt><dd><p>Reset only the translation component.</p>
@@ -334,10 +349,13 @@ to <code class="docutils literal notranslate"><span class="pre">group</span></co
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">generatePacking:grid</span> <span class="pre">&lt;name&gt;</span> <span class="pre">&lt;ox&gt;</span> <span class="pre">&lt;oy&gt;</span> <span class="pre">&lt;oz&gt;</span> <span class="pre">&lt;bx&gt;</span> <span class="pre">&lt;by&gt;</span> <span class="pre">&lt;bz&gt;</span> <span class="pre">&lt;nx&gt;</span> <span class="pre">&lt;ny&gt;</span> <span class="pre">&lt;nz&gt;</span> <span class="pre">&lt;group&gt;</span> <span class="pre">&lt;cluster&gt;</span> <span class="pre">&lt;homothety&gt;</span> <span class="pre">&lt;randQ&gt;</span></code></dt><dd><p>Fill a box of size <code class="docutils literal notranslate"><span class="pre">(bx,</span> <span class="pre">by,</span> <span class="pre">bz)</span></code> starting at origin <code class="docutils literal notranslate"><span class="pre">(ox,</span> <span class="pre">oy,</span> <span class="pre">oz)</span></code>
 with a regular <code class="docutils literal notranslate"><span class="pre">nx</span> <span class="pre">×</span> <span class="pre">ny</span> <span class="pre">×</span> <span class="pre">nz</span></code> grid of particles of shape <code class="docutils literal notranslate"><span class="pre">name</span></code>.
-Set <code class="docutils literal notranslate"><span class="pre">randQ</span></code> to <code class="docutils literal notranslate"><span class="pre">1</span></code> for random orientations.</p>
+Set <code class="docutils literal notranslate"><span class="pre">randQ</span></code> to <code class="docutils literal notranslate"><span class="pre">1</span></code> for random orientations. Each particle gets its own
+cluster, numbered from <code class="docutils literal notranslate"><span class="pre">cluster</span></code> upwards, so that the gluing commands
+(<code class="docutils literal notranslate"><span class="pre">stickVerticesInClusters</span></code>, <code class="docutils literal notranslate"><span class="pre">stickBCM</span></code>…) do not glue them together.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">generatePacking:grid_clust</span> <span class="pre">&lt;name&gt;</span> <span class="pre">&lt;ox&gt;</span> <span class="pre">&lt;oy&gt;</span> <span class="pre">&lt;oz&gt;</span> <span class="pre">&lt;bx&gt;</span> <span class="pre">&lt;by&gt;</span> <span class="pre">&lt;bz&gt;</span> <span class="pre">&lt;nx&gt;</span> <span class="pre">&lt;ny&gt;</span> <span class="pre">&lt;nz&gt;</span> <span class="pre">&lt;group&gt;</span> <span class="pre">&lt;cluster&gt;</span> <span class="pre">&lt;homothety&gt;</span> <span class="pre">&lt;randQ&gt;</span></code></dt><dd><p>Same as <code class="docutils literal notranslate"><span class="pre">generatePacking:grid</span></code> but assigns incrementing cluster indices
-to each particle.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">generatePacking:grid_clust</span> <span class="pre">&lt;name&gt;</span> <span class="pre">&lt;ox&gt;</span> <span class="pre">&lt;oy&gt;</span> <span class="pre">&lt;oz&gt;</span> <span class="pre">&lt;bx&gt;</span> <span class="pre">&lt;by&gt;</span> <span class="pre">&lt;bz&gt;</span> <span class="pre">&lt;nx&gt;</span> <span class="pre">&lt;ny&gt;</span> <span class="pre">&lt;nz&gt;</span> <span class="pre">&lt;group&gt;</span> <span class="pre">&lt;cluster&gt;</span> <span class="pre">&lt;homothety&gt;</span> <span class="pre">&lt;randQ&gt;</span></code></dt><dd><p>Same as <code class="docutils literal notranslate"><span class="pre">generatePacking:grid</span></code>, but all the particles get the <strong>same</strong>
+cluster <code class="docutils literal notranslate"><span class="pre">cluster</span></code>: they form one body once glued. See
+<code class="docutils literal notranslate"><span class="pre">examples/fragmentation</span></code>.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">generatePacking:RandomClosePacking</span> <span class="pre">&lt;name&gt;</span> <span class="pre">&lt;boxShape&gt;</span> <span class="pre">&lt;direction&gt;</span> <span class="pre">&lt;bx&gt;</span> <span class="pre">&lt;by&gt;</span> <span class="pre">&lt;bz&gt;</span> <span class="pre">&lt;xOBB&gt;</span> <span class="pre">&lt;yOBB&gt;</span> <span class="pre">&lt;zOBB&gt;</span> <span class="pre">&lt;hmin&gt;</span> <span class="pre">&lt;hmax&gt;</span> <span class="pre">&lt;nbTarget&gt;</span> <span class="pre">&lt;solidFraction&gt;</span> <span class="pre">&lt;group&gt;</span> <span class="pre">&lt;cluster&gt;</span></code></dt><dd><p>Generate a random close packing inside a box of size <code class="docutils literal notranslate"><span class="pre">(bx,</span> <span class="pre">by,</span> <span class="pre">bz)</span></code>.</p>
 <table class="docutils align-default">

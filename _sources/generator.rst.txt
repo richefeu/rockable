@@ -161,6 +161,21 @@ by packing commands when placing particles.
 ``transformation:add_rotation <x> <y> <z> <angle_deg>``
    Add a rotation around the axis ``(x, y, z)`` by ``angle_deg`` degrees.
 
+.. note::
+
+   The last command written is applied first. To turn a packing about its
+   centre and then move it, write the translation **before** the rotation,
+   with the packing centred on the origin:
+
+   .. code-block:: text
+
+      transformation:add_translation 0 0.056 0
+      transformation:add_rotation -1 0 1 54.7356
+
+   The rotation also turns each particle, but only the **last**
+   ``add_rotation`` does: the orientations are not composed, so a packing that
+   needs two rotations should be given a single equivalent one.
+
 ``transformation:reset``
    Reset the transformation to identity (clears both translation and rotation).
 
@@ -226,11 +241,14 @@ Packing Generation
 ``generatePacking:grid <name> <ox> <oy> <oz> <bx> <by> <bz> <nx> <ny> <nz> <group> <cluster> <homothety> <randQ>``
    Fill a box of size ``(bx, by, bz)`` starting at origin ``(ox, oy, oz)``
    with a regular ``nx × ny × nz`` grid of particles of shape ``name``.
-   Set ``randQ`` to ``1`` for random orientations.
+   Set ``randQ`` to ``1`` for random orientations. Each particle gets its own
+   cluster, numbered from ``cluster`` upwards, so that the gluing commands
+   (``stickVerticesInClusters``, ``stickBCM``...) do not glue them together.
 
 ``generatePacking:grid_clust <name> <ox> <oy> <oz> <bx> <by> <bz> <nx> <ny> <nz> <group> <cluster> <homothety> <randQ>``
-   Same as ``generatePacking:grid`` but assigns incrementing cluster indices
-   to each particle.
+   Same as ``generatePacking:grid``, but all the particles get the **same**
+   cluster ``cluster``: they form one body once glued. See
+   ``examples/fragmentation``.
 
 ``generatePacking:RandomClosePacking <name> <boxShape> <direction> <bx> <by> <bz> <xOBB> <yOBB> <zOBB> <hmin> <hmax> <nbTarget> <solidFraction> <group> <cluster>``
    Generate a random close packing inside a box of size ``(bx, by, bz)``.

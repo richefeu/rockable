@@ -72,6 +72,14 @@ force applied to a wall is the target stress times the corresponding area.
    the **free volume** available to the grains, not the distance between the
    wall centres.
 
+.. tip::
+
+   A wall driven by a force keeps its mass: it moves under the difference
+   between the imposed force and the force of the grains. A wall much heavier
+   than the sample oscillates, and the stress it imposes oscillates with it.
+   Giving the walls a small ``density`` (their own group) makes the loading
+   much smoother. The tutorial ``examples/triaxialTest`` shows the difference.
+
 
 ``tritriIsostaticCompression`` (*double*) **pressure**
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
