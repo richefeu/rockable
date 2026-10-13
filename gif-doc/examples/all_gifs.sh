@@ -169,6 +169,14 @@ bunnyShot() {
   WIDTH=300 COLORS=32 LOSSY=80 sh "$H/render.sh" "$W/bunnyShot" "$W/bunnyShot.json" "$W/bunnyShot.gif"
   sh "$H/sheet.sh" "$W/bunnyShot" "$W/bunnyShot.png"
 }
+jellyBunny() {
+  # three soft bunnies (E = 1e6, 3e4, 1e4 Pa) fall on a floor; around the impact, every conf-file
+  json jellyBunny '0, 0.08, 0' '0.06, 0.2, 0.64' '"alpha_fixparticles": 0.3'
+  PRE="$BIN/stl2shape -r 0.002 -c -n Bunny -o bunny.shp $X/bunnyFun/bunny.stl > stl2shape.log && $BIN/shapeSurvey bunny.shp -P bunny.shp > ss.log && $BIN/generator genShapes.txt > gen.log 2>&1 && cat floor.shp bunny.shp > shapes.shp" \
+    sh "$H/run_example.sh" "$X/bunnyFun/jellyBunny" "$W/jellyBunny" '' ''
+  FIRST=95 LAST=165 STEP=1 FPS=14 WIDTH=320 COLORS=24 LOSSY=110 sh "$H/render.sh" "$W/jellyBunny" "$W/jellyBunny.json" "$W/jellyBunny.gif"
+  sh "$H/sheet.sh" "$W/jellyBunny" "$W/jellyBunny.png"
+}
 postProcessing() {
   # the force chains: tubes between the centres, as thick as the normal force, in translucent spheres
   json postProcessing '0.017, 0.017, 0.017' '0.053, 0.047, 0.077' '"alpha_fixparticles": 0.05, "show_normal_forces": 1, "alpha_particles": 0.15'
@@ -219,13 +227,13 @@ complexShape() {
 dest() {
   case $1 in
     softBallImpact | softBallImpactVoronoi | elasticCube | viscousCube | bondedBeam) echo "$X/softParticles/$1" ;;
-    bunnyPile | bunnyInBunny | bunnyShot) echo "$X/bunnyFun/$1" ;;
+    bunnyPile | bunnyInBunny | bunnyShot | jellyBunny) echo "$X/bunnyFun/$1" ;;
     *) echo "$X/$1" ;;
   esac
 }
 ALL="helloworld helloworldPlus driving isoComprSpheres prepro_cpptools DominoFun stickVerticesInClusters
      isoComprSpheresPeriodic PerioPoly softBallImpact softBallImpactVoronoi bondedBeam elasticCube viscousCube
-     sweepable complexShape rockfall triaxialTest postProcessing fragmentation columnCollapse bunnyPile bunnyInBunny bunnyShot"
+     sweepable complexShape rockfall triaxialTest postProcessing fragmentation columnCollapse bunnyPile bunnyInBunny bunnyShot jellyBunny"
 
 if [ "$1" = install ]; then
   for e in $ALL; do
