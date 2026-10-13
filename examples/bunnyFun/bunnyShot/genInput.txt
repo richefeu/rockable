@@ -1,0 +1,63 @@
+# The conf-file (commands of generator): the plate, the ball, and the bunny
+# made of cubic cells
+open input.txt
+print Rockable 21-08-2022
+print t 0
+print tmax 0.02
+print dt 1e-6
+print interVerlet 1e-5
+print interConf 0.0005
+print
+print DVerlet 0.002
+print dVerlet 0.001
+print
+print # group 0: the plate, group 1: the cells, group 2: the ball (steel)
+print density 0 2700
+print density 1 2700
+print density 2 7800
+print gravity 0 -9.81 0
+print
+print forceLaw BCM
+print
+print # contacts plate-cell, cell-cell (once their interface is broken), cell-ball, plate-ball
+print knContact 0 1 1e7
+print en2Contact 0 1 0.1
+print ktContact 0 1 1e7
+print muContact 0 1 0.5
+print knContact 1 1 1e7
+print en2Contact 1 1 0.1
+print ktContact 1 1 1e7
+print muContact 1 1 0.5
+print knContact 1 2 1e7
+print en2Contact 1 2 0.1
+print ktContact 1 2 1e7
+print muContact 1 2 0.3
+print knContact 0 2 1e7
+print en2Contact 0 2 0.1
+print ktContact 0 2 1e7
+print muContact 0 2 0.3
+print
+print # the bonds between the cells (as in examples/fragmentation)
+print knInnerBond 1 1 2.5e6
+print ktInnerBond 1 1 1e6
+print en2InnerBond 1 1 0.5
+print gcInnerBond 1 1 50
+print
+print iconf 0
+print nDriven 1
+print shapeFile shapes.txt
+Particles:placeHolder
+addParticle Platen 0 0 1  0 -0.002 0  1 0 0 0
+# the ball, 20 cm in front of the head, at 60 m/s towards -z (a line written by
+# hand, with its velocity), counted by incrementNoParticles
+print Ball 2 1 1  -0.075 0.05 0.2  0 0 -60  0 0 0  1 0 0 0  0 0 0  0 0 0
+incrementNoParticles 1
+# the cells: a grid of 1 cm cut by the bunny of homothety 2 (21 cm long), all in
+# the cluster 2, lifted by 5 cm so that the lowest cells lie on the plate
+transformation:add_translation 0 0.0505 0
+generatePacking:grid_clust_inside bunny.shp Bunny 2  Cell  -0.12 -0.06 -0.09  0.22 0.14 0.19  22 14 19  1 2 1 0
+print
+print # The cells of the same cluster are glued, face to face
+print stickBCM 1e-4
+close
+

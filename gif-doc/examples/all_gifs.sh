@@ -161,6 +161,14 @@ bunnyInBunny() {
   STEP=2 WIDTH=300 COLORS=32 LOSSY=80 sh "$H/render.sh" "$W/bunnyInBunny" "$W/bunnyInBunny.json" "$W/bunnyInBunny.gif"
   sh "$H/sheet.sh" "$W/bunnyInBunny" "$W/bunnyInBunny.png"
 }
+bunnyShot() {
+  # a steel ball hits the head of a bunny made of 956 glued cubic cells; the plate is transparent
+  json bunnyShot '-0.02, 0.06, 0.02' '0.28, 0.3, 0.45' '"alpha_fixparticles": 0.25'
+  PRE="$BIN/stl2shape -r 0.001 -c -n Bunny -o bunny.shp $X/bunnyFun/bunny.stl > stl2shape.log && $BIN/shapeSurvey bunny.shp -P bunny.shp > ss.log && $BIN/generator genShapes.txt > gen.log 2>&1 && $BIN/generator genInput.txt >> gen.log 2>&1 && $BIN/shape2mesh shapes.txt --rmsh -s > s2m.log" \
+    JOBS=4 sh "$H/run_example.sh" "$X/bunnyFun/bunnyShot" "$W/bunnyShot" '' ''
+  WIDTH=300 COLORS=32 LOSSY=80 sh "$H/render.sh" "$W/bunnyShot" "$W/bunnyShot.json" "$W/bunnyShot.gif"
+  sh "$H/sheet.sh" "$W/bunnyShot" "$W/bunnyShot.png"
+}
 postProcessing() {
   # the force chains: tubes between the centres, as thick as the normal force, in translucent spheres
   json postProcessing '0.017, 0.017, 0.017' '0.053, 0.047, 0.077' '"alpha_fixparticles": 0.05, "show_normal_forces": 1, "alpha_particles": 0.15'
@@ -211,13 +219,13 @@ complexShape() {
 dest() {
   case $1 in
     softBallImpact | softBallImpactVoronoi | elasticCube | viscousCube | bondedBeam) echo "$X/softParticles/$1" ;;
-    bunnyPile | bunnyInBunny) echo "$X/bunnyFun/$1" ;;
+    bunnyPile | bunnyInBunny | bunnyShot) echo "$X/bunnyFun/$1" ;;
     *) echo "$X/$1" ;;
   esac
 }
 ALL="helloworld helloworldPlus driving isoComprSpheres prepro_cpptools DominoFun stickVerticesInClusters
      isoComprSpheresPeriodic PerioPoly softBallImpact softBallImpactVoronoi bondedBeam elasticCube viscousCube
-     sweepable complexShape rockfall triaxialTest postProcessing fragmentation columnCollapse bunnyPile bunnyInBunny"
+     sweepable complexShape rockfall triaxialTest postProcessing fragmentation columnCollapse bunnyPile bunnyInBunny bunnyShot"
 
 if [ "$1" = install ]; then
   for e in $ALL; do

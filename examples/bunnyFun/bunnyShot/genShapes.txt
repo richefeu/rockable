@@ -1,0 +1,9 @@
+# The shapes of the computation (commands of generator)
+open shapes.txt
+# a cube of 1 cm, rounded with a radius of 1 mm: the cells of the bunny
+generateShape:cube Cell 0.001 0.01
+# a plate of 50 x 50 cm, and a ball of 3 cm diameter: the projectile
+generateShape:rectangle_xz Platen 0.002 0.5 0.5
+generateShape:sphere Ball 0.015
+close
+

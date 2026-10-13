@@ -138,7 +138,7 @@ Each animation links to its example.
 <tr>
 <td align="center"><a href="examples/bunnyFun/bunnyPile"><img src="examples/bunnyFun/bunnyPile/animation.gif" width="200" alt="bunnyPile"/></a><br/><code>bunnyFun/bunnyPile</code></td>
 <td align="center"><a href="examples/bunnyFun/bunnyInBunny"><img src="examples/bunnyFun/bunnyInBunny/animation.gif" width="200" alt="bunnyInBunny"/></a><br/><code>bunnyFun/bunnyInBunny</code></td>
-<td></td>
+<td align="center"><a href="examples/bunnyFun/bunnyShot"><img src="examples/bunnyFun/bunnyShot/animation.gif" width="200" alt="bunnyShot"/></a><br/><code>bunnyFun/bunnyShot</code></td>
 <td></td>
 </tr>
 </table>
