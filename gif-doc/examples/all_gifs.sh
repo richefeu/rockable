@@ -152,6 +152,15 @@ bunnyPile() {
   FIRST=10 WIDTH=300 COLORS=32 LOSSY=80 sh "$H/render.sh" "$W/bunnyPile" "$W/bunnyPile.json" "$W/bunnyPile.gif"
   sh "$H/sheet.sh" "$W/bunnyPile" "$W/bunnyPile.png"
 }
+bunnyInBunny() {
+  # the small bunnies fall into the big hollow one through the hole of its back, then the big
+  # bunny rolls over and empties; its shell is transparent, all the bunnies have their skins
+  json bunnyInBunny '0, 0.12, 0.04' '0.42, 0.36, 0.6' '"alpha_fixparticles": 0.25'
+  PRE="$BIN/stl2shape -r 0.001 -c -n Bunny -o bunny.shp $X/bunnyFun/bunny.stl > stl2shape.log && $BIN/shapeSurvey bunny.shp -P bunny.shp > ss.log && $BIN/stl2shape -r 0.001 -c -n BigBunny -o raw.shp $X/bunnyFun/bunny.stl >> stl2shape.log && sh hollow.sh raw.shp big.shp 0.006 0.026 -0.01 0.021 2> hollow.log && $BIN/generator genShapes.txt > gen.log 2>&1 && cat floor.shp big.shp bunny.shp > shapes.shp && $BIN/generator genInput.txt >> gen.log 2>&1 && $BIN/shape2mesh shapes.shp --rmsh -s > s2m.log" \
+    JOBS=4 sh "$H/run_example.sh" "$X/bunnyFun/bunnyInBunny" "$W/bunnyInBunny" '' ''
+  STEP=2 WIDTH=300 COLORS=32 LOSSY=80 sh "$H/render.sh" "$W/bunnyInBunny" "$W/bunnyInBunny.json" "$W/bunnyInBunny.gif"
+  sh "$H/sheet.sh" "$W/bunnyInBunny" "$W/bunnyInBunny.png"
+}
 postProcessing() {
   # the force chains: tubes between the centres, as thick as the normal force, in translucent spheres
   json postProcessing '0.017, 0.017, 0.017' '0.053, 0.047, 0.077' '"alpha_fixparticles": 0.05, "show_normal_forces": 1, "alpha_particles": 0.15'
@@ -202,13 +211,13 @@ complexShape() {
 dest() {
   case $1 in
     softBallImpact | softBallImpactVoronoi | elasticCube | viscousCube | bondedBeam) echo "$X/softParticles/$1" ;;
-    bunnyPile) echo "$X/bunnyFun/$1" ;;
+    bunnyPile | bunnyInBunny) echo "$X/bunnyFun/$1" ;;
     *) echo "$X/$1" ;;
   esac
 }
 ALL="helloworld helloworldPlus driving isoComprSpheres prepro_cpptools DominoFun stickVerticesInClusters
      isoComprSpheresPeriodic PerioPoly softBallImpact softBallImpactVoronoi bondedBeam elasticCube viscousCube
-     sweepable complexShape rockfall triaxialTest postProcessing fragmentation columnCollapse bunnyPile"
+     sweepable complexShape rockfall triaxialTest postProcessing fragmentation columnCollapse bunnyPile bunnyInBunny"
 
 if [ "$1" = install ]; then
   for e in $ALL; do

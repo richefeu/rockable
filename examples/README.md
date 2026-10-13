@@ -52,7 +52,7 @@ conf-files of the computation (sometimes shortened, or with more conf-files).
 </tr>
 <tr>
 <td align="center"><a href="bunnyFun/bunnyPile"><img src="bunnyFun/bunnyPile/animation.gif" width="200" alt="bunnyPile"/></a><br/><code>bunnyFun/bunnyPile</code></td>
-<td></td>
+<td align="center"><a href="bunnyFun/bunnyInBunny"><img src="bunnyFun/bunnyInBunny/animation.gif" width="200" alt="bunnyInBunny"/></a><br/><code>bunnyFun/bunnyInBunny</code></td>
 <td></td>
 <td></td>
 </tr>
@@ -130,6 +130,7 @@ repository clean during a training day, the folder can also be copied first:
 | 13 | [`fragmentation`](fragmentation)                     | Fragmentation: bonded cells (`BCM`), fracture energy, damage, fragments         | 7 s     |
 | 14 | [`columnCollapse`](columnCollapse)                   | Collapse of a granular column: a gate lifted by the servo `ramp`, run-out, `GeoVisc` | 70 s    |
 | 15 | [`bunnyFun/bunnyPile`](bunnyFun/bunnyPile)          | The Stanford bunny: STL to shape, packing any shape with `generatePacking:OBBs`, stabilising a packing | 1 min (4 threads) |
+| 16 | [`bunnyFun/bunnyInBunny`](bunnyFun/bunnyInBunny)    | Bunnies in a bunny: a shape edited into a shell (`isSurface`), a driven rotation  | 1.5 min (4 threads) |
 
 The times are those of the whole computation on a laptop, with one thread
 unless stated otherwise.

@@ -1,0 +1,42 @@
+# The conf-file (commands of generator): the floor, the big hollow bunny, and
+# the small bunnies stacked above its hole by generatePacking:OBBs
+open input.txt
+print Rockable 21-08-2022
+print t 0
+print tmax 3.8
+print dt 5e-5
+print interVerlet 0.001
+print interConf 0.04
+print
+print DVerlet 0.01
+print dVerlet 0.003
+print forceLaw Default
+print AddOrRemoveInteractions OBBtree
+print
+print # group 0: the small bunnies, group 1: the floor and the big bunny
+print density 0 1000
+print density 1 1000
+print knContact 0 0 1e4
+print en2Contact 0 0 0.1
+print ktContact 0 0 1e4
+print muContact 0 0 0.7
+print knContact 0 1 1e4
+print en2Contact 0 1 0.1
+print ktContact 0 1 1e4
+print muContact 0 1 0.3
+print gravity 0 -9.81 0
+print
+print # a strong numerical damping while the small bunnies fall, none after t = 1.4 s
+print Tempo NDCoeff Range 0 1.4 0.7 0
+print
+print shapeFile shapes.shp
+print nDriven 2
+Particles:placeHolder
+addParticle Floor 1 0 1  0 -0.002 0  1 0 0 0
+# the big bunny, 2.5 times larger, its centre 20 cm above the floor
+addParticle BigBunny 1 1 2.5  0 0.2 0  1 0 0 0
+# small bunnies 2.6 to 3.7 cm long, stacked in a cylinder of 5.5 cm diameter
+# above the hole, whose centre is at (0.012, 0.254, -0.031)
+generatePacking:OBBs shapes.shp Bunny CYLINDER STACK Y  -0.0155 0.30 -0.0585  0.055 0.8 0.055  0.25 0.35  400 0.6  0 2  0
+close
+

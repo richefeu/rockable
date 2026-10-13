@@ -12,6 +12,7 @@ commands of `generator`.
 | Folder                   | What it shows                                                                   | Time            |
 |--------------------------|---------------------------------------------------------------------------------|-----------------|
 | [`bunnyPile`](bunnyPile) | A pile of bunnies: from the mesh to the shape, packing any shape with `generatePacking:OBBs`, a tube lifted | 50 s (4 threads) |
+| [`bunnyInBunny`](bunnyInBunny) | Bunnies in a bunny: a shape edited into a shell with a hole (`isSurface`), a driven rotation, counting with a ray | 1.5 min (4 threads) |
 
 ### The mesh
 

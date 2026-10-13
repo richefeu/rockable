@@ -1,0 +1,6 @@
+# The shape of the floor (commands of generator)
+open floor.shp
+# a plate of 1 x 1 m in the plane xz, with a radius of 2 mm
+generateShape:rectangle_xz Floor 0.002 1.0 1.0
+close
+
