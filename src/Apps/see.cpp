@@ -1037,15 +1037,19 @@ void drawParticles() {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_NORMALIZE);  // keep skin-mesh normals unit when a homothety scales them
 
-  // Driven particles (floor, walls) first, so the opaque scene is in the depth
-  // buffer before any transparent grain is blended over it.
-  if (params["show_driven"].get<int>() == 1) {
-    int alpha = (int)floor(params["alpha_fixparticles"].get<GLfloat>() * 255);
+  // Driven particles (floor, walls). When they are opaque, they are drawn first, so
+  // that they are in the depth buffer before any transparent grain is blended over
+  // them. When they are transparent, they are drawn last, without writing depth, so
+  // that the grains inside a container (a tube, a box) can be seen through it.
+  bool showDriven = (params["show_driven"].get<int>() == 1);
+  int alphaDriven = (int)floor(params["alpha_fixparticles"].get<GLfloat>() * 255);
+  bool transparentDriven = (alphaDriven < 254);
+  auto drawDriven = [&]() {
     for (size_t i = 0; i < box.nDriven; ++i) {
       if (selectedParticle >= 0 && i == (size_t)selectedParticle) {
-        glColor4ub(234, 255, 0, alpha);
+        glColor4ub(234, 255, 0, alphaDriven);
       } else {
-        glColor4ub(128, 128, 128, alpha);
+        glColor4ub(128, 128, 128, alphaDriven);
       }
       vec3r pos = box.Particles[i].pos;
       glPushMatrix();
@@ -1055,7 +1059,8 @@ void drawParticles() {
       drawParticleShape(box.Particles[i]);
       glPopMatrix();
     }
-  }
+  };
+  if (showDriven && !transparentDriven) drawDriven();
 
   // Free particles. When they are transparent, draw them back-to-front and stop
   // writing depth, so a nearer grain no longer hides the ones behind it. This is
@@ -1095,6 +1100,12 @@ void drawParticles() {
   }
 
   if (transparent) glDepthMask(GL_TRUE);
+
+  if (showDriven && transparentDriven) {
+    glDepthMask(GL_FALSE);
+    drawDriven();
+    glDepthMask(GL_TRUE);
+  }
 }
 
 void drawTrajectories() {

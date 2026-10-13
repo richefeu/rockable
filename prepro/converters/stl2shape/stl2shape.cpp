@@ -306,8 +306,8 @@ void readStlBin(const char* name, mesh& Mesh) {
 }
 
 // Exportation in shp format (for Rockable)
-void exportShape(mesh& Mesh) {
-  std::ofstream file("mesh.shp");
+void exportShape(mesh& Mesh, const std::string& outputFileName) {
+  std::ofstream file(outputFileName);
   file << "<" << std::endl;
   file << "name " << Mesh.name << std::endl;
   file << "radius " << Mesh.radius << std::endl;
@@ -392,6 +392,8 @@ int main(int argc, char const* argv[]) {
   double radius = 1.0;
   bool clean = false;
   bool scaleRadius = false;
+  std::string shapeName;
+  std::string outputFileName = "mesh.shp";
 
   try {
     TCLAP::CmdLine cmd("Convert a binary STL file to a shape that can be used by Rockable", ' ', "0.3");
@@ -405,6 +407,11 @@ int main(int argc, char const* argv[]) {
                                          false, 0.0, "double");
     TCLAP::SwitchArg cleanArg("c", "clean", "Remove duplicated edges", false);
     TCLAP::SwitchArg scaleRadiusArg("z", "scaleRadius", "Rescale the radius", false);
+    TCLAP::ValueArg<std::string> shapeNameArg("n", "name",
+                                              "Name of the shape (default: the name of the STL file, without its folder)",
+                                              false, "", "string");
+    TCLAP::ValueArg<std::string> outputArg("o", "output", "Name of the output shape file", false, "mesh.shp",
+                                           "string");
 
     cmd.add(nameArg);
     cmd.add(radiusArg);
@@ -412,6 +419,8 @@ int main(int argc, char const* argv[]) {
     cmd.add(maxLengthArg);
     cmd.add(cleanArg);
     cmd.add(scaleRadiusArg);
+    cmd.add(shapeNameArg);
+    cmd.add(outputArg);
 
     cmd.parse(argc, argv);
 
@@ -421,11 +430,17 @@ int main(int argc, char const* argv[]) {
     radius = radiusArg.getValue();
     clean = cleanArg.getValue();
     scaleRadius = scaleRadiusArg.getValue();
+    shapeName = shapeNameArg.getValue();
+    outputFileName = outputArg.getValue();
   } catch (TCLAP::ArgException& e) {
     std::cerr << "error: " << e.error() << " for argument " << e.argId() << std::endl;
   }
 
-  mesh MESH(stlFileName.c_str(), radius);
+  if (shapeName.empty()) {
+    size_t slash = stlFileName.find_last_of("/\\");
+    shapeName = (slash == std::string::npos) ? stlFileName : stlFileName.substr(slash + 1);
+  }
+  mesh MESH(shapeName.c_str(), radius);
   readStlBin(stlFileName.c_str(), MESH);
 
   if (clean == true) {
@@ -444,7 +459,8 @@ int main(int argc, char const* argv[]) {
     rescale(MESH, scaleFactor, scaleRadius);
   }
 
-  exportShape(MESH);
+  exportShape(MESH, outputFileName);
+  std::cout << "Shape '" << shapeName << "' written in " << outputFileName << '\n';
 
   return 0;
 }
