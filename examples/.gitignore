@@ -55,3 +55,8 @@ triaxialTest/shear/triaxial.txt
 fragmentation/damage.txt
 columnCollapse/column.txt
 columnCollapse/deposit.txt
+bunnyFun/*/mesh.shp
+bunnyFun/*/bunny.shp
+bunnyFun/*/walls.shp
+bunnyFun/*/shapes.shp
+bunnyFun/*/input.txt

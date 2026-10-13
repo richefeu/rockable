@@ -143,6 +143,15 @@ columnCollapse() {
   json columnCollapse '0.14, 0.05, 0.025' '0.14, 0.11, 0.42' '"show_driven": 0'
   FIRST=24 FILTER='crop=iw:320:0:190' WIDTH=440 COLORS=24 DITHER=none LOSSY=120 std columnCollapse "$X/columnCollapse" '' ''
 }
+bunnyPile() {
+  # the bunnies fall into the tube, settle, and spread when the tube is lifted (the tube and the floor
+  # are hidden: see draws them in the depth buffer, and they would hide the bunnies inside); with skins
+  json bunnyPile '0, 0.1, 0' '0.3, 0.3, 0.55' '"show_driven": 0'
+  PRE="$BIN/stl2shape -r 0.001 -c $X/bunnyFun/bunny.stl > stl2shape.log && sed 's/^name .*/name Bunny/' mesh.shp > bunny.shp && $BIN/shapeSurvey bunny.shp -P bunny.shp > ss.log && $BIN/generator genShapes.txt > gen.log 2>&1 && cat walls.shp bunny.shp > shapes.shp && $BIN/generator genPile.txt >> gen.log 2>&1 && $BIN/shape2mesh shapes.shp --rmsh -s > s2m.log" \
+    JOBS=4 sh "$H/run_example.sh" "$X/bunnyFun/bunnyPile" "$W/bunnyPile" '' ''
+  FIRST=10 WIDTH=300 COLORS=32 LOSSY=80 sh "$H/render.sh" "$W/bunnyPile" "$W/bunnyPile.json" "$W/bunnyPile.gif"
+  sh "$H/sheet.sh" "$W/bunnyPile" "$W/bunnyPile.png"
+}
 postProcessing() {
   # the force chains: tubes between the centres, as thick as the normal force, in translucent spheres
   json postProcessing '0.017, 0.017, 0.017' '0.053, 0.047, 0.077' '"show_driven": 0, "show_normal_forces": 1, "alpha_particles": 0.15'
@@ -193,12 +202,13 @@ complexShape() {
 dest() {
   case $1 in
     softBallImpact | softBallImpactVoronoi | elasticCube | viscousCube | bondedBeam) echo "$X/softParticles/$1" ;;
+    bunnyPile) echo "$X/bunnyFun/$1" ;;
     *) echo "$X/$1" ;;
   esac
 }
 ALL="helloworld helloworldPlus driving isoComprSpheres prepro_cpptools DominoFun stickVerticesInClusters
      isoComprSpheresPeriodic PerioPoly softBallImpact softBallImpactVoronoi bondedBeam elasticCube viscousCube
-     sweepable complexShape rockfall triaxialTest postProcessing fragmentation columnCollapse"
+     sweepable complexShape rockfall triaxialTest postProcessing fragmentation columnCollapse bunnyPile"
 
 if [ "$1" = install ]; then
   for e in $ALL; do

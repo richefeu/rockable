@@ -135,6 +135,12 @@ Each animation links to its example.
 <tr>
 <td colspan="4" align="center"><a href="examples/rockfall"><img src="examples/rockfall/animation.gif" width="560" alt="rockfall"/></a><br/><code>rockfall</code></td>
 </tr>
+<tr>
+<td align="center"><a href="examples/bunnyFun/bunnyPile"><img src="examples/bunnyFun/bunnyPile/animation.gif" width="200" alt="bunnyPile"/></a><br/><code>bunnyFun/bunnyPile</code></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
 </table>
 
 <p align="center"><a href="examples/README.md"><b>All the tutorials, in the order of the learning path</b></a></p>

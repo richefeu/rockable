@@ -50,6 +50,12 @@ conf-files of the computation (sometimes shortened, or with more conf-files).
 <tr>
 <td colspan="4" align="center"><a href="rockfall"><img src="rockfall/animation.gif" width="560" alt="rockfall"/></a><br/><code>rockfall</code></td>
 </tr>
+<tr>
+<td align="center"><a href="bunnyFun/bunnyPile"><img src="bunnyFun/bunnyPile/animation.gif" width="200" alt="bunnyPile"/></a><br/><code>bunnyFun/bunnyPile</code></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
 </table>
 
 
@@ -123,6 +129,7 @@ repository clean during a training day, the folder can also be copied first:
 | 12 | [`rockfall`](rockfall)                               | A rockfall: a slope, the `Avalanche` law, run-out and `TrackRockfall`            | < 1 s   |
 | 13 | [`fragmentation`](fragmentation)                     | Fragmentation: bonded cells (`BCM`), fracture energy, damage, fragments         | 7 s     |
 | 14 | [`columnCollapse`](columnCollapse)                   | Collapse of a granular column: a gate lifted by the servo `ramp`, run-out, `GeoVisc` | 70 s    |
+| 15 | [`bunnyFun/bunnyPile`](bunnyFun/bunnyPile)          | The Stanford bunny: STL to shape, packing any shape with `generatePacking:OBBs`, stabilising a packing | 1 min (4 threads) |
 
 The times are those of the whole computation on a laptop, with one thread
 unless stated otherwise.

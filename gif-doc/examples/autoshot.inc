@@ -19,6 +19,7 @@ static void autoShot(int) {
   for (int k = 0; k < 3; k++) { textZone.reset(); display(); }  // let the window settle
   do {
     textZone.reset();
+    display();  // twice: the screenshot may read the buffer of the previous frame
     display();
     char name[256];
     snprintf(name, 256, "frame%04d.tga", frame++);
