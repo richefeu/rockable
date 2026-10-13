@@ -42,7 +42,8 @@ conf-files of the computation (sometimes shortened, or with more conf-files).
 <td align="center"><a href="complexShape"><img src="complexShape/animation.gif" width="200" alt="complexShape"/></a><br/><code>complexShape</code></td>
 </tr>
 <tr>
-<td colspan="4" align="center"><a href="rockfall"><img src="rockfall/animation.gif" width="560" alt="rockfall"/></a><br/><code>rockfall</code></td>
+<td align="center"><a href="triaxialTest"><img src="triaxialTest/animation.gif" width="200" alt="triaxialTest"/></a><br/><code>triaxialTest</code></td>
+<td colspan="3" align="center"><a href="rockfall"><img src="rockfall/animation.gif" width="560" alt="rockfall"/></a><br/><code>rockfall</code></td>
 </tr>
 </table>
 
@@ -105,6 +106,7 @@ repository clean during a training day, the folder can also be copied first:
 | 2  | [`driving`](driving)                                   | Driving a body with `drivingSystem.txt`                                          | 1 s     |
 | 3  | [`isoComprSpheres`](isoComprSpheres)                   | Preparing a sample: a box of walls, a servo-controlled isotropic compression     | 20 s    |
 | 3b | [`postProcessing`](postProcessing)                     | After the computation: `postpro` (SampleState), the conf-files, ParaView         | 8 s     |
+| 3c | [`triaxialTest`](triaxialTest)                         | A triaxial test: restarting from a conf-file, peak, dilatancy, critical state  | 40 s    |
 | 4  | [`prepro_cpptools`](prepro_cpptools)                   | Generating shapes and packings with `generator`                                  | 15 min  |
 | 5  | [`DominoFun`](DominoFun)                               | A complete system built with `generator`                                         | 5 min (4 threads) |
 | 6  | [`stickVerticesInClusters`](stickVerticesInClusters)   | Breakable bonds: clusters, the `StickedLinks` law                                | 2 s     |

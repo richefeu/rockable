@@ -125,7 +125,8 @@ Each animation links to its example.
 <td align="center"><a href="examples/complexShape"><img src="examples/complexShape/animation.gif" width="200" alt="complexShape"/></a><br/><code>complexShape</code></td>
 </tr>
 <tr>
-<td colspan="4" align="center"><a href="examples/rockfall"><img src="examples/rockfall/animation.gif" width="560" alt="rockfall"/></a><br/><code>rockfall</code></td>
+<td align="center"><a href="examples/triaxialTest"><img src="examples/triaxialTest/animation.gif" width="200" alt="triaxialTest"/></a><br/><code>triaxialTest</code></td>
+<td colspan="3" align="center"><a href="examples/rockfall"><img src="examples/rockfall/animation.gif" width="560" alt="rockfall"/></a><br/><code>rockfall</code></td>
 </tr>
 </table>
 

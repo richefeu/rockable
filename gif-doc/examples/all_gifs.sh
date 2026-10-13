@@ -134,6 +134,12 @@ rockfall() {
   json rockfall '12, -1, 0' '12, 26, 72' '"alpha_fixparticles": 0.6'
   FILTER='crop=iw:400:0:150' WIDTH=560 COLORS=32 LOSSY=80 std rockfall "$X/rockfall" 0.1 10
 }
+triaxialTest() {
+  # the shear only: the compression is run first, and restart.sh builds the input file of the shear
+  json triaxialTest '0.026, 0.022, 0.026' '0.094, 0.056, 0.126' '"show_driven": 0'
+  sh "$H/run_example.sh" "$X/triaxialTest/compression" "$W/triaxialTest_compression" '' ''
+  PRE="sh restart.sh $W/triaxialTest_compression/conf30" STEP=3 FPS=8 WIDTH=240 COLORS=24 DITHER=none LOSSY=120 std triaxialTest "$X/triaxialTest/shear" '' ''
+}
 complexShape() {
   # the rock of rock.stl spinning freely (the input.txt of the example), drawn twice side by side:
   # with spheres, tubes and slabs (left), and with its skin mesh, rock.rmsh (right)
@@ -178,7 +184,7 @@ dest() {
 }
 ALL="helloworld helloworldPlus driving isoComprSpheres prepro_cpptools DominoFun stickVerticesInClusters
      isoComprSpheresPeriodic PerioPoly softBallImpact softBallImpactVoronoi bondedBeam elasticCube viscousCube
-     sweepable complexShape rockfall"
+     sweepable complexShape rockfall triaxialTest"
 
 if [ "$1" = install ]; then
   for e in $ALL; do

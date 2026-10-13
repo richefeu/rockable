@@ -137,6 +137,8 @@ friction and of the fast compression.
    widens along `x` and `z`, and its solid fraction decreases (it dilates):
    `sh solidFraction.sh conf100` (run in the new folder, with a copy of the
    script) gives about 0.51 at `t = 1.5 s`.
+   The tutorial [`triaxialTest`](../triaxialTest) does this test completely,
+   with the stress-strain curves.
 
 ### Going further
 

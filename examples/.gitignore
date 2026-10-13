@@ -50,3 +50,5 @@ SampleState.txt
 rockfall/sphere.txt
 rockfall/cube.txt
 rockfall/slab.txt
+triaxialTest/shear/input.txt
+triaxialTest/shear/triaxial.txt
