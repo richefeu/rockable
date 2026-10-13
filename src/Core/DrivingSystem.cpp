@@ -484,6 +484,7 @@ void DrivingSystem::read(bool allow_warn) {
         controls.push_back(C);
         ServoFunction = [icontr, dir, A, T, t_ini](Rockable& box) -> void {
           vec3r v = (4.0 * A / T) * dir;
+          if (box.t < t_ini) v.reset();  // the body does not move before t_ini
           double phase = (box.t - t_ini) - std::floor((box.t - t_ini) / T) * T;
           phase /= T;
           if (phase >= 0.25 && phase < 0.75) v *= -1.0;

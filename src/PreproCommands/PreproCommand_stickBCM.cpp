@@ -159,14 +159,13 @@ void stickBCM::exec() {
   }
 
   std::sort(box->activeInteractions.begin(), box->activeInteractions.end(), std::less<Interaction*>());
-  size_t nbInterf = box->Interfaces.size() - box->nDriven;
-  std::cout << "nb interfaces = " << nbInterf<< '\n';
-  std::cout << "                with " << countAddedInteractions / (double)nbInterf << " bond-point per interface"
-            << std::endl;
-  std::cout << "areas:\n";
-  for (auto& interfaceSet : box->Interfaces) {
-    for (auto& interface : interfaceSet) {
-      std::cout << " -> " <<interface.area << '\n';
-    }
+  // The interfaces created here (box->Interfaces holds one set of interfaces per particle)
+  size_t nbInterf = createdInterfaces.size();
+  double totalArea = 0.0;
+  for (BreakableInterface* BI : createdInterfaces) totalArea += BI->area;
+  std::cout << "stickBCM: " << nbInterf << " interfaces created";
+  if (nbInterf > 0) {
+    std::cout << ", with " << countAddedInteractions / (double)nbInterf << " bonds per interface on average";
   }
+  std::cout << ", total area " << totalArea << std::endl;
 }
