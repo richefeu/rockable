@@ -1116,7 +1116,13 @@ void Rockable::initParser() {
       }
       conf >> P.group >> P.cluster >> P.homothety >> P.pos >> P.vel >> P.acc >> P.Q >> P.vrot >> P.arot;
 
-      P.shape = &(Shapes[shapeId[shpName]]);  // Plug to the shape
+      auto foundShape = shapeId.find(shpName);
+      if (foundShape == shapeId.end()) {
+        Logger::error("@Rockable::loadConf, the shape named '{}' is not in the shape library '{}'", shpName,
+                      shapeFile);
+        exit(-1);
+      }
+      P.shape = &(Shapes[foundShape->second]);  // Plug to the shape
       double h = P.homothety;
       P.mass = (h * h * h * P.shape->volume) * properties.get(idDensity, P.group);
       P.inertia = (h * h * P.shape->inertia_mass) * P.mass;
