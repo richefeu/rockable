@@ -48,12 +48,12 @@ driving() {
   WIDTH=320 FPS=15 COLORS=32 LOSSY=60 std driving "$X/driving" 0.01 ''
 }
 isoComprSpheres() {
-  json isoComprSpheres '0.025, 0.025, 0.025' '0.084, 0.0742, 0.1234' '"show_driven": 0'
+  json isoComprSpheres '0.025, 0.025, 0.025' '0.084, 0.0742, 0.1234' '"alpha_fixparticles": 0.15'
   std isoComprSpheres "$X/isoComprSpheres" 0.005 0.25
 }
 prepro_cpptools() {
   # the input file and the shapes are written by generator (genAll.txt)
-  json prepro_cpptools '0.125, 0.125, 0.125' '0.3541, 0.3312, 0.5832' '"show_driven": 0'
+  json prepro_cpptools '0.125, 0.125, 0.125' '0.3541, 0.3312, 0.5832' '"alpha_fixparticles": 0.15'
   PRE="$BIN/generator genAll.txt > gen.log 2>&1" JOBS=4 \
     sh "$H/run_example.sh" "$X/prepro_cpptools" "$W/prepro_cpptools" 0.01 0.3
   LAST=30 FRAMES=30 WIDTH=220 FPS=10 COLORS=12 DITHER=none LOSSY=150 \
@@ -139,8 +139,8 @@ fragmentation() {
   WIDTH=260 COLORS=24 LOSSY=100 std fragmentation "$X/fragmentation" 0.00025 ''
 }
 columnCollapse() {
-  # from the settled column (conf24), without the walls, in a band
-  json columnCollapse '0.14, 0.05, 0.025' '0.14, 0.11, 0.42' '"show_driven": 0'
+  # from the settled column (conf24), translucent walls, in a band
+  json columnCollapse '0.14, 0.05, 0.025' '0.14, 0.11, 0.42' '"alpha_fixparticles": 0.08'
   FIRST=24 FILTER='crop=iw:320:0:190' WIDTH=440 COLORS=24 DITHER=none LOSSY=120 std columnCollapse "$X/columnCollapse" '' ''
 }
 bunnyPile() {
@@ -154,12 +154,12 @@ bunnyPile() {
 }
 postProcessing() {
   # the force chains: tubes between the centres, as thick as the normal force, in translucent spheres
-  json postProcessing '0.017, 0.017, 0.017' '0.053, 0.047, 0.077' '"show_driven": 0, "show_normal_forces": 1, "alpha_particles": 0.15'
+  json postProcessing '0.017, 0.017, 0.017' '0.053, 0.047, 0.077' '"alpha_fixparticles": 0.05, "show_normal_forces": 1, "alpha_particles": 0.15'
   FIRST=16 STEP=2 WIDTH=260 COLORS=32 LOSSY=80 std postProcessing "$X/postProcessing" '' ''
 }
 triaxialTest() {
   # the shear only: the compression is run first, and restart.sh builds the input file of the shear
-  json triaxialTest '0.026, 0.022, 0.026' '0.094, 0.056, 0.126' '"show_driven": 0'
+  json triaxialTest '0.026, 0.022, 0.026' '0.094, 0.056, 0.126' '"alpha_fixparticles": 0.15'
   sh "$H/run_example.sh" "$X/triaxialTest/compression" "$W/triaxialTest_compression" '' ''
   PRE="sh restart.sh $W/triaxialTest_compression/conf30" STEP=3 FPS=8 WIDTH=240 COLORS=24 DITHER=none LOSSY=120 std triaxialTest "$X/triaxialTest/shear" '' ''
 }
