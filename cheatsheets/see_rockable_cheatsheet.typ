@@ -80,7 +80,8 @@
   - #command("n") ~Bodies on/off.
   - #command("d") ~Driven bodies (the solid boundaries) on/off.
   - #command("a / A") ~Decrease / increase the transparency of the driven
-    bodies (step of 0.05).
+    bodies (step of 0.05). Transparent, they are drawn last, so that the
+    bodies inside a container can be seen through it.
   - #command("e / E") ~Decrease / increase the transparency of the free bodies.
   - #command("o") ~Oriented Bounding Boxes on/off.
   - #command("O") ~Enlarge the OBBs by half of the secure distance.

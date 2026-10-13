@@ -13,7 +13,7 @@ drawn by `see`.
 
 ### Notions
 
-- The converter **`stl2shape`**, and the name of the shape it writes
+- The converter **`stl2shape`**, the name of the shape and its file (`-n`, `-o`)
   ([converters](https://richefeu.github.io/rockable/converters.html)).
 - **`shapeSurvey -P`**: the mass properties and the **oriented bounding box**
   (OBB) of a shape ([shapeSurvey](https://richefeu.github.io/rockable/shapeSurvey.html)).
@@ -40,8 +40,7 @@ drawn by `see`.
 ### Run it
 
 ```sh
-stl2shape -r 0.001 -c ../bunny.stl               # writes mesh.shp
-sed 's/^name .*/name Bunny/' mesh.shp > bunny.shp # names the shape Bunny
+stl2shape -r 0.001 -c -n Bunny -o bunny.shp ../bunny.stl  # the shape Bunny
 shapeSurvey bunny.shp -P bunny.shp               # mass properties and OBB
 generator genShapes.txt                          # writes walls.shp
 cat walls.shp bunny.shp > shapes.shp             # the library of shapes
@@ -58,11 +57,11 @@ sh pile.sh conf90    # spread on the floor
 
 **The shape.** `stl2shape` turns the mesh into a sphero-polyhedron of radius
 1 mm (157 vertices, 464 edges once the 177 duplicated ones are removed by
-`-c`, 309 faces). It names the shape after the file, here `../bunny.stl`,
-which is not a convenient name: `sed` renames it `Bunny`. `shapeSurvey -P`
-then computes the volume (136 cm³), the inertia, and the **OBB**, the smallest
-box aligned with the principal axes that holds the whole shape, radius
-included:
+`-c`, 309 faces), named `Bunny` (`-n`; by default, it would be named after
+the file, `bunny.stl`), in the file `bunny.shp` (`-o`; `mesh.shp` by default).
+`shapeSurvey -P` then computes the volume (136 cm³), the inertia, and the
+**OBB**, the smallest box aligned with the principal axes that holds the whole
+shape, radius included:
 
 ```
 obb.extent 5.2513679405519001e-02 3.0797885114754682e-02 4.4848872436893027e-02
@@ -140,8 +139,9 @@ once the tube is gone.
 
 ### What to look at
 
-- In `see`, the tube hides the bunnies that are inside: the key `d` hides the
-  floor and the tube. The keys `+` and `-` go through the conf-files.
+- In `see`, the floor and the tube are transparent, and the bunnies can be seen
+  inside the tube (the keys `a` and `A` change the transparency, the key `d`
+  hides them). The keys `+` and `-` go through the conf-files.
 - `see` finds `shapes.rmsh` next to `shapes.shp`, and draws each body with its
   skin: the bunnies have ears. Without `-s`, `shape2mesh` gives the tube a skin
   of a million triangles (91 MB); with `-s`, the flat parts are merged, and the

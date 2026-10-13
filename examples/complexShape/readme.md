@@ -62,8 +62,9 @@ preCompDone n
 nv 12113
 ```
 
-`stl2shape` always writes `mesh.shp`, hence the `mv`, before converting
-another mesh.
+Without the option `-o`, `stl2shape` writes `mesh.shp`, hence the `mv`, before
+converting another mesh. `stl2shape -r 0.5 -c -o rock.shp -n Rock rock.stl`
+writes `rock.shp` directly, and names the shape `Rock`.
 
 **The pre-computation.** `preCompDone n` means that the volume, the position
 of the mass centre, the inertia and the principal axes of the shape are not
