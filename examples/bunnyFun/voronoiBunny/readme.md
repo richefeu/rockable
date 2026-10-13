@@ -105,7 +105,7 @@ the mesh, which is also the frame of the box. `makeInput.sh` then puts
 together `params.txt`, the plate, the ball and the cells, lifted by 5.15 cm.
 
 **The glue.** `stickBCM 1e-4` finds the faces of the neighbouring cells, and
-glues them: 2781 interfaces, with 5.2 bonds each on average, and 0.159 m² in
+glues them: 2781 interfaces, with 5.2 bonds each on average, and 0.152 m² in
 all. All the cells are glued in
 one piece: the centroidal cells are large enough to keep the ears.
 
@@ -114,18 +114,18 @@ one piece: the centroidal cells are large enough to keep the ears.
 
 ```
 sh fragments.sh conf40
-cells 523, fragments 100, single cells 88
-the largest fragments (cells): 390 7 6 6 6 5
+cells 523, fragments 98, single cells 87
+the largest fragments (cells): 400 6 6 5 4 3
 
 sh energies.sh
 kinetic energy of the ball before the impact   198.486 J
-energy to break all the interfaces              15.865 J
-energy spent in the cracks (conf40)              6.198 J  (3.1% of the kinetic energy)
-kinetic energy left in the ball (conf40)         4.607 J
-kinetic energy of the cells (conf40)            77.365 J
+energy to break all the interfaces              15.207 J
+energy spent in the cracks (conf40)              6.316 J  (3.2% of the kinetic energy)
+kinetic energy left in the ball (conf40)         5.864 J
+kinetic energy of the cells (conf40)            74.591 J
 ```
 
-The damage is 0.39 (0.11 with the cubes), and the body keeps 75% of the
+The damage is 0.42 (0.11 with the cubes), and the body keeps 76% of the
 cells (89% with the cubes). The two bunnies are not made of the same
 material: the stiffness and the strength of the interfaces are given **per
 bond** (`knInnerBond`, `gcInnerBond` per unit area), and the interfaces of the
@@ -140,9 +140,9 @@ with a smaller one:
 ```
 dt       damage   largest fragment
 4e-6     1        1        (the bunny explodes: unstable)
-2e-6     0.53     216
-1e-6     0.39     390
-5e-7     0.38     386
+2e-6     0.59     74
+1e-6     0.42     400
+5e-7     0.42     390
 ```
 
 `1e-6` gives nearly the same result as `5e-7`: it is the largest time step

@@ -304,7 +304,7 @@ outwards, and the holes are closed by fans of triangles. The Stanford bunny of
    mesh, cut by the planes) would overlap once rounded: they are kept together,
    in one block. Small blocks need a small time step: the program gives the
    smallest one. For the bunny of ``examples/bunnyFun`` (homothety 2) cut as
-   above, ``dt 2e-7`` is stable, ``1e-6`` is not. Even so, 30 of its 780
+   above, ``dt 2e-7`` is stable, ``1e-6`` is not. Even so, 29 of its 780
    interfaces (those with fewer than three bonds, where two blocks touch only
    along a sliver) break at the first step.
 
