@@ -100,6 +100,8 @@ The other executables
      - Generate a tree of input files for a parameter sweep.
    * - ``stl2shape -r <R> <f.stl>``
      - Convert a binary STL file into a shape. See :ref:`converters`.
+   * - ``stl2blocks <commandFile>``
+     - Cut a closed STL mesh into blocks (shapes and particles). See :ref:`converters`.
 
 
 Building

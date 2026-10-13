@@ -3,7 +3,7 @@
 Converters
 ==========
 
-Three converters bridge Rockable's shape format and the usual geometry formats.
+Four converters bridge Rockable's shape format and the usual geometry formats.
 They live in ``prepro/converters``, and are built by CMake with
 ``ROCKABLE_COMPILE_PREPRO``.
 
@@ -161,6 +161,156 @@ it, for instance to surround a shape that will be used as a cookie cutter
    Giving every particle the same ``cluster`` makes all the bonds *inner*, which
    is what a single fragmenting solid needs. Distinct clusters make them
    *outer*, for an assembly of separate grains. See :ref:`prePro`.
+
+
+``stl2blocks``: a mesh cut into blocks
+--------------------------------------
+
+Cuts a closed STL mesh (binary or ascii) into blocks along families of parallel
+planes, and writes the blocks as a shape library **and** the matching particle
+list, ready to be glued by ``stickBCM``.
+
+.. code-block:: sh
+
+   stl2blocks command.txt
+
+The cuts form a tree. The whole mesh (the block ``root``) is cut along one
+direction into slabs, numbered ``0``, ``1``, ... along that direction; each slab
+can then be cut along its own direction, with its own spacing of the planes,
+and so on. A block that is not cut any more is a final block (or several, when
+the planes leave several separate parts of the mesh in it).
+
+The Minkowski radius ``R`` is given first, and the blocks are built so that,
+once rounded by ``R``, they fill the mesh and touch each other:
+
+- the faces of the mesh are moved inwards by ``R`` (the *core* of the mesh);
+- each cutting plane removes a slice of thickness ``2R``: the faces of the two
+  blocks on either side of it are ``2R`` apart.
+
+.. code-block:: text
+   :caption: command.txt
+
+   stlFile          ../bunny.stl
+   homothety        2
+   translation      0 0.0515 0
+   MinkowskiRadius  0.001
+
+   cut root      1 0 0      spacing 0.02 0
+   cut root.*    0 1 0.3    spacing 0.02 0.005
+   cut root.*.*  0.2 -0.3 1 number 5
+   cut root.3.*  1 1 1      random 2 3
+
+   shapesFile       blocks.shp
+   inputFile        blocks.txt
+   ParticlesGroup   1
+   ParticlesCluster 1
+   MCnstep          10000
+
+A line ``cut <path> <direction> <planes>`` cuts the blocks whose path matches
+``<path>``: ``root``, ``root.2`` (the slab 2 of ``root``), ``root.2.0``... A
+``*`` matches any slab number; when several lines match a block, the one with
+the fewest ``*`` is used (the last one, if they have as many). Above,
+``root.3.*`` is cut along ``1 1 1``, and the other slabs of the second level
+along ``0.2 -0.3 1``. The direction need not be normalised. The planes are placed
+in one of five ways, along the direction (a position ``p`` is the plane
+``x.u = p``, ``u`` being the normalised direction):
+
+.. list-table::
+   :header-rows: 1
+   :widths: 35 65
+
+   * - Planes
+     - Description
+   * - ``number <n>``
+     - ``n`` slabs of the same thickness, over the extent of the block.
+   * - ``spacing <s> <offset>``
+     - The planes ``offset + k s``: the same planes for all the blocks cut with
+       this line (they line up from one block to the next).
+   * - ``positions <k> <p1> ... <pk>``
+     - ``k`` planes at the given positions.
+   * - ``fractions <k> <f1> ... <fk>``
+     - ``k`` planes at the given fractions (between 0 and 1) of the extent of
+       the block.
+   * - ``random <k> <seed>``
+     - ``k`` planes at random positions in the extent of the block.
+
+Only the planes inside the block are used. The program prints the tree of cuts,
+with the slabs kept (a slab with no part of the mesh is not kept, but the
+numbers of the other slabs do not change), then one line per final block: its
+name, its path, its number of vertices and faces, its volume.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - Keyword
+     - Description
+   * - ``stlFile``
+     - The STL file, binary or ascii.
+   * - ``homothety``, ``translation``
+     - Applied to the mesh before the cuts (and before ``MinkowskiRadius``,
+       which is in the units of the result).
+   * - ``MinkowskiRadius``
+     - Radius of all the blocks (required).
+   * - ``cut``
+     - A cut (see above), one line per rule.
+   * - ``shapesFile``, ``inputFile``
+     - The shape library and the conf-file (the line ``shapeFile`` and the
+       particles) to write (``blocks.shp`` and ``blocks.txt`` by default).
+   * - ``shapeName``
+     - The blocks are named ``<shapeName>_0``, ``<shapeName>_1``...
+       (``block`` by default).
+   * - ``ParticlesGroup``, ``ParticlesCluster``
+     - Group and cluster of all the particles (``0`` by default). The same
+       cluster for all makes all the bonds *inner* (see ``tess2shape``).
+   * - ``MCnstep``
+     - Number of Monte-Carlo points for the mass properties of each block
+       (``20000`` by default).
+   * - ``minVolume``
+     - The parts whose core is smaller than this volume are removed (``0``).
+   * - ``gluePoints``
+     - ``1`` (default) or ``0``: the vertices added for ``stickBCM`` (below).
+
+**The vertices for the glue.** ``stickBCM`` bonds the vertices of two blocks
+that face each other, ``2R`` apart. Two blocks on either side of a plane are
+cut by different later planes, and their vertices do not face each other: a
+cubic grid of cuts gives four bonds per interface, an oblique tree of cuts
+often one or two, and an interface with fewer than three bonds has no area
+(it breaks at once). So the program adds to both blocks the corners of the
+part of the plane they share: the vertices of each one that face the other
+block, and the points where their sides cross. These vertices are in the faces
+of the blocks, and do not change their shapes. The program also prints the area
+of the faces of the cuts, to be compared with the area given by ``stickBCM``.
+
+**Repair of the mesh.** The mesh is checked first: the triangles stuck on the
+mesh by a single side (a *fin*) are removed, the triangles are oriented
+outwards, and the holes are closed by fans of triangles. The Stanford bunny of
+``examples/bunnyFun`` has one fin.
+
+.. warning::
+
+   The parts of the mesh thinner than ``2R`` cannot be represented. Moving the
+   faces inwards by ``R`` is done node by node: on triangles smaller than
+   ``R``, the nodes are moved less, so that no triangle is turned over (the
+   program says how many); the core may then cross itself, and a face of a cut
+   have a crossed outline (the program says so too). Choose ``R`` small
+   compared with the details of the mesh, and with the spacing of the planes:
+   a slab thinner than ``2R`` disappears, and a block whose slabs are all
+   thinner than ``2R`` is not cut.
+
+.. tip::
+
+   Two parts of a block closer than ``2R`` to each other (a thin neck of the
+   mesh, cut by the planes) would overlap once rounded: they are kept together,
+   in one block. Small blocks need a small time step: the program gives the
+   smallest one. For the bunny of ``examples/bunnyFun`` (homothety 2) cut as
+   above, ``dt 2e-7`` is stable, ``1e-6`` is not. Even so, 30 of its 780
+   interfaces (those with fewer than three bonds, where two blocks touch only
+   along a sliver) break at the first step.
+
+The program works on a copy of ``polyhTool.hpp`` of toofus (in its folder),
+extended to polyhedra that are not convex: the cut by a plane gives faces with
+several loops, holes, and concave outlines, triangulated by ear clipping.
 
 
 ``shape2mesh``: from a shape to a surface mesh
