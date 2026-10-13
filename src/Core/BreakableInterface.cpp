@@ -33,8 +33,13 @@
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
+#include <algorithm>
+#include <cmath>
+#include <utility>
+
 #include "BreakableInterface.hpp"
 #include "Interaction.hpp"
+#include "vec2.hpp"
 
 BreakableInterface::BreakableInterface()
     : i(0), j(0), kn(0.0), kt(0.0), kr(0.0), fn0(0.0), ft0(0.0), mom0(0.0), power(2.0), dn0(0.0), isInner(1) {}
@@ -43,8 +48,12 @@ BreakableInterface::BreakableInterface(size_t I, size_t J)
     : i(I), j(J), kn(0.0), kt(0.0), kr(0.0), fn0(0.0), ft0(0.0), mom0(0.0), power(2.0), dn0(0.0), isInner(1) {}
 
 /**
- * @brief Computes the area of the interface from the current positions of its bonds,
- *        with a fan of triangles (the bonds are supposed to be at the corners of a convex polygon)
+ * @brief Computes the area of the interface from the current positions of its bonds
+ *        (the bonds are supposed to be at the corners of a convex polygon).
+ *
+ * The bonds are not created in the order of the corners: they are sorted by their angle
+ * around their centre, in the plane of the interface (normal to the mean normal of the
+ * bonds), and the area is that of the polygon they then make.
  */
 void BreakableInterface::computeAreaFromConcernedBonds() {
   area = 0.0;
@@ -53,11 +62,36 @@ void BreakableInterface::computeAreaFromConcernedBonds() {
     return;  // Not a valid polygon
   }
 
-  const vec3r& p0 = concernedBonds[0]->pos;
-  for (size_t b = 0; b < n; ++b) {
-    size_t c = (b + 1) % n;
-    area += 0.5 * norm(cross(concernedBonds[b]->pos - p0, concernedBonds[c]->pos - p0));
+  vec3r c, normal;
+  for (Interaction* I : concernedBonds) {
+    c += I->pos;
+    normal += (I->n * concernedBonds[0]->n >= 0.0) ? I->n : -I->n;
   }
+  c /= (double)n;
+  if (norm2(normal) == 0.0) {
+    return;
+  }
+  normal.normalize();
+  vec3r e1 = (std::fabs(normal.x) < 0.9) ? cross(normal, vec3r(1.0, 0.0, 0.0)) : cross(normal, vec3r(0.0, 1.0, 0.0));
+  e1.normalize();
+  vec3r e2 = cross(normal, e1);
+
+  std::vector<std::pair<double, vec2r>> corners(n);
+  for (size_t b = 0; b < n; ++b) {
+    vec3r d = concernedBonds[b]->pos - c;
+    vec2r p(d * e1, d * e2);
+    corners[b] = std::make_pair(atan2(p.y, p.x), p);
+  }
+  std::sort(corners.begin(), corners.end(),
+            [](const std::pair<double, vec2r>& a, const std::pair<double, vec2r>& b) { return a.first < b.first; });
+
+  double twiceArea = 0.0;
+  for (size_t b = 0; b < n; ++b) {
+    const vec2r& p = corners[b].second;
+    const vec2r& q = corners[(b + 1) % n].second;
+    twiceArea += p.x * q.y - q.x * p.y;
+  }
+  area = 0.5 * std::fabs(twiceArea);
 }
 
 

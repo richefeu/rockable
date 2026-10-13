@@ -400,7 +400,9 @@ bool Shape::inside(const vec3r& point) {
       for (size_t v = 1; v < face[f].size() - 1; ++v) {
         v2 = vertex[face[f][v]];
         v3 = vertex[face[f][v + 1]];
-        if (geoTool::intersectTriangle(point, vec3r::unit_x(), v1, v2, v3) > 0) {
+        // 1: the ray crosses the triangle (2 is returned for a flat triangle, or a point in
+        // the plane of a triangle parallel to the ray: not a crossing)
+        if (geoTool::intersectTriangle(point, vec3r::unit_x(), v1, v2, v3) == 1) {
           ++(nb_intersect);
           break;
         }

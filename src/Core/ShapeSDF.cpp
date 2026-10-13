@@ -185,7 +185,7 @@ bool ShapeSDF::rayCastInside(const vec3r& x) const {
         for (size_t v = 1; v + 1 < poly.size(); ++v) {
           const vec3r& v2 = shp->vertex[poly[v]];
           const vec3r& v3 = shp->vertex[poly[v + 1]];
-          if (geoTool::intersectTriangle(x, vec3r::unit_x(), v1, v2, v3) > 0) {
+          if (geoTool::intersectTriangle(x, vec3r::unit_x(), v1, v2, v3) == 1) {  // 2: flat triangle, no crossing
             ++nb_intersect;
             break;
           }
