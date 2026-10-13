@@ -45,7 +45,7 @@ conf-files of the computation (sometimes shortened, or with more conf-files).
 <td align="center"><a href="postProcessing"><img src="postProcessing/animation.gif" width="200" alt="postProcessing"/></a><br/><code>postProcessing</code></td>
 <td align="center"><a href="triaxialTest"><img src="triaxialTest/animation.gif" width="200" alt="triaxialTest"/></a><br/><code>triaxialTest</code></td>
 <td align="center"><a href="fragmentation"><img src="fragmentation/animation.gif" width="200" alt="fragmentation"/></a><br/><code>fragmentation</code></td>
-<td></td>
+<td align="center"><a href="columnCollapse"><img src="columnCollapse/animation.gif" width="200" alt="columnCollapse"/></a><br/><code>columnCollapse</code></td>
 </tr>
 <tr>
 <td colspan="4" align="center"><a href="rockfall"><img src="rockfall/animation.gif" width="560" alt="rockfall"/></a><br/><code>rockfall</code></td>
@@ -122,20 +122,10 @@ repository clean during a training day, the folder can also be copied first:
 | 11 | [`complexShape`](complexShape)                         | From an STL mesh to a shape: `stl2shape`, `shapeSurvey`                          | 20 s    |
 | 12 | [`rockfall`](rockfall)                               | A rockfall: a slope, the `Avalanche` law, run-out and `TrackRockfall`            | < 1 s   |
 | 13 | [`fragmentation`](fragmentation)                     | Fragmentation: bonded cells (`BCM`), fracture energy, damage, fragments         | 7 s     |
+| 14 | [`columnCollapse`](columnCollapse)                   | Collapse of a granular column: a gate lifted by the servo `ramp`, run-out, `GeoVisc` | 70 s    |
 
 The times are those of the whole computation on a laptop, with one thread
 unless stated otherwise.
-
-
-## Status of the other folders
-
-These folders are kept for now, but they are **not** tutorials. They will be
-reviewed, and possibly removed.
-
-| Folder                        | Status                                                                                                                                                |
-|-------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`BigForTests`](BigForTests)  | A large bonded sample (23 114 particles, 11 MB) used to test the performance. Its file `input.chai` is **obsolete**: ChaiScript is no longer supported. |
-| [`test_GeoVisc`](test_GeoVisc)| A test of the force law `GeoVisc` (2 758 particles), without explanations. To be reviewed.                                                            |
 
 
 ## How each example is documented

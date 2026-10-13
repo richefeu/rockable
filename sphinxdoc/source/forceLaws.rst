@@ -437,6 +437,8 @@ the normal force as the reference:
 Because the tangential force has no memory, ``ktContact`` is not used by this
 law: a body at rest carries no tangential force, and the model cannot sustain a
 static shear. It is meant for creeping motion, not for equilibrium.
+The exercise 4 of the tutorial ``examples/columnCollapse`` shows it: a deposit
+that would stop with ``Default`` keeps creeping with ``GeoVisc``.
 
 Moment vector
 ^^^^^^^^^^^^^

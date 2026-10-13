@@ -138,6 +138,11 @@ fragmentation() {
   json fragmentation '0, 0.03, 0' '0.16, 0.13, 0.29' '"alpha_fixparticles": 0.5'
   WIDTH=260 COLORS=24 LOSSY=100 std fragmentation "$X/fragmentation" 0.00025 ''
 }
+columnCollapse() {
+  # from the settled column (conf24), without the walls, in a band
+  json columnCollapse '0.14, 0.05, 0.025' '0.14, 0.11, 0.42' '"show_driven": 0'
+  FIRST=24 FILTER='crop=iw:320:0:190' WIDTH=440 COLORS=24 DITHER=none LOSSY=120 std columnCollapse "$X/columnCollapse" '' ''
+}
 postProcessing() {
   # the force chains: tubes between the centres, as thick as the normal force, in translucent spheres
   json postProcessing '0.017, 0.017, 0.017' '0.053, 0.047, 0.077' '"show_driven": 0, "show_normal_forces": 1, "alpha_particles": 0.15'
@@ -193,7 +198,7 @@ dest() {
 }
 ALL="helloworld helloworldPlus driving isoComprSpheres prepro_cpptools DominoFun stickVerticesInClusters
      isoComprSpheresPeriodic PerioPoly softBallImpact softBallImpactVoronoi bondedBeam elasticCube viscousCube
-     sweepable complexShape rockfall triaxialTest postProcessing fragmentation"
+     sweepable complexShape rockfall triaxialTest postProcessing fragmentation columnCollapse"
 
 if [ "$1" = install ]; then
   for e in $ALL; do

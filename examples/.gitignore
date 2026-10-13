@@ -53,3 +53,5 @@ rockfall/slab.txt
 triaxialTest/shear/input.txt
 triaxialTest/shear/triaxial.txt
 fragmentation/damage.txt
+columnCollapse/column.txt
+columnCollapse/deposit.txt
