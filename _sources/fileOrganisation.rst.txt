@@ -33,6 +33,9 @@ Some preprocessing applications.
   - 📁 ``shape2mesh``
     Builds the skin mesh (``.rmsh``) of the shapes, used by ``see`` to draw them.
 
+  - 📁 ``stl2blocks``
+    Cuts a closed STL mesh into blocks (shapes and particles), along planes.
+
   - 📁 ``stl2shape``
     Converter for STL files to shape format.
 
