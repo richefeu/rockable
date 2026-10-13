@@ -42,7 +42,6 @@
 #include <locale>
 #include <string>
 
-#include "OBBpacker.hpp"
 #include "kwParser.hpp"
 #include "message.hpp"
 #include "nanoExprParser.hpp"
@@ -57,6 +56,7 @@ int NumberOfParticles = 0;
 std::streampos Np_pos = std::streampos(0);
 
 #include "addParticle.hpp"
+#include "generatePacking_OBBs.hpp"
 #include "generatePacking_grid.hpp"
 #include "generatePacking_wallBox.hpp"
 
@@ -353,6 +353,51 @@ void readCommands(const char* name) {
     std::cerr << "@generatePacking:grid_clust, Number of added bodies: " << nbAdded << '\n';
   };
 
+  // Random sequential packing of the oriented bounding boxes (OBB) of a shape, then
+  // replaced by the particles (see generatePacking_OBBs.hpp)
+  // generatePacking:OBBs shapes.txt Bunny,Cube CUBOID STACK Y  0 0 0  0.2 0 0.2  0.8 1.2  500 0.4  0 0  0
+  parser.kwMap["generatePacking:OBBs"] = __DO__(com) {
+    std::string shapeFile;
+    std::string names;
+    std::string boxShape;
+    std::string mode;
+    std::string direction;
+    vec3r origBox;
+    vec3r boxSize;
+    double homothety_min;
+    double homothety_max;
+    size_t nbTarget;
+    double solidFractionTarget;
+    int group;
+    int clust;
+    unsigned int seed;
+    com >> shapeFile >> names >> boxShape >> mode >> direction >> origBox >> boxSize >> homothety_min >>
+        homothety_max >> nbTarget >> solidFractionTarget >> group >> clust >> seed;
+
+    std::vector<OBBPackShape> shapes;
+    std::istringstream nameList(names);
+    std::string name;
+    while (std::getline(nameList, name, ',')) {
+      OBBPackShape S;
+      if (readOBBPackShape(shapeFile.c_str(), name, S)) {
+        shapes.push_back(S);
+      }
+    }
+    if (shapes.empty()) {
+      std::cerr << msg::warn() << "@generatePacking:OBBs, no shape: nothing is generated" << msg::normal() << '\n';
+      return;
+    }
+
+    int axis = (direction == "X") ? 0 : ((direction == "Z") ? 2 : 1);
+    int packMode = (mode == "STACK") ? OBBPACK_STACK : OBBPACK_RANDOM;
+    int containerType = (boxShape == "CYLINDER") ? 1 : 0;
+    int nbAdded = generatePacking_OBBs(*outputStream, shapes, containerType, packMode, axis, origBox, boxSize,
+                                       homothety_min, homothety_max, nbTarget, solidFractionTarget, group, clust, seed);
+    NumberOfParticles += nbAdded;
+  };
+
+  // The former form: the OBB is given by its sizes, and is supposed to be centred on the particle and
+  // aligned with its axes. All the particles are in the same cluster.
   parser.kwMap["generatePacking:RandomClosePacking"] = __DO__(com) {
     std::string name;
     std::string boxShape;
@@ -371,38 +416,20 @@ void readCommands(const char* name) {
     com >> name >> boxShape >> direction >> boxSize >> xOBB >> yOBB >> zOBB >> homothety_min >> homothety_max >>
         nbTarget >> solidFractionTarget >> group >> clust;
 
-    OBBPacker packer;
-    packer.setOBBDimensions(xOBB, yOBB, zOBB);
-    packer.setHomothetyRange(homothety_min, homothety_max);
-    packer.setNbOBBsTarget(nbTarget);
-    packer.setSolidFractionTarget(solidFractionTarget);
-    packer.setContainerLength(boxSize.x, boxSize.y, boxSize.z);
-    if (boxShape == "CYLINDER") {
-      packer.setContainerType(OBBPacker::CYLINDER);
-    } else {
-      packer.setContainerType(OBBPacker::CUBOID);
-    }
-    if (direction == "X") {
-      packer.setPackingDirection(OBBPacker::X);
-    } else if (direction == "Y") {
-      packer.setPackingDirection(OBBPacker::Y);
-    } else if (direction == "Z") {
-      packer.setPackingDirection(OBBPacker::Z);
-    }
+    OBBPackShape S;
+    S.name = name;
+    S.e[0].set(1.0, 0.0, 0.0);
+    S.e[1].set(0.0, 1.0, 0.0);
+    S.e[2].set(0.0, 0.0, 1.0);
+    S.extent.set(0.5 * xOBB, 0.5 * yOBB, 0.5 * zOBB);
+    std::vector<OBBPackShape> shapes(1, S);
 
-    std::vector<OBB> obbs;
-    packer.pack(obbs);
-    packer.sort(obbs);
-
-    for (size_t i = 0; i < obbs.size(); i++) {
-      double homothety = 2.0 * obbs[i].extent.x / xOBB;
-      quat angularPosition = obbs[i].getQuaternion();
-      vec3r position = obbs[i].center;  // Ok only if the particle center is the obb center
-      addParticle(*outputStream, name.c_str(), group, clust, homothety, position, angularPosition);
-    }
-
-    std::cerr << "@generatePacking:RandomClosePacking, Number of added bodies: " << obbs.size() << '\n';
-    NumberOfParticles += (int)(obbs.size());
+    int axis = (direction == "X") ? 0 : ((direction == "Y") ? 1 : 2);
+    int containerType = (boxShape == "CYLINDER") ? 1 : 0;
+    int nbAdded =
+        generatePacking_OBBs(*outputStream, shapes, containerType, OBBPACK_RANDOM, axis, vec3r(0.0, 0.0, 0.0), boxSize,
+                             homothety_min, homothety_max, nbTarget, solidFractionTarget, group, clust, 143502, true);
+    NumberOfParticles += nbAdded;
   };
 
   // This single line actually parses the file
