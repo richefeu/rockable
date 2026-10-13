@@ -387,7 +387,8 @@ post-processor counts them.</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SievingSizes</span> <span class="pre">&lt;nb&gt;</span></code></p></td>
-<td><p>Followed by <code class="docutils literal notranslate"><span class="pre">nb</span></code> values, one per class.</p></td>
+<td><p>Followed by <code class="docutils literal notranslate"><span class="pre">nb</span></code> values, in increasing order, one per class: the
+largest number of particles of a sub-cluster in that class.</p></td>
 </tr>
 </tbody>
 </table>
@@ -406,15 +407,13 @@ SievingSizes 5
 <p>The results are written into <code class="docutils literal notranslate"><span class="pre">ClusterGranulo-conf&lt;iconf&gt;.txt</span></code>, one line per
 class: the value given in <code class="docutils literal notranslate"><span class="pre">SievingSizes</span></code>, and the fraction (in number) of the
 sub-clusters in that class.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Despite their name, the values of <code class="docutils literal notranslate"><span class="pre">SievingSizes</span></code> are not sizes that the
-sub-clusters are compared with: they are only written as labels. The class
-of a sub-cluster is its <strong>number of particles</strong> minus one (a single particle
-is in the first class, two particles in the second, …), and the larger
-sub-clusters all go into the last class. It is therefore a distribution of
-the number of particles per sub-cluster, not a grain-size distribution.</p>
-</div>
+<p>A sub-cluster of <span class="math notranslate nohighlight">\(n\)</span> particles goes into the first class whose value is
+not smaller than <span class="math notranslate nohighlight">\(n\)</span>, and the sub-clusters larger than the last value go
+into the last class. With <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">2</span> <span class="pre">3</span> <span class="pre">4</span> <span class="pre">5</span></code>, the classes hold the sub-clusters of 1,
+2, 3 and 4 particles, and of 5 particles or more; with <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">10</span> <span class="pre">100</span></code>, the single
+particles, the sub-clusters of 2 to 10 particles, and those of more than 10.
+It is a distribution of the <strong>number of particles</strong> per sub-cluster, not a
+grain-size distribution.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The sub-clusters are identified from the interfaces that are still intact,

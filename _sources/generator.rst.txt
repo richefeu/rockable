@@ -250,8 +250,108 @@ Packing Generation
    cluster ``cluster``: they form one body once glued. See
    ``examples/fragmentation``.
 
+``generatePacking:grid_inside <shapeFile> <cutter> <cutterHomothety> <name> <ox> <oy> <oz> <bx> <by> <bz> <nx> <ny> <nz> <group> <cluster> <homothety> <randQ>``
+   Same as ``generatePacking:grid``, but a shape is used as a cookie cutter:
+   only the positions of the grid that are inside the shape ``cutter`` of the
+   file ``shapeFile`` are kept. The cutter is placed at the origin, in the frame
+   of its shape file, and scaled by ``cutterHomothety``; the grid is given in
+   the same frame, and the transformation, if any, is applied afterwards to the
+   positions kept. The faces of the cutter must form a closed surface (its
+   radius is not taken into account). A position is inside when rays cast from
+   it cross the faces an odd number of times.
+
+   .. code-block:: text
+
+      # cubes of 1 cm filling a bunny of homothety 2
+      generatePacking:grid_inside shapes.txt Bunny 2  Cell  -0.12 -0.06 -0.09  0.22 0.14 0.19  22 14 19  1 0 1 0
+
+``generatePacking:grid_clust_inside <...>``
+   Same arguments, but all the particles get the same cluster, as with
+   ``generatePacking:grid_clust``: once glued, they form one body with the
+   shape of the cutter. See ``examples/bunnyFun/bunnyShot``.
+
+``generatePacking:OBBs <shapeFile> <names> <container> <mode> <axis> <ox> <oy> <oz> <bx> <by> <bz> <hmin> <hmax> <nb> <solidFraction> <group> <cluster> <seed>``
+   Pack particles of any shape in a container, without overlap, so that a
+   computation starts from a rather dense state. The oriented bounding boxes
+   (OBB) of the particles are placed one by one, with a random orientation,
+   until they overlap no other box; each box is then replaced by the particle
+   it bounds. The packing still has to be stabilised by a computation (under
+   gravity, or by moving the walls).
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 25 75
+
+      * - Parameter
+        - Description
+      * - ``shapeFile``
+        - The shape file where the OBB of each shape is read (``obb.extent``,
+          ``obb.center``, ``obb.e1``, ``obb.e2``, ``obb.e3``). The shapes must be
+          pre-computed (``preCompDone y``): run ``shapeSurvey`` first (see
+          :ref:`shapeSurvey`).
+      * - ``names``
+        - The name of a shape, or several names separated by commas, without
+          spaces (``Bunny,Cube``): each particle is then given one of them at
+          random.
+      * - ``container``
+        - ``CUBOID``, or ``CYLINDER`` along ``axis`` (an elliptic one if its two
+          transverse sizes differ).
+      * - ``mode``
+        - ``RANDOM``: each box is put anywhere in the container, the largest
+          first (random sequential addition, as ``TubePacker``). ``STACK``: each
+          box is tried 20 times, with a random orientation and a random
+          transverse position, and goes down along ``axis`` to the lowest place
+          where it overlaps no other box; the lowest trial is kept. The boxes
+          are stacked from the bottom of the container.
+      * - ``axis``
+        - ``X``, ``Y`` or ``Z``: the axis of the cylinder, the direction of
+          stacking, and the order of the particles in the output (bottom
+          first).
+      * - ``ox oy oz``, ``bx by bz``
+        - The corner and the sizes of the container (of the bounding box of the
+          cylinder). A size ``0`` along ``axis`` means a container without top:
+          with ``RANDOM``, its height is computed so that the ``nb`` boxes reach
+          ``solidFraction``; with ``STACK``, the ``nb`` boxes are stacked as high
+          as needed.
+      * - ``hmin hmax``
+        - The homothety of each particle is drawn uniformly in this range.
+      * - ``nb``
+        - Number of particles wanted.
+      * - ``solidFraction``
+        - The packing also stops when the volume of the boxes reaches this
+          fraction of the container.
+      * - ``group cluster``
+        - The group of all the particles, and the cluster of the first one:
+          each particle gets its own cluster, numbered from ``cluster``
+          upwards, as with ``generatePacking:grid``.
+      * - ``seed``
+        - Seed of the random draws: the same seed gives the same packing.
+
+   The packing also stops when a box finds no place: the container is full.
+   ``generator`` then prints the number of particles, the height reached, and
+   the solid fraction of the boxes and of the particles.
+
+   .. code-block:: text
+
+      generatePacking:OBBs shapes.txt Bunny CUBOID STACK Y  -0.1 0 -0.1  0.2 0.6 0.2  0.4 0.6  400 0.6  0 6  0
+
+   .. note::
+
+      A packing of boxes is loose: about 0.25 to 0.3 of the volume with
+      ``RANDOM`` (the boxes jam), a little more with ``STACK``. The solid
+      fraction of the particles is lower still, by the ratio of the volume of
+      a particle to the volume of its box (close to 1 for a cube, 0.52 for a
+      sphere, 0.23 for the Stanford bunny). The OBB of a shape is not
+      necessarily centred on its mass centre nor aligned with its principal
+      axes: the particles are placed so that their boxes are where they were
+      packed.
+
 ``generatePacking:RandomClosePacking <name> <boxShape> <direction> <bx> <by> <bz> <xOBB> <yOBB> <zOBB> <hmin> <hmax> <nbTarget> <solidFraction> <group> <cluster>``
-   Generate a random close packing inside a box of size ``(bx, by, bz)``.
+   The former form of ``generatePacking:OBBs``, with the mode ``RANDOM``, a
+   container whose corner is the origin, and the sizes of the box of the shape
+   given by hand instead of being read in a shape file. The box is supposed to
+   be centred on the particle and aligned with its axes, and all the particles
+   get the same ``cluster``.
 
    .. list-table::
       :header-rows: 1
@@ -262,9 +362,9 @@ Packing Generation
       * - ``boxShape``
         - Container geometry: ``CUBOID`` or ``CYLINDER``
       * - ``direction``
-        - Packing growth direction: ``X``, ``Y``, or ``Z``
+        - Axis of the cylinder, and order of the output: ``X``, ``Y``, or ``Z``
       * - ``xOBB`` ``yOBB`` ``zOBB``
-        - Bounding box dimensions of the particle shape
+        - Bounding box dimensions of the particle shape, at homothety 1
       * - ``hmin`` ``hmax``
         - Homothety range (size scatter)
       * - ``nbTarget``

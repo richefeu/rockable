@@ -61,7 +61,10 @@ random, by velocity, by shape, and, for soft particles (see
 :ref:`softParticles`), by their volume change :math:`\det \mathbf{F} - 1` and
 by their mean stress. The soft particles are drawn with their deformation. The
 cheatsheet ``see_rockable_cheatsheet`` (folder ``cheatsheets``) describes every
-key and the settings of ``see.json``.
+key and the settings of ``see.json``. The driven bodies (the walls, a
+container) can be made transparent with the keys ``a`` and ``A``: they are then
+drawn after the free bodies, so that the grains inside a box or a tube can be
+seen through its walls.
 
 
 

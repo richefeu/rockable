@@ -162,7 +162,10 @@ random, by velocity, by shape, and, for soft particles (see
 <a class="reference internal" href="softParticles.html#softparticles"><span class="std std-ref">Deformable particles (DCEM)</span></a>), by their volume change <span class="math notranslate nohighlight">\(\det \mathbf{F} - 1\)</span> and
 by their mean stress. The soft particles are drawn with their deformation. The
 cheatsheet <code class="docutils literal notranslate"><span class="pre">see_rockable_cheatsheet</span></code> (folder <code class="docutils literal notranslate"><span class="pre">cheatsheets</span></code>) describes every
-key and the settings of <code class="docutils literal notranslate"><span class="pre">see.json</span></code>.</p>
+key and the settings of <code class="docutils literal notranslate"><span class="pre">see.json</span></code>. The driven bodies (the walls, a
+container) can be made transparent with the keys <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">A</span></code>: they are then
+drawn after the free bodies, so that the grains inside a box or a tube can be
+seen through its walls.</p>
 </section>
 <section id="application-conftovtk">
 <h2>Application <cite>conftovtk</cite><a class="headerlink" href="#application-conftovtk" title="Link to this heading"></a></h2>

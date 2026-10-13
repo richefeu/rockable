@@ -357,7 +357,118 @@ cluster, numbered from <code class="docutils literal notranslate"><span class="p
 cluster <code class="docutils literal notranslate"><span class="pre">cluster</span></code>: they form one body once glued. See
 <code class="docutils literal notranslate"><span class="pre">examples/fragmentation</span></code>.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">generatePacking:RandomClosePacking</span> <span class="pre">&lt;name&gt;</span> <span class="pre">&lt;boxShape&gt;</span> <span class="pre">&lt;direction&gt;</span> <span class="pre">&lt;bx&gt;</span> <span class="pre">&lt;by&gt;</span> <span class="pre">&lt;bz&gt;</span> <span class="pre">&lt;xOBB&gt;</span> <span class="pre">&lt;yOBB&gt;</span> <span class="pre">&lt;zOBB&gt;</span> <span class="pre">&lt;hmin&gt;</span> <span class="pre">&lt;hmax&gt;</span> <span class="pre">&lt;nbTarget&gt;</span> <span class="pre">&lt;solidFraction&gt;</span> <span class="pre">&lt;group&gt;</span> <span class="pre">&lt;cluster&gt;</span></code></dt><dd><p>Generate a random close packing inside a box of size <code class="docutils literal notranslate"><span class="pre">(bx,</span> <span class="pre">by,</span> <span class="pre">bz)</span></code>.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">generatePacking:grid_inside</span> <span class="pre">&lt;shapeFile&gt;</span> <span class="pre">&lt;cutter&gt;</span> <span class="pre">&lt;cutterHomothety&gt;</span> <span class="pre">&lt;name&gt;</span> <span class="pre">&lt;ox&gt;</span> <span class="pre">&lt;oy&gt;</span> <span class="pre">&lt;oz&gt;</span> <span class="pre">&lt;bx&gt;</span> <span class="pre">&lt;by&gt;</span> <span class="pre">&lt;bz&gt;</span> <span class="pre">&lt;nx&gt;</span> <span class="pre">&lt;ny&gt;</span> <span class="pre">&lt;nz&gt;</span> <span class="pre">&lt;group&gt;</span> <span class="pre">&lt;cluster&gt;</span> <span class="pre">&lt;homothety&gt;</span> <span class="pre">&lt;randQ&gt;</span></code></dt><dd><p>Same as <code class="docutils literal notranslate"><span class="pre">generatePacking:grid</span></code>, but a shape is used as a cookie cutter:
+only the positions of the grid that are inside the shape <code class="docutils literal notranslate"><span class="pre">cutter</span></code> of the
+file <code class="docutils literal notranslate"><span class="pre">shapeFile</span></code> are kept. The cutter is placed at the origin, in the frame
+of its shape file, and scaled by <code class="docutils literal notranslate"><span class="pre">cutterHomothety</span></code>; the grid is given in
+the same frame, and the transformation, if any, is applied afterwards to the
+positions kept. The faces of the cutter must form a closed surface (its
+radius is not taken into account). A position is inside when rays cast from
+it cross the faces an odd number of times.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span># cubes of 1 cm filling a bunny of homothety 2
+generatePacking:grid_inside shapes.txt Bunny 2  Cell  -0.12 -0.06 -0.09  0.22 0.14 0.19  22 14 19  1 0 1 0
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">generatePacking:grid_clust_inside</span> <span class="pre">&lt;...&gt;</span></code></dt><dd><p>Same arguments, but all the particles get the same cluster, as with
+<code class="docutils literal notranslate"><span class="pre">generatePacking:grid_clust</span></code>: once glued, they form one body with the
+shape of the cutter. See <code class="docutils literal notranslate"><span class="pre">examples/bunnyFun/bunnyShot</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">generatePacking:OBBs</span> <span class="pre">&lt;shapeFile&gt;</span> <span class="pre">&lt;names&gt;</span> <span class="pre">&lt;container&gt;</span> <span class="pre">&lt;mode&gt;</span> <span class="pre">&lt;axis&gt;</span> <span class="pre">&lt;ox&gt;</span> <span class="pre">&lt;oy&gt;</span> <span class="pre">&lt;oz&gt;</span> <span class="pre">&lt;bx&gt;</span> <span class="pre">&lt;by&gt;</span> <span class="pre">&lt;bz&gt;</span> <span class="pre">&lt;hmin&gt;</span> <span class="pre">&lt;hmax&gt;</span> <span class="pre">&lt;nb&gt;</span> <span class="pre">&lt;solidFraction&gt;</span> <span class="pre">&lt;group&gt;</span> <span class="pre">&lt;cluster&gt;</span> <span class="pre">&lt;seed&gt;</span></code></dt><dd><p>Pack particles of any shape in a container, without overlap, so that a
+computation starts from a rather dense state. The oriented bounding boxes
+(OBB) of the particles are placed one by one, with a random orientation,
+until they overlap no other box; each box is then replaced by the particle
+it bounds. The packing still has to be stabilised by a computation (under
+gravity, or by moving the walls).</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 75.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">shapeFile</span></code></p></td>
+<td><p>The shape file where the OBB of each shape is read (<code class="docutils literal notranslate"><span class="pre">obb.extent</span></code>,
+<code class="docutils literal notranslate"><span class="pre">obb.center</span></code>, <code class="docutils literal notranslate"><span class="pre">obb.e1</span></code>, <code class="docutils literal notranslate"><span class="pre">obb.e2</span></code>, <code class="docutils literal notranslate"><span class="pre">obb.e3</span></code>). The shapes must be
+pre-computed (<code class="docutils literal notranslate"><span class="pre">preCompDone</span> <span class="pre">y</span></code>): run <code class="docutils literal notranslate"><span class="pre">shapeSurvey</span></code> first (see
+<a class="reference internal" href="shapeSurvey.html#shapesurvey"><span class="std std-ref">Application shapeSurvey</span></a>).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">names</span></code></p></td>
+<td><p>The name of a shape, or several names separated by commas, without
+spaces (<code class="docutils literal notranslate"><span class="pre">Bunny,Cube</span></code>): each particle is then given one of them at
+random.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">container</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CUBOID</span></code>, or <code class="docutils literal notranslate"><span class="pre">CYLINDER</span></code> along <code class="docutils literal notranslate"><span class="pre">axis</span></code> (an elliptic one if its two
+transverse sizes differ).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mode</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">RANDOM</span></code>: each box is put anywhere in the container, the largest
+first (random sequential addition, as <code class="docutils literal notranslate"><span class="pre">TubePacker</span></code>). <code class="docutils literal notranslate"><span class="pre">STACK</span></code>: each
+box is tried 20 times, with a random orientation and a random
+transverse position, and goes down along <code class="docutils literal notranslate"><span class="pre">axis</span></code> to the lowest place
+where it overlaps no other box; the lowest trial is kept. The boxes
+are stacked from the bottom of the container.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">axis</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">X</span></code>, <code class="docutils literal notranslate"><span class="pre">Y</span></code> or <code class="docutils literal notranslate"><span class="pre">Z</span></code>: the axis of the cylinder, the direction of
+stacking, and the order of the particles in the output (bottom
+first).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ox</span> <span class="pre">oy</span> <span class="pre">oz</span></code>, <code class="docutils literal notranslate"><span class="pre">bx</span> <span class="pre">by</span> <span class="pre">bz</span></code></p></td>
+<td><p>The corner and the sizes of the container (of the bounding box of the
+cylinder). A size <code class="docutils literal notranslate"><span class="pre">0</span></code> along <code class="docutils literal notranslate"><span class="pre">axis</span></code> means a container without top:
+with <code class="docutils literal notranslate"><span class="pre">RANDOM</span></code>, its height is computed so that the <code class="docutils literal notranslate"><span class="pre">nb</span></code> boxes reach
+<code class="docutils literal notranslate"><span class="pre">solidFraction</span></code>; with <code class="docutils literal notranslate"><span class="pre">STACK</span></code>, the <code class="docutils literal notranslate"><span class="pre">nb</span></code> boxes are stacked as high
+as needed.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hmin</span> <span class="pre">hmax</span></code></p></td>
+<td><p>The homothety of each particle is drawn uniformly in this range.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">nb</span></code></p></td>
+<td><p>Number of particles wanted.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">solidFraction</span></code></p></td>
+<td><p>The packing also stops when the volume of the boxes reaches this
+fraction of the container.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">group</span> <span class="pre">cluster</span></code></p></td>
+<td><p>The group of all the particles, and the cluster of the first one:
+each particle gets its own cluster, numbered from <code class="docutils literal notranslate"><span class="pre">cluster</span></code>
+upwards, as with <code class="docutils literal notranslate"><span class="pre">generatePacking:grid</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">seed</span></code></p></td>
+<td><p>Seed of the random draws: the same seed gives the same packing.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The packing also stops when a box finds no place: the container is full.
+<code class="docutils literal notranslate"><span class="pre">generator</span></code> then prints the number of particles, the height reached, and
+the solid fraction of the boxes and of the particles.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>generatePacking:OBBs shapes.txt Bunny CUBOID STACK Y  -0.1 0 -0.1  0.2 0.6 0.2  0.4 0.6  400 0.6  0 6  0
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A packing of boxes is loose: about 0.25 to 0.3 of the volume with
+<code class="docutils literal notranslate"><span class="pre">RANDOM</span></code> (the boxes jam), a little more with <code class="docutils literal notranslate"><span class="pre">STACK</span></code>. The solid
+fraction of the particles is lower still, by the ratio of the volume of
+a particle to the volume of its box (close to 1 for a cube, 0.52 for a
+sphere, 0.23 for the Stanford bunny). The OBB of a shape is not
+necessarily centred on its mass centre nor aligned with its principal
+axes: the particles are placed so that their boxes are where they were
+packed.</p>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">generatePacking:RandomClosePacking</span> <span class="pre">&lt;name&gt;</span> <span class="pre">&lt;boxShape&gt;</span> <span class="pre">&lt;direction&gt;</span> <span class="pre">&lt;bx&gt;</span> <span class="pre">&lt;by&gt;</span> <span class="pre">&lt;bz&gt;</span> <span class="pre">&lt;xOBB&gt;</span> <span class="pre">&lt;yOBB&gt;</span> <span class="pre">&lt;zOBB&gt;</span> <span class="pre">&lt;hmin&gt;</span> <span class="pre">&lt;hmax&gt;</span> <span class="pre">&lt;nbTarget&gt;</span> <span class="pre">&lt;solidFraction&gt;</span> <span class="pre">&lt;group&gt;</span> <span class="pre">&lt;cluster&gt;</span></code></dt><dd><p>The former form of <code class="docutils literal notranslate"><span class="pre">generatePacking:OBBs</span></code>, with the mode <code class="docutils literal notranslate"><span class="pre">RANDOM</span></code>, a
+container whose corner is the origin, and the sizes of the box of the shape
+given by hand instead of being read in a shape file. The box is supposed to
+be centred on the particle and aligned with its axes, and all the particles
+get the same <code class="docutils literal notranslate"><span class="pre">cluster</span></code>.</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 25.0%" />
@@ -373,10 +484,10 @@ cluster <code class="docutils literal notranslate"><span class="pre">cluster</sp
 <td><p>Container geometry: <code class="docutils literal notranslate"><span class="pre">CUBOID</span></code> or <code class="docutils literal notranslate"><span class="pre">CYLINDER</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">direction</span></code></p></td>
-<td><p>Packing growth direction: <code class="docutils literal notranslate"><span class="pre">X</span></code>, <code class="docutils literal notranslate"><span class="pre">Y</span></code>, or <code class="docutils literal notranslate"><span class="pre">Z</span></code></p></td>
+<td><p>Axis of the cylinder, and order of the output: <code class="docutils literal notranslate"><span class="pre">X</span></code>, <code class="docutils literal notranslate"><span class="pre">Y</span></code>, or <code class="docutils literal notranslate"><span class="pre">Z</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">xOBB</span></code> <code class="docutils literal notranslate"><span class="pre">yOBB</span></code> <code class="docutils literal notranslate"><span class="pre">zOBB</span></code></p></td>
-<td><p>Bounding box dimensions of the particle shape</p></td>
+<td><p>Bounding box dimensions of the particle shape, at homothety 1</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hmin</span></code> <code class="docutils literal notranslate"><span class="pre">hmax</span></code></p></td>
 <td><p>Homothety range (size scatter)</p></td>

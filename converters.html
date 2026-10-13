@@ -146,7 +146,8 @@ skeleton of a sphero-polyhedron and dilating it by a Minkowski radius.</p>
 </pre></div>
 </div>
 <p>The shape is written in the file <code class="docutils literal notranslate"><span class="pre">mesh.shp</span></code> of the current folder (an existing
-<code class="docutils literal notranslate"><span class="pre">mesh.shp</span></code> is overwritten), and is named after the STL file (<code class="docutils literal notranslate"><span class="pre">file.stl</span></code>).</p>
+<code class="docutils literal notranslate"><span class="pre">mesh.shp</span></code> is overwritten), and is named after the STL file, without its
+folder (<code class="docutils literal notranslate"><span class="pre">file.stl</span></code>). The options <code class="docutils literal notranslate"><span class="pre">-o</span></code> and <code class="docutils literal notranslate"><span class="pre">-n</span></code> change both.</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 34.0%" />
@@ -176,6 +177,13 @@ the given value.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-c</span></code>, <code class="docutils literal notranslate"><span class="pre">--clean</span></code></p></td>
 <td><p>Remove the duplicated edges.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-n</span></code>, <code class="docutils literal notranslate"><span class="pre">--name</span></code> (<em>string</em>)</p></td>
+<td><p>Name of the shape. By default, the name of the STL file, without its
+folder.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-o</span></code>, <code class="docutils literal notranslate"><span class="pre">--output</span></code> (<em>string</em>)</p></td>
+<td><p>Name of the shape file written, <code class="docutils literal notranslate"><span class="pre">mesh.shp</span></code> by default.</p></td>
 </tr>
 </tbody>
 </table>

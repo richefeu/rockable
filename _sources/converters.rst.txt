@@ -23,7 +23,8 @@ skeleton of a sphero-polyhedron and dilating it by a Minkowski radius.
    stl2shape -r 0.01 -c file.stl
 
 The shape is written in the file ``mesh.shp`` of the current folder (an existing
-``mesh.shp`` is overwritten), and is named after the STL file (``file.stl``).
+``mesh.shp`` is overwritten), and is named after the STL file, without its
+folder (``file.stl``). The options ``-o`` and ``-n`` change both.
 
 .. list-table::
    :header-rows: 1
@@ -44,6 +45,11 @@ The shape is written in the file ``mesh.shp`` of the current folder (an existing
      - Rescale the radius along with the object, instead of keeping it as given.
    * - ``-c``, ``--clean``
      - Remove the duplicated edges.
+   * - ``-n``, ``--name`` (*string*)
+     - Name of the shape. By default, the name of the STL file, without its
+       folder.
+   * - ``-o``, ``--output`` (*string*)
+     - Name of the shape file written, ``mesh.shp`` by default.
 
 .. important::
 
