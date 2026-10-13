@@ -116,6 +116,10 @@
     orientations. Each particle gets its own cluster, numbered from `cluster`.
   - #command("generatePacking:grid_clust <...>") ~Same arguments, but all the
     particles get the same cluster: they form one body once glued.
+  - #command("generatePacking:grid_inside <shapeFile> <cutter> <h> <...>")
+    ~A grid (same arguments as `grid` after the three first ones) cut by a
+    shape: only the positions inside the shape `cutter`, of homothety `h`, are
+    kept. `grid_clust_inside`: the same cluster for all.
   - #command("generatePacking:OBBs <...>") ~Any shape, packed without
     overlap through its bounding box. See below.
   - #command("generatePacking:RandomClosePacking <...>") ~Its former form.

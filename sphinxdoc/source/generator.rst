@@ -250,6 +250,26 @@ Packing Generation
    cluster ``cluster``: they form one body once glued. See
    ``examples/fragmentation``.
 
+``generatePacking:grid_inside <shapeFile> <cutter> <cutterHomothety> <name> <ox> <oy> <oz> <bx> <by> <bz> <nx> <ny> <nz> <group> <cluster> <homothety> <randQ>``
+   Same as ``generatePacking:grid``, but a shape is used as a cookie cutter:
+   only the positions of the grid that are inside the shape ``cutter`` of the
+   file ``shapeFile`` are kept. The cutter is placed at the origin, in the frame
+   of its shape file, and scaled by ``cutterHomothety``; the grid is given in
+   the same frame, and the transformation, if any, is applied afterwards to the
+   positions kept. The faces of the cutter must form a closed surface (its
+   radius is not taken into account). A position is inside when rays cast from
+   it cross the faces an odd number of times.
+
+   .. code-block:: text
+
+      # cubes of 1 cm filling a bunny of homothety 2
+      generatePacking:grid_inside shapes.txt Bunny 2  Cell  -0.12 -0.06 -0.09  0.22 0.14 0.19  22 14 19  1 0 1 0
+
+``generatePacking:grid_clust_inside <...>``
+   Same arguments, but all the particles get the same cluster, as with
+   ``generatePacking:grid_clust``: once glued, they form one body with the
+   shape of the cutter. See ``examples/bunnyFun/bunnyShot``.
+
 ``generatePacking:OBBs <shapeFile> <names> <container> <mode> <axis> <ox> <oy> <oz> <bx> <by> <bz> <hmin> <hmax> <nb> <solidFraction> <group> <cluster> <seed>``
    Pack particles of any shape in a container, without overlap, so that a
    computation starts from a rather dense state. The oriented bounding boxes

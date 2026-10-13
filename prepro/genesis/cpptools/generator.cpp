@@ -58,6 +58,7 @@ std::streampos Np_pos = std::streampos(0);
 #include "addParticle.hpp"
 #include "generatePacking_OBBs.hpp"
 #include "generatePacking_grid.hpp"
+#include "generatePacking_grid_inside.hpp"
 #include "generatePacking_wallBox.hpp"
 
 #include "generateShape_cube.hpp"
@@ -351,6 +352,39 @@ void readCommands(const char* name) {
         generatePacking_grid_clust(*outputStream, name.c_str(), origBox, boxSize, n, group, clust, homothety, randQ);
     NumberOfParticles += nbAdded;
     std::cerr << "@generatePacking:grid_clust, Number of added bodies: " << nbAdded << '\n';
+  };
+
+  // A grid cut by a shape: only the positions inside the shape cutterName of shapeFile,
+  // placed at the origin with the homothety cutterHomothety, are kept
+  // generatePacking:grid_inside shapes.txt Bunny 2  Cell  -0.1 -0.1 -0.1  0.2 0.2 0.2  20 20 20  1 0 1 0
+  auto gridInside = [&](std::istream& com, bool sameCluster, const char* label) {
+    std::string shapeFile;
+    std::string cutterName;
+    double cutterHomothety;
+    std::string name;
+    vec3r origBox;
+    vec3r boxSize;
+    vec3i n;
+    int group;
+    int clust;
+    double homothety;
+    int randQ;
+    com >> shapeFile >> cutterName >> cutterHomothety >> name >> origBox >> boxSize >> n >> group >> clust >>
+        homothety >> randQ;
+    GridCutter cutter;
+    if (!readGridCutter(shapeFile.c_str(), cutterName, cutter)) {
+      std::cerr << msg::warn() << "@" << label << ", no cutter shape: nothing is generated" << msg::normal() << '\n';
+      return;
+    }
+    int nbAdded = generatePacking_grid_inside(*outputStream, name.c_str(), origBox, boxSize, n, group, clust, homothety,
+                                              randQ, sameCluster, cutter, cutterHomothety);
+    NumberOfParticles += nbAdded;
+    std::cerr << "@" << label << ", Number of added bodies: " << nbAdded << " (out of " << n.x * n.y * n.z
+              << " in the grid)\n";
+  };
+  parser.kwMap["generatePacking:grid_inside"] = __DO__(com) { gridInside(com, false, "generatePacking:grid_inside"); };
+  parser.kwMap["generatePacking:grid_clust_inside"] = __DO__(com) {
+    gridInside(com, true, "generatePacking:grid_clust_inside");
   };
 
   // Random sequential packing of the oriented bounding boxes (OBB) of a shape, then
