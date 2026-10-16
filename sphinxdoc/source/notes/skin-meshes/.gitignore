@@ -1,0 +1,11 @@
+# LaTeX build artifacts (the PDF that is kept is ../skin-meshes.pdf)
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+skin-meshes.pdf

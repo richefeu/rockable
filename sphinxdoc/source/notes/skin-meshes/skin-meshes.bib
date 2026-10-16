@@ -1,0 +1,740 @@
+%% References of the Rockable technical note on skin meshes of R-shapes.
+
+@article{alonso2009,
+  author  = {Alonso-Marroqu{\'\i}n, Fernando and Wang, Yucang},
+  title   = {An efficient algorithm for granular dynamics simulations with
+             complex-shaped objects},
+  journal = {Granular Matter},
+  year    = {2009},
+  volume  = {11},
+  number  = {5},
+  pages   = {317--329},
+  doi     = {10.1007/s10035-009-0139-1}
+}
+
+@article{lorensen1987,
+  author  = {Lorensen, William E. and Cline, Harvey E.},
+  title   = {Marching cubes: A high resolution {3D} surface construction algorithm},
+  journal = {ACM SIGGRAPH Computer Graphics},
+  year    = {1987},
+  volume  = {21},
+  number  = {4},
+  pages   = {163--169},
+  doi     = {10.1145/37402.37422}
+}
+
+%% ---- Reference works and classical algorithms ----
+
+@book{vandenbergen2003,
+  author    = {van den Bergen, Gino},
+  title     = {Collision Detection in Interactive {3D} Environments},
+  publisher = {Morgan Kaufmann},
+  address   = {San Francisco},
+  series    = {The Morgan Kaufmann Series in Interactive {3D} Technology},
+  year      = {2003},
+  isbn      = {978-1-55860-801-6}
+}
+
+@article{vandenbergen1997,
+  author  = {van den Bergen, Gino},
+  title   = {Efficient collision detection of complex deformable models using
+             {AABB} trees},
+  journal = {Journal of Graphics Tools},
+  year    = {1997},
+  volume  = {2},
+  number  = {4},
+  pages   = {1--13},
+  doi     = {10.1080/10867651.1997.10487480}
+}
+
+@article{moller1997,
+  author  = {M{\"o}ller, Tomas and Trumbore, Ben},
+  title   = {Fast, minimum storage ray-triangle intersection},
+  journal = {Journal of Graphics Tools},
+  year    = {1997},
+  volume  = {2},
+  number  = {1},
+  pages   = {21--28},
+  doi     = {10.1080/10867651.1997.10487468}
+}
+
+@inproceedings{nielson1991,
+  author    = {Nielson, Gregory M. and Hamann, Bernd},
+  title     = {The asymptotic decider: resolving the ambiguity in marching cubes},
+  booktitle = {Proceedings of the 2nd Conference on Visualization (VIS '91)},
+  publisher = {IEEE Computer Society Press},
+  year      = {1991},
+  pages     = {83--91},
+  doi       = {10.1109/VISUAL.1991.175782}
+}
+
+@article{newman2006,
+  author  = {Newman, Timothy S. and Yi, Hong},
+  title   = {A survey of the marching cubes algorithm},
+  journal = {Computers \& Graphics},
+  year    = {2006},
+  volume  = {30},
+  number  = {5},
+  pages   = {854--879},
+  doi     = {10.1016/j.cag.2006.07.021}
+}
+
+@article{meisters1975,
+  author  = {Meisters, Gary H.},
+  title   = {Polygons have ears},
+  journal = {The American Mathematical Monthly},
+  year    = {1975},
+  volume  = {82},
+  number  = {6},
+  pages   = {648--651},
+  doi     = {10.1080/00029890.1975.11993898}
+}
+
+@book{orourke1998,
+  author    = {O'Rourke, Joseph},
+  title     = {Computational Geometry in {C}},
+  edition   = {2},
+  publisher = {Cambridge University Press},
+  address   = {Cambridge},
+  year      = {1998},
+  isbn      = {978-0-521-64976-6}
+}
+
+@inproceedings{garland1997,
+  author    = {Garland, Michael and Heckbert, Paul S.},
+  title     = {Surface simplification using quadric error metrics},
+  booktitle = {Proceedings of the 24th Annual Conference on Computer Graphics
+               and Interactive Techniques (SIGGRAPH '97)},
+  publisher = {ACM Press},
+  year      = {1997},
+  pages     = {209--216},
+  doi       = {10.1145/258734.258849}
+}
+
+@article{dagum1998,
+  author  = {Dagum, Leonardo and Menon, Ramesh},
+  title   = {{OpenMP}: an industry standard {API} for shared-memory programming},
+  journal = {IEEE Computational Science and Engineering},
+  year    = {1998},
+  volume  = {5},
+  number  = {1},
+  pages   = {46--55},
+  doi     = {10.1109/99.660313}
+}
+
+%% ---- Distance, sign and meshing ----
+
+@article{baerentzen2005,
+  author  = {B{\ae}rentzen, J. Andreas and Aan{\ae}s, Henrik},
+  title   = {Signed distance computation using the angle weighted pseudonormal},
+  journal = {IEEE Transactions on Visualization and Computer Graphics},
+  year    = {2005},
+  volume  = {11},
+  number  = {3},
+  pages   = {243--253},
+  doi     = {10.1109/TVCG.2005.49}
+}
+
+@article{jacobson2013,
+  author  = {Jacobson, Alec and Kavan, Ladislav and Sorkine-Hornung, Olga},
+  title   = {Robust inside-outside segmentation using generalized winding numbers},
+  journal = {ACM Transactions on Graphics},
+  year    = {2013},
+  volume  = {32},
+  number  = {4},
+  pages   = {33:1--33:12},
+  doi     = {10.1145/2461912.2461916}
+}
+
+@article{ju2002,
+  author  = {Ju, Tao and Losasso, Frank and Schaefer, Scott and Warren, Joe},
+  title   = {Dual contouring of {Hermite} data},
+  journal = {ACM Transactions on Graphics},
+  year    = {2002},
+  volume  = {21},
+  number  = {3},
+  pages   = {339--346},
+  doi     = {10.1145/566654.566586}
+}
+
+@article{mirtich1996,
+  author  = {Mirtich, Brian},
+  title   = {Fast and accurate computation of polyhedral mass properties},
+  journal = {Journal of Graphics Tools},
+  year    = {1996},
+  volume  = {1},
+  number  = {2},
+  pages   = {31--50},
+  doi     = {10.1080/10867651.1996.10487458}
+}
+
+%% Foundational Rockable paper (the framework paper), published online.
+@article{richefeu2025rockable,
+  author  = {Richefeu, Vincent and Combe, Ga\"el and Amarsid, Lhassan and
+             Prat, Rapha\"el and Vanson, Jean-Mathieu and Nezamabadi, Saied and
+             Mutabaruka, Patrick and Delenne, Jean-Yves and Radja\"i, Farhang},
+  title   = {Advanced strategies for discrete simulations with three-dimensional
+             {$R$}-shapes in the {Rockable} framework},
+  journal = {Computer Physics Communications},
+  year    = {2026},
+  volume  = {320},
+  pages   = {109997},
+  doi     = {10.1016/j.cpc.2025.109997}
+}
+
+%% ---- Shape descriptions in DEM (introduction survey) ----
+
+@article{cundall1988,
+  author  = {Cundall, Peter A.},
+  title   = {Formulation of a three-dimensional distinct element model---{Part I}.
+             {A} scheme to detect and represent contacts in a system composed of
+             many polyhedral blocks},
+  journal = {International Journal of Rock Mechanics and Mining Sciences \&
+             Geomechanics Abstracts},
+  year    = {1988},
+  volume  = {25},
+  number  = {3},
+  pages   = {107--116},
+  doi     = {10.1016/0148-9062(88)92293-X}
+}
+
+@article{favier1999,
+  author  = {Favier, John F. and Abbaspour-Fard, Mohammad H. and Kremmer, Martin
+             and Raji, Abdul O.},
+  title   = {Shape representation of axi-symmetrical, non-spherical particles in
+             discrete element simulation using multi-element model particles},
+  journal = {Engineering Computations},
+  year    = {1999},
+  volume  = {16},
+  number  = {4},
+  pages   = {467--480},
+  doi     = {10.1108/02644409910271894}
+}
+
+@article{houlsby2009,
+  author  = {Houlsby, Guy T.},
+  title   = {Potential particles: a method for modelling non-circular particles
+             in {DEM}},
+  journal = {Computers and Geotechnics},
+  year    = {2009},
+  volume  = {36},
+  number  = {6},
+  pages   = {953--959},
+  doi     = {10.1016/j.compgeo.2009.03.001}
+}
+
+@article{podlozhnyuk2017,
+  author  = {Podlozhnyuk, Alexander and Pirker, Stefan and Kloss, Christoph},
+  title   = {Efficient implementation of superquadric particles in {Discrete
+             Element Method} within an open-source framework},
+  journal = {Computational Particle Mechanics},
+  year    = {2017},
+  volume  = {4},
+  number  = {1},
+  pages   = {101--118},
+  doi     = {10.1007/s40571-016-0131-6}
+}
+
+@article{kawamoto2016,
+  author  = {Kawamoto, Reid and And{\`o}, Edward and Viggiani, Gioacchino and
+             Andrade, Jos{\'e} E.},
+  title   = {Level set discrete element method for three-dimensional
+             computations with triaxial case study},
+  journal = {Journal of the Mechanics and Physics of Solids},
+  year    = {2016},
+  volume  = {91},
+  pages   = {1--13},
+  doi     = {10.1016/j.jmps.2016.02.021}
+}
+
+@article{kawamoto2018,
+  author  = {Kawamoto, Reid and And{\`o}, Edward and Viggiani, Gioacchino and
+             Andrade, Jos{\'e} E.},
+  title   = {All you need is shape: predicting shear banding in sand with
+             {LS-DEM}},
+  journal = {Journal of the Mechanics and Physics of Solids},
+  year    = {2018},
+  volume  = {111},
+  pages   = {375--392},
+  doi     = {10.1016/j.jmps.2017.10.003}
+}
+
+%% ---- Quasi-Monte-Carlo and extrapolation (Section on mass properties) ----
+
+@article{sobol1967,
+  author  = {Sobol', Ilya M.},
+  title   = {On the distribution of points in a cube and the approximate
+             evaluation of integrals},
+  journal = {USSR Computational Mathematics and Mathematical Physics},
+  year    = {1967},
+  volume  = {7},
+  number  = {4},
+  pages   = {86--112},
+  doi     = {10.1016/0041-5553(67)90144-9}
+}
+
+@article{cranley1976,
+  author  = {Cranley, R. and Patterson, T. N. L.},
+  title   = {Randomization of number theoretic methods for multiple integration},
+  journal = {SIAM Journal on Numerical Analysis},
+  year    = {1976},
+  volume  = {13},
+  number  = {6},
+  pages   = {904--914},
+  doi     = {10.1137/0713071}
+}
+
+@article{richardson1927,
+  author  = {Richardson, Lewis F. and Gaunt, J. Arthur},
+  title   = {The deferred approach to the limit},
+  journal = {Philosophical Transactions of the Royal Society of London A},
+  year    = {1927},
+  volume  = {226},
+  pages   = {299--361},
+  doi     = {10.1098/rsta.1927.0008}
+}
+
+%% ---- Studies carried out with Rockable (introduction) ----
+
+@article{richefeu2012,
+  author  = {Richefeu, Vincent and Mollon, Guilhem and Daudon, Dominique and
+             Villard, Pascal},
+  title   = {Dissipative contacts and realistic block shapes for modeling rock
+             avalanches},
+  journal = {Engineering Geology},
+  year    = {2012},
+  volume  = {149--150},
+  pages   = {78--92},
+  doi     = {10.1016/j.enggeo.2012.07.021}
+}
+
+@article{mollon2012,
+  author  = {Mollon, Guilhem and Richefeu, Vincent and Villard, Pascal and
+             Daudon, Dominique},
+  title   = {Numerical simulation of rock avalanches: influence of a local
+             dissipative contact model on the collective behavior of granular
+             flows},
+  journal = {Journal of Geophysical Research: Earth Surface},
+  year    = {2012},
+  volume  = {117},
+  number  = {F2},
+  pages   = {F02036},
+  doi     = {10.1029/2011JF002202}
+}
+
+@article{mollon2015,
+  author  = {Mollon, Guilhem and Richefeu, Vincent and Villard, Pascal and
+             Daudon, Dominique},
+  title   = {Discrete modelling of rock avalanches: sensitivity to block and
+             slope geometries},
+  journal = {Granular Matter},
+  year    = {2015},
+  volume  = {17},
+  number  = {5},
+  pages   = {645--666},
+  doi     = {10.1007/s10035-015-0586-9}
+}
+
+@article{garcia2020,
+  author  = {Garcia, B. and Richefeu, V. and Baroth, J. and Daudon, D. and
+             Villard, P.},
+  title   = {Collision of shaped boulders with sand substrate investigated by
+             experimental, stochastic, and discrete approaches},
+  journal = {Journal of Geophysical Research: Earth Surface},
+  year    = {2020},
+  volume  = {125},
+  number  = {11},
+  pages   = {e2019JF005500},
+  doi     = {10.1029/2019JF005500}
+}
+
+@article{stasiak2022,
+  author  = {Stasiak, M. and Combe, G. and Richefeu, V. and Armand, G. and
+             Zghondi, J.},
+  title   = {High compression of granular assemblies of brittle hollow tubular
+             particles: investigation through a {3D} discrete element model},
+  journal = {Computational Particle Mechanics},
+  year    = {2022},
+  volume  = {9},
+  number  = {4},
+  pages   = {825--842},
+  doi     = {10.1007/s40571-021-00449-3}
+}
+
+@article{vu2024drum,
+  author  = {Vu, Duc Chung and Amarsid, Lhassan and Delenne, Jean-Yves and
+             Richefeu, Vincent and Radja\"i, Farhang},
+  title   = {Rheology and scaling behavior of polyhedral particle flows in
+             rotating drums},
+  journal = {Powder Technology},
+  year    = {2024},
+  volume  = {434},
+  pages   = {119338},
+  doi     = {10.1016/j.powtec.2023.119338}
+}
+
+@article{vu2024elast,
+  author  = {Vu, Duc Chung and Amarsid, Lhassan and Delenne, Jean-Yves and
+             Richefeu, Vincent and Radja\"i, Farhang},
+  title   = {Macro-elasticity of granular materials composed of polyhedral
+             particles},
+  journal = {Granular Matter},
+  year    = {2024},
+  volume  = {26},
+  number  = {1},
+  pages   = {6},
+  doi     = {10.1007/s10035-023-01382-3}
+}
+
+@article{vu2024frac,
+  author  = {Vu, Duc Chung and Amarsid, Lhassan and Delenne, Jean-Yves and
+             Richefeu, Vincent and Radja\"i, Farhang},
+  title   = {Particle fracture regimes from impact simulations},
+  journal = {Physical Review E},
+  year    = {2024},
+  volume  = {109},
+  number  = {4},
+  pages   = {044907},
+  doi     = {10.1103/PhysRevE.109.044907}
+}
+
+@article{prat2025,
+  author  = {Prat, Rapha\"el and Carrard, Thierry and Amarsid, Lhassan and
+             Richefeu, Vincent and Doncecchi, Carlo-elia and Lafourcade, Paul and
+             Latu, Guillaume and Vanson, Jean-Mathieu},
+  title   = {{ExaDEM}: a {HPC} application based on {exaNBody} targeting scalable
+             {DEM} simulations with complex particle shapes},
+  journal = {Journal of Open Source Software},
+  year    = {2025},
+  volume  = {10},
+  number  = {106},
+  pages   = {7484},
+  doi     = {10.21105/joss.07484}
+}
+
+%% =====================================================================
+%% Added for the technical note: related work
+%% =====================================================================
+
+%% ---- Sphero-polyhedra in DEM ----
+
+@inproceedings{pournin2005,
+  author    = {Pournin, Lionel and Liebling, Thomas M.},
+  title     = {A generalization of distinct element method to tridimensional
+               particles with complex shapes},
+  booktitle = {Powders and Grains 2005},
+  editor    = {Garc{\'\i}a-Rojo, Ram{\'o}n and Herrmann, Hans J. and McNamara, Sean},
+  publisher = {A.A. Balkema},
+  address   = {Leiden},
+  year      = {2005},
+  volume    = {2},
+  pages     = {1375--1378}
+}
+
+@incollection{pournin2009,
+  author    = {Pournin, Lionel and Liebling, Thomas M.},
+  title     = {From spheres to spheropolyhedra: generalized distinct element
+               methodology and algorithm analysis},
+  booktitle = {Research Trends in Combinatorial Optimization},
+  editor    = {Cook, William and Lov{\'a}sz, L{\'a}szl{\'o} and Vygen, Jens},
+  publisher = {Springer},
+  address   = {Berlin, Heidelberg},
+  year      = {2009},
+  pages     = {347--363},
+  doi       = {10.1007/978-3-540-76796-1_16}
+}
+
+@article{alonso2008,
+  author  = {Alonso-Marroqu{\'\i}n, Fernando},
+  title   = {Spheropolygons: A new method to simulate conservative and
+             dissipative interactions between {2D} complex-shaped rigid bodies},
+  journal = {EPL (Europhysics Letters)},
+  year    = {2008},
+  volume  = {83},
+  number  = {1},
+  pages   = {14001},
+  doi     = {10.1209/0295-5075/83/14001}
+}
+
+@article{galindo2010,
+  author  = {Galindo-Torres, Sergio A. and Pedroso, Dorival M.},
+  title   = {Molecular dynamics simulations of complex-shaped particles using
+             {Voronoi}-based spheropolyhedra},
+  journal = {Physical Review E},
+  year    = {2010},
+  volume  = {81},
+  number  = {6},
+  pages   = {061303},
+  doi     = {10.1103/PhysRevE.81.061303}
+}
+
+@article{lu2015,
+  author  = {Lu, Gang and Third, Jonathan R. and M{\"u}ller, Christoph R.},
+  title   = {Discrete element models for non-spherical particle systems: From
+             theoretical developments to applications},
+  journal = {Chemical Engineering Science},
+  year    = {2015},
+  volume  = {127},
+  pages   = {425--465},
+  doi     = {10.1016/j.ces.2014.11.050}
+}
+
+@book{schneider2014,
+  author    = {Schneider, Rolf},
+  title     = {Convex Bodies: The {Brunn--Minkowski} Theory},
+  edition   = {2},
+  series    = {Encyclopedia of Mathematics and its Applications},
+  volume    = {151},
+  publisher = {Cambridge University Press},
+  address   = {Cambridge},
+  year      = {2014},
+  doi       = {10.1017/CBO9781139003858}
+}
+
+%% ---- Offsets, Minkowski sums, distance fields ----
+
+@article{rossignac1986,
+  author  = {Rossignac, Jaroslaw R. and Requicha, Aristides A. G.},
+  title   = {Offsetting operations in solid modelling},
+  journal = {Computer Aided Geometric Design},
+  year    = {1986},
+  volume  = {3},
+  number  = {2},
+  pages   = {129--148},
+  doi     = {10.1016/0167-8396(86)90017-8}
+}
+
+@article{pavic2008,
+  author  = {Pavi{\'c}, Darko and Kobbelt, Leif},
+  title   = {High-resolution volumetric computation of offset surfaces with
+             feature preservation},
+  journal = {Computer Graphics Forum (Proc. Eurographics)},
+  year    = {2008},
+  volume  = {27},
+  number  = {2},
+  pages   = {165--174},
+  doi     = {10.1111/j.1467-8659.2008.01113.x}
+}
+
+@article{varadhan2006,
+  author  = {Varadhan, Gokul and Manocha, Dinesh},
+  title   = {Accurate {Minkowski} sum approximation of polyhedral models},
+  journal = {Graphical Models},
+  year    = {2006},
+  volume  = {68},
+  number  = {4},
+  pages   = {343--355},
+  doi     = {10.1016/j.gmod.2005.11.003}
+}
+
+@article{jones2006,
+  author  = {Jones, Mark W. and B{\ae}rentzen, J. Andreas and Sramek, Milos},
+  title   = {{3D} distance fields: a survey of techniques and applications},
+  journal = {IEEE Transactions on Visualization and Computer Graphics},
+  year    = {2006},
+  volume  = {12},
+  number  = {4},
+  pages   = {581--599},
+  doi     = {10.1109/TVCG.2006.56}
+}
+
+@inproceedings{frisken2000,
+  author    = {Frisken, Sarah F. and Perry, Ronald N. and Rockwood, Alyn P. and
+               Jones, Thouis R.},
+  title     = {Adaptively sampled distance fields: a general representation of
+               shape for computer graphics},
+  booktitle = {Proceedings of the 27th Annual Conference on Computer Graphics
+               and Interactive Techniques (SIGGRAPH '00)},
+  publisher = {ACM Press},
+  year      = {2000},
+  pages     = {249--254},
+  doi       = {10.1145/344779.344899}
+}
+
+@article{hart1996,
+  author  = {Hart, John C.},
+  title   = {Sphere tracing: a geometric method for the antialiased ray tracing
+             of implicit surfaces},
+  journal = {The Visual Computer},
+  year    = {1996},
+  volume  = {12},
+  number  = {10},
+  pages   = {527--545},
+  doi     = {10.1007/s003710050084}
+}
+
+@article{gilbert1988,
+  author  = {Gilbert, Elmer G. and Johnson, Daniel W. and Keerthi, S. Sathiya},
+  title   = {A fast procedure for computing the distance between complex
+             objects in three-dimensional space},
+  journal = {IEEE Journal on Robotics and Automation},
+  year    = {1988},
+  volume  = {4},
+  number  = {2},
+  pages   = {193--203},
+  doi     = {10.1109/56.2083}
+}
+
+@book{ericson2005,
+  author    = {Ericson, Christer},
+  title     = {Real-Time Collision Detection},
+  publisher = {Morgan Kaufmann},
+  address   = {San Francisco},
+  year      = {2005},
+  isbn      = {978-1-55860-732-3}
+}
+
+%% ---- Polygonization of implicit surfaces ----
+
+@article{bloomenthal1988,
+  author  = {Bloomenthal, Jules},
+  title   = {Polygonization of implicit surfaces},
+  journal = {Computer Aided Geometric Design},
+  year    = {1988},
+  volume  = {5},
+  number  = {4},
+  pages   = {341--355},
+  doi     = {10.1016/0167-8396(88)90013-1}
+}
+
+@inproceedings{kobbelt2001,
+  author    = {Kobbelt, Leif P. and Botsch, Mario and Schwanecke, Ulrich and
+               Seidel, Hans-Peter},
+  title     = {Feature sensitive surface extraction from volume data},
+  booktitle = {Proceedings of the 28th Annual Conference on Computer Graphics
+               and Interactive Techniques (SIGGRAPH '01)},
+  publisher = {ACM Press},
+  year      = {2001},
+  pages     = {57--66},
+  doi       = {10.1145/383259.383265}
+}
+
+@article{lewiner2003,
+  author  = {Lewiner, Thomas and Lopes, H{\'e}lio and Vieira, Ant{\^o}nio Wilson
+             and Tavares, Geovan},
+  title   = {Efficient implementation of marching cubes' cases with
+             topological guarantees},
+  journal = {Journal of Graphics Tools},
+  year    = {2003},
+  volume  = {8},
+  number  = {2},
+  pages   = {1--15},
+  doi     = {10.1080/10867651.2003.10487582}
+}
+
+@book{botsch2010,
+  author    = {Botsch, Mario and Kobbelt, Leif and Pauly, Mark and Alliez, Pierre
+               and L{\'e}vy, Bruno},
+  title     = {Polygon Mesh Processing},
+  publisher = {A K Peters / CRC Press},
+  address   = {Natick, MA},
+  year      = {2010},
+  isbn      = {978-1-56881-426-1}
+}
+
+%% ---- Simplification and polygon triangulation ----
+
+@inproceedings{hinker1993,
+  author    = {Hinker, Paul and Hansen, Charles},
+  title     = {Geometric optimization},
+  booktitle = {Proceedings of IEEE Visualization '93},
+  editor    = {Nielson, Gregory M. and Bergeron, R. Daniel},
+  publisher = {IEEE Computer Society Press},
+  year      = {1993},
+  pages     = {189--195},
+  doi       = {10.1109/VISUAL.1993.398868}
+}
+
+@article{kalvin1996,
+  author  = {Kalvin, Alan D. and Taylor, Russell H.},
+  title   = {Superfaces: polygonal mesh simplification with bounded error},
+  journal = {IEEE Computer Graphics and Applications},
+  year    = {1996},
+  volume  = {16},
+  number  = {3},
+  pages   = {64--77},
+  doi     = {10.1109/38.491187}
+}
+
+@article{schroeder1992,
+  author  = {Schroeder, William J. and Zarge, Jonathan A. and Lorensen, William E.},
+  title   = {Decimation of triangle meshes},
+  journal = {ACM SIGGRAPH Computer Graphics},
+  year    = {1992},
+  volume  = {26},
+  number  = {2},
+  pages   = {65--70},
+  doi     = {10.1145/142920.134010}
+}
+
+@article{held2001,
+  author  = {Held, Martin},
+  title   = {{FIST}: Fast industrial-strength triangulation of polygons},
+  journal = {Algorithmica},
+  year    = {2001},
+  volume  = {30},
+  number  = {4},
+  pages   = {563--596},
+  doi     = {10.1007/s00453-001-0028-4}
+}
+
+%% ---- Mass properties ----
+
+@article{lien1984,
+  author  = {Lien, Sheue-ling and Kajiya, James T.},
+  title   = {A symbolic method for calculating the integral properties of
+             arbitrary nonconvex polyhedra},
+  journal = {IEEE Computer Graphics and Applications},
+  year    = {1984},
+  volume  = {4},
+  number  = {10},
+  pages   = {35--42},
+  doi     = {10.1109/MCG.1984.6429334}
+}
+
+@article{kallay2006,
+  author  = {Kallay, Michael},
+  title   = {Computing the moment of inertia of a solid defined by a triangle
+             mesh},
+  journal = {Journal of Graphics Tools},
+  year    = {2006},
+  volume  = {11},
+  number  = {2},
+  pages   = {51--57},
+  doi     = {10.1080/2151237X.2006.10129220}
+}
+
+@article{tonon2005,
+  author  = {Tonon, Fulvio},
+  title   = {Explicit exact formulas for the {3-D} tetrahedron inertia tensor in
+             terms of its vertex coordinates},
+  journal = {Journal of Mathematics and Statistics},
+  year    = {2005},
+  volume  = {1},
+  number  = {1},
+  pages   = {8--11},
+  doi     = {10.3844/jmssp.2005.8.11}
+}
+
+@book{niederreiter1992,
+  author    = {Niederreiter, Harald},
+  title     = {Random Number Generation and Quasi-{Monte Carlo} Methods},
+  series    = {CBMS-NSF Regional Conference Series in Applied Mathematics},
+  volume    = {63},
+  publisher = {SIAM},
+  address   = {Philadelphia},
+  year      = {1992},
+  doi       = {10.1137/1.9781611970081}
+}
+
+@article{he2015,
+  author  = {He, Zhijian and Wang, Xiaoqun},
+  title   = {On the convergence rate of randomized quasi-{Monte Carlo} for
+             discontinuous functions},
+  journal = {SIAM Journal on Numerical Analysis},
+  year    = {2015},
+  volume  = {53},
+  number  = {5},
+  pages   = {2488--2503},
+  doi     = {10.1137/15M1007963}
+}

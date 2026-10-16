@@ -348,6 +348,10 @@ analytic normals of the surface, so even a coarse mesh shades correctly.
 The mesh is expressed in the body frame of the shape, the frame stored in the
 shape file.
 
+The method (exact signed distance, choice of the grid step, coplanar merge),
+its validation and its limits are described in a technical note, see
+:ref:`noteSkinMeshes`.
+
 The ``.rmsh`` companion
 ^^^^^^^^^^^^^^^^^^^^^^^
 
