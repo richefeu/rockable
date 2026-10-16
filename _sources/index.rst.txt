@@ -124,6 +124,12 @@ Features
 
 .. toctree::
    :maxdepth: 2
+   :caption: Technical notes
+
+   notes/index
+
+.. toctree::
+   :maxdepth: 2
    :caption: Development
 
    developerGuide

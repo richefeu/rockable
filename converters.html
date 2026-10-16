@@ -93,6 +93,10 @@
 </ul>
 </li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Technical notes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="notes/index.html">Technical notes</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="developerGuide.html">Extending Rockable</a></li>
@@ -516,6 +520,9 @@ and re-triangulate the flat regions from their boundary only.</p></td>
 </table>
 <p>The mesh is expressed in the body frame of the shape, the frame stored in the
 shape file.</p>
+<p>The method (exact signed distance, choice of the grid step, coplanar merge),
+its validation and its limits are described in a technical note, see
+<a class="reference internal" href="notes/index.html#noteskinmeshes"><span class="std std-ref">Watertight skin meshes of three-dimensional R-shapes</span></a>.</p>
 <section id="the-rmsh-companion">
 <h3><a class="toc-backref" href="#id8" role="doc-backlink">The <code class="docutils literal notranslate"><span class="pre">.rmsh</span></code> companion</a><a class="headerlink" href="#the-rmsh-companion" title="Link to this heading"></a></h3>
 <p>With <code class="docutils literal notranslate"><span class="pre">-r</span></code>, all the shapes of a library are meshed into one <code class="docutils literal notranslate"><span class="pre">.rmsh</span></code> file.
