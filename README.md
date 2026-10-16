@@ -32,6 +32,10 @@ Rockable is a DEM code written in C++, initiated by <vincent.richefeu@3sr-grenob
 
 The use of the code is not interfaced by any tool (like lua, python or any graphical interface) to facilitate its use, except the input format as described in the [documentation](https://richefeu.github.io/rockable/). This makes it particularly streamlined and greatly facilitates its integration with other calculation codes. It is in this sense that Rockable is qualified as an "academic code".
 
+The reference paper is 
+[`online`](https://doi.org/10.1016/j.cpc.2025.109997):
+V. Richefeu, G. Combe, L. Amarsid, R. Prat, J.-M. Vanson, S. Nezamabadi, P. Mutabaruka, J.-Y. Delenne, F. Radjaï (2026) _Advanced strategies for discrete simulations with three-dimensional R-shapes in Rockable framework_ Computer Physics Communications **30**, 109997, ISSN 0010-4655, https://doi.org/10.1016/j.cpc.2025.109997
+
 ### Source tree 
 
 * `sphinxdoc`: user [documentation](https://richefeu.github.io/rockable/) (sphinx with ReStructuredText)

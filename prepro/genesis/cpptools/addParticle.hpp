@@ -56,16 +56,4 @@ void addParticle(std::ostream& os, const char* name, int group, int cluster, dou
      << angularPosition * individualParticleRotation << "  0 0 0  0 0 0\n";
 }
 
-// DEPRECATED (TO REMOVE...)
-/*
-void addParticle(std::ostream& os, const char* name, int group, int cluster, double homothety, vec3r& position) {
-  using namespace std;
-
-  vec3r pos = position;
-  globalTransformation.apply(pos);
-  os << name << ' ' << group << ' ' << cluster << ' ' << homothety << "  " << pos
-     << "  0 0 0  0 0 0   1 0 0 0  0 0 0  0 0 0\n";
-}
-*/
-
 #endif /* end of include guard: ADD_PARTICLE_HPP */
