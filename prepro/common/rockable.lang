@@ -184,14 +184,24 @@ doc: ContactPartnership [(string) Name]
 [keyword] preventCrossingLength
 doc: preventCrossingLength [(double) value]
 
-  If positive, enables a safeguard that prevents bodies from crossing/tunneling
-  through each other when the overlap would exceed this characteristic length.
+  If positive, stiffens the normal repulsion at large overlap, to prevent bodies
+  from crossing each other (laws Default and GeoVisc): the elastic normal force is
+  multiplied by L / (L + dn), capped at 100.
 
 [keyword] initSpringJoint
 doc: initSpringJoint [(int) ibody] [(vec3r) ipos0] [(int) jbody] [(vec3r) jpos0] [(double) stiffness]
 
   Create a linear spring joint between bodies ibody and jbody, anchored at the
-  local positions ipos0 and jpos0, with the given stiffness.
+  local positions ipos0 and jpos0, with the given stiffness. Its length at rest
+  is the current distance between the two anchors.
+
+[keyword] SpringJoints
+doc: SpringJoints [(int) numberOfJoints]
+
+  The spring joints, as written in the conf-files.
+  REPEAT FOR EACH JOINT {
+     [(int) ibody] [(vec3r) ipos0] [(int) jbody] [(vec3r) jpos0] [(double) stiffness] [(double) l0]
+  }
 
 # --- periodic cell (requires Rockable compiled with ROCKABLE_ENABLE_PERIODIC)
 
@@ -228,14 +238,16 @@ doc: dh [(double) value]
   Numerical damping applied to the periodic cell.
 
 [keyword] cellMomentumCorrection
-doc: cellMomentumCorrection [0/1]
+doc: cellMomentumCorrection [interval]
 
-  Enable correction of the total momentum within the periodic cell.
+  Time interval between two removals of the total momentum of the particles
+  (periodic cell). 0, the default, disables it; dt corrects at every step.
 
 [keyword] cellVelocityCorrection
-doc: cellVelocityCorrection [0/1]
+doc: cellVelocityCorrection [interval]
 
-  Enable correction of the velocities within the periodic cell.
+  Time interval between two removals of the mean velocity of the particles
+  (periodic cell). 0, the default, disables it; dt corrects at every step.
 
 [keyword] useKineticStress
 doc: useKineticStress [0/1]
@@ -247,8 +259,53 @@ doc: useKineticStress [0/1]
 [keyword] useSoftParticles
 doc: useSoftParticles [(double) Young] [(double) Poisson]
 
-  Enable deformable (soft) particles with the given Young modulus and Poisson ratio.
+  Make all the free particles (not driven) soft, with the given Young modulus and Poisson ratio.
+  To be placed after the particles.
   Requires Rockable compiled with ROCKABLE_ENABLE_SOFT_PARTICLES.
+
+[keyword] defineElasticParticles
+doc: defineElasticParticles [(double) Young] [(double) Poisson] [(int) number] [(int) id1] [(int) id2] ...
+
+  Make the listed particles (identified by their ID) soft, with the given Young modulus and Poisson ratio.
+  To be placed after the particles.
+  Requires Rockable compiled with ROCKABLE_ENABLE_SOFT_PARTICLES.
+
+[keyword] defineViscousParameters
+doc: defineViscousParameters [(double) shearViscosity] [(double) bulkViscosity] [(int) number] [(int) id1] [(int) id2] ...
+
+  Make the listed soft particles viscoelastic (Kelvin-Voigt), with the given shear and bulk viscosities.
+  To be placed after defineElasticParticles or useSoftParticles.
+  Requires Rockable compiled with ROCKABLE_ENABLE_SOFT_PARTICLES.
+
+[keyword] defineViscousTime
+doc: defineViscousTime [(double) tau] [(int) number] [(int) id1] [(int) id2] ...
+
+  Make the listed soft particles viscoelastic, with a viscosity proportional to their stiffness (D = tau C).
+  To be placed after defineElasticParticles or useSoftParticles.
+  Requires Rockable compiled with ROCKABLE_ENABLE_SOFT_PARTICLES.
+
+[keyword] useViscousTime
+doc: useViscousTime [(double) tau]
+
+  Make all the soft particles viscoelastic, with a viscosity proportional to their stiffness (D = tau C).
+  To be placed after defineElasticParticles or useSoftParticles.
+  Requires Rockable compiled with ROCKABLE_ENABLE_SOFT_PARTICLES.
+
+[keyword] SoftParticles
+doc: SoftParticles [(int) numberOfSoftParticles]
+
+  State of the soft particles, as written in the conf-files (strain and stress in the body frame).
+  The viscosities are zero for an elastic particle.
+  REPEAT FOR EACH SOFT PARTICLE {
+     [(int) id] [(double) Young] [(double) Poisson] [(double) shearViscosity] [(double) bulkViscosity]
+     [(mat9r) deformationGradient] [(mat9r) stress] [(mat9r) strain]
+  }
+
+[keyword] Transformations
+doc: Transformations [(int) numberOfSoftParticles]
+
+  Deformation gradients written by the first versions of the soft particles (read only).
+  REPEAT FOR EACH SOFT PARTICLE { [(int) id] [(mat9r) deformationGradient] }
 
 [keyword] knContact
 doc: knContact [(int) group1] [(int) group2] [(double) value]
@@ -353,10 +410,12 @@ doc: By default, the separator character in a conf-file is the 'space'
   but it can be changed to 'tab' or 'semicolon'
 
 [keyword] glue_with_walls
-doc: glue_with_walls [0/1]
+doc: glue_with_walls [yes/no]
 
-  State wether the glue will be activated between driven and not-driven bodies
-  when the command 'stickClusters' will be invoked
+  State whether the glue will be activated between driven and not-driven bodies
+  by the commands 'stickClusters' and 'stickVerticesInClustersMoments'
+  ('stickVerticesInClusters' and 'stickBCM' ignore it). Accepted affirmative
+  forms are yes, YES, y, Y and 1.
 
 [keyword] precision
 doc: precision [(int) value]
@@ -384,18 +443,30 @@ doc: Interactions [(int) numberOfInteractions]
 doc: Interfaces [(int)numberOfInterfaces]
 
   REPEAT FOR EACH INTERFACE {
-     [(int) i] [(int) j] [(int) nbBonds]
+     [(int) i] [(int) j] [(int) nbBonds] [(double) dn0] [(double) area]
      IF (ParamsInInterfaces is not 0) {
-        [(double) kn] [(double) kt] [(double) kr] [(double) fn0] [(double) ft0] [(double) mom0] [(double) power]
+        [(double) kn] [(double) kt] [(double) kr] [(double) fn0] [(double) ft0] [(double) mom0] [(double) power] [(double) Gc]
      }
-     REPEAT FOR EACH BOND { [(int) type] [(int) isub] [(int) jsub] }
+     REPEAT FOR EACH BOND { [(int) type] [(int) isub] [(int) jsub] [(double) dn0] [(vec3r) ds] }
   }
+
+  The dn0 of a bond is its normal distance when it was created (it carries no force there),
+  and ds its cumulated tangential displacement. Older conf-files, without area, bond dn0 and ds,
+  are still read (the area is then computed from the positions of the bonds).
+
+[keyword] bondStiffnessPerInterface
+doc: bondStiffnessPerInterface [(int) 0 or 1]
+
+  With the force law BCM, the bond stiffnesses (knInnerBond, ktInnerBond...) are given
+  for each bond (0, default), or for the whole interface (1): each of the n bonds of an
+  interface then has 1/n of the stiffness. The breakage energy and the bond damping follow.
 
 [keyword] DataExtractor
 doc: DataExtractor [(string) Name] ...
 
   Adds a data extractor that records quantities during the simulation.
-  Possible Names are: 'ClusterAABB', 'dnStat', 'DuoBalance', 'MeanVelocity' or 'TrackBody'.
+  Possible Names are: 'ClusterAABB', 'dnStat', 'DuoBalance', 'MeanVelocity', 'TrackBody',
+  'TrackDamage', 'TrackRockfall', 'TrackSoftParticle' or 'TrackStress'.
   The remaining parameters depend on the chosen extractor.
   Kept for compatibility: prefer defining them in a file named 'dataExtractors.txt'.
 
@@ -444,7 +515,7 @@ doc: setStiffnessRatioInterfaces [(double) ratio]
   glued interfaces (only for parameters that are embedded in the Interfaces).
 
 [keyword] setVariableStickParams
-doc: setVariableStickParams [(string) paramName] [(string) isInnerStr] [(double) lambda] [(double) m] [(int) timeSeeded]
+doc: setVariableStickParams [(string) paramName: kn, kt, kr, fn0, ft0, mom0, power or Gc] [(string) inner|outer] [(double) lambda] [(double) m] [(int) timeSeeded]
 
 [keyword] randomlyOrientedVelocities
 doc: randomlyOrientedVelocities [(double) velocity]
@@ -507,7 +578,7 @@ doc: PeriodicLoading [(string) Name] ...
 doc: PostProcessor [(string) Name] ...
 
   Adds a post-processor (used by the 'postpro' tool).
-  Possible Names are: 'ClusterGranulo' or 'ParticleStress'.
+  Possible Names are: 'ClusterGranulo', 'ParticleStress' or 'SampleState'.
 
 [keyword] firstConf
 doc: firstConf [(int) value]
@@ -533,12 +604,21 @@ doc: ConfVolumes [(int) nb]
 [keyword] SievingSizes
 doc: SievingSizes [(int) nb] [(double) size1] [(double) size2] ...
 
-  List of nb sieving sizes used by the ClusterGranulo post-processor.
+  List of nb sieving sizes used by the ClusterGranulo post-processor: the
+  upper bounds, in number of particles, of the classes of sub-clusters
+  (the last class also holds the larger ones).
 
 [keyword] Volume
 doc: Volume [(double) value]
 
-  Reference volume used by the ParticleStress post-processor.
+  Reference volume used by the ParticleStress post-processor. With SampleState, a volume
+  imposed for every conf-file (otherwise from WallBox or the periodic cell).
+
+[keyword] WallBox
+doc: WallBox [(int) xmin] [(int) xmax] [(int) ymin] [(int) ymax] [(int) zmin] [(int) zmax]
+
+  The six walls of a box (body numbers), used by the SampleState post-processor
+  to measure the sizes and the volume of the sample.
 
 # --- shapes
 
@@ -729,11 +809,17 @@ doc: nf [(int) numberOfFaces]
 
 [type] TrackRockfall
 
+[type] TrackSoftParticle
+
+[type] TrackStress
+
 # --- post-processors
 
 [type] ClusterGranulo
 
 [type] ParticleStress
+
+[type] SampleState
 
 # --- controls (driving system)
 
@@ -878,6 +964,10 @@ dh _damping_
 
 [snippet] Soft particles
 useSoftParticles _Young_ _Poisson_
+
+[snippet] Viscoelastic soft particles
+useSoftParticles _Young_ _Poisson_
+useViscousTime _tau_
 
 [snippet] Spring joint
 initSpringJoint _ibody_ _ix_ _iy_ _iz_ _jbody_ _jx_ _jy_ _jz_ _stiffness_

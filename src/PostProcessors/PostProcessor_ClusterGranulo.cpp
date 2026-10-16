@@ -40,7 +40,7 @@
 #include "Core/Rockable.hpp"
 #include "ProcessingTools/processingTool_getBrokenSubClusters.hpp"
 
-static Registrar<PostProcessor, ClusterGranulo> registrar("ClusterGranulo");
+// Registered in Rockable::ExplicitRegistrations
 
 ClusterGranulo::ClusterGranulo() { }
 
@@ -80,8 +80,11 @@ void ClusterGranulo::exec() {
   std::vector<double> NumberInClass(SievingSizes.size());
   
   for (size_t i = 0 ; i < subclusters.size() ; i++) {
-    size_t sieveClass = subclusters[i].particleId.size() - 1;
-    if (sieveClass >= SievingSizes.size()) sieveClass = SievingSizes.size() - 1;
+    // The class of a sub-cluster of n particles is the first one whose value is not smaller
+    // than n; the sub-clusters larger than the last value go into the last class
+    double n = static_cast<double>(subclusters[i].particleId.size());
+    size_t sieveClass = 0;
+    while (sieveClass + 1 < SievingSizes.size() && n > SievingSizes[sieveClass]) sieveClass++;
     NumberInClass[sieveClass] += 1.0;
   }
   

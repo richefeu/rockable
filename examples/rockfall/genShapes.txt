@@ -1,0 +1,6 @@
+generateShape:rectangle_xz Slope 0.1 40 12
+generateShape:rectangle_xz Floor 0.1 60 12
+generateShape:sphere Sphere 0.62
+generateShape:cube Cube 0.05 1.0
+generateShape:cuboid Slab 0.05 2.0 0.5 1.0
+

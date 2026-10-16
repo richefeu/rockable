@@ -50,9 +50,6 @@ class BreakableInterface {
   size_t i{0};  ///< ID-number of the first particle
   size_t j{0};  ///< ID-number of the second particle
 
-  // Be careful not to change the order of the following parameters
-  // because they are accessed in Rockable::setVariableStickParams
-  // with a shift relative to 'kn'
   double kn{0.0};     ///< Embeded kn
   double kt{0.0};     ///< Embeded kt
   double kr{0.0};     ///< Embeded kr
@@ -65,15 +62,17 @@ class BreakableInterface {
   int breakModel{breakModel_Gc};
 
   double dn0{0.0};   ///< distance for which fn = 0
-  double area{0.0};  ///< ___
-  double En{0.0};    ///< ___
-  double Et{0.0};    ///< ___
+  double area{0.0};  ///< Area of the interface (used by the Gc breakage model)
+  double En{0.0};    ///< Normal elastic energy stored in the bonds
+  double Et{0.0};    ///< Tangential elastic energy stored in the bonds
 
   int isInner{-1};  ///< Equals 1 if the interface is inside a cluster, 0 if it is in-between two different clusters
   std::vector<Interaction*> concernedBonds;  ///< Links to the connected points
 
   BreakableInterface();  // Ctor
   BreakableInterface(size_t I, size_t J);
+
+  void computeAreaFromConcernedBonds();
 };
 
 namespace std {

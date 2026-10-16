@@ -1,0 +1,17 @@
+Control _x_Vel_ 2 0.0
+Control _y_Vel_ 2 0.0
+Control _z_Vel_ 2 0.0
+Control _y_Vel_ 22 0.0
+Control _z_Vel_ 22 0.0
+
+Control _x_Vel_ 23 0.0
+Control _y_Vel_ 23 0.0
+Control _z_Vel_ 23 0.0
+Control _y_Vel_ 43 0.0
+Control _z_Vel_ 43 0.0
+
+Control _x_Vel_ 44 0.0
+Control _y_Vel_ 44 0.0
+Control _z_Vel_ 44 0.0
+Control _y_Vel_ 64 0.0
+Control _z_Vel_ 64 0.0

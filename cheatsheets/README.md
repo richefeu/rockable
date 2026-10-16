@@ -48,7 +48,6 @@ The `boxed-sheet` package is fetched by Typst on first use.
 - `kwtable(...)` — a two-column keyword table. Use a bulleted list instead when
   the keys are long, otherwise the description column gets squeezed.
 
-The content is drawn from the source rather than from the documentation, so a
-few entries deliberately differ from `sphinxdoc`, in particular the
-`tranformation:` keywords of `generator` and the `MinkowskiRadius` keyword of
-`tess2shape`.
+The content is drawn from the source rather than from the documentation. When
+the two disagree, the source is what the sheets describe, and `sphinxdoc` is
+the thing to fix.

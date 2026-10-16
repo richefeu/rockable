@@ -19,6 +19,11 @@ other cases.
    ``BodyForce`` replaces the first. Unlike the data extractors, the active body
    force *is* written back into the conf-files, so it survives a restart.
 
+.. note::
+
+   A body force acts on the free bodies only, not on the ``nDriven`` driven
+   ones.
+
 
 ``ViscousFluid`` (*double*) **fluidDensity**
 --------------------------------------------
@@ -126,7 +131,9 @@ choice matters:
      - Caps the velocities without adding any dissipative force. Useful for a
        deposition, leaves the contact law untouched.
    * - ``BodyForce ViscousFluid``
-     - A real drag force, with a physical parameter. The only one of the three
-       that can be defended in a published result as part of the model.
+     - Meant as a real drag force, with a physical parameter, which would make
+       it the only one of the three that can be defended in a published result
+       as part of the model. In its current state, it does not oppose the
+       motion (see the warning above).
 
 They are described together in :ref:`Dissipation`.

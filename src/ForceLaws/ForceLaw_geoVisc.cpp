@@ -33,6 +33,8 @@
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
+#include <algorithm>
+
 #include "factory.hpp"
 
 #include "Core/Rockable.hpp"
@@ -85,11 +87,12 @@ bool GeoVisc::computeInteraction(Interaction& I) {
   double vn = I.vel * I.n;
   double fne = -kn * I.dn;
 
-  /*
+  // Stiffer repulsion at large overlap, to prevent the bodies from crossing each other.
+  // The factor L / (L + dn) is capped at 100 (it would diverge when the overlap reaches L)
   if (box->preventCrossingLength > 0.0) {
-    fne *= box->preventCrossingLength / (box->preventCrossingLength + I.dn);
+    const double L = box->preventCrossingLength;
+    fne *= L / std::max(L + I.dn, 0.01 * L);
   }
-  */
 
   double fnv = damp * vn;
   I.fn = fne + fnv;

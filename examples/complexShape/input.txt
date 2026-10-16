@@ -1,0 +1,27 @@
+Rockable 21-08-2022
+
+# A rock, converted from rock.stl, spinning freely (no gravity, no contact).
+# Before running it:
+#   stl2shape -r 0.5 -c rock.stl    (writes mesh.shp)
+#   mv mesh.shp rock.shp
+
+t 0
+tmax 1.0
+dt 1e-4
+interVerlet 0.01
+interConf 0.02
+
+DVerlet 0.01
+dVerlet 0.005
+
+density 0 2700
+gravity 0 0 0
+
+forceLaw Default
+
+iconf 0
+nDriven 0
+shapeFile rock.shp
+Particles 1
+# the coordinates of rock.stl are in millimetres: homothety 1e-3
+rock.stl 0 0 1.0e-3   0 0 0   0 0 0   0 0 0   1 0 0 0   1.0 6.0 0.5   0 0 0

@@ -115,15 +115,14 @@ bool Avalanche::computeInteraction(Interaction& I) {
 
   // === Resistant moment
   I.mom += kr * (box->Particles[I.j].vrot - box->Particles[I.i].vrot) * box->dt;
-  vec3r branch;
-  if (I.i < box->nDriven) {  // j is the free body (a rock block)
-    branch = I.pos - box->Particles[I.j].pos;
-    double r = (branch * box->Particles[I.j].vrot) / (box->Particles[I.j].vrot * box->Particles[I.j].vrot);
-    branch -= r * box->Particles[I.j].vrot;
-  } else {  // i is the free body (a rock block)
-    branch = I.pos - box->Particles[I.i].pos;
-    double r = (branch * box->Particles[I.i].vrot) / (box->Particles[I.i].vrot * box->Particles[I.i].vrot);
-    branch -= r * box->Particles[I.i].vrot;
+  // Branch vector of the free body (a rock block), without its component along the rotation vector.
+  // When the body does not rotate, the whole branch vector is kept.
+  size_t ifree = (I.i < box->nDriven) ? I.j : I.i;
+  vec3r branch = I.pos - box->Particles[ifree].pos;
+  const vec3r& w = box->Particles[ifree].vrot;
+  double w2 = w * w;
+  if (w2 > 0.0) {
+    branch -= ((branch * w) / w2) * w;
   }
   double threshold_mom = fabs(mur * norm(branch) * I.fn);  // even without fabs, the value should
                                                            // be positive

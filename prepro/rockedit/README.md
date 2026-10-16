@@ -108,7 +108,7 @@ Notes
 -----
 
 * The whole file is held in memory as a vector of lines and only the visible
-  ones are rendered, so opening the 11 MB `examples/BigForTests/input.txt` is
+  ones are rendered, so opening an input file of several megabytes is
   instantaneous.
 * Bytes are treated as columns: the Rockable input files are ASCII.
 * `^C` does not quit (signals are disabled in raw mode); use `^X`.

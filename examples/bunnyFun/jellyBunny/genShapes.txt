@@ -1,0 +1,7 @@
+# The shape of the floor (commands of generator)
+open floor.shp
+# a plate of 60 x 60 cm, 2 cm thick (a radius of 1 cm): the vertices of a
+# bunny that sinks into it by a few millimetres stay on the same side
+generateShape:rectangle_xz Floor 0.01 0.6 0.6
+close
+

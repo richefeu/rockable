@@ -1,11 +1,9 @@
 Rockable 21-08-2022
 
-#parallel_mode DefaultParallelMode
-
 #### time #############################
 t 0
 tmax 1.0
-dt $2 * 0.5e-6$
+dt 1e-6
 interVerlet 0.01
 interConf 0.05
 
@@ -17,18 +15,11 @@ dVerlet 0.02
 density 0 2700
 density 1 2700
 
-#BodyForce ViscousFluid 3000
-
-#VelocityBarrier 0.1
-#AngularVelocityBarrier 1.1
-#AngularVelocityBarrierExponent 5
-
-#useSoftParticles 1e6 0.0
-
 #### interaction model ################
 forceLaw Default
 
 #### interaction parameters ###########
+# between the plane (group 0) and the grains (group 1)
 knContact 0 1 1e7
 en2Contact 0 1 0.02
 ktContact 0 1 1e7
@@ -36,6 +27,7 @@ muContact 0 1 0.9
 krContact 0 1 1e7
 murContact 0 1 0.0
 
+# between two grains (group 1)
 knContact 1 1 1e7
 en2Contact 1 1 0.2
 ktContact 1 1 1e7
@@ -47,14 +39,7 @@ murContact 1 1 0.0
 iconf 0
 nDriven 1
 shapeFile shapes.shp
-Particles 5
-Plan 0 0 1.0   0 -0.05 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
-Rice 1 0 1.0   -0.5 0.5 0   0 0 0   0 0 0   0.707 0 0.707 0   0 0 -10   0 0 0
-Sphere 1 0 1.0   0.3 0.5 0   0 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
-Sphere 1 0 1.0   0.3 0.66 0   0.5 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
-HandRockSimple.stl 1 0 1.0e-2   0.7 0.7 0   0.5 0 0   0 0 0   1 0 0 0   0 0 0   0 0 0
-
-initSpringJoint  2  0 0.08 0     3  0 -0.08 0    1e6
-
-
-
+Particles 3
+Plan   0 0 1.0   0 -0.05 0   0 0 0   0 0 0   1 0 0 0         0 0 0     0 0 0
+Rice   1 0 1.0  -0.5 0.5 0   0 0 0   0 0 0   0.707 0 0.707 0   0 0 -10   0 0 0
+Sphere 1 0 1.0   0.3 0.5 0   0 0 0   0 0 0   1 0 0 0         0 0 0     0 0 0

@@ -2,6 +2,8 @@
 
 #show: rockable-sheet.with(
   title: [Configuration file for `Rockable` (conf-files)],
+  font-size: 6.4pt,
+  line-skip: 5.4pt,
 )
 
 = Anatomy of a conf-file
@@ -73,7 +75,7 @@
     - #command("angleUpdateNL <value>") ~Rotation threshold, *in degrees*.
   - #command("preventCrossingLength <value>") ~When positive, stiffens the
     normal repulsion at large overlap to prevent bodies from crossing each
-    other. Only written in the conf-file when non-zero.
+    other (`Default` and `GeoVisc`; factor $L\/(L+d_n)$ capped at 100).
 ])
 
 = Neighbor-list and contact strategies
@@ -137,20 +139,28 @@
 
   - #command("Interfaces <nb>") ~Glued interfaces between two bodies. One
     interface per line:
-    #command("<i> <j> <nbBonds> <dn0>") then, only if
+    #command("<i> <j> <nbBonds> <dn0> <area>") then, only if
     #command("ParamsInInterfaces") is 1,
-    #command("<kn> <kt> <kr> <fn0> <ft0> <mom0> <power> <Gc>"), then `nbBonds`
-    triplets #command("<type> <isub> <jsub>") identifying the bonded
-    sub-interactions. A bond that cannot be matched with an existing interaction
-    raises a warning and the whole interface is dropped.
+    #command("<kn> <kt> <kr> <fn0> <ft0> <mom0> <power> <Gc>"), then for each
+    bond #command("<type> <isub> <jsub> <dn0> <ds>"): the bonded
+    sub-interaction, its distance at creation and its tangential displacement
+    (vec3r). A bond that cannot be matched with an existing interaction raises a
+    warning and the whole interface is dropped. Older files, without `area`,
+    bond `dn0` and `ds`, are still read.
 
   - #command("ParamsInInterfaces <0|1>") ~When 1, each interface carries its own
     parameters (written and read on the interface line) instead of taking them
     from the group-pair table. Required by
     #command("setVariableStickParams") and #command("setStiffnessRatioInterfaces").
 
+  - #command("bondStiffnessPerInterface <0|1>") ~`BCM`: the bond stiffnesses are
+    given for each bond (0, default) or for the whole interface (1, shared by
+    its bonds).
+
   - #command("glue_with_walls <yes|no>") ~Also glue the free bodies to the
-    driven ones when the sticking prepro-commands are executed.
+    driven ones with #command("stickClusters") and
+    #command("stickVerticesInClustersMoments") (ignored by the other sticking
+    commands).
 
   - #command("initSpringJoint <i> <ipos0> <j> <jpos0> <stiffness>")
     ~Adds a linear spring joint between bodies `i` and `j`, anchored at
@@ -167,8 +177,8 @@
     the cell matrix.
   - #command("mh <value>") ~Mass ratio used to build the inertia of the cell.
   - #command("dh <value>") ~Numerical damping of the cell degrees of freedom.
-  - #command("cellVelocityCorrection <0|1>") ~Remove the mean velocity drift.
-  - #command("cellMomentumCorrection <0|1>") ~Remove the total momentum drift.
+  - #command("cellVelocityCorrection <interval>") ~Remove the mean velocity drift (0: off).
+  - #command("cellMomentumCorrection <interval>") ~Remove the total momentum drift (0: off).
   - #command("useKineticStress <0|1>") ~Include the kinetic (fluctuation) term
     in the stress used by the cell servo-control.
 
@@ -180,9 +190,21 @@
 = Deformable particles #soft-flag
 
 #concept-block(body: [
-  - #command("useSoftParticles <Young> <Poisson>") ~Enable the homogeneous
-    straining of the particles and set the compliance from the Young modulus and
-    the Poisson ratio.
+  To be placed after the particles. Each soft particle has a uniform
+  deformation gradient $bold(F)$ driven by its mean stress.
+  - #command("useSoftParticles <E> <nu>") ~All the free (not driven) particles
+    become elastic.
+  - #command("defineElasticParticles <E> <nu> <n> <id1> ...") ~The listed
+    particles become elastic.
+  - #command("useViscousTime <tau>") ~All the soft particles become
+    viscoelastic (Kelvin-Voigt) with $bold(D) = tau bold(C)$; a few tens of
+    time steps stabilise the stiff interfaces.
+  - #command("defineViscousTime <tau> <n> <id1> ...") ~The same for the listed
+    particles.
+  - #command("defineViscousParameters <etaS> <etaB> <n> <id1> ...") ~Shear and
+    bulk viscosities of the listed particles.
+  - #command("SoftParticles <n>") ~Written in the dumps: one line per soft
+    particle, #command("<id> <E> <nu> <etaS> <etaB> <F> <stress> <strain>").
 ])
 
 = What a saved conf-file contains
@@ -191,7 +213,8 @@
   Dumps written by `rockable` are themselves valid input files. They always hold
   the timing, the neighbor-list settings, the strategy option names, the group
   properties, every *defined* interaction parameter, then
-  #command("Particles"), #command("Interactions") and #command("Interfaces").
+  #command("Particles"), #command("SoftParticles") (if any),
+  #command("Interactions") and #command("Interfaces").
 
   They never hold the pre-processing commands, the data extractors, nor the
   driving system: those live in the initial input file and in the companion

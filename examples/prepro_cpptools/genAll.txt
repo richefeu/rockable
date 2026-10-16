@@ -10,7 +10,7 @@ open input.txt
 print Rockable 21-08-2022
 print #### time #############################
 print t 0
-print tmax 2.0
+print tmax 0.5
 print dt 5e-6
 print interVerlet 0.001
 print interConf 0.01
@@ -46,7 +46,7 @@ print #### the system #######################
 print iconf 0
 print shapeFile shapes.txt
 print nDriven 6
-print Particles 3381
+Particles:placeHolder
 
 generatePacking:wallBox
 1

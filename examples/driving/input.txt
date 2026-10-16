@@ -1,17 +1,25 @@
-Rockable 29-11-2018
+Rockable 21-08-2022
+
+#### time #############################
 t 0
 tmax 1.0
 dt 1e-6
-interVerlet 0.01
+interVerlet 0.001
 interConf 0.01
 
+#### proximity of the particles #######
 DVerlet 0.08
 dVerlet 0.02
+
+#### properties for particles #########
 density 0 2700
 density 1 2700
 
+#### interaction model ################
 forceLaw Avalanche
 
+#### interaction parameters ###########
+# between the plate (group 0) and the grains (group 1)
 knContact 0 1 1e6
 en2Contact 0 1 0.2
 ktContact 0 1 1e7
@@ -19,11 +27,21 @@ muContact 0 1 0.9
 krContact 0 1 1e7
 murContact 0 1 0.0
 
+# between two grains (group 1)
+knContact 1 1 1e6
+en2Contact 1 1 0.2
+ktContact 1 1 1e7
+muContact 1 1 0.9
+krContact 1 1 1e7
+murContact 1 1 0.0
+
+#### the system #######################
 iconf 0
+# the first particle (the plate) is driven: see drivingSystem.txt
 nDriven 1
 shapeFile SphereAndPlan.shp
 Particles 4
-Plan 0 0 1 0 -0.05 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0
-Rice 1 0 1 -0.5 0.5 0 3.69 -3.29 0 0 0 0 0.707 0 0.707 0 0 0 0. 0 0 0
-Sphere 1 0 1 0.3 0.5 0 3.69 -3.29 0 0 0 0 0.707 0 0.707 0 0 0 0. 0 0 0
-Rice 1 0 0.5 -0.8 0.5 0 3.69 -3.29 0 0 0 0 0.707 0 0.707 0 0 0 0. 0 0 0
+Plan   0 0 1.0   0 -0.05 0    0 0 0         0 0 0   1 0 0 0             0 0 0   0 0 0
+Rice   1 0 1.0  -0.5 0.5 0    3.69 -3.29 0  0 0 0   0.707 0 0.707 0     0 0 0   0 0 0
+Sphere 1 0 1.0   0.3 0.5 0    3.69 -3.29 0  0 0 0   0.707 0 0.707 0     0 0 0   0 0 0
+Rice   1 0 0.5  -0.8 0.5 0    3.69 -3.29 0  0 0 0   0.707 0 0.707 0     0 0 0   0 0 0

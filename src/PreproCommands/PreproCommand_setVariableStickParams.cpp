@@ -51,8 +51,9 @@ void setVariableStickParams::addCommand() {
 
 /**
    Usage (in an input file):
-   variableStickParams paramName inner/outer lambdaValue mValue 0/1
-   example: variableStickParams fn0 inner 80 9 1
+   setVariableStickParams paramName inner/outer lambdaValue mValue 0/1
+   with paramName among kn, kt, kr, fn0, ft0, mom0, power and Gc
+   example: setVariableStickParams fn0 inner 80 9 1
 */
 void setVariableStickParams::exec() {
   std::default_random_engine generator;
@@ -61,19 +62,29 @@ void setVariableStickParams::exec() {
   }
   std::weibull_distribution<> distribution(m, lambda);
 
-  int shift = 0;
+  double BreakableInterface::*param = nullptr;
   if (paramName == "kn")
-    shift = 0;
+    param = &BreakableInterface::kn;
   else if (paramName == "kt")
-    shift = 1;
+    param = &BreakableInterface::kt;
   else if (paramName == "kr")
-    shift = 2;
+    param = &BreakableInterface::kr;
   else if (paramName == "fn0")
-    shift = 3;
+    param = &BreakableInterface::fn0;
   else if (paramName == "ft0")
-    shift = 4;
+    param = &BreakableInterface::ft0;
   else if (paramName == "mom0")
-    shift = 5;
+    param = &BreakableInterface::mom0;
+  else if (paramName == "power")
+    param = &BreakableInterface::power;
+  else if (paramName == "Gc")
+    param = &BreakableInterface::Gc;
+  else {
+    Logger::warn("setVariableStickParams: unknown parameter '{}' (kn, kt, kr, fn0, ft0, mom0, power or Gc), "
+                 "nothing is changed",
+                 paramName);
+    return;
+  }
 
   int isInner = 0;
   if (isInnerStr == "inner") isInner = 1;
@@ -85,8 +96,8 @@ void setVariableStickParams::exec() {
       if (isInner == 0 && icluster == jcluster) continue;
       if (isInner == 1 && icluster != jcluster) continue;
 
-      double* seek = (double*)&(it->kn);
-      *(seek + shift) = distribution(generator);
+      // the set holds const elements, but the parameters do not take part in their ordering
+      const_cast<BreakableInterface&>(*it).*param = distribution(generator);
     }
   }
 

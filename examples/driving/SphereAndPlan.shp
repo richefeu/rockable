@@ -1,7 +1,7 @@
 <
 name Plan
 radius 0.05
-preCompDone n
+preCompDone y
 nv 4
 2 0 0.5
 2 0 -0.5
@@ -14,7 +14,7 @@ ne 4
 3 0
 nf 1
 4 0 1 2 3
-obb.extent 2.0 0.05 0.5
+obb.extent 2.05 0.05 0.55
 obb.e1 1 0 0
 obb.e2 0 1 0
 obb.e3 0 0 1
@@ -36,8 +36,8 @@ obb.e1 1 0 0
 obb.e2 0 1 0
 obb.e3 0 0 1
 obb.center 0 0 0
-volume 0.004021
-I/m 0.00493333 0.00493333 0.0032
+volume 0.002144660584851
+I/m 0.00256 0.00256 0.00256
 >
 
 <
@@ -57,6 +57,8 @@ obb.e1 1 0 0
 obb.e2 0 1 0
 obb.e3 0 0 1
 obb.center 0 0 0
-volume 0.014021
+volume 0.008578642339403
 I/m 0.00493333 0.00493333 0.0032
 >
+
+

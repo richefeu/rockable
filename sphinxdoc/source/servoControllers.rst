@@ -15,6 +15,12 @@ the wall, which changes as the sample deforms.
    Only one servo can be active at a time. The servo function is stored as a
    single callback, so a second ``Servo`` entry silently replaces the first.
 
+.. note::
+
+   A misspelt servo name whose name starts with ``tritri`` prints an error, but
+   any other unknown name is **silently ignored**: check the spelling when a
+   servo seems to do nothing.
+
 .. contents::
    :local:
    :depth: 2
@@ -65,6 +71,14 @@ force applied to a wall is the target stress times the corresponding area.
    Because the Minkowski radii are subtracted, the dimensions used are those of
    the **free volume** available to the grains, not the distance between the
    wall centres.
+
+.. tip::
+
+   A wall driven by a force keeps its mass: it moves under the difference
+   between the imposed force and the force of the grains. A wall much heavier
+   than the sample oscillates, and the stress it imposes oscillates with it.
+   Giving the walls a small ``density`` (their own group) makes the loading
+   much smoother. The tutorial ``examples/triaxialTest`` shows the difference.
 
 
 ``tritriIsostaticCompression`` (*double*) **pressure**
@@ -223,9 +237,16 @@ the continuously varying inertial forcing of a sine.
 ``sawtooth_shaker`` (*int*) **body** (*vec3r*) **dir** (*double*) **A** (*double*) **freq** (*double*) **t_ini**
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-``triangle_shaker`` with a settable phase origin ``t_ini``, so that the
-oscillation can be made to start at a chosen time rather than at :math:`t = 0`.
-This is what makes it usable after a deposition stage.
+``triangle_shaker`` with a starting time ``t_ini``: the body stays still until
+``t_ini``, then oscillates. Its displacement is a triangular wave of amplitude
+:math:`A` about its position at ``t_ini``, starting along ``dir``. This is what
+makes it usable after a deposition stage, in the same computation.
+
+.. code-block:: text
+   :caption: drivingSystem.txt
+
+   # body 1 still until t = 0.5 s, then shaken vertically, 2 mm at 20 Hz
+   Servo sawtooth_shaker 1  0 1 0  0.002 20  0.5
 
 
 Ramps
@@ -252,6 +273,11 @@ along a linear ramp:
    Servo ramp _y_For_ 3 0.0 -5000.0 0.1 0.6
 
 This is the way to avoid the shock of a load applied abruptly at the first step.
+
+.. note::
+
+   ``drivingSystem.txt`` is re-read at every conf-file, so the parameters of a
+   ramp can be changed while the computation runs.
 
 .. tip::
 

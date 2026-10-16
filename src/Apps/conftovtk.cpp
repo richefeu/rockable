@@ -33,6 +33,9 @@
 //  The fact that you are presently reading this means that you have had
 //  knowledge of the CeCILL-B license and that you accept its terms.
 
+#include <algorithm>
+#include <cctype>
+
 #include "conftovtk.hpp"
 
 bool tryToReadConf(int num) {
@@ -362,7 +365,6 @@ void writeVTKContactsSpheres(int num) {
   sortie_vtk = fopen(vtk_file, "w");
 
   long nbContacts = 0;
-  double fMax = 0;
 
   for (size_t k = 0; k < box.Interactions.size(); ++k) {
     std::set<Interaction>::iterator it = box.Interactions[k].begin();
@@ -372,7 +374,6 @@ void writeVTKContactsSpheres(int num) {
           continue;
         else {
           nbContacts++;
-          fMax = std::max(fMax, norm(it->fn * it->n + it->ft));
         }
       }
     }
@@ -400,7 +401,9 @@ void writeVTKContactsSpheres(int num) {
 
   fprintf(sortie_vtk, "POINT_DATA %li\n", nbContacts);
 
-  fprintf(sortie_vtk, "VECTORS F_Fmax float\n");
+  // Half the sum of the Minkowski radii of the two bodies, along z (a size for the glyphs of the contacts).
+  // This array was named F_Fmax, although it holds no force.
+  fprintf(sortie_vtk, "VECTORS MeanRadius float\n");
 
   for (size_t k = 0; k < box.Interactions.size(); ++k) {
     std::set<Interaction>::iterator it = box.Interactions[k].begin();
@@ -412,9 +415,9 @@ void writeVTKContactsSpheres(int num) {
         if (it->dn > 0.0 && it->stick == nullptr)
           continue;
         else {
-          fMax = box.Particles[i].MinkowskiRadius() + box.Particles[j].MinkowskiRadius();
-          if (fMax != 0.)
-            fprintf(sortie_vtk, "0. 0. %lf\n", fMax / 2.);
+          double sumRadii = box.Particles[i].MinkowskiRadius() + box.Particles[j].MinkowskiRadius();
+          if (sumRadii != 0.)
+            fprintf(sortie_vtk, "0. 0. %lf\n", sumRadii / 2.);
           else
             fprintf(sortie_vtk, "0. 0. 0.\n");
         }
@@ -612,11 +615,8 @@ void writeVTKOBB(int num) {
 
   for (size_t i = 0; i < box.Particles.size(); i++) {
 
-    obbi = box.Particles[i].shape->obb;
-    obbi.rotate(box.Particles[i].Q);
-    obbi.extent *= box.Particles[i].homothety;
-    obbi.center *= box.Particles[i].homothety;
-    obbi.center += box.Particles[i].pos;
+    box.Particles[i].updateObb();  // it accounts for the deformation of the soft particles
+    obbi = box.Particles[i].obb;
     // if (enlarged_obb) obbi.enlarge(0.5 * box.DVerlet);
 
     // je vais écrire les 8 sommets
@@ -675,31 +675,18 @@ void writeVTKOBB(int num) {
 
 void nbConfToVtk() {
   std::string nomfich;
-  char nom[25];
   struct dirent* lecture;
   DIR* rep;
   rep = opendir(".");
 
-  int number;
-
   tabConf.clear();
 
+  // Only the files named conf<number>
   while ((lecture = readdir(rep))) {
-    strcpy(nom, lecture->d_name);
-
-    nomfich = nom;
-
-    if (nomfich[0] == 'c' && nomfich[1] == 'o' && nomfich[2] == 'n' && nomfich[3] == 'f') {
-      std::string temp;
-
-      for (unsigned int i = 0; i < nomfich.size(); i++) {
-        if (isdigit(nomfich[i])) {
-          temp += nomfich[i];
-        }
-      }
-      std::istringstream stream(temp);
-      stream >> number;
-      tabConf.push_back(number);
+    nomfich = lecture->d_name;
+    if (nomfich.size() > 4 && nomfich.compare(0, 4, "conf") == 0 &&
+        std::all_of(nomfich.begin() + 4, nomfich.end(), [](unsigned char c) { return std::isdigit(c); })) {
+      tabConf.push_back(std::stoi(nomfich.substr(4)));
     }
   }
   closedir(rep);

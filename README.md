@@ -39,7 +39,7 @@ V. Richefeu, G. Combe, L. Amarsid, R. Prat, J.-M. Vanson, S. Nezamabadi, P. Muta
 ### Source tree 
 
 * `sphinxdoc`: user [documentation](https://richefeu.github.io/rockable/) (sphinx with ReStructuredText)
-* `examples`: examples for usage tutorials or for testing features
+* `examples`: the tutorials, with their learning path in [`examples/README.md`](examples/README.md)
 * `prepro`: some pre-processing tools
 * `src`: C++ source files
 * `test`: regression test files
@@ -87,6 +87,8 @@ Here is the non-exhaustive list of involved persons with their main mission:
 > [!NOTE]
 > The possibility of applying tri-periodic loading to an assembly is implemented and currently in the testing phase.
 
+* **Deformable Particles**: a particle can be given a uniform, linear isotropic elastic (or viscoelastic) deformation, driven by its mean stress: the Discrete Compliant-Element Method (DCEM). Glued together with the `BCM` force law, such particles model a material made of deformable cells whose interfaces can break. See `examples/softParticles` and the page *Deformable particles* of the documentation.
+
 * **Parallel Computation**: currently, an OpenMP optimization using compilation flags has been implemented. However, the computational speedup is relatively low. Typically, 8 cores are needed to halve the simulation time (for a dense system with a large number of elements).
 
 * **Documentation**: there is little [documentation](https://richefeu.github.io/rockable/), although efforts are being made to address this. For now, it is possible to generate the sphinxdoc documentation in your local folder.
@@ -94,6 +96,64 @@ Here is the non-exhaustive list of involved persons with their main mission:
 <p align="center">
 <img src="./gif-doc/gen-doc-rockable.gif" width="90%"/>
 </p>
+
+## Examples
+
+**To learn Rockable, start with the [tutorials and their learning path](examples/README.md).**
+
+The folder [`examples`](examples) holds small simulations written as tutorials, to
+be followed in order. Each one has a `readme.md` that explains it, with exercises.
+Each animation links to its example.
+
+<table>
+<tr>
+<td align="center"><a href="examples/helloworld"><img src="examples/helloworld/animation.gif" width="200" alt="helloworld"/></a><br/><code>helloworld</code></td>
+<td align="center"><a href="examples/helloworldPlus"><img src="examples/helloworldPlus/animation.gif" width="200" alt="helloworldPlus"/></a><br/><code>helloworldPlus</code></td>
+<td align="center"><a href="examples/driving"><img src="examples/driving/animation.gif" width="200" alt="driving"/></a><br/><code>driving</code></td>
+<td align="center"><a href="examples/isoComprSpheres"><img src="examples/isoComprSpheres/animation.gif" width="200" alt="isoComprSpheres"/></a><br/><code>isoComprSpheres</code></td>
+</tr>
+<tr>
+<td align="center"><a href="examples/prepro_cpptools"><img src="examples/prepro_cpptools/animation.gif" width="200" alt="prepro_cpptools"/></a><br/><code>prepro_cpptools</code></td>
+<td align="center"><a href="examples/DominoFun"><img src="examples/DominoFun/animation.gif" width="200" alt="DominoFun"/></a><br/><code>DominoFun</code></td>
+<td align="center"><a href="examples/stickVerticesInClusters"><img src="examples/stickVerticesInClusters/animation.gif" width="200" alt="stickVerticesInClusters"/></a><br/><code>stickVerticesInClusters</code></td>
+<td align="center"><a href="examples/isoComprSpheresPeriodic"><img src="examples/isoComprSpheresPeriodic/animation.gif" width="200" alt="isoComprSpheresPeriodic"/></a><br/><code>isoComprSpheresPeriodic</code></td>
+</tr>
+<tr>
+<td align="center"><a href="examples/PerioPoly"><img src="examples/PerioPoly/animation.gif" width="200" alt="PerioPoly"/></a><br/><code>PerioPoly</code></td>
+<td align="center"><a href="examples/softParticles/softBallImpact"><img src="examples/softParticles/softBallImpact/animation.gif" width="200" alt="softBallImpact"/></a><br/><code>softBallImpact</code></td>
+<td align="center"><a href="examples/softParticles/softBallImpactVoronoi"><img src="examples/softParticles/softBallImpactVoronoi/animation.gif" width="200" alt="softBallImpactVoronoi"/></a><br/><code>softBallImpactVoronoi</code></td>
+<td align="center"><a href="examples/softParticles/bondedBeam"><img src="examples/softParticles/bondedBeam/animation.gif" width="200" alt="bondedBeam"/></a><br/><code>bondedBeam</code></td>
+</tr>
+<tr>
+<td align="center"><a href="examples/softParticles/elasticCube"><img src="examples/softParticles/elasticCube/animation.gif" width="200" alt="elasticCube"/></a><br/><code>elasticCube</code></td>
+<td align="center"><a href="examples/softParticles/viscousCube"><img src="examples/softParticles/viscousCube/animation.gif" width="200" alt="viscousCube"/></a><br/><code>viscousCube</code></td>
+<td align="center"><a href="examples/sweepable"><img src="examples/sweepable/animation.gif" width="200" alt="sweepable"/></a><br/><code>sweepable</code></td>
+<td align="center"><a href="examples/complexShape"><img src="examples/complexShape/animation.gif" width="200" alt="complexShape"/></a><br/><code>complexShape</code></td>
+</tr>
+<tr>
+<td align="center"><a href="examples/postProcessing"><img src="examples/postProcessing/animation.gif" width="200" alt="postProcessing"/></a><br/><code>postProcessing</code></td>
+<td align="center"><a href="examples/triaxialTest"><img src="examples/triaxialTest/animation.gif" width="200" alt="triaxialTest"/></a><br/><code>triaxialTest</code></td>
+<td align="center"><a href="examples/fragmentation"><img src="examples/fragmentation/animation.gif" width="200" alt="fragmentation"/></a><br/><code>fragmentation</code></td>
+<td align="center"><a href="examples/columnCollapse"><img src="examples/columnCollapse/animation.gif" width="200" alt="columnCollapse"/></a><br/><code>columnCollapse</code></td>
+</tr>
+<tr>
+<td colspan="4" align="center"><a href="examples/rockfall"><img src="examples/rockfall/animation.gif" width="560" alt="rockfall"/></a><br/><code>rockfall</code></td>
+</tr>
+<tr>
+<td align="center"><a href="examples/bunnyFun/bunnyPile"><img src="examples/bunnyFun/bunnyPile/animation.gif" width="200" alt="bunnyPile"/></a><br/><code>bunnyFun/bunnyPile</code></td>
+<td align="center"><a href="examples/bunnyFun/bunnyInBunny"><img src="examples/bunnyFun/bunnyInBunny/animation.gif" width="200" alt="bunnyInBunny"/></a><br/><code>bunnyFun/bunnyInBunny</code></td>
+<td align="center"><a href="examples/bunnyFun/bunnyShot"><img src="examples/bunnyFun/bunnyShot/animation.gif" width="200" alt="bunnyShot"/></a><br/><code>bunnyFun/bunnyShot</code></td>
+<td align="center"><a href="examples/bunnyFun/jellyBunny"><img src="examples/bunnyFun/jellyBunny/animation.gif" width="200" alt="jellyBunny"/></a><br/><code>bunnyFun/jellyBunny</code></td>
+</tr>
+<tr>
+<td align="center"><a href="examples/bunnyFun/voronoiBunny"><img src="examples/bunnyFun/voronoiBunny/animation.gif" width="200" alt="voronoiBunny"/></a><br/><code>bunnyFun/voronoiBunny</code></td>
+<td align="center"><a href="examples/bunnyFun/bunnyBlocks"><img src="examples/bunnyFun/bunnyBlocks/animation.gif" width="200" alt="bunnyBlocks"/></a><br/><code>bunnyFun/bunnyBlocks</code></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+
+<p align="center"><a href="examples/README.md"><b>All the tutorials, in the order of the learning path</b></a></p>
 
 ## How to install
 
@@ -128,16 +188,19 @@ make -j
 make install 
 ```
 
-The options available are listed below:
+The options available are listed below. The features that work (periodic cell,
+soft particles) are enabled by default, so that a default build, and the
+continuous integration, compiles and tests all of them; disable the ones you do
+not need, since each has a small cost even when it is not used.
 
 * `ROCKABLE_USE_FT_CORR` (default is OFF): add objectivity correction to tangent forces.
 * `ROCKABLE_USE_TESTING` (default is OFF): build the regression tests.
 * `ROCKABLE_ENABLE_PROFILING` (default is OFF): enable time profiling.
 * `ROCKABLE_ENABLE_BOUNDARY` (default is OFF): enable the special boundaries like Ball or Cylinder.
-* `ROCKABLE_ENABLE_SOFT_PARTICLES` (default is OFF): enable straining of particles.
-* `ROCKABLE_ENABLE_PERIODIC` (default is OFF): enable full periodic boundary conditions.
+* `ROCKABLE_ENABLE_SOFT_PARTICLES` (default is ON): enable the homogeneous deformation of particles (DCEM).
+* `ROCKABLE_ENABLE_PERIODIC` (default is ON): enable full periodic boundary conditions.
 * `ROCKABLE_COMPILE_SEE` (default is ON): compile the application to visualize the conf-files.
-* `ROCKABLE_COMPILE_SEER` (default is ON): compile Dear My Seer (and Dear My Shape), the successor of `see`.
+* `ROCKABLE_COMPILE_SEER` (default is OFF): compile Dear My Seer (and Dear My Shape), the successor of `see`.
 * `ROCKABLE_COMPILE_CONF2VTK` (default is ON): compile the application to convert the conf-files into VTK files, to visualize the results with paraview.
 * `ROCKABLE_COMPILE_POSTPRO` (default is ON): compile the application for postprocessing the results.
 * `ROCKABLE_COMPILE_PREPRO` (default is ON): compile the applications to generate inputs for the code.

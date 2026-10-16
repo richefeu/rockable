@@ -50,7 +50,7 @@ src/Apps/mini-imgui-implot/*.o
 tutorials/
 
 # Scratch simulation folder of Dear My Seer: 245 MB of conf files and
-# screenshots, duplicating examples/test_GeoVisc. Never to be tracked again.
+# screenshots, from the former examples/test_GeoVisc. Never to be tracked again.
 src/Apps/DearMySeer/test_GeoVisc/
 
 # Any folder named sandbox: throwaway trials, never to be committed

@@ -1,1 +1,2 @@
+# The plate (body 0) rotates about the z axis at 6.28 rad/s (one turn per second)
 Control _zrot_Vel_ 0 6.28

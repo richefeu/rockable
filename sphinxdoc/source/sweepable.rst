@@ -1,3 +1,5 @@
+.. _sweepable:
+
 Application `sweepable`
 =======================
 
@@ -6,12 +8,14 @@ It reads a script file and generates a tree of input files — one per parameter
 combination — ready to be launched in parallel with the companion script
 ``batchable.sh``.
 
-Both tools ship as a single self-contained file:
+The tool lives in ``prepro/sweepable`` and is made of two files:
 
 - ``simuFileManips.hpp`` — header-only C++ library (the engine)
-- ``sweepable.cpp`` — the script interpreter (build with ``make``)
+- ``sweepable.cpp`` — the script interpreter
 
-No external dependencies. Requires C++17.
+No external dependencies. Requires C++17. It is built and installed by CMake
+along with the other pre-processing tools (``ROCKABLE_COMPILE_PREPRO``, on by
+default); the ``Makefile`` of its folder builds it on its own.
 
 .. contents::
    :local:
@@ -23,6 +27,9 @@ Quick Start
 
 Build
 ^^^^^
+
+With CMake, ``sweepable`` is built with the rest of Rockable. On its own, in
+``prepro/sweepable``:
 
 .. code-block:: sh
 

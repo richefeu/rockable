@@ -1,0 +1,8 @@
+# postpro command file: the state of the sample in each conf-file
+firstConf 0
+lastConf 60
+stepConf 1
+
+PostProcessor SampleState
+# the walls xmin xmax ymin ymax zmin zmax (the first six bodies)
+WallBox 0 1 2 3 4 5

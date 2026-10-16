@@ -1,0 +1,7 @@
+# postpro command file: the state of the sample in each conf-file
+firstConf 0
+lastConf 30
+stepConf 1
+
+PostProcessor SampleState
+# nothing else: the periodic cell gives the volume

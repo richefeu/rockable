@@ -1,0 +1,42 @@
+# The conf-file (commands of generator): the floor, the tube, and the bunnies
+# stacked in the tube by generatePacking:OBBs
+open input.txt
+print Rockable 21-08-2022
+print t 0
+print tmax 1.8
+print dt 5e-5
+print interVerlet 0.001
+print interConf 0.02
+print
+print DVerlet 0.01
+print dVerlet 0.003
+print forceLaw Default
+print AddOrRemoveInteractions OBBtree
+print
+print # group 0: the bunnies, group 1: the floor and the tube
+print density 0 1000
+print density 1 10
+print knContact 0 0 1e4
+print en2Contact 0 0 0.1
+print ktContact 0 0 1e4
+print muContact 0 0 0.7
+print knContact 0 1 1e4
+print en2Contact 0 1 0.1
+print ktContact 0 1 1e4
+print muContact 0 1 0.3
+print gravity 0 -9.81 0
+print
+print # a strong numerical damping while the bunnies fall into the tube, none after t = 0.6 s
+print Tempo NDCoeff Range 0 0.6 0.7 0
+print
+print shapeFile shapes.shp
+print nDriven 2
+Particles:placeHolder
+addParticle Floor 1 0 1  0 -0.002 0  1 0 0 0
+# the tube is turned by 90 degrees about z, so that its axis is y
+addParticle Tube  1 1 1  0 0.4 0  0.7071067811865476 0 0 0.7071067811865476
+# bunnies 3 to 4.7 cm long (homothety 0.3 to 0.45), stacked in a cylinder of
+# 11.7 cm diameter and 80 cm high, a little narrower than the tube
+generatePacking:OBBs shapes.shp Bunny CYLINDER STACK Y  -0.0585 0 -0.0585  0.117 0.8 0.117  0.3 0.45  400 0.6  0 2  0
+close
+

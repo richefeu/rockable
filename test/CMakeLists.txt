@@ -48,3 +48,18 @@ add_regression_test(512_particles_bruteforce_LawDefault_noPeriodicity
 add_regression_test(512_particles_bruteforce_LawAvalanche_noPeriodicity
   512_particles 512_particles_bruteforce_LawAvalanche_noPeriodicity.conf conf101
   regression_512_particles_LawAvalanche_noPeriodicity.conf)
+
+# Two cubes glued by stickBCM and pulled apart until their interface breaks (BCM law).
+# The restart from the conf-file at t = 0.006 must reach the same state, so both use the same reference.
+add_regression_test(bcm_two_cubes_stick
+  bcm_two_cubes bcm_two_cubes_stick.conf conf15 regression_bcm_two_cubes.conf)
+add_regression_test(bcm_two_cubes_restart
+  bcm_two_cubes bcm_two_cubes_restart.conf conf15 regression_bcm_two_cubes.conf)
+
+if(ROCKABLE_ENABLE_SOFT_PARTICLES)
+  # A soft cube squeezed between two platens, elastic and viscoelastic
+  add_regression_test(soft_elastic_cube
+    soft_cube soft_elastic_cube.conf conf2 regression_soft_elastic_cube.conf)
+  add_regression_test(soft_viscous_cube
+    soft_cube soft_viscous_cube.conf conf2 regression_soft_viscous_cube.conf)
+endif()

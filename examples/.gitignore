@@ -1,0 +1,77 @@
+# Files written when an example is run in its own folder, so that they are
+# never committed. The conf-files, kineticEnergy.txt, perf.txt,
+# staticBalance.txt and extractedDataDoc.txt are already ignored by the
+# .gitignore of the repository.
+#
+# When a new example writes other files (data extractors, post-processors...),
+# add them below, or give them a name that matches one of the patterns.
+
+# Written by rockable
+checkplots.txt
+log.txt
+run.log
+
+# Written by the other tools
+*.vtk
+*.rmsh
+ParticleStress-conf*.txt
+ClusterGranulo-conf*.txt
+oneshot.*
+shot*.png
+shot*.tga
+
+# Data extractors of the examples
+helloworld/sphere.txt
+isoComprSpheres/xmax.txt
+isoComprSpheres/ymax.txt
+isoComprSpheres/zmax.txt
+isoComprSpheres/phi.txt
+isoComprSpheresPeriodic/phi.txt
+stickVerticesInClusters/plan_up.txt
+stickVerticesInClusters/plan_down.txt
+softParticles/*/damage.txt
+softParticles/*/lowestCell.txt
+softParticles/*/lowestCellPos.txt
+softParticles/*/midspan.txt
+softParticles/*/soft.txt
+softParticles/*/stress.txt
+sweepable/simulations/
+sweepable/all_inputs.txt
+sweepable/results.txt
+complexShape/*.shp
+prepro_cpptools/input.txt
+prepro_cpptools/shapes.txt
+prepro_cpptools/sample.txt
+DominoFun/input.txt
+DominoFun/shapes.txt
+complexShape/*.obj
+postProcessing/fn.txt
+SampleState.txt
+rockfall/sphere.txt
+rockfall/cube.txt
+rockfall/slab.txt
+triaxialTest/shear/input.txt
+triaxialTest/shear/triaxial.txt
+fragmentation/damage.txt
+columnCollapse/column.txt
+columnCollapse/deposit.txt
+bunnyFun/*/mesh.shp
+bunnyFun/*/bunny.shp
+bunnyFun/*/walls.shp
+bunnyFun/*/shapes.shp
+bunnyFun/*/input.txt
+bunnyFun/*/raw.shp
+bunnyFun/*/big.shp
+bunnyFun/*/floor.shp
+bunnyFun/*/shapes.txt
+bunnyFun/*/damage.txt
+bunnyFun/*/squash.txt
+bunnyFun/*/box.tess
+bunnyFun/*/cells.txt
+bunnyFun/*/cells.shp
+bunnyFun/*/kept.txt
+bunnyFun/*/kept.shp
+bunnyFun/*/others.shp
+bunnyFun/*/*.log
+bunnyFun/*/blocks.shp
+bunnyFun/*/blocks.txt

@@ -69,7 +69,9 @@ Computing the mass properties
        recomputation.
    * - ``N`` / ``n``
      - Multiply / divide by ten the number of Monte-Carlo samples
-       (``MCnstep``), between :math:`10^3` and :math:`10^8`.
+       (``MCnstep``), between :math:`10^3` and :math:`10^8`. Note that a value
+       above :math:`10^7` saved in the file is brought back to :math:`10^7`
+       when the file is read again.
    * - ``d``
      - Clean every shape, removing the duplicated entities.
 
@@ -81,7 +83,7 @@ is printed with the result.
 .. tip::
 
    Increase ``MCnstep`` with ``N`` until the printed error is small enough for
-   your purpose, then press ``C`` and ``s``. For a shape used as a driven wall
+   your purpose, then press ``C`` and ``s`` (or use ``-P``). For a shape used as a driven wall
    the default is plenty; for a grain whose mass drives the dynamics, it is
    worth a few more samples.
 
@@ -135,15 +137,17 @@ Saving
    * - Key
      - Action
    * - ``s``
-     - Save the library back to **the file it was read from**.
+     - Save the library in ``mod_<file>``, next to the file it was read from
+       (``mod_shapes.shp`` for ``shapes.shp``). The file that was read is not
+       modified.
    * - ``p``
      - Export a sample: one particle per shape, laid out so that the library can
        be opened directly in ``see``.
 
-.. warning::
+.. note::
 
-   ``s`` overwrites the input file in place, without asking. Keep a copy of a
-   library you care about before pressing it.
+   An existing ``mod_<file>`` is overwritten without asking. Rename it before
+   using it: ``mv mod_shapes.shp shapes.shp``.
 
 
 Typical workflow after a conversion
@@ -151,9 +155,33 @@ Typical workflow after a conversion
 
 .. code-block:: sh
 
-   stl2shape -i mesh.stl -r 0.01 -c    # -> mesh.shp, preCompDone n
-   shapeSurvey mesh.shp
+   stl2shape -r 0.01 -c mesh.stl       # -> mesh.shp, preCompDone n
+   shapeSurvey mesh.shp                # look at it
+   shapeSurvey mesh.shp -P mesh.shp    # pre-compute, in place, without window
 
-Then, in the window: browse with ``+`` to check the geometry, press ``C`` to
-compute the mass properties of every shape, and ``s`` to save. The library is
-then ready for a simulation, and no shape will be recomputed at start-up.
+The library is then ready for a simulation, and no shape will be recomputed at
+start-up. In the window, the keys ``C`` then ``s`` do the same as ``-P``, but
+write ``mod_mesh.shp``.
+
+
+Command line
+------------
+
+``shapeSurvey <shapeFile> [options]`` opens the window, except with one of the
+two options below, which do their work and exit.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 34 66
+
+   * - Option
+     - Description
+   * - ``-P``, ``--precompute`` *out.shp*
+     - Compute the mass properties of every shape marked ``preCompDone n``
+       (with the ``MCnstep`` of each shape), and write the whole library to
+       *out.shp*, which can be the input file itself. No window is opened:
+       it can be used in a script, or on a machine without display.
+   * - ``-o``, ``--output`` *file.png*
+     - Render one shape to an image (``-i`` *n* or ``-N`` *name* to choose
+       it, ``-W``, ``-H``, ``--elev``, ``--azim``, ``--skin`` *file.rmsh*,
+       ``--wire``, ``--color``, ``--transparent``). See ``shapeSurvey -h``.

@@ -1,0 +1,8 @@
+# The shapes of the floor and of the tube (commands of generator)
+open walls.shp
+# a plate of 60 x 60 cm in the plane xz, with a radius of 2 mm
+generateShape:rectangle_xz Floor 0.002 0.6 0.6
+# a tube of 6 cm inner radius, 80 cm long, with 24 sides; its axis is x
+generateShape:thin_cylinder Tube 0.06 0.064 0.8 24
+close
+

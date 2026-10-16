@@ -39,7 +39,7 @@
 #include "PostProcessor_ParticleStress.hpp"
 #include "Core/Rockable.hpp"
 
-static Registrar<PostProcessor, ParticleStress> registrar("ParticleStress");
+// Registered in Rockable::ExplicitRegistrations
 
 ParticleStress::ParticleStress() { }
 
@@ -85,6 +85,21 @@ void ParticleStress::exec() {
   sprintf(fname, "ParticleStress-conf%d.txt", box->iconf);
   std::ofstream file(fname);
 
+  // Vector from the contact point to the centre of the particle (nearest image with a periodic cell)
+  auto lever = [this](const vec3r& xp, const vec3r& xc) {
+    vec3r d = xp - xc;
+#ifdef ROCKABLE_ENABLE_PERIODIC
+    if (box->usePeriodicCell == 1) {
+      vec3r s = box->Cell.hinv * d;
+      s.x -= std::round(s.x);
+      s.y -= std::round(s.y);
+      s.z -= std::round(s.z);
+      d = box->Cell.h * s;
+    }
+#endif
+    return d;
+  };
+
   std::vector<mat9r> M(box->Particles.size());
   for (size_t ibody = 0; ibody < box->Particles.size(); ibody++) {
     for (auto it = box->Interactions[ibody].begin(); it != box->Interactions[ibody].end(); ++it) {
@@ -93,41 +108,18 @@ void ParticleStress::exec() {
       size_t i = I->i;
       size_t j = I->j;
 
-      vec3r x = I->pos;
-      vec3r f = -(I->fn * I->n + I->ft); // the sign - is for obtaining positive M for compression
+      // The normal n goes from j to i, so that fn * n + ft is the force received by i.
+      // M_p = sum over the contacts c of F_c (x) (x_p - x_c), with F_c the force received by p: it is positive
+      // in compression, and it does not depend on the origin, even when the particle is not in equilibrium
+      // (with the absolute position x_c, the moment of the resultant force was added to it).
+      vec3r f = I->fn * I->n + I->ft;
 
-      double sxx = f.x * x.x;
-      double sxy = f.x * x.y;
-      double sxz = f.x * x.z;
-      double syx = f.y * x.x;
-      double syy = f.y * x.y;
-      double syz = f.y * x.z;
-      double szx = f.z * x.x;
-      double szy = f.z * x.y;
-      double szz = f.z * x.z;
-
-      if (i >= box->nDriven) { // the tensorial moment of walls is not computed
-        M[i].xx += sxx;
-        M[i].xy += sxy;
-        M[i].xz += sxz;
-        M[i].yx += syx;
-        M[i].yy += syy;
-        M[i].yz += syz;
-        M[i].zx += szx;
-        M[i].zy += szy;
-        M[i].zz += szz;
+      if (i >= box->nDriven) {  // the tensorial moment of walls is not computed
+        M[i] += dyadic_product(f, lever(box->Particles[i].pos, I->pos));
       }
 
-      if (j >= box->nDriven) { // the tensorial moment of walls is not computed
-        M[j].xx -= sxx;
-        M[j].xy -= sxy;
-        M[j].xz -= sxz;
-        M[j].yx -= syx;
-        M[j].yy -= syy;
-        M[j].yz -= syz;
-        M[j].zx -= szx;
-        M[j].zy -= szy;
-        M[j].zz -= szz;
+      if (j >= box->nDriven) {  // the tensorial moment of walls is not computed
+        M[j] += dyadic_product(-f, lever(box->Particles[j].pos, I->pos));
       }
     }
   }
@@ -148,12 +140,11 @@ void ParticleStress::exec() {
   for (size_t ibody = 0; ibody < box->Particles.size(); ibody++) {
     vec3r u = box->Particles[ibody].Q * bodyAxis;
     
-    vec3r y(0.0, 1.0, 0.0);
-    vec3r ut1;
-    if (fabs(u.x) < 1e-10 && fabs(u.z) < 1e-10) ut1 = cross(u, y); // u different from y
-    else ut1.set(1.0, 0.0, 0.0);
+    // Two unit vectors perpendicular to u, built from an axis that is not parallel to u
+    vec3r helper = (fabs(u.y) < 0.9) ? vec3r(0.0, 1.0, 0.0) : vec3r(1.0, 0.0, 0.0);
+    vec3r ut1 = cross(u, helper);
     ut1.normalize();
-    vec3r ut2 = cross (ut1,u);
+    vec3r ut2 = cross(ut1, u);
     double a = (M[ibody] * u) * u;
     double r1 = (M[ibody] * ut1) * ut1;
     double r2 = (M[ibody] * ut2) * ut2;

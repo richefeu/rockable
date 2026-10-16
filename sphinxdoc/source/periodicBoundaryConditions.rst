@@ -11,15 +11,12 @@ possible.
 
 .. important::
 
-   These keywords are only understood when Rockable has been compiled with
-
-   .. code-block:: sh
-
-      cmake .. -DROCKABLE_ENABLE_PERIODIC=ON
-
-   Without that option the keywords are still accepted, but each of them only
-   prints ``PERIODIC_NOT_ENABLED when Rockable was compiled`` and does nothing.
-   ``rockable -b`` tells you which options a binary was built with.
+   These keywords are only understood when Rockable has been compiled with the
+   CMake option ``ROCKABLE_ENABLE_PERIODIC``, which is ``ON`` by default. With
+   ``-DROCKABLE_ENABLE_PERIODIC=OFF``, the keywords are still accepted, but
+   each of them only prints ``PERIODIC_NOT_ENABLED when Rockable was compiled``
+   and does nothing. ``rockable -b`` tells you which options a binary was built
+   with.
 
 .. warning::
 
@@ -80,10 +77,12 @@ Corrections and stress measurement
 
    * - Keyword
      - Description
-   * - ``cellVelocityCorrection`` (*int*)
-     - Removes the mean velocity drift of the sample.
-   * - ``cellMomentumCorrection`` (*int*)
-     - Removes the total momentum drift of the sample.
+   * - ``cellVelocityCorrection`` (*double*)
+     - Time interval between two removals of the mean velocity of the
+       particles. ``0``, the default, disables it.
+   * - ``cellMomentumCorrection`` (*double*)
+     - Time interval between two removals of the total momentum of the
+       particles. ``0``, the default, disables it.
    * - ``useKineticStress`` (*int*)
      - Includes the kinetic (velocity fluctuation) term in the stress used to
        drive the cell.
@@ -97,7 +96,8 @@ Corrections and stress measurement
 
 A fully periodic system has no boundary to anchor it, so nothing prevents the
 whole sample from drifting: any residual momentum is conserved for ever. The two
-correction flags remove that drift, and are normally left on.
+corrections remove that drift; they are off by default. A value equal to
+``dt`` applies the correction at every time step.
 
 ``useKineticStress`` matters as soon as the sample is not quasi-static. The
 stress of a granular assembly is the sum of a contact term and a kinetic term;

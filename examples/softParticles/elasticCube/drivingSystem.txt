@@ -1,0 +1,6 @@
+Control _x_Vel_ 1 0.0
+Control _y_For_ 1 -1e4
+Control _z_Vel_ 1 0.0
+Control _xrot_Vel_ 1 0.0
+Control _yrot_Vel_ 1 0.0
+Control _zrot_Vel_ 1 0.0

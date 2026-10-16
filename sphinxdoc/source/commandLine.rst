@@ -39,9 +39,15 @@ there, and the dumps are written there.
      - Print the banner, which lists the version, the git tag and the
        compilation options actually used, then exit.
    * - ``-n`` (*string*) ``-r`` (*string*)
-     - Non-regression check. After the run, compare the two conf-files line by
-       line from their ``Particles`` section onwards, and exit with an error if
-       they differ.
+     - Non-regression check. After the run, compare the conf-file given by
+       ``-n`` with the reference given by ``-r``, from their ``Particles``
+       section onwards, and exit with an error if they differ beyond the
+       tolerance. The numbers are compared with a relative tolerance, and the
+       interactions are matched by their key, since their order in the file is
+       not reproducible (``test/README.md`` details the comparison).
+   * - ``-t``, ``--tolerance`` (*double*)
+     - Relative tolerance of the comparison between the ``-n`` and ``-r``
+       files, ``1e-5`` by default.
    * - ``-h``, ``--help``
      - The usual help.
    * - ``--version``
@@ -88,10 +94,14 @@ The other executables
      - Build shape files, input files and packings. See the ``generator`` page.
    * - ``shapeSurvey <shapeFile>``
      - Inspect and pre-compute a shape library. See :ref:`shapeSurvey`.
+   * - ``shapeSurvey <f.shp> -P <f.shp>``
+     - Pre-compute the shapes of a library, in place, without window.
    * - ``sweepable [script]``
      - Generate a tree of input files for a parameter sweep.
-   * - ``stl2shape -i <f.stl> -r <R>``
+   * - ``stl2shape -r <R> <f.stl>``
      - Convert a binary STL file into a shape. See :ref:`converters`.
+   * - ``stl2blocks <commandFile>``
+     - Cut a closed STL mesh into blocks (shapes and particles). See :ref:`converters`.
 
 
 Building
@@ -133,8 +143,11 @@ To make the binaries reachable from the shell:
 Compilation options
 -------------------
 
-Options that change the physics, or the set of keywords understood. All default
-to ``OFF``.
+Options that change the physics, or the set of keywords understood.
+``ROCKABLE_ENABLE_PERIODIC`` and ``ROCKABLE_ENABLE_SOFT_PARTICLES`` default to
+``ON``, so that a default build, and the continuous integration, compiles and
+tests them; the others default to ``OFF``. Each enabled feature has a small cost
+even when a computation does not use it, so disable the ones you do not need.
 
 .. list-table::
    :header-rows: 1
@@ -147,20 +160,24 @@ to ``OFF``.
        ``mh``, ``dh`` keywords and the ``PeriodicLoading`` drivings. See
        :ref:`periodicBoundaryConditions`.
    * - ``ROCKABLE_ENABLE_SOFT_PARTICLES``
-     - Homogeneous straining of the particles, keyword ``useSoftParticles``.
+     - Homogeneous deformation of the particles (DCEM), keywords
+       ``useSoftParticles``, ``defineElasticParticles``, ``useViscousTime``...
        See :ref:`softParticles`.
    * - ``ROCKABLE_ENABLE_BOUNDARY``
      - The special boundary shapes, ``Ball`` and ``Cylinder``.
    * - ``ROCKABLE_USE_FT_CORR``
      - Objectivity correction of the tangential forces under large rotations.
    * - ``ROCKABLE_ENABLE_PROFILING``
-     - Time profiling of the main routines, reported into ``perf.txt``.
+     - Time profiling of the main routines with MATools (fetched by CMake),
+       which reports the timers at the end of the run. The file ``perf.txt`` is
+       written in any case.
 
 .. warning::
 
-   ``ROCKABLE_ENABLE_BOUNDARY`` compiles the ``Ball`` and ``Cylinder``
-   boundaries, but their ``read`` methods are still empty stubs in the source.
-   Enabling the option therefore does not yet give a usable feature.
+   ``ROCKABLE_ENABLE_BOUNDARY`` is not usable yet. With this option, the
+   current sources do **not compile** (``InteractionBoundary`` is used in
+   ``Rockable.hpp`` without being declared), and the ``read`` methods of the
+   ``Ball`` and ``Cylinder`` boundaries are still empty stubs. Keep it ``OFF``.
 
 Options that select what gets compiled:
 
@@ -175,7 +192,7 @@ Options that select what gets compiled:
      - ``ON``
      - ``see``
    * - ``ROCKABLE_COMPILE_SEER``
-     - ``ON``
+     - ``OFF``
      - ``seer`` (Dear My Seer) and ``shape`` (Dear My Shape)
    * - ``ROCKABLE_COMPILE_CONF2VTK``
      - ``ON``

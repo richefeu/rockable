@@ -1,0 +1,2 @@
+generateShape:cube Cell 0.001 0.01
+generateShape:rectangle_xz Platen 0.002 0.3 0.3

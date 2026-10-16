@@ -1,0 +1,4 @@
+# position, velocity... of each block, every 1000 time steps (0.1 s)
+TrackBody 2 sphere.txt 1000
+TrackBody 3 cube.txt 1000
+TrackBody 4 slab.txt 1000

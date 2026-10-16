@@ -47,6 +47,7 @@
 #include <map>
 #include <memory>
 #include <set>
+#include <sstream>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -143,8 +144,8 @@ class Rockable {
                                         ///< instead of the Parrinello-Rahman conjugate of h (0, default)
 #endif
 
-  int useSoftParticles{0};  ///< Flag indicating if soft particles are used
-  Compliance Cinv;          ///< The inverse compliance
+  int useSoftParticles{0};           ///< Flag indicating if soft particles are used
+  bool freezeSoftParticles{false};  ///< When true, the deformation of the soft particles is not updated
 
   // Time parameters
   double t{0.0};                ///< Current Time
@@ -187,6 +188,9 @@ class Rockable {
   vec3r gravity{0.0, -9.81, 0.0};  ///< Gravity acceleration
   int paramsInInterfaces{0};       ///< Flag saying if the parameters for sticked blonds
                                    ///< are embedded within the interfaces
+  int bondStiffnessPerInterface{0};  ///< Flag saying if the bond stiffnesses (BCM) are given for a whole interface
+                                     ///< (1) rather than for each of its bonds (0, default)
+  double bondStiffnessWeight(const BreakableInterface* BI) const;  ///< Weight of the bond stiffnesses (BCM)
   bool glue_with_walls{false};     ///< flag to say if the glue can be also set between free and controlled particles
 
   vec3r cellMinSizes{1.0, 1.0, 1.0};  ///< Sizes of the linked cells in the 3 directions x, y ad z
@@ -243,6 +247,10 @@ class Rockable {
   void compute_forces_and_moments();              ///< Compute forces and moments
   void compute_resultants();                      ///< Compute the resulting forces and moments
   void compute_SpringJoints();                    ///< Compute the spring joints
+#ifdef ROCKABLE_ENABLE_SOFT_PARTICLES
+  void compute_SoftParticles_transformation();  ///< Update the deformation of the soft particles
+  void setSoftParticle(size_t id, double Young, double Poisson);  ///< Make a particle soft
+#endif
   void check_breakage_of_interfaces();            ///< ____
   void breakage_of_interfaces();                  ///< Break the interfaces
   void compute_accelerations_from_resultants();   ///< Compute accelerations

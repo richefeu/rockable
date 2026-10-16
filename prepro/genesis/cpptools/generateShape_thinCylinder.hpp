@@ -111,7 +111,7 @@ void generateShape_thinCylinder(std::ostream& os, const char* name, double Rin, 
   os << "obb.e2 0 1 0" << std::endl;
   os << "obb.e3 0 0 1" << std::endl;
   os << "obb.center 0 0 0" << std::endl;
-  os << "volume " << (2.0 * radius) * 2.0 * M_PI * H << std::endl;
+  os << "volume " << M_PI * (Rout * Rout - Rin * Rin) * H << std::endl;  // a thick tube
   double I2 = (3.0 * (Rin * Rin + Rout * Rout) + H * H) / 12.0;
   os << "I/m " << 0.5 * (Rin * Rin + Rout * Rout) << " " << I2 << " " << I2 << std::endl;
 

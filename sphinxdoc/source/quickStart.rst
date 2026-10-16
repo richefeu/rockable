@@ -4,7 +4,7 @@ Quick-start guide
 What is Rockable?
 -----------------
 
-``Rockable`` is a DEM code written in C++11 (tend to become C++17). The two main specificities of the code are (*i*) to hold sphero-polyhedral shapes, (*ii*) to manage breakable interfaces. This technique has been developed in another code named ``DEMbox`` which was designed to do more things, with a higher degree of abstraction. Also, it is designed and developed for an academic usage.
+``Rockable`` is a DEM code written in C++17. The two main specificities of the code are (*i*) to hold sphero-polyhedral shapes, (*ii*) to manage breakable interfaces. This technique has been developed in another code named ``DEMbox`` which was designed to do more things, with a higher degree of abstraction. Also, it is designed and developed for an academic usage.
 
 Compilation with cmake
 ----------------------
@@ -48,19 +48,30 @@ These options will set up the CMake build system accordingly to either include o
 All the options are listed below:
 
 - ``ROCKABLE_USE_FT_CORR`` (default is ``OFF``): add objectivity correction to tangent forces.
-- ``ROCKABLE_ENABLE_PROFILING`` (default is ``ON``): enable time profiling.
+- ``ROCKABLE_USE_TESTING`` (default is ``OFF``): build the regression tests (run them with ``ctest``).
+- ``ROCKABLE_ENABLE_PROFILING`` (default is ``OFF``): enable time profiling.
 - ``ROCKABLE_ENABLE_BOUNDARY`` (default is ``OFF``): enable the special boundaries like Ball or Cylinder.
-- ``ROCKABLE_ENABLE_SOFT_PARTICLES``` (default is ``OFF``): enable straining of particles.
-- ``ROCKABLE_ENABLE_PERIODIC`` (default is ``OFF``): enable full periodic boundary conditions.
+- ``ROCKABLE_ENABLE_SOFT_PARTICLES`` (default is ``ON``): enable the homogeneous deformation of particles (DCEM), see :ref:`softParticles`.
+- ``ROCKABLE_ENABLE_PERIODIC`` (default is ``ON``): enable full periodic boundary conditions.
 - ``ROCKABLE_COMPILE_SEE`` (default is ``ON``): compile the application to visualize the conf-files.
-- ``ROCKABLE_COMPILE_SEE3`` (default is ``OFF``): compile the application to edit graphically the input files.
+- ``ROCKABLE_COMPILE_SEER`` (default is ``OFF``): compile Dear My Seer and Dear My Shape, the successors of ``see``.
+- ``ROCKABLE_COMPILE_CONF2VTK`` (default is ``ON``): compile ``conftovtk``, which converts the conf-files into VTK files for ParaView.
+- ``ROCKABLE_COMPILE_POSTPRO`` (default is ``ON``): compile ``postpro``, which runs post-processing commands.
+- ``ROCKABLE_COMPILE_PREPRO`` (default is ``ON``): compile the pre-processing tools.
+
+See :ref:`commandLine` for what each option changes.
 
 
 Compilation with `Makefile`
 ------------------------------------
 
+.. warning::
 
-The compilation is managed with a classic `Makefile`. Some options can be set at compile time: ``FT_CORR``, and ``COMPONENTWISE_NUM_DAMPING``. To disable an option it is advised to rename it by adding a letter 'n' at the beginning.
+   The ``Makefile`` in the folder ``src`` is **not maintained** any more (its
+   last change dates from September 2025). It does not know the sources added
+   since, and it may not build the current code. Use CMake.
+
+The compilation was managed with a classic `Makefile`. Some options can be set at compile time: ``FT_CORR``, and ``COMPONENTWISE_NUM_DAMPING``. To disable an option it is advised to rename it by adding a letter 'n' at the beginning.
 
 - ``FT_CORR``: with this option, the tangential force is corrected to account for the rotation of the local framework
 - ``COMPONENTWISE_NUM_DAMPING``: it activates the component-wise numerical damping (so called Cundall damping) 
@@ -90,7 +101,7 @@ Installation of `Rockable` via `spack`:
 
 .. code-block:: bash
   
-  git clone git clone --depth=2 --branch=v1.1.0 https://github.com/spack/spack.git
+  git clone --depth=2 --branch=v1.1.0 https://github.com/spack/spack.git
   source spack/share/spack/setup-env.sh
   git clone https://github.com/Collab4exaNBody/spack-repos.git
   spack repo add spack-repos
@@ -133,10 +144,16 @@ Running a simulation
 
 To run a simulation, a configuration file has to be written. The format of such a file is described in the section Syntax for conf-files. We show here a simple example simulating a sphere bouncing on a plan.
 
+.. tip::
+
+   The input files are best written with ``rockedit input.txt``, an editor that
+   runs in the terminal, colours the keywords, and shows the documentation of
+   the keyword under the cursor with ``Ctrl+D`` (see :ref:`editors`).
+
 .. code-block:: text
-   :caption: input.txt
+   :caption: bouncingSphere.txt
    
-   Rockable 20-02-2017
+   Rockable 21-08-2022
    t 0
    tmax 0.06
    dt 1e-6
@@ -148,7 +165,7 @@ To run a simulation, a configuration file has to be written. The format of such 
    density 0 2700
    density 1 2700
    
-   forceLaw Avalanches
+   forceLaw Avalanche
    knContact 0 1 1e6
    en2Contact 0 1 0.05
    ktContact 0 1 1e7
@@ -166,7 +183,7 @@ To run a simulation, a configuration file has to be written. The format of such 
 The shape-file as described in the section Syntax for shape-files is a file named SphereAndPlan.shp with the following content:
 
 .. code-block:: text
-   :caption: SphereAndPlan.sph
+   :caption: SphereAndPlan.shp
    
    <
    name Plan
@@ -201,13 +218,13 @@ The shape-file as described in the section Syntax for shape-files is a file name
    0 0 0
    ne 0
    nf 0
-   obb.extent 1 1 1
+   obb.extent 0.08 0.08 0.08
    obb.e1 1 0 0
    obb.e2 0 1 0
    obb.e3 0 0 1
    obb.center 0 0 0
-   volume 0.004021
-   I/m 0.00493333 0.00493333 0.0032
+   volume 0.00214466
+   I/m 0.00256 0.00256 0.00256
    >
 
 Supposing that the executable named ``rockable`` stands in the same folder as the configuration and shape files, the simulation is launched that way:
@@ -222,7 +239,7 @@ If the executable has been compiled with openMP abilities, the number of threads
 
    ./rockable bouncingSphere.txt -j 24
 
-In this particular example, it is clearly not a good idea to use so much threads because the number of particles is to small and the computation duration will be worst.
+In this particular example, it is clearly not a good idea to use so many threads: the number of particles is too small, and the computation would be slower.
 
 The verbosity of logs is set with a number that way:
 
@@ -232,7 +249,7 @@ The verbosity of logs is set with a number that way:
 
 Highest number corresponds highest verbosity: ``trace`` = 6, ``debug`` = 5, ``info`` = 4, ``warn`` = 3, ``err`` = 2, ``critical`` = 1, ``off`` = 0
 
-If the files produced by a computation (``conf*``, ``kineticEnergy.txt``, ``perf.txt``, and ``staticBalance.txt``) have to be deleted, ``rockable`` can do the job.
+If the files produced by a computation (``conf*``, ``kineticEnergy.txt``, ``perf.txt``, ``staticBalance.txt`` and ``checkplots.txt``) have to be deleted, ``rockable`` can do the job.
 
 .. code-block:: sh
 

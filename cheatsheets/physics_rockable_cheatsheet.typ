@@ -36,8 +36,9 @@
       `DEMbox`). Normal force with distinct loading/unloading paths.],
     command("StickedLinks"), [Breakable elastic solid bonds, with a stress-like
       rupture criterion. Introduced for the cemented granular materials.],
-    command("BCM"), [Bonded Cell Method: bonds carry a stiffness shared over
-      the sub-bonds of the interface, with an energy-based (`Gc`) criterion.],
+    command("BCM"), [Bonded Cell Method: bonds of stiffness given per bond (or
+      per interface with `bondStiffnessPerInterface 1`), free of force at
+      their creation, with an energy-based (`Gc`) criterion on the interface.],
     command("GeoVisc"), [Variant of `Default` for slow landslides: the friction
       force is *viscous* while still yielding on the Coulomb cone.],
   )

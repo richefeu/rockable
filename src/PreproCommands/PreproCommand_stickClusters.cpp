@@ -145,6 +145,7 @@ void stickClusters::exec() {
     Interaction* Iptr = const_cast<Interaction*>(std::addressof(*((p.second)[imin])));
 
     Iptr->stick = BI;
+    Iptr->dn0 = BI->dn0;
     BI->concernedBonds.push_back(Iptr);
   }
 

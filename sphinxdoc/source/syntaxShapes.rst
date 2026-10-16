@@ -78,7 +78,26 @@ To run a simulation, we need that all required shapes are defined in a single sh
 
 - ``orientation`` (*quat*) **Q**
 
-  As the position defined previouly, an orientation can also be stored for processing purpose 
+  As the position defined previously, an orientation can also be stored for processing purpose 
+
+- ``isSurface`` (no value)
+
+  Says that the shape is an open surface rather than the boundary of a volume
+  (a membrane, a single face...). The test of a point inside the shape, used by
+  the Monte-Carlo computation of the mass properties and by the skin mesh, then
+  considers only the distance to the surface, not an inside of the polyhedron.
+
+- ``MCnstep`` (*int*) **number**
+
+  Number of Monte-Carlo samples used to compute the volume and the inertia of
+  the shape (10000 by default). When the file is read, the value is kept
+  between :math:`10^3` and :math:`10^7`. See :ref:`shapeSurvey`.
+
+- ``fibObbOption`` (*int*) **0|1|2|3**
+
+  Strategy used to fit the oriented bounding box of the shape: 0 for the
+  covariance, 1 for the minimum volume, 2 for an axis-aligned box (the default)
+  and 3 for an imposed axis. See :ref:`shapeSurvey`.
 
 
 As an example, this is how a cube with unit side can be defined (radius of 0.1):
@@ -129,7 +148,7 @@ As an example, this is how a cube with unit side can be defined (radius of 0.1):
    obb.center 0 0 0
 
    volume 0.975587
-   I/m 0.166667 0.166667 0.166667
+   I/m 0.161966 0.161966 0.161966
    >
 
 

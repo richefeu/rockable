@@ -1,6 +1,6 @@
 Rockable 29-11-2018
 t 0
-tmax 0.1
+tmax 0.04
 dt 1e-7
 interVerlet 0.0005
 dynamicUpdateNL 1

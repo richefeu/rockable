@@ -96,10 +96,7 @@ class Particle {
   double mass{0.0};       ///< The particle mass
 
 #ifdef ROCKABLE_ENABLE_SOFT_PARTICLES
-  // FIXME: we may use a pointer to all these dataset
-  SoftParticlePhysics* SPP{nullptr};  // when SPP == nullptr, the particle is rigid
-  // mat9r uniformTransformation;
-  // mat9r stress;
+  SoftParticlePhysicsPtr SPP;  ///< Homogeneous deformation (when SPP == nullptr, the particle is rigid)
 #endif
 
   vec3r force;   ///< Resultant force acting on the particle
@@ -112,6 +109,7 @@ class Particle {
   vec3r Glob(vec3r& pos) const;
   vec3r GlobVertex(size_t v) const;
   vec3r GlobFaceVertex(size_t f, size_t v) const;
+  vec3r Deform(const vec3r& v) const;
   double MinkowskiRadius() const;
 
   void updateObb();

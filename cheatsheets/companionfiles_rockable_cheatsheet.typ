@@ -135,6 +135,11 @@
     sub-interaction types between two bodies, and their weighted sum.
   - #command("TrackDamage <file> <nrec>") ~`t` and the damage, i.e. the broken
     interface area over the initial one.
+  - #command("TrackSoftParticle <ibody> <file> <nrec>") ~`t`, $det bold(F)$,
+    $tr bold(sigma)$, $tr bold(epsilon)$, then $bold(F)$, $bold(sigma)$ and
+    $bold(epsilon)$ (9 components each, body frame) of a soft particle.
+  - #command("TrackStress <istart> <file> <nrec>") ~`t`, then $sigma_(x x)$ of
+    every particle from `istart` on (0 for a rigid one).
 
   #note[Extractors are ignored by the interactive tools (`see`, `conftovtk`). A
   #command("DataExtractor ...") line inside a conf-file still works but is
@@ -155,10 +160,12 @@
   - #command("stickClusters <epsilon>") ~Glue bodies of *different* clusters,
     all bond types, closer than `epsilon`.
   - #command("stickBCM <epsilonDist>") ~Build the interfaces for the `BCM` force
-    law (bond areas are computed).
+    law (bond areas are computed). Each bond records its distance at creation,
+    where it carries no force.
 
-  #note[#command("glue_with_walls yes") extends these commands to the driven
-  bodies.]
+  #note[#command("glue_with_walls yes") extends #command("stickClusters") and
+  #command("stickVerticesInClustersMoments") to the driven bodies; the two
+  others never glue a driven body.]
 
   #inline("Tuning the interfaces")
   - #command("copyParamsToInterfaces <inner|outer>") ~Copy the group-pair
@@ -203,8 +210,12 @@
     command("ParticleStress"), [Per-particle stress tensor. #command("Volume")
       gives the default total volume, and #command("ConfVolumes <nb>") followed
       by `nb` pairs #command("<iconf> <volume>") overrides it conf by conf.],
+    command("SampleState"), [One line per dump in `SampleState.txt`: sizes,
+      volume, solid fraction, coordination number, stress tensor.
+      #command("WallBox <6 walls>") for a box; nothing for a periodic cell.],
     command("ClusterGranulo"), [Size distribution of the (possibly broken)
-      clusters. #command("SievingSizes <nb>") followed by `nb` sieve sizes.],
+      clusters, in number of particles. #command("SievingSizes <nb>") followed by
+      `nb` increasing class bounds (the last class also holds the larger ones).],
   )
 
   #note[`postpro` loads the dumps in interactive mode: the extractors are not

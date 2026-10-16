@@ -80,7 +80,8 @@
   - #command("n") ~Bodies on/off.
   - #command("d") ~Driven bodies (the solid boundaries) on/off.
   - #command("a / A") ~Decrease / increase the transparency of the driven
-    bodies (step of 0.05).
+    bodies (step of 0.05). Transparent, they are drawn last, so that the
+    bodies inside a container can be seen through it.
   - #command("e / E") ~Decrease / increase the transparency of the free bodies.
   - #command("o") ~Oriented Bounding Boxes on/off.
   - #command("O") ~Enlarge the OBBs by half of the secure distance.
@@ -107,6 +108,10 @@
   - #command("1") ~Cyclic colours, one per particle.
   - #command("2") ~Coloured by velocity magnitude.
   - #command("3") ~Coloured by shape name.
+  - #command("4") ~Soft particles coloured by their volume change
+    $det bold(F) - 1$ (rigid ones at 0).
+  - #command("5") ~Soft particles coloured by their mean stress
+    $tr bold(sigma) \/ 3$.
   - #command("c") ~Colour bar on/off.
   - #command("r") ~Toggle the automatic rescaling of the colour range. When
     switched off, the range is taken from `colorRangeMin` and `colorRangeMax` of

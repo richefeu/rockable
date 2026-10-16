@@ -1,0 +1,10 @@
+transformation:add_translation 0 0.056 0
+transformation:add_rotation -1 0 1 54.7356
+generatePacking:grid_clust Cell
+-0.03 -0.03 -0.03
+0.06 0.06 0.06
+6 6 6
+1
+0
+1
+0

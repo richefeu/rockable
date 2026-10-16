@@ -44,9 +44,61 @@ among others:
   *Documented with a warning; not fixed.*
 - `copyParamsToInterfaces inner` does not copy `kr` and `mom0`, while its
   `outer` branch does. *Documented with a warning; not fixed.*
-- With `useSoftParticles`, the uniform transformation is not written to the
-  conf-files, so such a run cannot be restarted exactly from a dump.
-  *Documented with a warning; not fixed.*
+- With `useSoftParticles`, the uniform transformation was not written to the
+  conf-files, so such a run could not be restarted exactly from a dump.
+  *Fixed* (section `SoftParticles` of the conf-files).
+
+The pass of October 2026, after the port of the soft particles (DCEM), found
+the following:
+
+- A computation restarted from a conf-file did not follow the uninterrupted
+  one: the computation of the forces done when a conf-file is loaded added one
+  more increment to the tangential forces. With `BCM`, the interfaces read from
+  a conf-file could no longer break, their area was lost, and so was the
+  tangential displacement of their bonds. *Fixed.*
+- `TrackDamage` never flushed its file, which lost its end. *Fixed.*
+- The spring joints (`initSpringJoint`) were not written in the conf-files, so
+  a restarted computation lost them. *Fixed* (section `SpringJoints`).
+- The controls of angular velocity (`_zrot_Vel_`...) rotated the body but left
+  its angular velocity at zero, so the contacts did not see the motion of a
+  rotating drum or blade. *Fixed.*
+- `ROCKABLE_ENABLE_BOUNDARY=ON` does not compile (to be adapted from an older
+  version of the code).
+- `postpro` crashed whatever its command file: the post-processors registered
+  themselves with static objects, which the linker dropped from the static
+  library. *Fixed* (explicit registration).
+- `preventCrossingLength` had no effect: the lines that use it were commented
+  out in the force laws. *Fixed* (reactivated, with a capped factor).
+- `en2ContactFromViscRate` converted the damping rate into $e_n$ and stored it
+  as $e_n^2$, so the damping actually used was smaller than the one given.
+  *Fixed.*
+- The tangential viscosity of `StickedLinks` was cumulated over time (as in
+  `BCM`), and the $d_n^0$ of its inner bonds was taken as zero when the
+  parameters come from the group-pair table. *Fixed.*
+- The bonds of `StickedLinks` never broke when `mom0*Bond` (or `ft0*Bond`) was
+  not defined: the term $0/0$ made the yield function NaN. This was the case of
+  the example `stickVerticesInClusters`. *Fixed* (a term with a zero numerator
+  contributes nothing).
+- The moment threshold of `Avalanche` was undefined when the free body does not
+  rotate at all. *Fixed.*
+- The numerical damping used the total velocity, not the velocity relative to
+  the deformation of a periodic cell. *Fixed.*
+- `sawtooth_shaker` drifted when `t_ini` was not a multiple of the period, and
+  moved before `t_ini` (which was only a phase); the slope of `ramp` was
+  computed once for the whole run. *Fixed.*
+- `ParticleStress` built a wrong transverse vector for its columns `a` and `r`
+  (*fixed*), and `ClusterGranulo` ignored the values of `SievingSizes`, and
+  classified the sub-clusters by their number of particles minus one. *Fixed*:
+  the values are the bounds of the classes, in number of particles.
+- `conftovtk` copied the file names of the folder into a buffer of 25
+  characters. *Fixed.*
+- The `generator` commands were spelt `tranformation:...` in the source. *Fixed*
+  (the old spelling is still accepted).
+- `tess2shape` is not built by CMake, and `src/Makefile` is not maintained.
+- Several pages described things the code does not do: a cohesion force in
+  `Default`, the integration of the free components of a driven body (they are
+  not integrated), gravity on a force-driven wall (it is not applied), the
+  coefficients of the `Beeman` and `RungeKutta4` schemes. *Fixed in the pages.*
 
 Findings of this kind are reported, not silently papered over. A page that
 described a bug as if it were a feature would be worse than no page at all.

@@ -67,8 +67,38 @@ The conf-files are loaded one after the other, from ``./conf<first>`` to
 ``ParticleStress``
 ------------------
 
-Computes the stress tensor of the sample from the contact forces and the branch
-vectors, for each processed configuration.
+Computes, for each processed configuration, the tensorial moment of each
+particle,
+
+.. math::
+
+   \mathbf{M}_i = \sum_c \underline{F}_c \otimes \left( \underline{x}_i - \underline{x}_c \right)
+
+where the sum runs over the interactions of the particle, :math:`\underline{F}_c`
+is the force it receives at the contact point :math:`\underline{x}_c`, and
+:math:`\underline{x}_i` is its centre (the nearest image with a periodic cell).
+It is positive in compression. The driven bodies are skipped. The sum of the
+:math:`\mathbf{M}_i` divided by the volume is the stress tensor of the sample,
+the same as the one of ``SampleState``.
+
+.. note::
+
+   Up to October 2026, the absolute position :math:`\underline{x}_c` was used
+   instead of :math:`\underline{x}_i - \underline{x}_c`. The result was the
+   same for a particle in equilibrium only, and depended on the origin
+   otherwise: on a sample compressed by a servo-control, the stress of the
+   whole sample could be wrong by a factor of two.
+
+The results are written into ``ParticleStress-conf<iconf>.txt``, one line per
+particle: the 9 components of :math:`\mathbf{M}_i` (they are **not** divided
+by the volume of the particle), then four values that separate an axial part,
+along the axis :math:`z` of the body (:math:`\underline{u}`), from a radial
+part: :math:`a = \underline{u} \cdot \mathbf{M}_i \underline{u}`,
+:math:`r = \sqrt{r_1^2 + r_2^2}` with :math:`r_k = \underline{t}_k \cdot \mathbf{M}_i \underline{t}_k`
+for two unit vectors :math:`\underline{t}_1, \underline{t}_2` perpendicular to
+:math:`\underline{u}`, then the trace of the axial part and the trace of the
+radial part. The stress of the whole sample, :math:`\sum_i \mathbf{M}_i / V`, is
+printed on the terminal.
 
 .. list-table::
    :header-rows: 1
@@ -77,8 +107,8 @@ vectors, for each processed configuration.
    * - Keyword
      - Description
    * - ``Volume <double>``
-     - Total volume used to normalise the stress. This is the default value,
-       used for every configuration that is not listed below.
+     - Total volume used to normalise the stress of the sample. This is the
+       default value, used for every configuration that is not listed below.
    * - ``ConfVolumes <nb>``
      - Followed by ``nb`` lines ``<iconf> <volume>``, giving the volume of
        specific configurations.
@@ -108,13 +138,110 @@ during the run, its volume changes from one configuration to the next, and
    The six bounds of a box of driven walls are printed by ``see`` with the key
    ``x``, which gives a quick way of building this list for a triaxial cell.
 
+.. note::
+
+   For the stress of the soft particles themselves, which Rockable computes
+   during the run, use the data extractors ``TrackSoftParticle`` or
+   ``TrackStress`` (see :ref:`dataExtractors`).
+
+
+``SampleState``
+---------------
+
+The state of the whole sample, one line per processed configuration, in the
+file ``SampleState.txt``: the time, the sizes and the volume of the sample, the
+solid fraction, the coordination number, the number of contacts, and the stress
+tensor computed from the contact forces.
+
+.. code-block:: text
+   :caption: commands.txt
+
+   firstConf 0
+   lastConf 100
+   stepConf 1
+
+   PostProcessor SampleState
+   WallBox 0 1 2 3 4 5
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - Keyword
+     - Description
+   * - ``WallBox <xmin> <xmax> <ymin> <ymax> <zmin> <zmax>``
+     - The numbers of the six walls of a box. The sizes of the sample are the
+       distances between their inner faces (the position of each wall, minus
+       or plus its Minkowski radius times its homothety).
+   * - ``Volume <double>``
+     - A volume imposed for every configuration (the sizes are then written
+       as 0, or taken from the box or the cell if there is one).
+
+With a periodic cell, nothing has to be given: the volume is
+:math:`\det \mathbf{h}`, and the sizes are the lengths of the three vectors of
+the cell.
+
+The columns of ``SampleState.txt`` are:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 80
+
+   * - Column
+     - Content
+   * - 1
+     - time
+   * - 2-4
+     - sizes :math:`L_x`, :math:`L_y`, :math:`L_z` of the sample
+   * - 5
+     - volume :math:`V`
+   * - 6
+     - solid fraction: the volume of the free particles (the volume of their
+       shape times the cube of their homothety) divided by :math:`V`
+   * - 7
+     - coordination number :math:`Z`: twice the number of contacts between
+       free bodies plus the number of contacts with driven bodies, divided by
+       the number of free bodies. Two bodies touching at several points
+       (vertex-face, edge-edge...) make **one** contact.
+   * - 8
+     - number of contacts (pairs of bodies)
+   * - 9, 10
+     - mean stress :math:`p = \operatorname{tr}\boldsymbol{\sigma}/3` and von
+       Mises stress :math:`q`
+   * - 11-16
+     - :math:`\sigma_{xx}`, :math:`\sigma_{yy}`, :math:`\sigma_{zz}`,
+       :math:`\sigma_{xy}`, :math:`\sigma_{xz}`, :math:`\sigma_{yz}`
+
+The stress is
+
+.. math::
+
+   \boldsymbol{\sigma} = \frac{1}{V} \sum_{p} \sum_{c} \underline{F}_c \otimes
+   \left( \underline{x}_p - \underline{x}_c \right)
+
+where the first sum runs over the free bodies, the second over their contacts,
+:math:`\underline{F}_c` is the force received by the body :math:`p` at the
+contact point :math:`\underline{x}_c`. It is **positive in compression**, and
+only its symmetric part is written. It does not include the kinetic
+contribution of the velocity fluctuations, negligible in a quasi-static state.
+With a periodic cell, it is the opposite of the stress that Rockable computes
+during the computation to drive the cell (which is positive in tension).
+
+.. note::
+
+   With walls, the contact forces with the walls are included through the
+   free bodies that touch them: the stress is that of the sample. In a box
+   driven by a servo-control, :math:`\sigma_{xx}`, :math:`\sigma_{yy}` and
+   :math:`\sigma_{zz}` match the imposed pressure once the sample is at
+   equilibrium.
+
 
 ``ClusterGranulo``
 ------------------
 
-Grain-size distribution of the clusters, obtained by sieving. It is meant for
-fragmentation studies: as the interfaces break, an initial cluster splits into
-sub-clusters, and this post-processor counts how many pass through each sieve.
+Distribution of the sizes of the sub-clusters, for fragmentation studies: as
+the interfaces break, an initial cluster splits into sub-clusters, and this
+post-processor counts them.
 
 .. list-table::
    :header-rows: 1
@@ -123,8 +250,8 @@ sub-clusters, and this post-processor counts how many pass through each sieve.
    * - Keyword
      - Description
    * - ``SievingSizes <nb>``
-     - Followed by ``nb`` sieve sizes, given as plain numbers on the following
-       lines.
+     - Followed by ``nb`` values, in increasing order, one per class: the
+       largest number of particles of a sub-cluster in that class.
 
 .. code-block:: text
    :caption: commands.txt
@@ -135,13 +262,26 @@ sub-clusters, and this post-processor counts how many pass through each sieve.
 
    PostProcessor ClusterGranulo
    SievingSizes 5
-   0.001 0.002 0.005 0.01 0.02
+   1 2 3 4 5
+
+The results are written into ``ClusterGranulo-conf<iconf>.txt``, one line per
+class: the value given in ``SievingSizes``, and the fraction (in number) of the
+sub-clusters in that class.
+
+A sub-cluster of :math:`n` particles goes into the first class whose value is
+not smaller than :math:`n`, and the sub-clusters larger than the last value go
+into the last class. With ``1 2 3 4 5``, the classes hold the sub-clusters of 1,
+2, 3 and 4 particles, and of 5 particles or more; with ``1 10 100``, the single
+particles, the sub-clusters of 2 to 10 particles, and those of more than 10.
+It is a distribution of the **number of particles** per sub-cluster, not a
+grain-size distribution.
 
 .. note::
 
    The sub-clusters are identified from the interfaces that are still intact,
    so this analysis is only meaningful together with a force law that breaks
-   interfaces (``StickedLinks`` or ``BCM``).
+   interfaces (``StickedLinks`` or ``BCM``). The file of a configuration
+   without any sub-cluster is left empty.
 
 
 Post-processing without ``postpro``

@@ -91,7 +91,7 @@ Since each test has its own folder, tests can run in parallel.
 
 `compareConf` reads both files from the `Particles` line on (the header holds
 paths and options that may legitimately differ) and cuts them into the sections
-`Particles`, `Interactions` and `Interfaces`.
+`Particles`, `SoftParticles`, `SpringJoints`, `Interactions` and `Interfaces`.
 
 - Section headers, hence the numbers of particles, interactions and interfaces,
   must be identical, and so must non-numeric tokens (shape names).
@@ -107,7 +107,10 @@ paths and options that may legitimately differ) and cuts them into the sections
 
 `S_j` matters for quantities that are the small difference of large ones, such
 as the acceleration of a grain at equilibrium: its round-off error scales with
-the contact forces, not with the resultant. The tolerance is `1e-5` by default
+the contact forces, not with the resultant. The scale is also at least `1e-10` times the
+largest magnitude in the reference row, so that a column that should be zero and
+only holds round-off noise (such as `pos.z` of a motion in the plane `xy`, around
+`1e-38`) is not compared relatively to this noise. The tolerance is `1e-5` by default
 and can be changed with `-t`. With `ctest -V`, each test prints the largest
 relative deviation it found.
 
@@ -128,6 +131,15 @@ a largest deviation of 2.6e-6.
 | `518_poly_bruteforce_default_noPeriodicity`           | 518 polyhedra, `Default` law, 11 steps                                |
 | `512_particles_bruteforce_LawDefault_noPeriodicity`   | 512 spheres, `Default` law, 11 steps                                  |
 | `512_particles_bruteforce_LawAvalanche_noPeriodicity` | 512 spheres, `Avalanche` law, 11 steps                                |
+| `bcm_two_cubes_stick`                                 | 2 cubes glued by `stickBCM` and pulled apart until they break (`BCM`) |
+| `bcm_two_cubes_restart`                               | The same, restarted from the conf-file at t = 0.006 (same reference)  |
+| `soft_elastic_cube`                                   | A soft cube squeezed between two platens (soft particles only)        |
+| `soft_viscous_cube`                                   | The same, viscoelastic, with stiffer contacts (soft particles only)   |
+
+The two `soft_*` tests are declared only when Rockable is configured with
+`-DROCKABLE_ENABLE_SOFT_PARTICLES=ON`. The two `bcm_two_cubes_*` tests share one
+reference: a computation restarted from a conf-file must follow the
+uninterrupted one.
 
 The unit tests print one `PASS`/`FAIL` line per check, with the measured value
 and the tolerance, and return a non-zero status if any check fails.

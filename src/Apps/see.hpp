@@ -139,6 +139,8 @@ vec3r up;
 void drawShape(Shape* s, double homothety = 1.0, const mat9r& T = mat9r::unit());
 void drawShapeMesh(const ShapeMesh& m, double homothety = 1.0);
 void drawShapeOrMesh(Shape* s, double homothety = 1.0);
+void drawParticleShape(const Particle& P);
+double softParticleColorValue(const Particle& P, int mode);
 void drawForces();
 void drawC2CNormalForce();
 void drawVelocities();

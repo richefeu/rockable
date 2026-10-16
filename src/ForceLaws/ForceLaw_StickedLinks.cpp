@@ -101,7 +101,6 @@ bool StickedLinks::computeInteraction(Interaction& I) {
         ft0 = box->dataTable.get(box->idFt0InnerBond, g1, g2);
         mom0 = box->dataTable.get(box->idMom0InnerBond, g1, g2);
         power = box->dataTable.get(box->idPowInnerBond, g1, g2);
-        dn0 = 0.0;
       } else {  // Outer
         kn = box->dataTable.get(box->idKnOuterBond, g1, g2);
         kt = box->dataTable.get(box->idKtOuterBond, g1, g2);
@@ -121,6 +120,7 @@ bool StickedLinks::computeInteraction(Interaction& I) {
 
     // === Tangential force (friction)
     vec3r vt = (I.vel - (vn * I.n));
+    I.ft -= I.ftv;  // remove the viscous part added at the previous step
 #ifdef FT_CORR
     vec3r ft_corr = I.ft;
     ft_corr -= cross(ft_corr, cross(I.prev_n, I.n));
@@ -131,21 +131,29 @@ bool StickedLinks::computeInteraction(Interaction& I) {
 #endif
 
     // Tangential viscosity ========
-    // This term should be added only on the elastic part of ft
-    // So it is somehow wrong because the viscosity is cumulated... Be carreful!
-    vec3r ftv = I.damp * vt;
-    I.ft += ftv;
+    // It is added to the elastic part of ft, and remembered so that it can be removed
+    // at the next step (otherwise, it would be cumulated)
+    I.ftv = I.damp * vt;
+    I.ft += I.ftv;
     // =============================
 
     // === Rupture criterion (and resistant moment for outer bonds)
     double yield;  // it defines the yield surface
     I.mom += kr * (box->Particles[I.j].vrot - box->Particles[I.i].vrot) * box->dt;
-    yield = pow(norm(I.ft) / ft0, power) + pow(norm(I.mom) / mom0, power) - I.fn / fn0 - 1.0;
+    // A term whose numerator is zero contributes nothing, even when its threshold is not defined (zero):
+    // otherwise 0/0 makes the yield function NaN, and the bond never breaks
+    double ftNorm = norm(I.ft);
+    double momNorm = norm(I.mom);
+    double ftTerm = (ftNorm > 0.0) ? pow(ftNorm / ft0, power) : 0.0;
+    double momTerm = (momNorm > 0.0) ? pow(momNorm / mom0, power) : 0.0;
+    yield = ftTerm + momTerm - I.fn / fn0 - 1.0;
 
     if (yield > 0.0) {
       // All the bonds (Interactions) of the interface are broken.
       // The Interactions pointer inserted in this std::set
-      // will be 'broken' just after all the forces are computed
+      // will be 'broken' just after all the forces are computed.
+      // The forces are computed in parallel: the std::set must not be modified by two threads at once
+#pragma omp critical(interfacesToBreak)
       box->interfacesToBreak.insert(I.stick);
       // The breakage is postponed to avoid assymetry in the tangential forces
       // that are computed incrementally

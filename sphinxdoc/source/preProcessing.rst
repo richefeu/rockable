@@ -58,12 +58,16 @@ number, and **outer** otherwise. This is what selects the ``*InnerBond`` or
     bonds, it computes the **area** of each interface, which is what the
     energy-based rupture criterion needs, and copies ``knInnerBond``,
     ``ktInnerBond`` and ``gcInnerBond`` into each interface. All the interfaces
-    it creates are flagged as inner.
+    it creates are flagged as inner. A bond joins two vertices whose spheres
+    are less than **Epsilon** apart, and it records this initial distance
+    :math:`d_n^0`: it carries no force as long as the distance does not change.
 
 .. tip::
 
-   ``glue_with_walls yes``, placed before these commands, extends them to the
-   driven bodies, so that a sample can be glued to its container.
+   ``glue_with_walls yes``, placed before ``stickClusters`` or
+   ``stickVerticesInClustersMoments``, extends them to the driven bodies, so
+   that a sample can be glued to its container. ``stickVerticesInClusters`` and
+   ``stickBCM`` ignore it: they never glue a free body to a driven one.
 
 .. note::
 
@@ -105,6 +109,12 @@ one of the sticking commands.
     ``lambda`` and modulus ``m``, independently for each interface. This is the
     usual way of introducing a controlled scatter of strength, and hence a
     progressive rather than simultaneous failure.
+
+    ``paramName`` is one of ``kn``, ``kt``, ``kr``, ``fn0``, ``ft0``, ``mom0``,
+    ``power`` and ``Gc`` (the fracture energy of the law ``BCM``). Any other
+    name is reported and changes nothing. The mean of the distribution is
+    ``lambda`` times :math:`\Gamma(1 + 1/m)`, a little less than ``lambda``
+    (0.91 ``lambda`` for :math:`m = 4`).
 
     ``timeSeeded`` set to 1 seeds the random generator on the clock, so that two
     runs differ; set to 0, the same sample is reproduced exactly.
@@ -188,7 +198,7 @@ A typical bonded sample
 
    stickVerticesInClusters 0.05
    copyParamsToInterfaces inner
-   setVariableStickParams fn0InnerBond inner 1.0e4 5 0
+   setVariableStickParams fn0 inner 1.0e4 5 0
 
 The sample is glued cluster by cluster, each interface then receives its own
 copy of the parameters, and the tensile strength of the bonds is finally

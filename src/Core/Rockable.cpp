@@ -46,6 +46,8 @@
 #include "DataExtractors/DataExtractor_TrackBody.hpp"
 #include "DataExtractors/DataExtractor_TrackDamage.hpp"
 #include "DataExtractors/DataExtractor_TrackRockfall.hpp"
+#include "DataExtractors/DataExtractor_TrackSoftParticle.hpp"
+#include "DataExtractors/DataExtractor_TrackStress.hpp"
 #include "DataExtractors/DataExtractor_dnStat.hpp"
 
 #include "ForceLaws/ForceLaw_Avalanche.hpp"
@@ -53,6 +55,10 @@
 #include "ForceLaws/ForceLaw_Default.hpp"
 #include "ForceLaws/ForceLaw_StickedLinks.hpp"
 #include "ForceLaws/ForceLaw_geoVisc.hpp"
+
+#include "PostProcessors/PostProcessor_ClusterGranulo.hpp"
+#include "PostProcessors/PostProcessor_ParticleStress.hpp"
+#include "PostProcessors/PostProcessor_SampleState.hpp"
 
 #include "PreproCommands/PreproCommand_copyParamsToInterfaces.hpp"
 #include "PreproCommands/PreproCommand_homothetyRange.hpp"
@@ -76,8 +82,6 @@
  *
  */
 Rockable::Rockable() : m_linkCells(aabb, cellMinSizes) {
-  Cinv.set(1e10, 0.0);
-
   idDensity = properties.add("density");
 
   optionNames["forceLaw"] = "Default";
@@ -148,6 +152,8 @@ void Rockable::ExplicitRegistrations() {
   REGISTRER_BASE_DERIVED(DataExtractor, TrackBody);
   REGISTRER_BASE_DERIVED(DataExtractor, TrackRockfall);
   REGISTRER_BASE_DERIVED(DataExtractor, TrackDamage);
+  REGISTRER_BASE_DERIVED(DataExtractor, TrackSoftParticle);
+  REGISTRER_BASE_DERIVED(DataExtractor, TrackStress);
 
   // ForceLaws
   REGISTRER_BASE_DERIVED(ForceLaw, Default);
@@ -169,6 +175,11 @@ void Rockable::ExplicitRegistrations() {
   REGISTRER_BASE_DERIVED(PreproCommand, stickVerticesInClusters);
   REGISTRER_BASE_DERIVED(PreproCommand, stickVerticesInClustersMoments);
   REGISTRER_BASE_DERIVED(PreproCommand, stickBCM);
+
+  // PostProcessors (used by the application postpro)
+  REGISTRER_BASE_DERIVED(PostProcessor, ClusterGranulo);
+  REGISTRER_BASE_DERIVED(PostProcessor, ParticleStress);
+  REGISTRER_BASE_DERIVED(PostProcessor, SampleState);
 }
 
 /**
@@ -472,6 +483,9 @@ void Rockable::saveConf(const char* fname) {
     bodyForce->write(conf);
   }
   conf << "ParamsInInterfaces " << paramsInInterfaces << '\n';
+  if (bondStiffnessPerInterface != 0) {
+    conf << "bondStiffnessPerInterface " << bondStiffnessPerInterface << '\n';
+  }
   conf << "dynamicUpdateNL " << dynamicUpdateNL << '\n';
   if (dynamicUpdateNL != 0) {
     conf << "dispUpdateNL " << dispUpdateNL << '\n';
@@ -556,12 +570,36 @@ void Rockable::saveConf(const char* fname) {
   for (size_t i = 0; i < Particles.size(); i++) {
     conf << Particles[i].shape->name << ' ' << Particles[i].group << ' ' << Particles[i].cluster << ' '
          << Particles[i].homothety << ' ' << Particles[i].pos << ' ' << Particles[i].vel << ' ' << Particles[i].acc
-         << ' ' << Particles[i].Q << ' ' << Particles[i].vrot << ' ' << Particles[i].arot;
-    if (useSoftParticles == 1) {
-      //conf << ' ' << Particles[i].uniformTransformation << '\n'; // FIXME J'ai du enlever ce truc (à voir...)
-      conf << '\n';
-    } else {
-      conf << '\n';
+         << ' ' << Particles[i].Q << ' ' << Particles[i].vrot << ' ' << Particles[i].arot << '\n';
+  }
+
+#ifdef ROCKABLE_ENABLE_SOFT_PARTICLES
+  if (useSoftParticles == 1) {
+    size_t nbSoft = 0;
+    for (size_t i = 0; i < Particles.size(); i++) {
+      if (Particles[i].SPP != nullptr) {
+        nbSoft++;
+      }
+    }
+    conf << "SoftParticles " << nbSoft << '\n';
+    conf << "#id young poisson shearViscosity bulkViscosity F(9) stress(9) strain(9)\n";
+    for (size_t i = 0; i < Particles.size(); i++) {
+      const auto& SPP = Particles[i].SPP;
+      if (SPP == nullptr) {
+        continue;
+      }
+      conf << i << ' ' << SPP->young << ' ' << SPP->poisson << ' ' << SPP->shearViscosity << ' '
+           << SPP->bulkViscosity << ' ' << SPP->F << ' ' << SPP->stress << ' ' << SPP->strain << '\n';
+    }
+  }
+#endif
+
+  // The spring joints, with their stiffness and their length at rest
+  if (!joints.empty()) {
+    conf << "SpringJoints " << joints.size() << '\n';
+    conf << "#ibody ipos0 jbody jpos0 stiffness l0\n";
+    for (const SpringJoint& SJ : joints) {
+      conf << SJ.ibody << ' ' << SJ.ipos0 << ' ' << SJ.jbody << ' ' << SJ.jpos0 << ' ' << SJ.K << ' ' << SJ.l0 << '\n';
     }
   }
 
@@ -589,14 +627,18 @@ void Rockable::saveConf(const char* fname) {
   for (size_t i = 0; i < Interfaces.size(); i++) {
     std::set<BreakableInterface>::iterator it = Interfaces[i].begin();
     for (; it != Interfaces[i].end(); ++it) {
-      conf << it->i << ' ' << it->j << "  " << it->concernedBonds.size() << ' ' << it->dn0;
+      const int prec = CommBox().precision;
+      conf << it->i << ' ' << it->j << "  " << it->concernedBonds.size() << ' ' << it->dn0 << ' '
+           << fmt::format("{:.{}e}", it->area, prec);
       if (paramsInInterfaces == 1) {
         conf << ' ' << it->kn << ' ' << it->kt << ' ' << it->kr << ' ' << it->fn0 << ' ' << it->ft0 << ' ' << it->mom0
              << ' ' << it->power << ' ' << it->Gc << ' ';
       }
       for (size_t b = 0; b < it->concernedBonds.size(); ++b) {
-        conf << "  " << it->concernedBonds[b]->type << ' ' << it->concernedBonds[b]->isub << ' '
-             << it->concernedBonds[b]->jsub;
+        const Interaction* I = it->concernedBonds[b];
+        conf << "  " << I->type << ' ' << I->isub << ' ' << I->jsub << ' '
+             << fmt::format("{:.{}e} {:.{}e} {:.{}e} {:.{}e}", I->dn0, prec, I->ds.x, prec, I->ds.y, prec, I->ds.z,
+                            prec);
       }
       conf << '\n';
     }
@@ -669,6 +711,7 @@ void Rockable::initParser() {
   };
   parser.kwMap["gravity"] = __GET__(conf, gravity);
   parser.kwMap["ParamsInInterfaces"] = __GET__(conf, paramsInInterfaces);
+  parser.kwMap["bondStiffnessPerInterface"] = __GET__(conf, bondStiffnessPerInterface);
   parser.kwMap["dynamicUpdateNL"] = __GET__(conf, dynamicUpdateNL);
   parser.kwMap["dispUpdateNL"] = __GET__(conf, dispUpdateNL);
   parser.kwMap["angleUpdateNL"] = __DO__(conf) {
@@ -706,17 +749,153 @@ void Rockable::initParser() {
 #endif
 
 #ifdef ROCKABLE_ENABLE_SOFT_PARTICLES
+  // All the free particles (not driven) become soft, with the same material
   parser.kwMap["useSoftParticles"] = __DO__(conf) {
-    useSoftParticles = 1;
-    double Y, P;
-    conf >> Y >> P;
-    Cinv.set(Y, P);
+    double Young, Poisson;
+    conf >> Young >> Poisson;
+    if (Particles.empty()) {
+      Logger::warn("useSoftParticles must be placed after the particles; it is ignored");
+      return;
+    }
+    for (size_t i = nDriven; i < Particles.size(); i++) {
+      setSoftParticle(i, Young, Poisson);
+    }
+    Logger::info("{} soft particles (E = {}, nu = {})", Particles.size() - nDriven, Young, Poisson);
+  };
+  // A list of particles (identified by their ID) become soft, with the same material
+  parser.kwMap["defineElasticParticles"] = __DO__(conf) {
+    double Young, Poisson;
+    size_t nb;
+    conf >> Young >> Poisson >> nb;
+    for (size_t i = 0; i < nb; i++) {
+      size_t id;
+      conf >> id;
+      if (id >= Particles.size()) {
+        Logger::warn("defineElasticParticles: there is no particle with ID {}", id);
+        continue;
+      }
+      setSoftParticle(id, Young, Poisson);
+    }
+    Logger::info("{} soft particles (E = {}, nu = {})", nb, Young, Poisson);
+  };
+  // Viscoelastic (Kelvin-Voigt) soft particles, with given shear and bulk viscosities.
+  // The particles have to be made soft before.
+  parser.kwMap["defineViscousParameters"] = __DO__(conf) {
+    double ShearVis, BulkVis;
+    size_t nb;
+    conf >> ShearVis >> BulkVis >> nb;
+    for (size_t i = 0; i < nb; i++) {
+      size_t id;
+      conf >> id;
+      if (id >= Particles.size() || Particles[id].SPP == nullptr) {
+        Logger::warn("defineViscousParameters: the particle {} is not a soft particle", id);
+        continue;
+      }
+      Particles[id].SPP->setViscosity(ShearVis, BulkVis);
+    }
+    Logger::info("{} viscoelastic particles (shear viscosity = {}, bulk viscosity = {})", nb, ShearVis, BulkVis);
+  };
+  // Viscoelastic soft particles, with a viscosity proportional to the stiffness (D = tau C).
+  // The particles have to be made soft before.
+  parser.kwMap["defineViscousTime"] = __DO__(conf) {
+    double tau;
+    size_t nb;
+    conf >> tau >> nb;
+    for (size_t i = 0; i < nb; i++) {
+      size_t id;
+      conf >> id;
+      if (id >= Particles.size() || Particles[id].SPP == nullptr) {
+        Logger::warn("defineViscousTime: the particle {} is not a soft particle", id);
+        continue;
+      }
+      Particles[id].SPP->setViscousTime(tau);
+    }
+    Logger::info("{} viscoelastic particles (tau = {})", nb, tau);
+  };
+  // All the soft particles become viscoelastic, with D = tau C
+  parser.kwMap["useViscousTime"] = __DO__(conf) {
+    double tau;
+    conf >> tau;
+    size_t nb = 0;
+    for (size_t i = 0; i < Particles.size(); i++) {
+      if (Particles[i].SPP != nullptr) {
+        Particles[i].SPP->setViscousTime(tau);
+        nb++;
+      }
+    }
+    if (nb == 0) {
+      Logger::warn("useViscousTime: there is no soft particle (it has to be placed after useSoftParticles)");
+    }
+    Logger::info("{} viscoelastic particles (tau = {})", nb, tau);
+  };
+  // The state of the soft particles, as saved in the conf-files
+  parser.kwMap["SoftParticles"] = __DO__(conf) {
+    size_t nb;
+    conf >> nb;
+    for (size_t i = 0; i < nb; i++) {
+      std::string token;
+      conf >> token;
+      if (token[0] == '#') {  // a commented line
+        getline(conf, token);
+        --i;
+        continue;
+      }
+      size_t id = std::stoul(token);
+
+      // The viscosities were not written by the first version of this section,
+      // so the number of values on the line tells which version it is
+      std::string line;
+      getline(conf, line);
+      std::istringstream is(line);
+      std::vector<double> values;
+      double value;
+      while (is >> value) {
+        values.push_back(value);
+      }
+      if (values.size() != 29 && values.size() != 31) {
+        Logger::warn("SoftParticles: unexpected number of values for the particle {}", id);
+        continue;
+      }
+      setSoftParticle(id, values[0], values[1]);
+      size_t k = 2;
+      if (values.size() == 31) {
+        Particles[id].SPP->setViscosity(values[2], values[3]);
+        k = 4;
+      }
+      std::istringstream rest(line);
+      for (size_t skip = 0; skip < k; skip++) {
+        rest >> value;
+      }
+      rest >> Particles[id].SPP->F >> Particles[id].SPP->stress >> Particles[id].SPP->strain;
+    }
+  };
+  // Deformation gradients written by the first versions of the soft particles (rockable-deformable).
+  // The material is not part of it: defineElasticParticles has to come after.
+  parser.kwMap["Transformations"] = __DO__(conf) {
+    size_t nb;
+    conf >> nb;
+    for (size_t i = 0; i < nb; i++) {
+      size_t id;
+      mat9r F;
+      conf >> id >> F;
+      if (Particles[id].SPP == nullptr) {
+        Particles[id].SPP.create();
+        useSoftParticles = 1;
+      }
+      Particles[id].SPP->F = F;
+    }
   };
 #else
   auto SOFT_PARTICLES_NOT_ENABLED = __DO__(conf) {
     std::cout << "!!!!!! SOFT_PARTICLES_NOT_ENABLED when Rockable was compiled" << std::endl;
+    std::string trash;
+    getline(conf, trash);
   };
   parser.kwMap["useSoftParticles"] = SOFT_PARTICLES_NOT_ENABLED;
+  parser.kwMap["defineElasticParticles"] = SOFT_PARTICLES_NOT_ENABLED;
+  parser.kwMap["defineViscousParameters"] = SOFT_PARTICLES_NOT_ENABLED;
+  parser.kwMap["defineViscousTime"] = SOFT_PARTICLES_NOT_ENABLED;
+  parser.kwMap["useViscousTime"] = SOFT_PARTICLES_NOT_ENABLED;
 #endif
 
   parser.kwMap["numericalDampingCoeff"] = __GET__(conf, numericalDampingCoeff);
@@ -795,6 +974,27 @@ void Rockable::initParser() {
     SJ.init(Particles, stiffness);
     joints.push_back(SJ);
   };
+  // The spring joints as saved in the conf-files (the length at rest is not recomputed)
+  parser.kwMap["SpringJoints"] = __DO__(conf) {
+    size_t nb;
+    conf >> nb;
+    joints.clear();
+    for (size_t k = 0; k < nb; ++k) {
+      std::string token;
+      conf >> token;
+      if (token[0] == '#') {  // a commented line
+        getline(conf, token);
+        --k;
+        continue;
+      }
+      size_t ibody = std::stoul(token), jbody;
+      vec3r ipos0, jpos0;
+      conf >> ipos0 >> jbody >> jpos0;
+      SpringJoint SJ(ibody, jbody, ipos0, jpos0);
+      conf >> SJ.K >> SJ.l0;
+      joints.push_back(SJ);
+    }
+  };
 
   parser.kwMap["AddOrRemoveInteractions"] = __DO__(conf) {
     std::string Name;
@@ -828,7 +1028,8 @@ void Rockable::initParser() {
     size_t g1, g2;
     double viscRate;
     conf >> g1 >> g2 >> viscRate;
-    double en2 = exp(-viscRate * Mth::pi / sqrt(1.0 - viscRate * viscRate));
+    // e_n = exp(-alpha pi / sqrt(1 - alpha^2)), and the table holds e_n^2
+    double en2 = exp(-2.0 * viscRate * Mth::pi / sqrt(1.0 - viscRate * viscRate));
     dataTable.set(idEn2Contact, g1, g2, en2);
   };
   parser.kwMap["ktContact"] = __DO__(conf) { readLawData(conf, idKtContact); };
@@ -914,13 +1115,14 @@ void Rockable::initParser() {
         continue;
       }
       conf >> P.group >> P.cluster >> P.homothety >> P.pos >> P.vel >> P.acc >> P.Q >> P.vrot >> P.arot;
-      if (useSoftParticles == 1) {
-        // conf >> P.uniformTransformation;
-      } else {
-        // P.uniformTransformation = mat9r::unit();
-      }
 
-      P.shape = &(Shapes[shapeId[shpName]]);  // Plug to the shape
+      auto foundShape = shapeId.find(shpName);
+      if (foundShape == shapeId.end()) {
+        Logger::error("@Rockable::loadConf, the shape named '{}' is not in the shape library '{}'", shpName,
+                      shapeFile);
+        exit(-1);
+      }
+      P.shape = &(Shapes[foundShape->second]);  // Plug to the shape
       double h = P.homothety;
       P.mass = (h * h * h * P.shape->volume) * properties.get(idDensity, P.group);
       P.inertia = (h * h * P.shape->inertia_mass) * P.mass;
@@ -971,6 +1173,8 @@ void Rockable::initParser() {
       Interfaces[i].clear();
     }
 
+    breakableInterfaces.clear();
+
     for (size_t k = 0; k < nbInterf; ++k) {
       Interaction ItoFind;
       BreakableInterface BI;
@@ -980,13 +1184,41 @@ void Rockable::initParser() {
       ItoFind.j = BI.j;
       BI.concernedBonds.resize(nbBonds);
 
+      // The rest of the line is 'area [params] (type isub jsub dn0 ds) for each bond'.
+      // The conf-files written before (with neither area nor dn0 and ds) hold 'type isub jsub' for each bond.
+      // The number of values on the line tells which version it is.
+      std::string line;
+      getline(conf, line);
+      std::istringstream is(line);
+      size_t nbValues = 0;
+      std::string trash;
+      while (is >> trash) {
+        nbValues++;
+      }
       if (paramsInInterfaces == 1) {
-        conf >> BI.kn >> BI.kt >> BI.kr >> BI.fn0 >> BI.ft0 >> BI.mom0 >> BI.power >> BI.Gc;
+        nbValues -= 8;
+      }
+      bool fullBonds = (nbValues == 1 + 7 * nbBonds);
+      if (!fullBonds && nbValues != 3 * nbBonds) {
+        Logger::warn("Interfaces: unexpected number of values for the interface between {} and {}", BI.i, BI.j);
+      }
+      std::istringstream rest(line);
+      if (fullBonds) {
+        rest >> BI.area;
+      }
+
+      if (paramsInInterfaces == 1) {
+        rest >> BI.kn >> BI.kt >> BI.kr >> BI.fn0 >> BI.ft0 >> BI.mom0 >> BI.power >> BI.Gc;
       }
 
       bool missed = false;
+      std::vector<double> bondDn0(nbBonds, BI.dn0);
+      std::vector<vec3r> bondDs(nbBonds);
       for (size_t u = 0; u < nbBonds; ++u) {
-        conf >> ItoFind.type >> ItoFind.isub >> ItoFind.jsub;
+        rest >> ItoFind.type >> ItoFind.isub >> ItoFind.jsub;
+        if (fullBonds) {
+          rest >> bondDn0[u] >> bondDs[u];
+        }
         std::set<Interaction>::iterator it = Interactions[ItoFind.i].find(ItoFind);
         if (it != Interactions[ItoFind.i].end()) {
           BI.concernedBonds[u] = const_cast<Interaction*>(std::addressof(*it));
@@ -1001,7 +1233,19 @@ void Rockable::initParser() {
         BreakableInterface* ptr =
             const_cast<BreakableInterface*>(std::addressof(*((Interfaces[BI.i].insert(BI)).first)));
         for (size_t i = 0; i < BI.concernedBonds.size(); i++) {
-          ptr->concernedBonds[i]->stick = ptr;
+          Interaction* I = ptr->concernedBonds[i];
+          I->stick = ptr;
+          I->dn0 = bondDn0[i];
+          I->ds = bondDs[i];
+          // The viscous part of ft, as computed by the force law at the last step
+          I->ftv = I->damp * (I->vel - (I->vel * I->n) * I->n);
+        }
+        if (!fullBonds) {
+          ptr->computeAreaFromConcernedBonds();  // from the current positions of the bonds
+        }
+        // As done by stickBCM, so that the interface can break
+        if (optionNames["forceLaw"] == "BCM") {
+          breakableInterfaces.insert(ptr);
         }
       }
     }
@@ -1141,7 +1385,18 @@ void Rockable::loadConf(const char* a_name) {
   // mainly used to compute resultant forces and moments on the particles.
   // It will also populate the vector 'activeInteractions'.
   if (interactiveMode == false) {
+    // The state read in the conf-file must not be changed by this fake step, otherwise a computation restarted
+    // from a conf-file would not follow the uninterrupted one. With a zero time step, the force laws compute the
+    // forces of this state without adding an increment to the tangential forces, moments and displacements.
+    // The deformation of the soft particles is not updated either.
+    double dtSaved = dt;
+    double dt_2Saved = dt_2;
+    dt = dt_2 = 0.0;
+    freezeSoftParticles = true;
     accelerations();
+    freezeSoftParticles = false;
+    dt = dtSaved;
+    dt_2 = dt_2Saved;
 #ifdef ROCKABLE_ENABLE_PERIODIC
     if (usePeriodicCell == 1) {
       realToReducedKinematics();
@@ -1864,6 +2119,19 @@ void Rockable::initIntegrator() {
       Particles[i].RK4Data = std::make_shared<RK4MoreData>();
     }
   }
+
+#ifdef ROCKABLE_ENABLE_SOFT_PARTICLES
+  // The viscoelastic strain is integrated over dt each time the accelerations are computed,
+  // which happens more than once per time step with these integrators
+  if (optionNames["Integrator"] == "Beeman" || optionNames["Integrator"] == "RungeKutta4") {
+    for (size_t i = 0; i < Particles.size(); ++i) {
+      if (Particles[i].SPP != nullptr && Particles[i].SPP->useVisco) {
+        Logger::warn("The viscoelastic soft particles are only correct with the integrators Euler and velocityVerlet");
+        break;
+      }
+    }
+  }
+#endif
 }
 
 /**
@@ -1888,24 +2156,28 @@ void Rockable::velocityControlledDrive() {
       case _xrot_Vel_: {
         size_t i = System.controls[c].i;
         vec3r vrot(System.controls[c].value, 0.0, 0.0);
+        Particles[i].vrot.x = System.controls[c].value;  // used by the contacts (velocity at the contact point)
         Particles[i].Q += ((Particles[i].Q.dot(vrot)) *= dt);
         Particles[i].Q.normalize();
       } break;
       case _yrot_Vel_: {
         size_t i = System.controls[c].i;
         vec3r vrot(0.0, System.controls[c].value, 0.0);
+        Particles[i].vrot.y = System.controls[c].value;  // used by the contacts (velocity at the contact point)
         Particles[i].Q += ((Particles[i].Q.dot(vrot)) *= dt);
         Particles[i].Q.normalize();
       } break;
       case _zrot_Vel_: {
         size_t i = System.controls[c].i;
         vec3r vrot(0.0, 0.0, System.controls[c].value);
+        Particles[i].vrot.z = System.controls[c].value;  // used by the contacts (velocity at the contact point)
         Particles[i].Q += ((Particles[i].Q.dot(vrot)) *= dt);
         Particles[i].Q.normalize();
       } break;
       case _xyzrot_Vel_: {
         size_t i = System.controls[c].i;
         vec3r vrot = System.controls[c].vec_value;
+        Particles[i].vrot = vrot;  // used by the contacts (velocity at the contact point)
         Particles[i].Q += ((Particles[i].Q.dot(vrot)) *= dt);
         Particles[i].Q.normalize();
       } break;
@@ -2783,30 +3055,6 @@ void Rockable::incrementResultants(Interaction& I) {
   vec3r Cj = (I.pos - (Particles[I.j].pos + I.jPeriodicShift));
   Particles[I.i].moment += cross(Ci, f) + I.mom;
   Particles[I.j].moment += cross(Cj, -f) - I.mom;
-
-  if (useSoftParticles == 1) {
-    /*
-    Particles[I.i].stress.xx += f.x * Ci.x;
-    Particles[I.i].stress.xy += f.x * Ci.y;
-    Particles[I.i].stress.xz += f.x * Ci.z;
-    Particles[I.i].stress.yx += f.y * Ci.x;
-    Particles[I.i].stress.yy += f.y * Ci.y;
-    Particles[I.i].stress.yz += f.y * Ci.z;
-    Particles[I.i].stress.zx += f.z * Ci.x;
-    Particles[I.i].stress.zy += f.z * Ci.y;
-    Particles[I.i].stress.zz += f.z * Ci.z;
-
-    Particles[I.j].stress.xx -= f.x * Cj.x;
-    Particles[I.j].stress.xy -= f.x * Cj.y;
-    Particles[I.j].stress.xz -= f.x * Cj.z;
-    Particles[I.j].stress.yx -= f.y * Cj.x;
-    Particles[I.j].stress.yy -= f.y * Cj.y;
-    Particles[I.j].stress.yz -= f.y * Cj.z;
-    Particles[I.j].stress.zx -= f.z * Cj.x;
-    Particles[I.j].stress.zy -= f.z * Cj.y;
-    Particles[I.j].stress.zz -= f.z * Cj.z;
-    */
-  }
 }
 
 #ifdef ROCKABLE_ENABLE_PERIODIC
@@ -2897,7 +3145,6 @@ void Rockable::initialise_particle_forces_and_moments() {
     Particles[i].acc.reset();
     Particles[i].moment.reset();
     Particles[i].arot.reset();
-    // Particles[i].stress.reset();
   }
 #ifdef ROCKABLE_ENABLE_PERIODIC
   if (usePeriodicCell == 1) {
@@ -3300,6 +3547,65 @@ void Rockable::compute_resultants() {
 #endif
 }
 
+#ifdef ROCKABLE_ENABLE_SOFT_PARTICLES
+/**
+ * Makes the particle id soft (or changes its material if it is already soft).
+ * The current deformation of the particle, if any, is kept.
+ */
+void Rockable::setSoftParticle(size_t id, double Young, double Poisson) {
+  if (Particles[id].SPP == nullptr) {
+    Particles[id].SPP.create();
+  }
+  Particles[id].SPP->setElasticity(Young, Poisson);
+  useSoftParticles = 1;
+}
+
+/**
+ * Computes the mean stress in the soft particles from the forces of the active interactions,
+ * and updates their deformation gradient accordingly.
+ *
+ * The stress is computed in a separate loop (rather than when the resultants are incremented)
+ * so that it is the same whatever the parallel mode.
+ */
+void Rockable::compute_SoftParticles_transformation() {
+  START_TIMER("compute_SoftParticles_transformation");
+
+  for (size_t i = 0; i < Particles.size(); i++) {
+    if (Particles[i].SPP != nullptr) {
+      Particles[i].SPP->stressSum.reset();
+    }
+  }
+
+  for (size_t k = 0; k < activeInteractions.size(); ++k) {
+    Interaction& I = *activeInteractions[k];
+    if (I.dn >= 0.0 && I.stick == nullptr) {
+      continue;
+    }
+    Particle& Pi = Particles[I.i];
+    Particle& Pj = Particles[I.j];
+    if (Pi.SPP == nullptr && Pj.SPP == nullptr) {
+      continue;
+    }
+    vec3r f = I.fn * I.n + I.ft;
+    if (Pi.SPP != nullptr) {
+      Pi.SPP->stressSum += dyadic_product(f, I.pos - Pi.pos);
+    }
+    if (Pj.SPP != nullptr) {
+      Pj.SPP->stressSum -= dyadic_product(f, I.pos - (Pj.pos + I.jPeriodicShift));
+    }
+  }
+
+#pragma omp parallel for default(shared)
+  for (size_t i = 0; i < Particles.size(); i++) {
+    if (Particles[i].SPP == nullptr) {
+      continue;
+    }
+    double h = Particles[i].homothety;
+    Particles[i].SPP->updateTransformation(Particles[i].Q, h * h * h * Particles[i].shape->volume, dt);
+  }
+}
+#endif
+
 /**
  * Compute the SpringJoints for the Rockable object.
  *
@@ -3327,6 +3633,17 @@ void Rockable::compute_SpringJoints() {
   }
 }
 
+/**
+ * Weight applied to the stiffnesses of a bond (BCM): 1 when they are given for each bond,
+ * or 1 / (number of bonds) when they are given for the whole interface (bondStiffnessPerInterface 1).
+ */
+double Rockable::bondStiffnessWeight(const BreakableInterface* BI) const {
+  if (bondStiffnessPerInterface == 1 && BI != nullptr && !BI->concernedBonds.empty()) {
+    return 1.0 / static_cast<double>(BI->concernedBonds.size());
+  }
+  return 1.0;
+}
+
 void Rockable::check_breakage_of_interfaces() {
   START_TIMER("check_breakage_of_interfaces");
 
@@ -3341,7 +3658,12 @@ void Rockable::check_breakage_of_interfaces() {
       int g1 = Particles[BI->i].group;
       int g2 = Particles[BI->j].group;
 
-      if (BI->isInner == true) {
+      // Same parameters as in the force law (BCM)
+      if (paramsInInterfaces == 1) {
+        kn = BI->kn;
+        kt = BI->kt;
+        Gc = BI->Gc;
+      } else if (BI->isInner == true) {
         kn = dataTable.get(idKnInnerBond, g1, g2);
         kt = dataTable.get(idKtInnerBond, g1, g2);
         Gc = dataTable.get(idGcInnerBond, g1, g2);
@@ -3350,14 +3672,17 @@ void Rockable::check_breakage_of_interfaces() {
         kt = dataTable.get(idKtOuterBond, g1, g2);
         Gc = dataTable.get(idGcOuterBond, g1, g2);
       }
+      double weight = bondStiffnessWeight(BI);
+      kn *= weight;
+      kt *= weight;
 
       BI->En = 0.0;
       BI->Et = 0.0;
       for (size_t b = 0; b < BI->concernedBonds.size(); ++b) {
         Interaction* I = BI->concernedBonds[b];
 
-        if (I->dn > BI->dn0) {  // FIXME: there should be one dn0 per bond BI->dn0[b]
-          BI->En += 0.5 * kn * (I->dn - BI->dn0) * (I->dn - BI->dn0);
+        if (I->dn > I->dn0) {  // only the bonds in tension store energy
+          BI->En += 0.5 * kn * (I->dn - I->dn0) * (I->dn - I->dn0);
         }
         BI->Et += 0.5 * kt * norm2(I->ds);
       }
@@ -3393,6 +3718,9 @@ void Rockable::breakage_of_interfaces() {
 
     for (size_t b = 0; b < (*BI)->concernedBonds.size(); ++b) {  // concernedBonds includes the current bond
       (*BI)->concernedBonds[b]->stick = nullptr;                 // it unplugs the interface from the interaction
+      (*BI)->concernedBonds[b]->dn0 = 0.0;
+      (*BI)->concernedBonds[b]->ft -= (*BI)->concernedBonds[b]->ftv;  // a contact has no viscous part in ft
+      (*BI)->concernedBonds[b]->ftv.reset();
       if ((*BI)->concernedBonds[b]->dn >= 0.0) {
         (*BI)->concernedBonds[b]->fn = 0.0;
         (*BI)->concernedBonds[b]->ft.reset();
@@ -3722,21 +4050,9 @@ void Rockable::accelerations() {
   compute_SpringJoints();
 
 #ifdef ROCKABLE_ENABLE_SOFT_PARTICLES
-  /*
-  // compute_SoftParticles_transformation();
-  if (useSoftParticles == 1) {
-    // pour le moment on code en dure la loi. ***** DEVEL
-
-    for (size_t i = 0; i < Particles.size(); i++) {
-      double volume =  (Particles[i].homothety * Particles[i].homothety *
-                                                                  Particles[i].homothety * Particles[i].shape->volume);
-      Particles[i].stress /= volume;
-      Particles[i].stress.symmetrize();
-      // mat9r strain = Cinv.getStrain(Particles[i].stress);
-      Particles[i].uniformTransformation = mat9r::unit();  // + strain;
-    }
+  if (useSoftParticles == 1 && freezeSoftParticles == false) {
+    compute_SoftParticles_transformation();
   }
-  */
 #endif
 
   check_breakage_of_interfaces();
@@ -3963,7 +4279,7 @@ void Rockable::numericalDamping() {
 #ifdef COMPONENTWISE_NUM_DAMPING
     // Translation
     for (int c = 0; c < 3; ++c) {
-      factor = (Particles[i].force[c] * Particles[i].vel[c] > 0.0) ? factorMinus : factorPlus;
+      factor = (Particles[i].force[c] * vel[c] > 0.0) ? factorMinus : factorPlus;
       Particles[i].force[c] *= factor;
     }
 
@@ -3974,7 +4290,7 @@ void Rockable::numericalDamping() {
     }
 #else
     // Translation
-    factor = (Particles[i].force * Particles[i].vel > 0.0) ? factorMinus : factorPlus;
+    factor = (Particles[i].force * vel > 0.0) ? factorMinus : factorPlus;
     Particles[i].force *= factor;
 
     // Rotation

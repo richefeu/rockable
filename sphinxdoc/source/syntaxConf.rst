@@ -13,10 +13,11 @@ The conf-files are the files that hold the whole configuration at a given time. 
 Header
 ------
 
-A conf-file always starts with the following header format: ``Rockable dd-mm-yyyy`` (e.g., ``Rockable 29-11-2018``). 
+A conf-file always starts with the following header format: ``Rockable dd-mm-yyyy`` (e.g., ``Rockable 21-08-2022``). 
 The header includes the date (``dd-mm-yyyy``) corresponding to the version of the format. 
 Whenever a noticeable change is made in the format, the date in the header is updated to reflect the new version. 
-The version date is defined in the preprocessor define of ``CONF_VERSION_DATE`` in the source code.
+The version date is defined in the preprocessor define of ``CONF_VERSION_DATE`` in the source code (``21-08-2022`` at present).
+A file with another date is still read, with a warning: in most cases, this is not a problem.
 
 
 Keywords
@@ -100,8 +101,8 @@ Available options
 ~~~~~~~~~~~~~~~~~
 
 ``DefaultParallelMode``
-    Uses the default execution strategy defined by Rockable.  
-    Typically mapped to the most stable or recommended mode depending on the build configuration.
+    The default. The forces of the active interactions are computed in
+    parallel, and the resultants on the bodies are then summed sequentially.
 
 ``InteractionBuffer``
     Uses an intermediate buffer to store interactions before applying updates.  
@@ -123,7 +124,9 @@ Input keyword
 
 The input parameter ``parallel_mode`` is parsed from string values.
 
-Accepted keywords are **exactly identical** to the enum names:
+Accepted keywords are **exactly identical** to the enum names (``Default`` is also
+accepted for ``DefaultParallelMode``). An unknown name silently selects
+``DefaultParallelMode``.
 
 - ``DefaultParallelMode``
 - ``InteractionBuffer``
@@ -134,7 +137,7 @@ Accepted keywords are **exactly identical** to the enum names:
 Example
 ~~~~~~~
 
-.. code-block:: yaml
+.. code-block:: text
 
     parallel_mode WaveMethodBlock
 
@@ -149,7 +152,7 @@ The format described here can be used as both input and output of a simulation.
 
   Elapsed time between each backup of the configuration.
 
-- ``iconf`` (*double*) **value**
+- ``iconf`` (*int*) **value**
 
   Number of the current configuration. This number is used to name the conf-file.
 
@@ -206,6 +209,15 @@ Particles
   (*string*)shapeName (*int*) **group** (*int*) **cluster** (*double*) **homothety** (*vec3r*) **position** 
   (*vec3r*) **velocity** (*vec3r*) **acceleration** (*quat*) **angularPosition** (*vec3r*) **angularVelocity** 
   (*vec3r*) **angularAcceleration**
+
+- ``SoftParticles`` (*int*) **numberOfSoftParticles**
+
+  Written after the particles when some of them are soft (deformable). The
+  following entries are repeated for each soft particle, on one line:
+  (*int*) **id** (*double*) **young** (*double*) **poisson**
+  (*double*) **shearViscosity** (*double*) **bulkViscosity**
+  (*mat9r*) **F** (*mat9r*) **stress** (*mat9r*) **strain**.
+  The viscosities are zero for an elastic particle. See :ref:`softParticles`.
 
 
 Interactions
@@ -327,14 +339,26 @@ Interfaces and bonds
 
   Opens the list of glued interfaces. Each entry holds, on one line:
 
-  ``<i> <j> <nbBonds> <dn0>``
+  ``<i> <j> <nbBonds> <dn0> <area>``
 
   then, only when ``ParamsInInterfaces`` is 1,
 
   ``<kn> <kt> <kr> <fn0> <ft0> <mom0> <power> <Gc>``
 
-  and finally ``nbBonds`` triplets ``<type> <isub> <jsub>`` identifying the
-  bonded sub-interactions among those already read in ``Interactions``.
+  and finally, for each of the ``nbBonds`` bonds, ``<type> <isub> <jsub>``,
+  identifying the bonded sub-interaction among those already read in
+  ``Interactions``, followed by ``<dn0> <ds>``: the normal distance of the bond
+  when it was created (it carries no normal force there, see
+  :ref:`Force-laws`) and its cumulated tangential displacement (*vec3r*), used
+  by the breakage criterion. The ``area`` of the interface is used by the same
+  criterion.
+
+  .. note::
+
+     The conf-files written before these values were saved (with neither
+     ``area`` nor the bond ``dn0`` and ``ds``) are still read: the bonds then
+     take the ``dn0`` of their interface, and the area is computed from the
+     positions of the bonds.
 
   .. warning::
 
@@ -342,17 +366,41 @@ Interfaces and bonds
      warning and the **whole interface** is dropped. This is why ``Interactions``
      must be read before ``Interfaces``.
 
+- ``bondStiffnessPerInterface`` (*int*) **0|1**
+
+  With the force law ``BCM``, the bond stiffnesses (``knInnerBond``,
+  ``ktInnerBond``, and their ``Outer`` counterparts) are given for **each bond**
+  (0, the default), or for the **whole interface** (1). In the latter case, each
+  of the ``n`` bonds of an interface takes ``1/n`` of the stiffness, and the
+  breakage energy and the damping of the bonds follow. The keyword is written in
+  the conf-files only when it is not 0.
+
 - ``glue_with_walls`` (*string*) **yes|no**
 
-  When set to yes, the sticking pre-processing commands also glue the free
-  bodies to the driven ones. Accepted affirmative forms are ``yes``, ``YES``,
-  ``y``, ``Y`` and ``1``.
+  When set to yes, the pre-processing commands ``stickClusters`` and
+  ``stickVerticesInClustersMoments`` also glue the free bodies to the driven
+  ones. Accepted affirmative forms are ``yes``, ``YES``, ``y``, ``Y`` and ``1``.
+
+  .. note::
+
+     ``stickVerticesInClusters`` and ``stickBCM`` ignore this keyword: they
+     only glue free bodies together, never a free body to a driven one.
 
 - ``initSpringJoint`` (*int*) **ibody** (*vec3r*) **ipos0** (*int*) **jbody** (*vec3r*) **jpos0** (*double*) **stiffness**
 
   Add a linear spring joining two bodies. The anchor points ``ipos0`` and
   ``jpos0`` are given in the **body frames**, so they follow the bodies as they
-  rotate. Unlike an interface, a spring joint never breaks.
+  rotate. The length of the spring at rest is the distance between the two
+  anchors when the keyword is read. Unlike an interface, a spring joint never
+  breaks.
+
+- ``SpringJoints`` (*int*) **numberOfJoints**
+
+  The spring joints, as written in the conf-files, one per line:
+  (*int*) **ibody** (*vec3r*) **ipos0** (*int*) **jbody** (*vec3r*) **jpos0**
+  (*double*) **stiffness** (*double*) **l0**, where **l0** is the length at
+  rest. A computation restarted from a conf-file therefore keeps its springs
+  unchanged.
 
 
 Interaction parameters
@@ -429,8 +477,9 @@ A bond is **inner** when the two bodies share the same ``cluster`` number, and
 - ``preventCrossingLength`` (*double*) **value**
 
   When strictly positive, stiffens the normal repulsion at large overlap, to
-  prevent bodies from crossing each other. It is written in the conf-files only
-  when it is non-zero.
+  prevent bodies from crossing each other: with the force laws ``Default`` and
+  ``GeoVisc``, the elastic normal force is multiplied by :math:`L / (L + d_n)`,
+  capped at 100. It is written in the conf-files only when it is non-zero.
 
 
 Time-dependent parameters
@@ -498,10 +547,13 @@ corresponding CMake option. Otherwise they are accepted but print a message
 saying the feature was not enabled; see :ref:`commandLine`.
 
 - Periodic cell: ``usePeriodicCell``, ``h``, ``vh``, ``ah``, ``mh``, ``dh``,
-  ``cellVelocityCorrection``, ``cellMomentumCorrection``, ``useKineticStress``.
+  ``cellVelocityCorrection``, ``cellMomentumCorrection``, ``useKineticStress``,
+  ``cellRelattice``, ``cellDriveCauchy``.
   See :ref:`periodicBoundaryConditions`.
 
-- Deformable particles: ``useSoftParticles``. See :ref:`softParticles`.
+- Deformable particles: ``useSoftParticles``, ``defineElasticParticles``,
+  ``defineViscousParameters``, ``defineViscousTime``, ``useViscousTime``, and the
+  sections ``SoftParticles`` and ``Transformations``. See :ref:`softParticles`.
 
 
 Deprecated keywords

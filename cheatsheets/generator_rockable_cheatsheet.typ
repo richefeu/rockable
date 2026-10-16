@@ -69,16 +69,15 @@
   A global transformation is carried along the script and applied by the packing
   commands when they place the particles.
 
-  - #command("tranformation:add_translation <x> <y> <z>")
-  - #command("tranformation:add_rotation <x> <y> <z> <angle_deg>") ~Rotation of
+  - #command("transformation:add_translation <x> <y> <z>")
+  - #command("transformation:add_rotation <x> <y> <z> <angle_deg>") ~Rotation of
     `angle_deg` degrees around the axis $(x, y, z)$.
-  - #command("tranformation:reset") ~Back to identity.
-  - #command("tranformation:reset_translation") /
-    #command("tranformation:reset_rotation") ~Reset only one part.
+  - #command("transformation:reset") ~Back to identity.
+  - #command("transformation:reset_translation") /
+    #command("transformation:reset_rotation") ~Reset only one part.
 
-  #note[Mind the spelling: the keyword really is `tranformation:`, without the
-  first `s`. `transformation:...` is silently ignored (with an "unknown token"
-  message).]
+  #note[The old spelling `tranformation:...`, without the first `s`, is still
+  accepted.]
 ])
 
 = Generating shapes
@@ -114,10 +113,44 @@
   - #command("generatePacking:grid <name> <ox> <oy> <oz> <bx> <by> <bz> <nx> <ny> <nz> <group> <cluster> <homothety> <randQ>")
     ~Fill a box of size $(b_x, b_y, b_z)$ from the origin $(o_x, o_y, o_z)$ with
     a regular $n_x times n_y times n_z$ grid. `randQ` set to `1` gives random
-    orientations.
-  - #command("generatePacking:grid_clust <...>") ~Same arguments, but each
-    particle gets its own incrementing cluster index.
-  - #command("generatePacking:RandomClosePacking <...>") ~See below.
+    orientations. Each particle gets its own cluster, numbered from `cluster`.
+  - #command("generatePacking:grid_clust <...>") ~Same arguments, but all the
+    particles get the same cluster: they form one body once glued.
+  - #command("generatePacking:grid_inside <shapeFile> <cutter> <h> <...>")
+    ~A grid (same arguments as `grid` after the three first ones) cut by a
+    shape: only the positions inside the shape `cutter`, of homothety `h`, are
+    kept. `grid_clust_inside`: the same cluster for all.
+  - #command("generatePacking:OBBs <...>") ~Any shape, packed without
+    overlap through its bounding box. See below.
+  - #command("generatePacking:RandomClosePacking <...>") ~Its former form.
+])
+
+= `OBBs`
+
+#concept-block(body: [
+  #command("generatePacking:OBBs <shapeFile> <names> <container> <mode> <axis> <ox> <oy> <oz> <bx> <by> <bz> <hmin> <hmax> <nb> <solidFraction> <group> <cluster> <seed>")
+
+  #kwtable(
+    command("shapeFile"), [Shape file where the OBB of each shape is read
+      (run `shapeSurvey` first).],
+    command("names"), [One shape, or several separated by commas (`Bunny,Cube`),
+      drawn at random.],
+    command("container"), [`CUBOID`, or `CYLINDER` along `axis`.],
+    command("mode"), [`RANDOM`: anywhere in the container. `STACK`: as low as
+      possible along `axis`.],
+    command("axis"), [`X`, `Y` or `Z`; the output is sorted along it.],
+    command("ox oy oz bx by bz"), [Corner and sizes of the container. A size
+      `0` along `axis`: no top.],
+    command("hmin hmax"), [Homothety range.],
+    command("nb solidFraction"), [Stop at `nb` particles, or when the boxes
+      fill this fraction of the container, or when it is full.],
+    command("group cluster"), [Group; clusters numbered from `cluster`.],
+    command("seed"), [Seed of the random draws.],
+  )
+
+  #note[The boxes fill about 0.25 to 0.3 of the volume; the particles less, by
+  the ratio of their volume to that of their box. Stabilise the packing by a
+  computation.]
 ])
 
 = `RandomClosePacking`
@@ -137,7 +170,8 @@
     command("group cluster"), [Group and cluster given to every particle.],
   )
 
-  #note[Any `boxShape` other than `CYLINDER` falls back to `CUBOID`. The
+  #note[The former form of `generatePacking:OBBs`, mode `RANDOM`, with the box
+  of the shape given by hand, centred on the particle. Any `boxShape` other than `CYLINDER` falls back to `CUBOID`. The
   homothety of each placed particle is recovered from its bounding box, so
   `xOBB`, `yOBB` and `zOBB` must describe the shape at homothety 1.]
 ])
@@ -221,11 +255,11 @@
 
   #inline("Placing an inclined plane")
   ```txt
-  tranformation:reset
-  tranformation:add_rotation 0 0 1 -30
-  tranformation:add_translation 0 0.1 0
+  transformation:reset
+  transformation:add_rotation 0 0 1 -30
+  transformation:add_translation 0 0.1 0
   generatePacking:grid Ball 0 0 0  0.1 0.1 0.1  3 3 3  1 0 1.0 0
-  tranformation:reset
+  transformation:reset
   ```
   The transformation stays in effect until it is reset, so a script that mixes
   placed and unplaced groups should reset it explicitly.

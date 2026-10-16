@@ -155,24 +155,25 @@
   - #command("d") ~Clean every shape (remove the duplicated entities).
 
   #inline("Saving")
-  - #command("s") ~Save the library back to *the file it was read from*.
+  - #command("s") ~Save the library in `mod_<file>` (the file read is kept).
   - #command("p") ~Export a sample: one particle per shape, laid out so that the
     library can be opened directly in `see`.
 
-  #note[The usual workflow after a conversion: open the library, press
-  #command("C"), then #command("s"). The simulation then starts without
-  recomputing anything.]
+  #note[The usual workflow after a conversion, without window:
+  #command("shapeSurvey shapes.shp -P shapes.shp") pre-computes the library
+  in place (the keys #command("C") then #command("s") write `mod_shapes.shp`).
+  The simulation then starts without recomputing anything.]
 ])
 
 = `stl2shape`
 
 #concept-block(body: [
-  #align(center, command("stl2shape -i <file.stl> -r <radius> [options]"))
+  #align(center, command("stl2shape -r <radius> [options] <file.stl>"))
 
   Converts a *binary* STL mesh into one shape.
 
   #kwtable(
-    command("-i, --input <string>"), [Input STL file. Required.],
+    command("<file.stl>"), [Input STL file (last argument). Required. The shape goes to `mesh.shp`.],
     command("-r, --radius <double>"), [Minkowski radius of the result. Required.],
     command("-s, --scaleFactor <double>"), [Rescale the object.],
     command("-m, --maxLength <double>"), [Maximum length (sieving size) of the
@@ -208,9 +209,9 @@
   MCnstep             50000
   ```
 
-  #note[The keyword is `MinkowskiRadius`. Some example files in the repository
-  spell it `MinskowskiRadius`, which is *not* recognised and silently leaves the
-  radius at its default.]
+  #note[The keyword is `MinkowskiRadius`. Older command files may spell it
+  `MinskowskiRadius`, which is *not* recognised and silently leaves the radius
+  at its default. `tess2shape` is not built by CMake: use its own `Makefile`.]
 
   Generating the tessellation itself:
   ```sh
